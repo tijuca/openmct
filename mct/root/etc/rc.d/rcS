@@ -1,0 +1,10 @@
+#!/bin/sh
+PATH=/bin:/sbin:/var/bin
+
+echo Mounting data
+mount -a
+
+echo Running /etc/rc.d/rcSlocal
+if [ -e /etc/rc.d/rcSlocal ]; then
+        . /etc/rc.d/rcSlocal &
+fi

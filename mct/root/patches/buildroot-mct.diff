@@ -1,0 +1,138 @@
+diff -Naru buildroot/toolchain/kernel-headers/kernel-headers.mk buildroot.mct/toolchain/kernel-headers/kernel-headers.mk
+--- buildroot/toolchain/kernel-headers/kernel-headers.mk	2005-09-30 09:15:04.000000000 +0200
++++ buildroot.mct/toolchain/kernel-headers/kernel-headers.mk	2005-09-30 11:22:38.000000000 +0200
+@@ -95,13 +95,15 @@
+ 	mkdir -p $(DL_DIR)
+ 	$(WGET) -P $(DL_DIR) $(LINUX_HEADERS_SITE)/$(LINUX_HEADERS_SOURCE)
+ 
+-$(LINUX_HEADERS_DIR)/.unpacked: $(DL_DIR)/$(LINUX_HEADERS_SOURCE)
++#$(LINUX_HEADERS_DIR)/.unpacked: $(DL_DIR)/$(LINUX_HEADERS_SOURCE)
++$(LINUX_HEADERS_DIR)/.unpacked: 
+ 	rm -rf $(LINUX_HEADERS_DIR)
+ 	mkdir -p $(TOOL_BUILD_DIR)
+-	bzcat $(DL_DIR)/$(LINUX_HEADERS_SOURCE) | tar -C $(TOOL_BUILD_DIR) $(TAR_OPTIONS) -
+-ifneq ($(LINUX_HEADERS_UNPACK_DIR),$(LINUX_HEADERS_DIR))
+-	mv $(LINUX_HEADERS_UNPACK_DIR) $(LINUX_HEADERS_DIR)
+-endif
++	# bzcat $(DL_DIR)/$(LINUX_HEADERS_SOURCE) | tar -C $(TOOL_BUILD_DIR) $(TAR_OPTIONS) -
++	ln -s ../../../../kernel/packages/linux-2.4.31 $(LINUX_HEADERS_DIR)
++#ifneq ($(LINUX_HEADERS_UNPACK_DIR),$(LINUX_HEADERS_DIR))
++#	mv $(LINUX_HEADERS_UNPACK_DIR) $(LINUX_HEADERS_DIR)
++#endif
+ 	touch $(LINUX_HEADERS_DIR)/.unpacked
+ 
+ $(LINUX_HEADERS_DIR)/.patched: $(LINUX_HEADERS_DIR)/.unpacked
+diff -Naru buildroot/toolchain/uClibc/uClibc.config buildroot.mct/toolchain/uClibc/uClibc.config
+--- buildroot/toolchain/uClibc/uClibc.config	2005-09-30 09:15:02.000000000 +0200
++++ buildroot.mct/toolchain/uClibc/uClibc.config	2005-09-30 11:23:39.000000000 +0200
+@@ -12,7 +12,7 @@
+ # TARGET_i960 is not set
+ # TARGET_m68k is not set
+ # TARGET_microblaze is not set
+-# TARGET_mips is not set
++TARGET_mips=y
+ # TARGET_nios is not set
+ # TARGET_nios2 is not set
+ # TARGET_powerpc is not set
+@@ -26,8 +26,13 @@
+ # Target Architecture Features and Options
+ #
+ HAVE_ELF=y
+-TARGET_ARCH="none"
+-# ARCH_HAS_NO_MMU is not set
++ARCH_SUPPORTS_LITTLE_ENDIAN=y
++TARGET_ARCH="mips"
++ARCH_CFLAGS="-mno-split-addresses"
++ARCH_SUPPORTS_BIG_ENDIAN=y
++CONFIG_MIPS_ISA_1=y
++ARCH_LITTLE_ENDIAN=y
++ARCH_HAS_NO_MMU=y
+ UCLIBC_HAS_FLOATS=y
+ HAS_FPU=y
+ DO_C99_MATH=y
+@@ -49,7 +54,7 @@
+ LDSO_CACHE_SUPPORT=y
+ # LDSO_PRELOAD_FILE_SUPPORT is not set
+ LDSO_BASE_FILENAME="ld.so"
+-LDSO_RUNPATH=n
++LDSO_RUNPATH=y
+ # DL_FINI_CRT_COMPAT is not set
+ UCLIBC_CTOR_DTOR=y
+ # HAS_NO_THREADS is not set
+@@ -106,7 +111,7 @@
+ UCLIBC_HAS_STDIO_BUILTIN_BUFFER_NONE=y
+ # UCLIBC_HAS_STDIO_BUILTIN_BUFFER_4 is not set
+ # UCLIBC_HAS_STDIO_BUILTIN_BUFFER_8 is not set
+-UCLIBC_HAS_STDIO_SHUTDOWN_ON_ABORT=n
++UCLIBC_HAS_STDIO_SHUTDOWN_ON_ABORT=y
+ UCLIBC_HAS_STDIO_GETC_MACRO=y
+ UCLIBC_HAS_STDIO_PUTC_MACRO=y
+ UCLIBC_HAS_STDIO_AUTO_RW_TRANSITION=y
+@@ -115,9 +120,9 @@
+ UCLIBC_HAS_GLIBC_CUSTOM_STREAMS=y
+ UCLIBC_HAS_PRINTF_M_SPEC=y
+ UCLIBC_HAS_ERRNO_MESSAGES=y
+-# UCLIBC_HAS_SYS_ERRLIST is not set
++UCLIBC_HAS_SYS_ERRLIST=y
+ UCLIBC_HAS_SIGNUM_MESSAGES=y
+-# UCLIBC_HAS_SYS_SIGLIST is not set
++UCLIBC_HAS_SYS_SIGLIST=y
+ UCLIBC_HAS_GNU_GETOPT=y
+ 
+ #
+diff -Naru buildroot/toolchain/uClibc/uClibc.config-locale buildroot.mct/toolchain/uClibc/uClibc.config-locale
+--- buildroot/toolchain/uClibc/uClibc.config-locale	2005-09-30 09:15:02.000000000 +0200
++++ buildroot.mct/toolchain/uClibc/uClibc.config-locale	2005-09-30 11:23:48.000000000 +0200
+@@ -12,7 +12,7 @@
+ # TARGET_i960 is not set
+ # TARGET_m68k is not set
+ # TARGET_microblaze is not set
+-# TARGET_mips is not set
++TARGET_mips=y
+ # TARGET_nios is not set
+ # TARGET_nios2 is not set
+ # TARGET_powerpc is not set
+@@ -26,8 +26,13 @@
+ # Target Architecture Features and Options
+ #
+ HAVE_ELF=y
+-TARGET_ARCH="none"
+-# ARCH_HAS_NO_MMU is not set
++ARCH_SUPPORTS_LITTLE_ENDIAN=y
++TARGET_ARCH="mips"
++ARCH_CFLAGS="-mno-split-addresses"
++ARCH_SUPPORTS_BIG_ENDIAN=y
++CONFIG_MIPS_ISA_1=y
++ARCH_LITTLE_ENDIAN=y
++ARCH_HAS_NO_MMU=y
+ UCLIBC_HAS_FLOATS=y
+ HAS_FPU=y
+ DO_C99_MATH=y
+@@ -49,6 +54,7 @@
+ LDSO_CACHE_SUPPORT=y
+ # LDSO_PRELOAD_FILE_SUPPORT is not set
+ LDSO_BASE_FILENAME="ld.so"
++LDSO_RUNPATH=y
+ # DL_FINI_CRT_COMPAT is not set
+ UCLIBC_CTOR_DTOR=y
+ # HAS_NO_THREADS is not set
+@@ -110,6 +116,7 @@
+ UCLIBC_HAS_STDIO_BUILTIN_BUFFER_NONE=y
+ # UCLIBC_HAS_STDIO_BUILTIN_BUFFER_4 is not set
+ # UCLIBC_HAS_STDIO_BUILTIN_BUFFER_8 is not set
++UCLIBC_HAS_STDIO_SHUTDOWN_ON_ABORT=y
+ UCLIBC_HAS_STDIO_GETC_MACRO=y
+ UCLIBC_HAS_STDIO_PUTC_MACRO=y
+ UCLIBC_HAS_STDIO_AUTO_RW_TRANSITION=y
+@@ -118,9 +125,9 @@
+ UCLIBC_HAS_GLIBC_CUSTOM_STREAMS=y
+ UCLIBC_HAS_PRINTF_M_SPEC=y
+ UCLIBC_HAS_ERRNO_MESSAGES=y
+-# UCLIBC_HAS_SYS_ERRLIST is not set
++UCLIBC_HAS_SYS_ERRLIST=y
+ UCLIBC_HAS_SIGNUM_MESSAGES=y
+-# UCLIBC_HAS_SYS_SIGLIST is not set
++UCLIBC_HAS_SYS_SIGLIST=y
+ UCLIBC_HAS_GNU_GETOPT=y
+ 
+ #
