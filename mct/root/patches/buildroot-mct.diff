@@ -1,6 +1,6 @@
 diff -Naru buildroot/toolchain/kernel-headers/kernel-headers.mk buildroot.mct/toolchain/kernel-headers/kernel-headers.mk
---- buildroot/toolchain/kernel-headers/kernel-headers.mk	2005-09-30 09:15:04.000000000 +0200
-+++ buildroot.mct/toolchain/kernel-headers/kernel-headers.mk	2005-09-30 11:22:38.000000000 +0200
+--- buildroot/toolchain/kernel-headers/kernel-headers.mk	2005-10-17 09:15:41.000000000 +0200
++++ buildroot.mct/toolchain/kernel-headers/kernel-headers.mk	2005-10-18 08:50:28.000000000 +0200
 @@ -95,13 +95,15 @@
  	mkdir -p $(DL_DIR)
  	$(WGET) -P $(DL_DIR) $(LINUX_HEADERS_SITE)/$(LINUX_HEADERS_SOURCE)
@@ -23,8 +23,8 @@ diff -Naru buildroot/toolchain/kernel-headers/kernel-headers.mk buildroot.mct/to
  
  $(LINUX_HEADERS_DIR)/.patched: $(LINUX_HEADERS_DIR)/.unpacked
 diff -Naru buildroot/toolchain/uClibc/uClibc.config buildroot.mct/toolchain/uClibc/uClibc.config
---- buildroot/toolchain/uClibc/uClibc.config	2005-09-30 09:15:02.000000000 +0200
-+++ buildroot.mct/toolchain/uClibc/uClibc.config	2005-09-30 11:23:39.000000000 +0200
+--- buildroot/toolchain/uClibc/uClibc.config	2005-10-17 09:15:07.000000000 +0200
++++ buildroot.mct/toolchain/uClibc/uClibc.config	2005-10-18 08:50:28.000000000 +0200
 @@ -12,7 +12,7 @@
  # TARGET_i960 is not set
  # TARGET_m68k is not set
@@ -81,8 +81,8 @@ diff -Naru buildroot/toolchain/uClibc/uClibc.config buildroot.mct/toolchain/uCli
  
  #
 diff -Naru buildroot/toolchain/uClibc/uClibc.config-locale buildroot.mct/toolchain/uClibc/uClibc.config-locale
---- buildroot/toolchain/uClibc/uClibc.config-locale	2005-09-30 09:15:02.000000000 +0200
-+++ buildroot.mct/toolchain/uClibc/uClibc.config-locale	2005-09-30 11:23:48.000000000 +0200
+--- buildroot/toolchain/uClibc/uClibc.config-locale	2005-10-17 09:15:07.000000000 +0200
++++ buildroot.mct/toolchain/uClibc/uClibc.config-locale	2005-10-18 08:50:28.000000000 +0200
 @@ -12,7 +12,7 @@
  # TARGET_i960 is not set
  # TARGET_m68k is not set
@@ -136,3 +136,17 @@ diff -Naru buildroot/toolchain/uClibc/uClibc.config-locale buildroot.mct/toolcha
  UCLIBC_HAS_GNU_GETOPT=y
  
  #
+diff -Naru buildroot/toolchain/uClibc/uclibc.mk buildroot.mct/toolchain/uClibc/uclibc.mk
+--- buildroot/toolchain/uClibc/uclibc.mk	2005-10-17 09:15:07.000000000 +0200
++++ buildroot.mct/toolchain/uClibc/uclibc.mk	2005-10-18 08:51:02.000000000 +0200
+@@ -15,8 +15,9 @@
+ ifeq ($(BR2_UCLIBC_VERSION_SNAPSHOT),y)
+ # Be aware that this changes daily....
+ UCLIBC_DIR:=$(TOOL_BUILD_DIR)/uClibc
+-UCLIBC_SOURCE:=uClibc-$(strip $(subst ",, $(BR2_USE_UCLIBC_SNAPSHOT))).tar.bz2
++#UCLIBC_SOURCE:=uClibc-$(strip $(subst ",, $(BR2_USE_UCLIBC_SNAPSHOT))).tar.bz2
+ #"
++UCLIBC_SOURCE:=uClibc-20050828.tar.bz2
+ UCLIBC_SITE:=http://www.uclibc.org/downloads/snapshots
+ else
+ UCLIBC_VER:=0.9.28

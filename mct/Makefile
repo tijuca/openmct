@@ -7,9 +7,8 @@ MAKE=/usr/bin/make
 
 ACTDIR=$(shell pwd)
 KERNELDIR=$(ACTDIR)/kernel
-EGCSDIR=$(ACTDIR)/egcs
+ROOTDIR=$(ACTDIR)/root
 
 all:	
-	$(MAKE) -C $(KERNELDIR) preparekernel
-	$(MAKE) -C $(EGCSDIR) KERNELDIR=$(KERNELDIR)
-	$(MAKE) -C $(KERNELDIR) buildkernel
+	$(MAKE) -C $(KERNELDIR) 
+	$(MAKE) -C $(ROOTDIR) 

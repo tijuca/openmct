@@ -48,6 +48,10 @@ SQUASHFS=$(shell basename $(SQUASHFSFILE) .tar.gz)
 # LZMABASEURL=http://heanet.dl.sourceforge.net/sourceforge/sevenzip
 # LZMAFILE=lzma427.tar.bz2
 # LZMA=lzma-4.27
+#
+# MPPE
+# MPPEBASEURL=http://mppe-mppc.alphacron.de/
+# MPPEFILE=linux-2.4.31-mppe-mppc-1.3.patch.gz
 
 # ZLIB
 ZLIBBASEURL=http://www.gzip.org/zlib
