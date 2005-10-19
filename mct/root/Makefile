@@ -66,13 +66,13 @@ busybox:
 
 mct_flash:
 	@if [ ! -f $(SRCDIR)/$(BUILD) ]; then \
-		$(GCC) $(SRCDIR)/$(MCT_FLASH).c -o $(SRCDIR)/$(MCT_FLASH) ; \
+		$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc $(SRCDIR)/$(MCT_FLASH).c -o $(SRCDIR)/$(MCT_FLASH) ; \
 		$(TOUCH) $(SRCDIR)/$(BUILD) ; \
 	fi
 
 prepareroot:	
 	$(shell if [ -d $(ROOTDIR) ]; then rm -rf $(ROOTDIR); fi)
-	@$(RM) $(OUTPUTDIR)/$(OUTPUTDIR)/$(ROOTSQUASHFS)
+	@$(RM) $(OUTPUTDIR)/$(ROOTSQUASHFS)
 	@$(TAR) xfz $(ROOTTARGZ)
 	@$(CP) -a $(ROOTDIR) $(NEWROOTDIR)
 	@$(RM) -rf $(NEWROOTDIR)/home
@@ -87,9 +87,16 @@ prepareroot:
 
 	@$(ECHO) INSTALL $(BUSYBOX)
 	@$(CP) $(PACKAGEDIR)/$(BUSYBOX)/busybox $(NEWROOTDIR)/sbin
-	@$(SSTRIP) $(NEWROOTDIR)/bin/busybox
+	@$(SSTRIP) $(NEWROOTDIR)/sbin/busybox
 
-	@$(PACKAGEDIR)/$(SQUASHFS)/squashfs-tools/mksquashfs $(NEWROOTDIR)/* $(OUTPUTDIR)/$(ROOTSQUASHFS) $(SQUASHFSOPTS)
+	@$(ECHO) MAKE SYMLINKS FOR $(BUSYBOX)
+	@$(LN) -s /sbin/busybox $(NEWROOTDIR)/bin/
+
+	@$(ECHO) INSTALL $(MCT_FLASH)
+	@$(CP) $(SRCDIR)/$(MCT_FLASH) $(NEWROOTDIR)/sbin
+	@$(SSTRIP) $(NEWROOTDIR)/sbin/$(MCT_FLASH)
+
+	@$(MKSQUASHFS) $(NEWROOTDIR)/* $(OUTPUTDIR)/$(ROOTSQUASHFS) $(SQUASHFSOPTS)
 
 clean:
 	$(shell if [ -d $(PACKAGEDIR) ]; then rm -rf $(PACKAGEDIR); fi)

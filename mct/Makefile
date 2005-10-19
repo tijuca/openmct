@@ -26,8 +26,8 @@ directories:
 	$(shell if [ ! -d $(OUTPUTDIR) ]; then mkdir $(OUTPUTDIR); fi)
 
 image:	
-	@if [ ! -f $(OUTPUTDIR)/$(IMAGEFILENAME) ]; then \
-		$(SRCDIR)/$(MCT_MODIFY) -w -i $(OUTPUTDIR)/$(IMAGEFILENAME) -m $(IMAGEMODE) -p $(IMAGEPRODCODE) \
+	@if [ ! -f $(IMAGEFILENAME) ]; then \
+		$(SRCDIR)/$(MCT_MODIFY) -w -i $(IMAGEFILENAME) -m $(IMAGEMODE) -p $(IMAGEPRODCODE) \
 		-v $(IMAGEVERSION) -n $(IMAGESUBVERSION) -k $(KERNELDIR)/output/$(VMLINUXBIN).gz \
 		-q $(ROOTDIR)/output/$(ROOTSQUASHFS) -j $(OUTPUTDIR)/$(ETCJFFS2) -a $(IMAGEFLASHMAP) ; \
 	fi
@@ -51,8 +51,8 @@ mct_modify:
 	fi
 
 clean:
-	@if [ -f $(OUTPUTDIR)/$(IMAGEFILENAME) ]; then \
-		rm $(OUTPUTDIR)/$(IMAGEFILENAME) ; \
+	@if [ -f $(IMAGEFILENAME) ]; then \
+		rm $(IMAGEFILENAME) ; \
 	fi
 	@if [ -f $(OUTPUTDIR)/$(ETCJFFS2) ]; then \
 		rm $(OUTPUTDIR)/$(ETCJFFS2) ; \
