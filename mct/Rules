@@ -1,0 +1,49 @@
+#
+# Generel Parameters
+#
+
+# Target
+TARGET=mipsel-linux
+
+# Binaries
+ECHO=/bin/echo
+WGET=/usr/bin/wget -Nc --passive-ftp -P $(DOWNLOADDIR)
+TAR=/bin/tar
+CP=/bin/cp
+PATCH=/usr/bin/patch
+ZCAT=/bin/zcat
+GZIP=/bin/gzip
+MAKE=/usr/bin/make
+TOUCH=/usr/bin/touch
+LN=/bin/ln
+MKDIR=/bin/mkdir
+MKFSJFFS2=/usr/bin/mkfs.jffs2
+MAKE=/usr/bin/make
+GCC=/usr/bin/gcc
+
+# Directories
+ACTDIR=$(shell /bin/pwd)
+DOWNLOADDIR=$(ACTDIR)/downloads
+CONFIGDIR=$(ACTDIR)/configs
+PATCHDIR=$(ACTDIR)/patches
+PACKAGEDIR=$(ACTDIR)/packages
+OUTPUTDIR=$(ACTDIR)/output
+TARGETDIR=$(OUTPUTDIR)/$(TARGET)
+SRCDIR=$(ACTDIR)/src
+ROOTDIR=$(ACTDIR)/root
+NEWROOTDIR=$(ACTDIR)/newroot
+
+# MCT Info Files
+CONFIG=.config
+PATCHED=.patched
+BUILD=.build
+
+# MCT Output Files
+VMLINUXBIN=vmlinux.bin
+ROOTSQUASHFS=root.squashfs
+ETCJFFS2=etc.jffs2
+MCT_MODIFY=mct_modify
+MCT_FLASH=mct_flash
+
+# Options
+SQUASHFSOPTS=-le -all-root

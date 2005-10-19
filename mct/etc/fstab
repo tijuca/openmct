@@ -1,0 +1,5 @@
+proc    /proc           proc    defaults        0 0
+tmpfs   /tmp            ramfs   defaults        0 0
+devpts	/dev/pts	devpts	defaults	0 0
+/dev/mtdblock/3     /etc	jffs2     defaults     0 0
+/dev/hda1	/data	ext2	defaults	0 0

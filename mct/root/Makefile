@@ -3,45 +3,10 @@
 #
 # Andi <andi@void.at>
 
-# Target
-TARGET=mipsel-linux
-
-# Binaries
-ACTDIR=$(shell /bin/pwd)
-ECHO=/bin/echo
-WGET=/usr/bin/wget -Nc --passive-ftp -P $(DOWNLOADDIR)
-TAR=/bin/tar
-CP=/bin/cp
-PATCH=/usr/bin/patch
-ZCAT=/bin/zcat
-GZIP=/bin/gzip
-MAKE=/usr/bin/make
-TOUCH=/usr/bin/touch
-GCC=/usr/bin/gcc
-
-# Directories
-DOWNLOADDIR=$(ACTDIR)/downloads
-CONFIGDIR=$(ACTDIR)/configs
-PATCHDIR=$(ACTDIR)/patches
-PACKAGEDIR=$(ACTDIR)/packages
-OUTPUTDIR=$(ACTDIR)/output
-ROOTDIR=$(ACTDIR)/root
+include $(TOP)/Rules
 
 # Files
 ROOTTARGZ=$(OUTPUTDIR)/root.tar.gz
-IMAGEVER=0x0106
-IMAGESUBVER=0x1
-IMAGE=$(OUTPUTDIR)/mct-$(IMAGEVER)-$(IMAGESUBVER).bin
-
-# MCT Info Files
-CONFIG=.config
-PATCHED=.patched
-BUILD=.build
-
-# Source
-MCT_MODIFY=mct_modify
-
-# Base Software Packages
 
 # Buildroot (Cross Compiler, Libs, etc..)
 BUILDROOTBASEURL=http://buildroot.uclibc.org/downloads/snapshots
@@ -55,7 +20,7 @@ BUSYBOX=$(shell basename $(BUSYBOXFILE) -snapshot.tar.bz2)
 
 SSTRIP=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-sstrip
 
-all:	directories buildroot busybox prepareroot
+all:	directories buildroot busybox mct_flash prepareroot
 
 directories:
 	$(shell if [ ! -d $(DOWNLOADDIR) ]; then mkdir $(DOWNLOADDIR); fi)
@@ -83,7 +48,7 @@ buildroot:
 	fi
 	@$(TAR) cfz $(ROOTTARGZ) root
 
-busybox:	directories
+busybox:	
 	@if [ ! -f $(DOWNLOADDIR)/$(BUSYBOXFILE) ]; then \
 		$(ECHO) WGET $(BUSYBOX) ; \
 		$(WGET) $(BUSYBOXBASEURL)/$(BUSYBOXFILE) ; \
@@ -99,21 +64,39 @@ busybox:	directories
 		$(MAKE) CROSS=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc- ;\
 	fi
 
-prepareroot:	busybox
+mct_flash:
+	@if [ ! -f $(SRCDIR)/$(BUILD) ]; then \
+		$(GCC) $(SRCDIR)/$(MCT_FLASH).c -o $(SRCDIR)/$(MCT_FLASH) ; \
+		$(TOUCH) $(SRCDIR)/$(BUILD) ; \
+	fi
+
+prepareroot:	
 	$(shell if [ -d $(ROOTDIR) ]; then rm -rf $(ROOTDIR); fi)
-	@$(RM) $(OUTPUTDIR)/root.squashfs
+	@$(RM) $(OUTPUTDIR)/$(OUTPUTDIR)/$(ROOTSQUASHFS)
 	@$(TAR) xfz $(ROOTTARGZ)
-	@$(RM) -rf $(ROOTDIR)/home
-	@$(RM) -rf $(ROOTDIR)/mnt
-	@$(RM) -rf $(ROOTDIR)/opt
-	@$(RM) -rf $(ROOTDIR)/root
-	@$(RM) -rf $(ROOTDIR)/usr
-	@$(RM) -rf $(ROOTDIR)/etc
-	@$(RM) -f $(ROOTDIR)/lib/libstdc++*
-	@$(CP) -a $(ACTDIR)/etc $(ROOTDIR)
+	@$(CP) -a $(ROOTDIR) $(NEWROOTDIR)
+	@$(RM) -rf $(NEWROOTDIR)/home
+	@$(RM) -rf $(NEWROOTDIR)/mnt
+	@$(RM) -rf $(NEWROOTDIR)/opt
+	@$(RM) -rf $(NEWROOTDIR)/root
+	@$(RM) -rf $(NEWROOTDIR)/usr
+	@$(RM) -rf $(NEWROOTDIR)/etc
+	@$(RM) -f $(NEWROOTDIR)/lib/libstdc++*
+	@$(CP) -a $(ACTDIR)/etc $(NEWROOTDIR)
+	@$(CP) -a $(SRCDIR)/$(MCT_FLASH) $(NEWROOTDIR)/sbin
 
 	@$(ECHO) INSTALL $(BUSYBOX)
-	@$(CP) $(PACKAGEDIR)/$(BUSYBOX)/busybox $(ROOTDIR)/bin
-	@$(SSTRIP) $(ROOTDIR)/bin/busybox
+	@$(CP) $(PACKAGEDIR)/$(BUSYBOX)/busybox $(NEWROOTDIR)/sbin
+	@$(SSTRIP) $(NEWROOTDIR)/bin/busybox
 
-	@$(PACKAGEDIR)/$(SQUASHFS)/squashfs-tools/mksquashfs $(ROOTDIR)/* $(OUTPUTDIR)/root.squashfs -le -all-root
+	@$(PACKAGEDIR)/$(SQUASHFS)/squashfs-tools/mksquashfs $(NEWROOTDIR)/* $(OUTPUTDIR)/$(ROOTSQUASHFS) $(SQUASHFSOPTS)
+
+clean:
+	$(shell if [ -d $(PACKAGEDIR) ]; then rm -rf $(PACKAGEDIR); fi)
+	$(shell if [ -d $(OUTPUTDIR) ]; then rm -rf $(OUTPUTDIR); fi)
+	$(shell if [ -d $(ROOTDIR) ]; then rm -rf $(ROOTDIR); fi)
+	$(shell if [ -d $(NEWROOTDIR) ]; then rm -rf $(NEWROOTDIR); fi)
+
+distclean:      clean
+	$(shell if [ -d $(DOWNLOADDIR) ]; then rm -rf $(DOWNLOADDIR); fi)
+

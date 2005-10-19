@@ -182,8 +182,8 @@ buildkernel:
 	@if [ ! -f $(PACKAGEDIR)/$(KERNEL)/$(BUILD) ]; then \
 		$(ECHO) BUILD $(KERNEL) ; \
 		cd $(PACKAGEDIR)/$(KERNEL) && $(MAKE) CROSS_COMPILE=$(TARGET)- vmlinux && \
-		$(CP) $(PACKAGEDIR)/$(KERNEL)/vmlinux.bin $(OUTPUTDIR) && \
-		$(GZIP) -9 $(OUTPUTDIR)/vmlinux.bin && \
+		$(CP) $(PACKAGEDIR)/$(KERNEL)/$(VMLINUXBIN) $(OUTPUTDIR) && \
+		$(GZIP) -9 $(OUTPUTDIR)/$(VMLINUXBIN) && \
 		$(TOUCH) $(PACKAGEDIR)/$(KERNEL)/$(BUILD) ; \
         fi
 	

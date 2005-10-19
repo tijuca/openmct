@@ -1,0 +1,24 @@
+#!/bin/sh
+PATH=/bin:/sbin:/var/bin
+
+echo Setting hostname
+hostname -F /etc/hostname
+
+echo Enable DMA
+hdparm -c 1 -X66 /dev/hda
+
+echo Activating SWAP parttion
+swapon /dev/hda2
+
+echo Setting up Interfaces
+ifup -a
+
+echo Starting Telnet
+telnetd
+
+if [ ! -f /etc/dropbear/dropbear_dss_host_key ]; then
+   dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key
+fi
+
+echo Starting SSH daemon
+dropbear
