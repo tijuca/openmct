@@ -3,36 +3,9 @@
 #
 # Andi <andi@void.at>
 
-# Target
-TARGET=mipsel-linux
+include $(TOP)Rules
 
-# Binaries
-ACTDIR=$(shell /bin/pwd)
-ECHO=/bin/echo
-WGET=/usr/bin/wget -Nc --passive-ftp -P $(DOWNLOADDIR)
-TAR=/bin/tar
-CP=/bin/cp
-PATCH=/usr/bin/patch
-ZCAT=/bin/zcat
-GZIP=/bin/gzip
-MAKE=/usr/bin/make
-TOUCH=/usr/bin/touch
-LN=/bin/ln
-MKDIR=/bin/mkdir
-
-# Directories
-DOWNLOADDIR=$(ACTDIR)/downloads
-CONFIGDIR=$(ACTDIR)/configs
-PATCHDIR=$(ACTDIR)/patches
-PACKAGEDIR=$(ACTDIR)/packages
-OUTPUTDIR=$(ACTDIR)/output
-TARGETDIR=$(OUTPUTDIR)/$(TARGET)
 PATH=$(TARGETDIR)/bin:/usr/local/bin:/usr/bin:/bin
-
-# MCT Info Files
-CONFIG=.config
-PATCHED=.patched
-BUILD=.build
 
 # Kernel
 KERNELBASEURL=http://www.de.kernel.org/pub/linux/kernel/v2.4
@@ -43,20 +16,6 @@ KERNEL=$(shell basename $(KERNELFILE) .tar.bz2)
 SQUASHFSBASEURL=http://heanet.dl.sourceforge.net/sourceforge/squashfs
 SQUASHFSFILE=squashfs2.2-r2.tar.gz
 SQUASHFS=$(shell basename $(SQUASHFSFILE) .tar.gz)
-
-# LZMA
-# LZMABASEURL=http://heanet.dl.sourceforge.net/sourceforge/sevenzip
-# LZMAFILE=lzma427.tar.bz2
-# LZMA=lzma-4.27
-#
-# MPPE
-# MPPEBASEURL=http://mppe-mppc.alphacron.de/
-# MPPEFILE=linux-2.4.31-mppe-mppc-1.3.patch.gz
-
-# ZLIB
-ZLIBBASEURL=http://www.gzip.org/zlib
-ZLIBFILE=zlib-1.2.2.tar.gz
-ZLIB=$(shell basename $(ZLIBFILE) .tar.gz)
 
 # Binutils
 BINUTILSBASEURL=ftp://ftp.gnu.org/gnu/binutils
@@ -90,7 +49,7 @@ directories:
 	$(shell if [ ! -d $(PACKAGEDIR) ]; then mkdir $(PACKAGEDIR); fi)
 	$(shell if [ ! -d $(OUTPUTDIR) ]; then mkdir $(OUTPUTDIR); fi)
 
-squashfs:	directories
+squashfs:	
 	@if [ ! -f $(DOWNLOADDIR)/$(SQUASHFSFILE) ]; then \
 		$(ECHO) WGET $(SQUASHFS) ; \
 		$(WGET) $(SQUASHFSBASEURL)/$(SQUASHFSFILE) ; \
@@ -105,26 +64,7 @@ squashfs:	directories
 		$(MAKE) ; \
 	fi
 
-#lzma:	squashfs
-#	@if [ ! -f $(DOWNLOADDIR)/$(LZMAFILE) ]; then \
-#		$(ECHO) WGET $(LZMA) ; \
-#		$(WGET) $(LZMABASEURL)/$(LZMAFILE) ; \
-#	fi
-#	@if [ ! -d $(PACKAGEDIR)/$(LZMA) ]; then \
-#		$(ECHO) UNPACK $(LZMA) ; \
-#		$(MKDIR) $(PACKAGEDIR)/$(LZMA) ; \
-#		$(TAR) -xj -C $(PACKAGEDIR)/$(LZMA) -f $(DOWNLOADDIR)/$(LZMAFILE) ; \
-#	fi
-#	@if [ ! -f $(PACKAGEDIR)/$(LZMA)/$(PATCHED) ]; then \
-#		$(ECHO) PATCH $(LZMA) ; \
-#		$(PATCH) -d $(PACKAGEDIR) -p0 < $(PATCHDIR)/$(LZMA)-mct.diff ; \
-#	fi
-#	@if [ ! -f $(PACKAGEDIR)/$(LZMA)/$(CONFIG) ]; then \
-#		$(ECHO) BUILD $(LZMA) ; \
-#		$(MAKE) ; \
-#	fi
-	
-preparekernel:	squashfs
+preparekernel:
 	@if [ ! -f $(DOWNLOADDIR)/$(KERNELFILE) ]; then \
 		$(ECHO) WGET $(KERNEL) ; \
 		$(WGET) $(KERNELBASEURL)/$(KERNELFILE) ; \
@@ -146,7 +86,7 @@ preparekernel:	squashfs
 		$(LN) -s $(PACKAGEDIR)/$(KERNEL) $(ACTDIR)/linux ; \
 	fi
 
-binutils:	preparekernel
+binutils:	
 	@if [ ! -f $(DOWNLOADDIR)/$(BINUTILSFILE) ]; then \
 		$(ECHO) WGET $(BINUTILS) ; \
 		$(WGET) $(BINUTILSBASEURL)/$(BINUTILSFILE) ; \
@@ -163,7 +103,7 @@ binutils:	preparekernel
 		touch $(PACKAGEDIR)/$(BINUTILS)/$(CONFIG) ; \
         fi
 
-gcccore:	binutils
+gcccore:	
 	@if [ ! -f $(DOWNLOADDIR)/$(GCCCOREFILE) ]; then \
 		$(ECHO) WGET $(GCCCORE) ; \
 		$(WGET) $(GCCCOREBASEURL)/$(GCCCOREFILE) ; \
@@ -182,7 +122,7 @@ gcccore:	binutils
 		touch $(PACKAGEDIR)/$(GCCCORE)/$(CONFIG) ; \
         fi
 
-glibc:	gcccore
+glibc:	
 	@if [ ! -f $(DOWNLOADDIR)/$(GLIBCFILE) ]; then \
 		$(ECHO) WGET $(GLIBC) ; \
 		$(WGET) $(GLIBCBASEURL)/$(GLIBCFILE) ; \
@@ -214,7 +154,7 @@ glibc:	gcccore
 		$(TOUCH) $(PACKAGEDIR)/$(GLIBC)/$(CONFIG) ; \
 	fi
 
-gcc:	glibc
+gcc:	
 	@if [ ! -f $(DOWNLOADDIR)/$(EGCSFILE) ]; then \
 		$(ECHO) WGET $(EGCS) ; \
 		$(WGET) $(EGCSBASEURL)/$(EGCSFILE) ; \
@@ -238,24 +178,7 @@ gcc:	glibc
 		touch $(PACKAGEDIR)/$(EGCS)/$(CONFIG) ; \
         fi
 
-zlib:	gcc
-	@if [ ! -f $(DOWNLOADDIR)/$(ZLIBFILE) ]; then \
-		$(ECHO) WGET $(ZLIB) ; \
-		$(WGET) $(ZLIBBASEURL)/$(ZLIBFILE) ; \
-	fi
-	@if [ ! -d $(PACKAGEDIR)/$(ZLIB) ]; then \
-		$(ECHO) UNPACK $(ZLIB) ; \
-		$(TAR) -xz -C $(PACKAGEDIR) -f $(DOWNLOADDIR)/$(ZLIBFILE) ; \
-        fi
-	@if [ ! -f $(PACKAGEDIR)/$(ZLIB)/$(CONFIG) ]; then \
-		$(ECHO) CONFIGURE $(ZLIB) ; \
-		cd $(PACKAGEDIR)/$(ZLIB) && \
-		CC=$(TARGET)-gcc ./configure --prefix=$(TARGETDIR) && \
-		$(MAKE) all install && \
-		touch $(PACKAGEDIR)/$(ZLIB)/$(CONFIG) ; \
-        fi
-
-buildkernel:	zlib
+buildkernel:
 	@if [ ! -f $(PACKAGEDIR)/$(KERNEL)/$(BUILD) ]; then \
 		$(ECHO) BUILD $(KERNEL) ; \
 		cd $(PACKAGEDIR)/$(KERNEL) && $(MAKE) CROSS_COMPILE=$(TARGET)- vmlinux && \
@@ -267,6 +190,7 @@ buildkernel:	zlib
 clean:
 	$(shell if [ -d $(PACKAGEDIR) ]; then rm -rf $(PACKAGEDIR); fi)
 	$(shell if [ -d $(OUTPUTDIR) ]; then rm -rf $(OUTPUTDIR); fi)
+	$(shell if [ -h linux ]; then rm linux; fi )
 
 distclean:	clean
 	$(shell if [ -d $(DOWNLOADDIR) ]; then rm -rf $(DOWNLOADDIR); fi)
