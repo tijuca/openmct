@@ -1,1 +1,2 @@
 ::sysinit:/etc/rc.d/rcS
+::respawn:/sbin/getty -L ttyS0 115200 vt100
