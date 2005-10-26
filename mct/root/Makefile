@@ -90,7 +90,7 @@ prepareroot:
 	@$(SSTRIP) $(NEWROOTDIR)/sbin/busybox
 
 	@$(ECHO) MAKE SYMLINKS FOR $(BUSYBOX)
-	# TODO: symlink for every binary
+	$(foreach link, $(shell cat busybox.mct.links), $(shell ln -s --force /sbin/busybox $(NEWROOTDIR)$(link)))
 
 	@$(ECHO) INSTALL $(MCT_FLASH)
 	@$(CP) $(SRCDIR)/$(MCT_FLASH) $(NEWROOTDIR)/sbin
