@@ -1,0 +1,11 @@
+success {
+ echo ' [  OK  ]'
+}
+
+failure {
+ echo ' [FAILED]'
+}
+
+skipped() {
+ echo ' [ SKIP ]'
+}

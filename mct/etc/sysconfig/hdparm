@@ -1,0 +1,1 @@
+OPTIONS="-c 1 -X66 /dev/hda"
