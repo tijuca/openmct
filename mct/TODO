@@ -12,3 +12,9 @@
 
 * Create Busybox links forced			done, acki, 20051024
 
+* Split up Kernel patch in single diff files	outstanding, andi
+
+* Implement Led Kernel Patch from Udu		outstanding, andi
+
+* Remove flash.c from Kernel Tree (flash via	outstanding, andi
+  mtd Tools)
