@@ -7,15 +7,13 @@ include $(TOP)Rules
 
 PATH=$(TARGETDIR)/bin:/usr/local/bin:/usr/bin:/bin
 
+# Patch Files, that will be used
+PATCHKERNEL=$(SCRIPTDIR)/patch-kernel.sh
+
 # Kernel
 KERNELBASEURL=http://www.de.kernel.org/pub/linux/kernel/v2.4
 KERNELFILE=linux-2.4.31.tar.bz2
 KERNEL=$(shell basename $(KERNELFILE) .tar.bz2)
-
-# SquashFS 
-SQUASHFSBASEURL=http://heanet.dl.sourceforge.net/sourceforge/squashfs
-SQUASHFSFILE=squashfs2.2-r2.tar.gz
-SQUASHFS=$(shell basename $(SQUASHFSFILE) .tar.gz)
 
 # Binutils
 BINUTILSBASEURL=ftp://ftp.gnu.org/gnu/binutils
@@ -42,27 +40,12 @@ EGCSBASEURL=ftp://ftp.fu-berlin.de/unix/languages/gcc/old-releases/egcs
 EGCSFILE=egcs-1.1.2.tar.bz2
 EGCS=egcs-1.1.2
 
-all:	directories squashfs preparekernel binutils gcccore glibc gcc buildkernel
+all:	directories preparekernel binutils gcccore glibc gcc buildkernel
 
 directories:
 	$(shell if [ ! -d $(DOWNLOADDIR) ]; then mkdir $(DOWNLOADDIR); fi)
 	$(shell if [ ! -d $(PACKAGEDIR) ]; then mkdir $(PACKAGEDIR); fi)
 	$(shell if [ ! -d $(OUTPUTDIR) ]; then mkdir $(OUTPUTDIR); fi)
-
-squashfs:	
-	@if [ ! -f $(DOWNLOADDIR)/$(SQUASHFSFILE) ]; then \
-		$(ECHO) WGET $(SQUASHFS) ; \
-		$(WGET) $(SQUASHFSBASEURL)/$(SQUASHFSFILE) ; \
-	fi
-	@if [ ! -d $(PACKAGEDIR)/$(SQUASHFS) ]; then \
-		$(ECHO) UNPACK $(SQUASHFS) ; \
-		$(TAR) -xz -C $(PACKAGEDIR) -f $(DOWNLOADDIR)/$(SQUASHFSFILE) ; \
-	fi
-	@if [ ! -f $(PACKAGEDIR)/$(SQUASHFS)/$(CONFIG) ]; then \
-		$(ECHO) BUILD $(SQUASHFS) ; \
-		cd $(PACKAGEDIR)/$(SQUASHFS)/squashfs-tools && \
-		$(MAKE) ; \
-	fi
 
 preparekernel:
 	@if [ ! -f $(DOWNLOADDIR)/$(KERNELFILE) ]; then \
@@ -75,8 +58,7 @@ preparekernel:
 	fi
 	@if [ ! -f $(PACKAGEDIR)/$(KERNEL)/$(PATCHED) ]; then \
 		$(ECHO) PATCH $(KERNEL) : MCT ; \
-		$(PATCH) -d $(PACKAGEDIR) -p0 < $(PATCHDIR)/$(KERNEL)-mct.diff ; \
-		$(PATCH) -d $(PACKAGEDIR) -p0 < $(PACKAGEDIR)/$(SQUASHFS)/$(KERNEL)/squashfs2.2-patch ; \
+		$(PATCHKERNEL) $(PACKAGEDIR)/$(KERNEL) $(PATCHDIR) *.patch ; \
 		$(TOUCH) $(PACKAGEDIR)/$(KERNEL)/$(PATCHED) ; \
 	fi
 	@if [ ! -f $(PACKAGEDIR)/$(KERNEL)/$(CONFIG) ]; then \

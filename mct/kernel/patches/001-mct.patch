@@ -1,6 +1,6 @@
 diff -Naru linux-2.4.31/Makefile linux-2.4.31-mct/Makefile
 --- linux-2.4.31/Makefile	2005-06-01 02:56:56.000000000 +0200
-+++ linux-2.4.31-mct/Makefile	2005-10-04 09:01:36.000000000 +0200
++++ linux-2.4.31-mct/Makefile	2005-10-27 14:52:48.000000000 +0200
 @@ -5,7 +5,7 @@
  
  KERNELRELEASE=$(VERSION).$(PATCHLEVEL).$(SUBLEVEL)$(EXTRAVERSION)
@@ -29,18 +29,19 @@ diff -Naru linux-2.4.31/Makefile linux-2.4.31-mct/Makefile
  symlinks:
 diff -Naru linux-2.4.31/arch/mips/Makefile linux-2.4.31-mct/arch/mips/Makefile
 --- linux-2.4.31/arch/mips/Makefile	2005-01-19 15:09:26.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/Makefile	2005-10-04 09:00:00.000000000 +0200
-@@ -114,7 +114,8 @@
- GCCFLAGS	+= $(call set_gccflags,r3000,mips1,r3000,mips1,mips1)
- endif
- ifdef CONFIG_CPU_TX39XX
--GCCFLAGS	+= $(call set_gccflags,r3900,mips1,r3000,mips1,mips1)
-+#GCCFLAGS	+= $(call set_gccflags,r3900,mips1,r3000,mips1,mips1)
-+GCCFLAGS	+= -mips1
- endif
- ifdef CONFIG_CPU_R6000
- GCCFLAGS	+= $(call set_gccflags,r6000,mips2,r6000,mips2,mips2) \
-@@ -714,6 +715,43 @@
++++ linux-2.4.31-mct/arch/mips/Makefile	2005-10-27 14:54:22.000000000 +0200
+@@ -46,8 +46,8 @@
+ GCCFLAGS	:= -I $(TOPDIR)/include/asm/gcc
+ GCCFLAGS	+= -G 0 -mno-abicalls -fno-pic -pipe
+ GCCFLAGS	+= $(call check_gcc, -finline-limit=100000,)
+-LINKFLAGS	+= -G 0 -static -n
+-MODFLAGS	+= -mlong-calls
++LINKFLAGS	+= -G 0 -static -n -nostdlib
++MODFLAGS	+= -mlong-calls -fno-common
+ 
+ ifdef CONFIG_DEBUG_INFO
+ GCCFLAGS	+= -g
+@@ -714,6 +714,43 @@
  LOADADDR      += 0x80020000
  endif
  
@@ -84,7 +85,7 @@ diff -Naru linux-2.4.31/arch/mips/Makefile linux-2.4.31-mct/arch/mips/Makefile
  #
  # Choosing incompatible machines durings configuration will result in
  # error messages during linking.  Select a default linkscript if
-@@ -722,7 +760,7 @@
+@@ -722,7 +759,7 @@
  vmlinux: arch/$(ARCH)/ld.script
  
  arch/$(ARCH)/ld.script: arch/$(ARCH)/ld.script.in arch/$(ARCH)/Makefile
@@ -95,7 +96,7 @@ diff -Naru linux-2.4.31/arch/mips/Makefile linux-2.4.31-mct/arch/mips/Makefile
  HEAD := arch/mips/kernel/head.o arch/mips/kernel/init_task.o
 diff -Naru linux-2.4.31/arch/mips/config-shared.in linux-2.4.31-mct/arch/mips/config-shared.in
 --- linux-2.4.31/arch/mips/config-shared.in	2005-01-19 15:09:27.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/config-shared.in	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/config-shared.in	2005-10-27 14:52:48.000000000 +0200
 @@ -214,6 +214,31 @@
  
  dep_bool 'Support for Toshiba JMR-TX3927 board' CONFIG_TOSHIBA_JMR3927 $CONFIG_MIPS32
@@ -166,21 +167,9 @@ diff -Naru linux-2.4.31/arch/mips/config-shared.in linux-2.4.31-mct/arch/mips/co
     fi
  fi
  if [ "$CONFIG_SIBYTE_SB1250" = "y" -o \
-diff -Naru linux-2.4.31/arch/mips/kernel/Makefile linux-2.4.31-mct/arch/mips/kernel/Makefile
---- linux-2.4.31/arch/mips/kernel/Makefile	2005-01-19 15:09:29.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/kernel/Makefile	2005-10-04 09:00:00.000000000 +0200
-@@ -16,7 +16,7 @@
- 
- obj-y		+= branch.o cpu-probe.o irq.o process.o signal.o entry.o \
- 		   traps.o ptrace.o reset.o semaphore.o setup.o syscall.o \
--		   sysmips.o ipc.o scall_o32.o time.o unaligned.o
-+		   sysmips.o ipc.o scall_o32.o time.o unaligned.o urlfilter.o
- 
- obj-$(CONFIG_MODULES)		+= mips_ksyms.o
- 
 diff -Naru linux-2.4.31/arch/mips/kernel/head.S linux-2.4.31-mct/arch/mips/kernel/head.S
 --- linux-2.4.31/arch/mips/kernel/head.S	2005-01-19 15:09:29.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/kernel/head.S	2005-10-04 09:00:51.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/kernel/head.S	2005-10-27 14:52:48.000000000 +0200
 @@ -21,25 +21,57 @@
  #include <asm/asm.h>
  #include <asm/current.h>
@@ -453,7 +442,7 @@ diff -Naru linux-2.4.31/arch/mips/kernel/head.S linux-2.4.31-mct/arch/mips/kerne
 +		.align	13
 diff -Naru linux-2.4.31/arch/mips/kernel/setup.c linux-2.4.31-mct/arch/mips/kernel/setup.c
 --- linux-2.4.31/arch/mips/kernel/setup.c	2005-01-19 15:09:29.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/kernel/setup.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/kernel/setup.c	2005-10-27 14:52:48.000000000 +0200
 @@ -678,6 +678,11 @@
                 tx4927_setup();
                 break;
@@ -466,24 +455,9 @@ diff -Naru linux-2.4.31/arch/mips/kernel/setup.c linux-2.4.31-mct/arch/mips/kern
  #ifdef CONFIG_SIBYTE_BOARD
  	case MACH_GROUP_SIBYTE:
  		swarm_setup();
-diff -Naru linux-2.4.31/arch/mips/kernel/syscalls.h linux-2.4.31-mct/arch/mips/kernel/syscalls.h
---- linux-2.4.31/arch/mips/kernel/syscalls.h	2003-08-25 13:44:40.000000000 +0200
-+++ linux-2.4.31-mct/arch/mips/kernel/syscalls.h	2005-10-04 09:15:29.000000000 +0200
-@@ -255,3 +255,11 @@
- SYS(sys_ni_syscall, 0)				/* res. for futex */
- SYS(sys_ni_syscall, 0)				/* res. for sched_setaffinity */
- SYS(sys_ni_syscall, 0)				/* 4240 res. for sched_getaffinity */
-+
-+#if defined(CONFIG_MCT_BOARDS)
-+SYS(sys_read_config, 2)                         /* mct r/w config function 2002/4/11*/
-+SYS(sys_write_config, 2)                                /* added by louistsai 2002/4/11 */
-+SYS(sys_get_urllog, 2)                          /* added by louistsai 2002/4/11 */
-+SYS(sys_get_netstats, 1)                                /* added by louistsai 2002/4/11 */
-+//SYS(sys_tx4926DesDMACTriple, 1)                               /* added by louistsai 2002/4/11 */
-+#endif
 diff -Naru linux-2.4.31/arch/mips/kernel/time.c linux-2.4.31-mct/arch/mips/kernel/time.c
 --- linux-2.4.31/arch/mips/kernel/time.c	2005-01-19 15:09:29.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/kernel/time.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/kernel/time.c	2005-10-27 14:52:48.000000000 +0200
 @@ -310,60 +310,61 @@
  	return res;
  }
@@ -598,353 +572,18 @@ diff -Naru linux-2.4.31/arch/mips/kernel/time.c linux-2.4.31-mct/arch/mips/kerne
  }
  
  
-diff -Naru linux-2.4.31/arch/mips/kernel/urlfilter.c linux-2.4.31-mct/arch/mips/kernel/urlfilter.c
---- linux-2.4.31/arch/mips/kernel/urlfilter.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/kernel/urlfilter.c	2005-10-04 09:00:00.000000000 +0200
-@@ -0,0 +1,331 @@
-+#include <linux/kernel.h>
-+#include <linux/init.h>
-+#include <linux/sched.h>
-+#include <linux/list.h>
-+#include <linux/spinlock.h>
-+#include <linux/skbuff.h>
-+#include <linux/in.h>
-+#include <linux/netdevice.h>
-+#include <linux/ip.h>
-+#include <linux/tcp.h>
-+
-+#include <asm/mconfig.h>
-+#include <linux/urlfilter.h>
-+
-+static spinlock_t urllog_list_lock = SPIN_LOCK_UNLOCKED;
-+static LIST_HEAD(urllog_free);
-+
-+// urllog_active is an ordered list.
-+// recently reference url location was placed in the list tail.
-+static LIST_HEAD(urllog_active);
-+
-+static URLLOG urllog[URLLOG_MAX];	
-+static struct list_head urllog_hash_list[URLLOG_HASH_SIZE];
-+
-+static inline int get_url_hash_value(unsigned long val)
-+{
-+	return ((val >> 16) ^ (val & 0xffff)) % URLLOG_HASH_SIZE;
-+}
-+
-+static inline void copy_url_target(URLLOG *url, char *firstp, char *endp)
-+{
-+	int	i;
-+
-+	for (i = 0; i < URL_TARGET_SIZE - 1 && *firstp != 0x0d && *firstp != 0x0a && firstp < endp; i++) {
-+		url->target[i] = *firstp++;
-+	}
-+	url->target[i] = 0;
-+}
-+
-+void fill_record(unsigned long srcip, char *firstp, char *endp)
-+{
-+	int	log_index;
-+	URLLOG	*url, *newurl;
-+	struct list_head *pfree, *p;
-+
-+	spin_lock_irq(&urllog_list_lock);
-+	log_index = get_url_hash_value(srcip);
-+	list_for_each(p, &urllog_hash_list[log_index]) {
-+		url = list_entry(p, URLLOG, hash_list);
-+		if ( srcip == url->srcip ) {
-+			copy_url_target(url, firstp, endp);
-+			list_del(&url->list);
-+			list_add_tail(&url->list, &urllog_active);
-+			spin_unlock_irq(&urllog_list_lock);
-+			return;
-+		}
-+	}
-+
-+	// get free urllog node
-+	if ( !list_empty(&urllog_free) ) {
-+		pfree = urllog_free.next;
-+		list_del(pfree);
-+		newurl = list_entry(pfree, URLLOG, list);
-+	} else {
-+		int	index;
-+		// remove the oldest node in the urllog_active
-+		pfree = urllog_active.next;
-+		list_del(pfree);
-+		newurl = list_entry(pfree, URLLOG, list);
-+
-+		// remove the correspoinging node in the urllog_hash_list
-+		index = get_url_hash_value(newurl->srcip);
-+		list_for_each(p, &urllog_hash_list[index]) {
-+			url = list_entry(p, URLLOG, hash_list);	
-+			if ( url == newurl ) {
-+				list_del(&url->hash_list);
-+				break;
-+			}
-+		}
-+	}
-+
-+	newurl->time = jiffies;
-+	newurl->srcip = srcip;
-+	copy_url_target(newurl, firstp, endp);
-+
-+	list_add_tail(&newurl->list, &urllog_active);
-+	list_add(&newurl->hash_list, &urllog_hash_list[log_index]);
-+
-+	spin_unlock_irq(&urllog_list_lock);
-+}
-+
-+static spinlock_t url_filter_lock = SPIN_LOCK_UNLOCKED;
-+static int	url_filter_enable;
-+static int	nr_suffix_domain, nr_fully_qualified_domain;
-+static int	suffix_domain_len[MAX_URL_ACCESS_RULES];
-+static int	fully_qualified_domain_len[MAX_URL_ACCESS_RULES];
-+static char	suffix_domain[MAX_URL_ACCESS_RULES][URL_NAME_SIZE];
-+static char	fully_qualified_domain[MAX_URL_ACCESS_RULES][URL_NAME_SIZE];
-+
-+static void lower_case(char *str)
-+{
-+	for ( ; *str != 0; str++) {
-+		if ( *str >= 'A' && *str <= 'Z' )
-+			*str |= 0x20;
-+	}
-+}
-+
-+// if the requested domain name is allowed, return 0;
-+// otherwise, return -1
-+static int verify_pattern(char *domain_name, char *firstp, char *endp)
-+{
-+	int	i, j, k, len;
-+
-+	spin_lock_irq(&url_filter_lock);
-+
-+	if ( !url_filter_enable )
-+		goto allow;
-+
-+	if ( strncmp(firstp, "http://", 7) == 0 ) {
-+		firstp += 7;
-+	}
-+
-+	for (len = 0; len < URL_NAME_SIZE - 1 && *firstp != '/' && *firstp != 0x0d && *firstp != 0x0a && firstp < endp; len++) {
-+		domain_name[len] = *firstp++;
-+	}
-+
-+	domain_name[len] = 0;
-+	lower_case(domain_name);
-+
-+	for (i = 0; i < nr_fully_qualified_domain; i++) {
-+		if ( len != fully_qualified_domain_len[i] )
-+			continue;
-+
-+		if ( strcmp(domain_name, fully_qualified_domain[i]) == 0 ) {
-+#if 0
-+			printk("drop packet destined for \"%s\"\n", domain_name);
-+#endif
-+			goto drop;
-+		}
-+	}
-+
-+	for (i = 0; i < nr_suffix_domain; i++) {
-+		char	*psuffix;
-+		psuffix = suffix_domain[i];
-+		for (j = suffix_domain_len[i] - 1, k = len - 1; j >= 0 && k >= 0; j--, k--) {
-+			if ( psuffix[j] != domain_name[k] )
-+				break;
-+		}
-+
-+		if ( j < 0 ) {
-+#if 0
-+			printk("drop packet destined for \"%s\" with suffix domain rule \"%s\"\n", domain_name, suffix_domain[i]);
-+#endif
-+			goto drop;
-+		}
-+	}
-+
-+allow:
-+	spin_unlock_irq(&url_filter_lock);
-+	return 0;
-+
-+drop:
-+	spin_unlock_irq(&url_filter_lock);
-+	return -1;
-+}
-+
-+void submit_url_records(REG_URL_ACCESS_CONF *url_conf)
-+{
-+	int	i;
-+
-+	spin_lock_irq(&url_filter_lock);
-+
-+	url_filter_enable = url_conf->enable;
-+	if ( !url_filter_enable )
-+		goto done;
-+
-+	nr_suffix_domain = nr_fully_qualified_domain = 0;
-+
-+	for (i = 0; i < MAX_URL_ACCESS_RULES; i++) {
-+		if ( url_conf->url[i][0] == 0 )
-+			continue;
-+
-+		if ( url_conf->url[i][0] == '.' ) {
-+			strcpy(suffix_domain[nr_suffix_domain], url_conf->url[i]);
-+			lower_case(suffix_domain[nr_suffix_domain]);
-+			suffix_domain_len[nr_suffix_domain] = strlen(suffix_domain[nr_suffix_domain]);
-+			nr_suffix_domain++;
-+		} else {
-+			strcpy(fully_qualified_domain[nr_fully_qualified_domain], url_conf->url[i]);
-+			lower_case(fully_qualified_domain[nr_fully_qualified_domain]);
-+			fully_qualified_domain_len[nr_fully_qualified_domain] = strlen(fully_qualified_domain[nr_fully_qualified_domain]);
-+			nr_fully_qualified_domain++;
-+		}
-+	}
-+
-+done:
-+	spin_unlock_irq(&url_filter_lock);
-+}
-+
-+int process_url_access(struct sk_buff *skb)
-+{
-+	struct iphdr	*iph;
-+	struct tcphdr	*tcph;
-+	unsigned int	len;
-+	struct net_device *dev;
-+	char		*firstp, *endp;
-+	char		domain_name[URL_NAME_SIZE];	
-+	int		ret;
-+
-+	dev = skb->dev;
-+	//printk("name = %s\n", dev->name);
-+	if ( strncmp(dev->name, "eth1", 4) != 0 )
-+		return 0;
-+
-+	iph = skb->nh.iph;
-+	if ( iph->protocol != IPPROTO_TCP )	// constant defined in linux/in.h
-+		return 0;
-+
-+	//tcph = skb->h.th;
-+	tcph = (struct tcphdr *) (((void *) iph) + iph->ihl * 4);
-+	if ( tcph->dest != ntohs(80) || !tcph->ack || !tcph->psh )
-+		return 0;
-+
-+	//printk("ifindex = %d\n", dev->ifindex);
-+
-+	len = iph->tot_len;
-+	len = len - iph->ihl * 4 - tcph->doff * 4;
-+
-+	firstp = (char *) (((void*) tcph) + tcph->doff * 4);
-+	endp = firstp + len;
-+	do {
-+		int hit;
-+
-+		// skip one line
-+		while ( *firstp != 0x0a && firstp < endp)
-+			firstp++;
-+
-+		if ( firstp > endp )
-+			break;
-+
-+		firstp++;
-+
-+		if ( firstp + 9 > endp )
-+			break;
-+
-+		if ( *firstp == 0x0d && *(firstp+1) == 0x0a )
-+			break;
-+
-+		hit = 0;
-+		if ( strncmp(firstp, "Referer:", 8) == 0 ) {
-+			firstp += 8;
-+			hit = 1;
-+		} else if ( strncmp(firstp, "Host:", 5) == 0 ) {
-+			firstp += 5;
-+			hit = 1;
-+		}
-+
-+		if ( hit ) {
-+			// skip leading spaces
-+			while ( *firstp == ' ' && firstp < endp )
-+				firstp++;
-+
-+			ret = verify_pattern(domain_name, firstp, endp);
-+			if ( ret < 0 )
-+				return ret;
-+
-+			fill_record(iph->saddr, firstp, endp);
-+			break;
-+		}
-+	} while ( firstp < endp );
-+
-+	return 0;
-+}
-+
-+
-+asmlinkage int sys_get_urllog(int *size, URLLOG_INFO *urllog_info)
-+{
-+	int	i;
-+	struct list_head *p;
-+	URLLOG		*url;
-+	URLLOG_INFO	*pinfo;
-+
-+	spin_lock_irq(&urllog_list_lock);
-+	i = 0;
-+	pinfo = &urllog_info[i];
-+	list_for_each(p, &urllog_active) {
-+		url = list_entry(p, URLLOG, list);
-+		pinfo->time = url->time;
-+		pinfo->srcip = url->srcip;
-+		strcpy(pinfo->target, url->target);
-+		i++;
-+		pinfo++;
-+	}
-+	spin_unlock_irq(&urllog_list_lock);
-+
-+	*size = i;
-+
-+	return 0;
-+}
-+
-+int __init init_urllog(void)
-+{
-+	URLLOG *p;
-+	struct list_head *entry;
-+	
-+	printk(KERN_INFO "URL log initialization\n");
-+
-+	// There is no need to initialize "list_head" member in the URLLOG
-+	// before we use list_add function. This is because __list_add function
-+	// will update both "prev" and "next" member of added entry.
-+	for (p = &urllog[0]; p < &urllog[URLLOG_MAX]; p++) {
-+		list_add_tail(&p->list, &urllog_free);
-+	}
-+
-+	for (entry = &urllog_hash_list[0]; entry < &urllog_hash_list[URLLOG_HASH_SIZE]; entry++)
-+		INIT_LIST_HEAD(entry);
-+
-+#if 0
-+	url_filter_enable = 1;
-+	nr_suffix_domain = 1;
-+	nr_fully_qualified_domain = 1;
-+	strcpy(suffix_domain[0], ".com.tw");
-+	strcpy(fully_qualified_domain[0], "www.yahoo.com");
-+	suffix_domain_len[0] = strlen(suffix_domain[0]);
-+	fully_qualified_domain_len[0] = strlen(fully_qualified_domain[0]);
-+#endif
-+
-+	return 0;
-+}
-+
-+__initcall(init_urllog);
 diff -Naru linux-2.4.31/arch/mips/ld.script.in linux-2.4.31-mct/arch/mips/ld.script.in
 --- linux-2.4.31/arch/mips/ld.script.in	2005-01-19 15:09:29.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/ld.script.in	2005-10-04 09:00:00.000000000 +0200
-@@ -10,7 +10,6 @@
++++ linux-2.4.31-mct/arch/mips/ld.script.in	2005-10-27 15:16:15.000000000 +0200
+@@ -9,6 +9,7 @@
+   {
      _ftext = . ;
      *(.text)
++    *(.fixup)
      *(.rodata)
--    *(.rodata.*)
+     *(.rodata.*)
      *(.rodata1)
-     /* .gnu.warning sections are handled specially by elf32.em.  */
-     *(.gnu.warning)
-@@ -50,6 +49,9 @@
+@@ -50,6 +51,9 @@
    . = ALIGN(4096);	/* Align double page for init_task_union */
    __init_end = .;
  
@@ -954,7 +593,7 @@ diff -Naru linux-2.4.31/arch/mips/ld.script.in linux-2.4.31-mct/arch/mips/ld.scr
    . = ALIGN(32);
    .data.cacheline_aligned : { *(.data.cacheline_aligned) }
  
-@@ -79,8 +81,8 @@
+@@ -79,8 +83,8 @@
     . = ALIGN(4096);
     __rd_start = .;
     *(.initrd)
@@ -964,7 +603,7 @@ diff -Naru linux-2.4.31/arch/mips/ld.script.in linux-2.4.31-mct/arch/mips/ld.scr
  
      CONSTRUCTORS
    }
-@@ -109,6 +111,10 @@
+@@ -109,6 +113,10 @@
     *(.bss)
     *(COMMON)
     .  = ALIGN(4);
@@ -977,7 +616,7 @@ diff -Naru linux-2.4.31/arch/mips/ld.script.in linux-2.4.31-mct/arch/mips/ld.scr
    }
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/Makefile linux-2.4.31-mct/arch/mips/mct-boards/generic/Makefile
 --- linux-2.4.31/arch/mips/mct-boards/generic/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/Makefile	2005-10-04 09:26:57.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/Makefile	2005-10-27 14:53:36.000000000 +0200
 @@ -0,0 +1,32 @@
 +#
 +# Makefile for the Toshiba TX-RISC board generic parts of the kernel
@@ -1003,7 +642,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/Makefile linux-2.4.31-mct/a
 +
 +export-objs = setup.o irq_tx3927.o irq_tx4927.o irq_tx4925.o dma.o
 +
-+obj-y	:= setup.o pmon.o pmon-low.o prom.o pci.o \
++obj-y	:= setup.o pmon.o pmon-low.o prom.o pci.o proc.o \
 +	irq.o irq_tx3927.o irq_tx4927.o irq_tx4925.o int-handler.o \
 +	dma.o wbflush.o \
 +	irq_jmi39io2isac.o ide-jmi39io2.o kbd-jmi39io2.o basic_io.o \
@@ -1013,7 +652,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/Makefile linux-2.4.31-mct/a
 +include $(TOPDIR)/Rules.make
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/basic_io.c linux-2.4.31-mct/arch/mips/mct-boards/generic/basic_io.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/basic_io.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/basic_io.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/basic_io.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,317 @@
 +#include <linux/config.h>
 +#include <linux/init.h>
@@ -1334,7 +973,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/basic_io.c linux-2.4.31-mct
 +
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/dma.c linux-2.4.31-mct/arch/mips/mct-boards/generic/dma.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/dma.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/dma.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/dma.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,888 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/dma.c
@@ -2226,7 +1865,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/dma.c linux-2.4.31-mct/arch
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/dump_tx3927.c linux-2.4.31-mct/arch/mips/mct-boards/generic/dump_tx3927.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/dump_tx3927.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/dump_tx3927.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/dump_tx3927.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,38 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/dump_tx3927.c
@@ -2268,7 +1907,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/dump_tx3927.c linux-2.4.31-
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/dump_tx4925.c linux-2.4.31-mct/arch/mips/mct-boards/generic/dump_tx4925.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/dump_tx4925.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/dump_tx4925.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/dump_tx4925.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,120 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/dump_tx4925.c
@@ -2392,7 +2031,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/dump_tx4925.c linux-2.4.31-
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/dump_tx4927.c linux-2.4.31-mct/arch/mips/mct-boards/generic/dump_tx4927.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/dump_tx4927.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/dump_tx4927.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/dump_tx4927.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,130 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/dump_tx4927.c
@@ -2526,7 +2165,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/dump_tx4927.c linux-2.4.31-
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/gdb_hook.c linux-2.4.31-mct/arch/mips/mct-boards/generic/gdb_hook.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/gdb_hook.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/gdb_hook.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/gdb_hook.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,451 @@
 +/*
 + * Carsten Langgaard, carstenl@mips.com
@@ -2981,7 +2620,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/gdb_hook.c linux-2.4.31-mct
 +#endif
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/ide-jmi39io2.c linux-2.4.31-mct/arch/mips/mct-boards/generic/ide-jmi39io2.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/ide-jmi39io2.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/ide-jmi39io2.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/ide-jmi39io2.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,64 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -3049,7 +2688,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/ide-jmi39io2.c linux-2.4.31
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/int-handler.S linux-2.4.31-mct/arch/mips/mct-boards/generic/int-handler.S
 --- linux-2.4.31/arch/mips/mct-boards/generic/int-handler.S	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/int-handler.S	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/int-handler.S	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,165 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/int-handler.S
@@ -3218,7 +2857,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/int-handler.S linux-2.4.31-
 +#endif /* EXCEPTION_DEBUG */
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/irq.c linux-2.4.31-mct/arch/mips/mct-boards/generic/irq.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/irq.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/irq.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/irq.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,336 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/irq.c
@@ -3558,7 +3197,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/irq.c linux-2.4.31-mct/arch
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/irq_jmi39io2isac.c linux-2.4.31-mct/arch/mips/mct-boards/generic/irq_jmi39io2isac.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/irq_jmi39io2isac.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/irq_jmi39io2isac.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/irq_jmi39io2isac.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,183 @@
 +/*
 + * linux/arch/mips/toshiba-boards/generic/irq_jmi39io2isac.c
@@ -3745,7 +3384,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/irq_jmi39io2isac.c linux-2.
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/irq_tx3927.c linux-2.4.31-mct/arch/mips/mct-boards/generic/irq_tx3927.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/irq_tx3927.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/irq_tx3927.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/irq_tx3927.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,125 @@
 +/*
 + * linux/arch/mips/toshiba-boards/generic/irq_tx3927.c
@@ -3874,7 +3513,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/irq_tx3927.c linux-2.4.31-m
 +EXPORT_SYMBOL(tx3927_irq_to_irq);
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/irq_tx4925.c linux-2.4.31-mct/arch/mips/mct-boards/generic/irq_tx4925.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/irq_tx4925.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/irq_tx4925.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/irq_tx4925.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,140 @@
 +/*
 + * linux/arch/mips/toshiba-boards/generic/irq_tx4925.c
@@ -4018,7 +3657,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/irq_tx4925.c linux-2.4.31-m
 +EXPORT_SYMBOL(tx4925_irq_to_irq);
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/irq_tx4927.c linux-2.4.31-mct/arch/mips/mct-boards/generic/irq_tx4927.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/irq_tx4927.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/irq_tx4927.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/irq_tx4927.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,120 @@
 +/*
 + * linux/arch/mips/toshiba-boards/generic/irq_tx4927.c
@@ -4142,7 +3781,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/irq_tx4927.c linux-2.4.31-m
 +EXPORT_SYMBOL(tx4927_irq_to_irq);
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/kbd-jmi39io2.c linux-2.4.31-mct/arch/mips/mct-boards/generic/kbd-jmi39io2.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/kbd-jmi39io2.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/kbd-jmi39io2.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/kbd-jmi39io2.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,101 @@
 +/* $Id: linux-2.4.31-mct.diff,v 1.1.1.1 2005/10/04 20:57:53 andi Exp $
 + *
@@ -4247,7 +3886,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/kbd-jmi39io2.c linux-2.4.31
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/pci.c linux-2.4.31-mct/arch/mips/mct-boards/generic/pci.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/pci.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/pci.c	2005-10-04 09:26:50.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/pci.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,351 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/pci.c
@@ -4602,7 +4241,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/pci.c linux-2.4.31-mct/arch
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/pmon-low.S linux-2.4.31-mct/arch/mips/mct-boards/generic/pmon-low.S
 --- linux-2.4.31/arch/mips/mct-boards/generic/pmon-low.S	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/pmon-low.S	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/pmon-low.S	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,50 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/pmon-low.S
@@ -4656,7 +4295,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/pmon-low.S linux-2.4.31-mct
 +	END(pmon_trap_low)
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/pmon.c linux-2.4.31-mct/arch/mips/mct-boards/generic/pmon.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/pmon.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/pmon.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/pmon.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,59 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/pmon.c
@@ -4717,9 +4356,320 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/pmon.c linux-2.4.31-mct/arc
 +	set_except_vector(tt, pmon_trap_low);
 +	restore_flags(flags);
 +}
+diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/proc.c linux-2.4.31-mct/arch/mips/mct-boards/generic/proc.c
+--- linux-2.4.31/arch/mips/mct-boards/generic/proc.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/proc.c	2005-10-27 14:53:21.000000000 +0200
+@@ -0,0 +1,306 @@
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/proc_fs.h>
++#include <linux/sched.h>
++#include <linux/netdevice.h>
++#include <asm/uaccess.h>
++
++#define MODULE_VERSION "0.1"
++#define MODULE_NAME "mct"
++
++static struct proc_dir_entry *mct_dir, *mct_led_dir, *hb_entry, *in_entry, *out_entry;
++
++struct hb_data_t {
++	char mode[10];
++	int v_on;
++	int v_off;
++};
++struct net_data_t {
++	char iface[10];
++	char mode;
++	int max_kbps;
++};
++struct hb_data_t hb_data;
++struct net_data_t in_data,out_data;
++
++void __init hbled_init(void);
++static int proc_read_hb(char *page, char **start,off_t off, int count,int *eof, void *data) {
++	int len;
++	MOD_INC_USE_COUNT;
++	if (strcmp(hb_data.mode,"blink")==0) {
++		len = sprintf (page,"%s %i/%i\n",hb_data.mode,hb_data.v_on,hb_data.v_off);
++	} else {
++		len = sprintf (page,"%s\n",hb_data.mode);
++	}
++	MOD_DEC_USE_COUNT;
++	return len;
++}
++static int proc_write_hb(struct file *file,const char *buffer,unsigned long count,void *data) {
++	unsigned long len;
++	char b[64],mode[64];
++	int ontime,offtime,p;
++	MOD_INC_USE_COUNT;
++	if (count>64) len=64; else len=count;
++	copy_from_user(b,buffer,len);
++	b[count]=0;
++	p = sscanf (b,"%64s %d %d",mode,&ontime,&offtime);
++	if (p>0) strcpy(hb_data.mode,mode);
++	if (p>1) hb_data.v_on = ontime;
++	if (p>2) hb_data.v_off = offtime;
++	if (hb_data.v_on > 5000) hb_data.v_on = 5000;
++	if (hb_data.v_on < 1) hb_data.v_on = 1;
++	if (hb_data.v_off > 5000) hb_data.v_off = 5000;
++	if (hb_data.v_off < 1) hb_data.v_off = 1;
++	MOD_DEC_USE_COUNT;
++	return len;
++}
++
++#define CPU_PIODO_ADDR	0xfffef500
++#define CPU_PIODI_ADDR	0xfffef504
++#define CPU_GPIO_HBLED_BIT		0x00000100
++static struct timer_list hbled_timer;
++static unsigned long pre_uptime,pre_idle;
++extern struct task_struct *init_tasks[NR_CPUS];
++
++static void hbled_blink(unsigned long dummy) {
++	unsigned long val,uptime,idle,u,i,next;
++	int is_on;
++	
++	val = *(volatile unsigned long *) CPU_PIODI_ADDR;
++	is_on = val & CPU_GPIO_HBLED_BIT;
++	if (strcmp("blink",hb_data.mode)==0) {
++		(*(volatile unsigned long *) CPU_PIODO_ADDR) = is_on ? (val & ~CPU_GPIO_HBLED_BIT) : (val | CPU_GPIO_HBLED_BIT);
++		next = is_on ? hb_data.v_on : hb_data.v_off;
++	} else if (strcmp("on",hb_data.mode)==0) {
++		(*(volatile unsigned long *) CPU_PIODO_ADDR) = val & ~CPU_GPIO_HBLED_BIT;
++		next = HZ / 5;
++	} else if (strcmp("off",hb_data.mode)==0) {
++		(*(volatile unsigned long *) CPU_PIODO_ADDR) = val | CPU_GPIO_HBLED_BIT;
++		next = HZ / 5;
++	} else if (strcmp("cpu",hb_data.mode)==0) {
++		(*(volatile unsigned long *) CPU_PIODO_ADDR) = is_on ? (val & ~CPU_GPIO_HBLED_BIT) : (val | CPU_GPIO_HBLED_BIT);
++		if (! is_on) {
++			next = 3;
++		} else {
++			uptime = jiffies;
++			idle = init_tasks[0]->times.tms_utime + init_tasks[0]->times.tms_stime;
++			u = uptime - pre_uptime;
++			i = idle - pre_idle;
++			if (u > 0) next = 5 + ((i * 162)) / u; else next = 167;
++			pre_uptime = uptime;
++			pre_idle = idle;
++		}
++	} else {
++		next = HZ / 5;
++	}
++	init_timer(&hbled_timer);
++	hbled_timer.function = hbled_blink;
++	hbled_timer.expires = jiffies + next;
++	add_timer(&hbled_timer);
++}
++
++void __init hbled_init(void) {
++	init_timer(&hbled_timer);
++	hbled_timer.function = hbled_blink;
++	hbled_timer.expires = jiffies + HZ / 5;
++	add_timer(&hbled_timer);
++}
++
++
++
++static int proc_read_in(char *page, char **start,off_t off, int count,int *eof, void *data) {
++	int len;
++	MOD_INC_USE_COUNT;
++	len = sprintf (page,"%s %c %i\n",in_data.iface,in_data.mode,in_data.max_kbps);
++	MOD_DEC_USE_COUNT;
++	return len;
++}
++static int proc_write_in(struct file *file,const char *buffer,unsigned long count,void *data) {
++	unsigned long len;
++	char b[64],iface[64],mode;
++	int max_kbps,p;
++	MOD_INC_USE_COUNT;
++	if (count>64) len=64; else len = count;
++	copy_from_user(b,buffer,len);
++	b[count]=0;
++	p = sscanf (b,"%64s %1s %d",iface,&mode,&max_kbps);
++	if (p>0) strcpy(in_data.iface,iface);
++	if (p>1) in_data.mode = mode;
++	if (p>2) in_data.max_kbps = max_kbps;
++	MOD_DEC_USE_COUNT;
++	return len;
++}
++static int proc_read_out(char *page, char **start,off_t off, int count,int *eof, void *data) {
++	int len;
++	MOD_INC_USE_COUNT;
++	len = sprintf (page,"%s %c %i\n",out_data.iface,out_data.mode,out_data.max_kbps);
++	MOD_DEC_USE_COUNT;
++	return len;
++}
++static int proc_write_out(struct file *file,const char *buffer,unsigned long count,void *data) {
++	unsigned long len;
++	char b[64],iface[64],mode;
++	int max_kbps,p;
++	MOD_INC_USE_COUNT;
++	if (count>64) len=64; else len = count;
++	copy_from_user(b,buffer,len);
++	b[count]=0;
++	p = sscanf (b,"%64s %1s %d",iface,&mode,&max_kbps);
++	if (p>0) strcpy(out_data.iface,iface);
++	if (p>1) out_data.mode = mode;
++	if (p>2) out_data.max_kbps = max_kbps;
++	MOD_DEC_USE_COUNT;
++	return len;
++}
++#define ETHER_LED		0xb4000000
++static struct timer_list inout_timer;
++static unsigned long last_in,last_out;
++unsigned long getDevRx(char *devName) {
++	struct net_device *dev;
++	unsigned long val=0;
++	read_lock(&dev_base_lock);
++	for (dev = dev_base; dev != NULL; dev = dev->next) {
++		if (strcmp(dev->name,devName)==0) {
++			struct net_device_stats *stats = (dev->get_stats ? dev->get_stats(dev): NULL);
++			if (stats) val = stats->rx_bytes;
++		}
++	}
++	read_unlock(&dev_base_lock);
++	return val;
++}
++unsigned long getDevTx(char *devName) {
++	struct net_device *dev;
++	unsigned long val=0;
++	read_lock(&dev_base_lock);
++	for (dev = dev_base; dev != NULL; dev = dev->next) {
++		if (strcmp(dev->name,devName)==0) {
++			struct net_device_stats *stats = (dev->get_stats ? dev->get_stats(dev): NULL);
++			if (stats) val = stats->tx_bytes;
++		}
++	}
++	read_unlock(&dev_base_lock);
++	return val;
++}
++static void inout_led(unsigned long dummy) {
++	int in_led,out_led;
++	unsigned long val;
++
++	if (strcmp("off",in_data.iface)==0) {
++		in_led = 0;
++	} else 	if (strcmp("on",in_data.iface)==0) {
++		in_led = 4;
++	} else {
++		val = in_data.mode=='r' ? getDevRx(in_data.iface) : getDevTx(in_data.iface);
++		in_led = ((val-last_in)*4) / (in_data.max_kbps * 1024);
++		last_in = val;
++	}
++	if (strcmp("off",out_data.iface)==0) {
++		out_led = 0;
++	} else 	if (strcmp("on",out_data.iface)==0) {
++		out_led = 4;
++	} else {
++		val = out_data.mode=='r' ? getDevRx(out_data.iface) : getDevTx(out_data.iface);
++		out_led = ((val-last_out)*4) / (out_data.max_kbps * 1024);
++		last_out = val;
++	}
++
++	*((volatile unsigned char *) ETHER_LED) = (0x0f >> out_led) | ((0xff >> in_led) & 0xf0);
++	init_timer(&inout_timer);
++	inout_timer.function = inout_led;
++	inout_timer.expires = jiffies + HZ/10;
++	add_timer(&inout_timer);
++}
++
++void __init inout_init(void) {
++	init_timer(&inout_timer);
++	inout_timer.function = inout_led;
++	inout_timer.expires = jiffies + HZ/10;
++	add_timer(&inout_timer);
++}
++
++static int __init init_procfs_mct(void) {
++	int rv = 0;
++	/* create directory */
++	mct_dir = proc_mkdir(MODULE_NAME, NULL);
++	if(mct_dir == NULL) {
++		rv = -ENOMEM;
++		goto out;
++	}
++	mct_dir->owner = THIS_MODULE;
++	/* create led directory */
++	mct_led_dir = proc_mkdir("led",mct_dir);
++	if(mct_led_dir == NULL) {
++		rv = -ENOMEM;
++		goto no_led;
++	}
++	mct_led_dir->owner = THIS_MODULE;
++	hb_entry = create_proc_entry ("hb",0644,mct_led_dir);
++	if(hb_entry == NULL) {
++		rv = -ENOMEM;
++		goto no_hb;
++	}
++	strcpy(hb_data.mode,"on");
++	hb_data.v_off = HZ /2;
++	hb_data.v_on = HZ / 2;
++	hb_entry->data = &hb_data;
++	hb_entry->read_proc = proc_read_hb;
++	hb_entry->write_proc = proc_write_hb;
++	hb_entry->owner = THIS_MODULE;
++	hbled_init();
++	in_entry = create_proc_entry ("in",0644,mct_led_dir);
++	if(in_entry == NULL) {
++		rv = -ENOMEM;
++		goto no_in;
++	}
++	strcpy(in_data.iface,"eth0");
++	in_data.mode = 'r';
++	in_data.max_kbps = 100;
++	in_entry->data = &in_data;
++	in_entry->read_proc = proc_read_in;
++	in_entry->write_proc = proc_write_in;
++	in_entry->owner = THIS_MODULE;
++	out_entry = create_proc_entry ("out",0644,mct_led_dir);
++	if(out_entry == NULL) {
++		rv = -ENOMEM;
++		goto no_out;
++	}
++	strcpy(out_data.iface,"eth0");
++	out_data.mode = 't';
++	out_data.max_kbps = 100;
++	out_entry->data = &out_data;;
++	out_entry->read_proc = proc_read_out;
++	out_entry->write_proc = proc_write_out;
++	out_entry->owner = THIS_MODULE;
++	inout_init();
++	
++	/* everything OK */
++	printk(KERN_INFO "%s %s initialised\n",MODULE_NAME, MODULE_VERSION);
++	return rv;
++no_out:
++	remove_proc_entry("in",mct_led_dir);
++no_in:	
++	remove_proc_entry("hb",mct_led_dir);
++no_hb:	
++	remove_proc_entry("led",mct_dir);
++no_led:
++	remove_proc_entry(MODULE_NAME, NULL);
++out:
++	return rv;
++}
++
++static void __exit cleanup_procfs_mct(void) {
++	remove_proc_entry("out",mct_led_dir);
++	remove_proc_entry("in",mct_led_dir);
++	remove_proc_entry("hb",mct_led_dir);
++	remove_proc_entry("led",mct_dir);
++	remove_proc_entry(MODULE_NAME, NULL);
++	printk(KERN_INFO "%s %s removed\n",MODULE_NAME, MODULE_VERSION);
++}
++
++module_init(init_procfs_mct);
++module_exit(cleanup_procfs_mct);
++
++MODULE_AUTHOR("Udo Hegel");
++MODULE_DESCRIPTION("Mct proc support");
++EXPORT_NO_SYMBOLS;
+\ No newline at end of file
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/prom.c linux-2.4.31-mct/arch/mips/mct-boards/generic/prom.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/prom.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/prom.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/prom.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,386 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/prom.c
@@ -5109,7 +5059,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/prom.c linux-2.4.31-mct/arc
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/rtl8305.c linux-2.4.31-mct/arch/mips/mct-boards/generic/rtl8305.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/rtl8305.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/rtl8305.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/rtl8305.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,175 @@
 +#include <linux/config.h>
 +#include <asm/delay.h>
@@ -5288,7 +5238,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/rtl8305.c linux-2.4.31-mct/
 +
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/setup.c linux-2.4.31-mct/arch/mips/mct-boards/generic/setup.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/setup.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/setup.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/setup.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,613 @@
 +/*
 + * linux/arch/mips/toshiba-boards/generic/setup.c
@@ -5905,7 +5855,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/setup.c linux-2.4.31-mct/ar
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/wbflush.c linux-2.4.31-mct/arch/mips/mct-boards/generic/wbflush.c
 --- linux-2.4.31/arch/mips/mct-boards/generic/wbflush.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/generic/wbflush.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/generic/wbflush.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,70 @@
 +/*
 + * Setup the right wbflush routine for TOSHIBA TX-RISC.
@@ -5979,7 +5929,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/generic/wbflush.c linux-2.4.31-mct/
 +
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/Makefile linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/Makefile
 --- linux-2.4.31/arch/mips/mct-boards/sg4x00/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/Makefile	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/Makefile	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,24 @@
 +#
 +# Makefile for the TOSHIBA RBTX4925 board specific parts of the kernel
@@ -6007,7 +5957,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/Makefile linux-2.4.31-mct/ar
 +include $(TOPDIR)/Rules.make
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/irq.c linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/irq.c
 --- linux-2.4.31/arch/mips/mct-boards/sg4x00/irq.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/irq.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/irq.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,461 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/rbtx4925/irq.c
@@ -6472,7 +6422,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/irq.c linux-2.4.31-mct/arch/
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/pci.c linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/pci.c
 --- linux-2.4.31/arch/mips/mct-boards/sg4x00/pci.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/pci.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/pci.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,210 @@
 +/* $Id: linux-2.4.31-mct.diff,v 1.1.1.1 2005/10/04 20:57:53 andi Exp $
 + *
@@ -6686,7 +6636,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/pci.c linux-2.4.31-mct/arch/
 +#endif /* CONFIG_PCI */
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/power.c linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/power.c
 --- linux-2.4.31/arch/mips/mct-boards/sg4x00/power.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/power.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/power.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,152 @@
 +
 +#include <linux/kernel.h>
@@ -6842,7 +6792,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/power.c linux-2.4.31-mct/arc
 +#endif
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/prom.c linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/prom.c
 --- linux-2.4.31/arch/mips/mct-boards/sg4x00/prom.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/prom.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/prom.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,37 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/rbtx4925/prom.c
@@ -6883,7 +6833,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/prom.c linux-2.4.31-mct/arch
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/s3511a.c linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/s3511a.c
 --- linux-2.4.31/arch/mips/mct-boards/sg4x00/s3511a.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/s3511a.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/s3511a.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,324 @@
 +#include <linux/config.h>
 +#include <linux/init.h>
@@ -7211,7 +7161,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/s3511a.c linux-2.4.31-mct/ar
 +
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/setup.c linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/setup.c
 --- linux-2.4.31/arch/mips/mct-boards/sg4x00/setup.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/setup.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/setup.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,711 @@
 +/*
 + * linux/arch/mips/toshiba-boards/rbtx4925/setup.c
@@ -7926,7 +7876,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/setup.c linux-2.4.31-mct/arc
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/time.c linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/time.c
 --- linux-2.4.31/arch/mips/mct-boards/sg4x00/time.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/time.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/time.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,102 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/rbtx4925/time.c
@@ -8032,7 +7982,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/time.c linux-2.4.31-mct/arch
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/wdtmr.c linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/wdtmr.c
 --- linux-2.4.31/arch/mips/mct-boards/sg4x00/wdtmr.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/wdtmr.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sg4x00/wdtmr.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,65 @@
 +
 +#include <linux/init.h>
@@ -8101,7 +8051,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sg4x00/wdtmr.c linux-2.4.31-mct/arc
 +
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/Makefile linux-2.4.31-mct/arch/mips/mct-boards/sgx00/Makefile
 --- linux-2.4.31/arch/mips/mct-boards/sgx00/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/Makefile	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/Makefile	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,32 @@
 +#
 +# Makefile for the TJSYS JMR-TX3927 board specific parts of the kernel
@@ -8137,7 +8087,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/Makefile linux-2.4.31-mct/arc
 +include $(TOPDIR)/Rules.make
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/irq.c linux-2.4.31-mct/arch/mips/mct-boards/sgx00/irq.c
 --- linux-2.4.31/arch/mips/mct-boards/sgx00/irq.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/irq.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/irq.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,327 @@
 +/*
 + *  linux/arch/mips/mct-boards/jmr3927/irq.c
@@ -8468,7 +8418,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/irq.c linux-2.4.31-mct/arch/m
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/pci.c linux-2.4.31-mct/arch/mips/mct-boards/sgx00/pci.c
 --- linux-2.4.31/arch/mips/mct-boards/sgx00/pci.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/pci.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/pci.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,202 @@
 +/* $Id: linux-2.4.31-mct.diff,v 1.1.1.1 2005/10/04 20:57:53 andi Exp $
 + *
@@ -8674,7 +8624,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/pci.c linux-2.4.31-mct/arch/m
 +#endif /* CONFIG_PCI */
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/power.c linux-2.4.31-mct/arch/mips/mct-boards/sgx00/power.c
 --- linux-2.4.31/arch/mips/mct-boards/sgx00/power.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/power.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/power.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,175 @@
 +
 +#include <linux/kernel.h>
@@ -8853,7 +8803,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/power.c linux-2.4.31-mct/arch
 +__initcall(power_init);
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/prom.c linux-2.4.31-mct/arch/mips/mct-boards/sgx00/prom.c
 --- linux-2.4.31/arch/mips/mct-boards/sgx00/prom.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/prom.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/prom.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,38 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/jmr3927/prom.c
@@ -8895,7 +8845,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/prom.c linux-2.4.31-mct/arch/
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/rtc.c linux-2.4.31-mct/arch/mips/mct-boards/sgx00/rtc.c
 --- linux-2.4.31/arch/mips/mct-boards/sgx00/rtc.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/rtc.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/rtc.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,35 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/jmr3927/rtc.c
@@ -8934,7 +8884,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/rtc.c linux-2.4.31-mct/arch/m
 +};
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/s3511a.c linux-2.4.31-mct/arch/mips/mct-boards/sgx00/s3511a.c
 --- linux-2.4.31/arch/mips/mct-boards/sgx00/s3511a.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/s3511a.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/s3511a.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,353 @@
 +#include <linux/config.h>
 +#include <linux/init.h>
@@ -9291,7 +9241,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/s3511a.c linux-2.4.31-mct/arc
 +
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/setup.c linux-2.4.31-mct/arch/mips/mct-boards/sgx00/setup.c
 --- linux-2.4.31/arch/mips/mct-boards/sgx00/setup.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/setup.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/setup.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,449 @@
 +/*
 + * linux/arch/mips/toshiba-boards/jmr3927/setup.c
@@ -9744,7 +9694,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/setup.c linux-2.4.31-mct/arch
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/time.c linux-2.4.31-mct/arch/mips/mct-boards/sgx00/time.c
 --- linux-2.4.31/arch/mips/mct-boards/sgx00/time.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/time.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/time.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,98 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/jmr3927/time.c
@@ -9846,7 +9796,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/time.c linux-2.4.31-mct/arch/
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/wdtmr.c linux-2.4.31-mct/arch/mips/mct-boards/sgx00/wdtmr.c
 --- linux-2.4.31/arch/mips/mct-boards/sgx00/wdtmr.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/wdtmr.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/sgx00/wdtmr.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,64 @@
 +
 +#include <linux/init.h>
@@ -9914,7 +9864,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/sgx00/wdtmr.c linux-2.4.31-mct/arch
 +
 diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/Makefile linux-2.4.31-mct/arch/mips/mct-boards/tsdb/Makefile
 --- linux-2.4.31/arch/mips/mct-boards/tsdb/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/Makefile	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/Makefile	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,24 @@
 +#
 +# Makefile for the Toshiba SDB CPU board specific parts of the kernel
@@ -9942,7 +9892,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/Makefile linux-2.4.31-mct/arch
 +include $(TOPDIR)/Rules.make
 diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/int-handler.S linux-2.4.31-mct/arch/mips/mct-boards/tsdb/int-handler.S
 --- linux-2.4.31/arch/mips/mct-boards/tsdb/int-handler.S	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/int-handler.S	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/int-handler.S	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,114 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/tsdb/int-handler.S
@@ -10060,7 +10010,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/int-handler.S linux-2.4.31-mct
 +	END(tsdb_IRQ)
 diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/irq.c linux-2.4.31-mct/arch/mips/mct-boards/tsdb/irq.c
 --- linux-2.4.31/arch/mips/mct-boards/tsdb/irq.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/irq.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/irq.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,456 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/tsdb/irq.c
@@ -10520,7 +10470,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/irq.c linux-2.4.31-mct/arch/mi
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/pci.c linux-2.4.31-mct/arch/mips/mct-boards/tsdb/pci.c
 --- linux-2.4.31/arch/mips/mct-boards/tsdb/pci.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/pci.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/pci.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,210 @@
 +/* $Id: linux-2.4.31-mct.diff,v 1.1.1.1 2005/10/04 20:57:53 andi Exp $
 + *
@@ -10734,7 +10684,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/pci.c linux-2.4.31-mct/arch/mi
 +#endif /* CONFIG_PCI */
 diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/prom.c linux-2.4.31-mct/arch/mips/mct-boards/tsdb/prom.c
 --- linux-2.4.31/arch/mips/mct-boards/tsdb/prom.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/prom.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/prom.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,40 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/tsdb/prom.c
@@ -10778,7 +10728,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/prom.c linux-2.4.31-mct/arch/m
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/rtc.c linux-2.4.31-mct/arch/mips/mct-boards/tsdb/rtc.c
 --- linux-2.4.31/arch/mips/mct-boards/tsdb/rtc.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/rtc.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/rtc.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,45 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/tsdb/rtc.c
@@ -10827,7 +10777,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/rtc.c linux-2.4.31-mct/arch/mi
 +};
 diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/setup.c linux-2.4.31-mct/arch/mips/mct-boards/tsdb/setup.c
 --- linux-2.4.31/arch/mips/mct-boards/tsdb/setup.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/setup.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/setup.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,464 @@
 +/*
 + * linux/arch/mips/toshiba-boards/tsdb/setup.c
@@ -11295,7 +11245,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/setup.c linux-2.4.31-mct/arch/
 +}
 diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/time.c linux-2.4.31-mct/arch/mips/mct-boards/tsdb/time.c
 --- linux-2.4.31/arch/mips/mct-boards/tsdb/time.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/time.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/mct-boards/tsdb/time.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,105 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/tsdb/time.c
@@ -11404,7 +11354,7 @@ diff -Naru linux-2.4.31/arch/mips/mct-boards/tsdb/time.c linux-2.4.31-mct/arch/m
 +}
 diff -Naru linux-2.4.31/arch/mips/pci/pci.c linux-2.4.31-mct/arch/mips/pci/pci.c
 --- linux-2.4.31/arch/mips/pci/pci.c	2005-01-19 15:09:29.000000000 +0100
-+++ linux-2.4.31-mct/arch/mips/pci/pci.c	2005-10-04 09:31:37.000000000 +0200
++++ linux-2.4.31-mct/arch/mips/pci/pci.c	2005-10-27 14:52:48.000000000 +0200
 @@ -12,6 +12,7 @@
  
  #include <asm/pci_channel.h>
@@ -11449,7 +11399,7 @@ diff -Naru linux-2.4.31/arch/mips/pci/pci.c linux-2.4.31-mct/arch/mips/pci/pci.c
  /*
 diff -Naru linux-2.4.31/drivers/char/Config.in linux-2.4.31-mct/drivers/char/Config.in
 --- linux-2.4.31/drivers/char/Config.in	2004-08-08 01:26:04.000000000 +0200
-+++ linux-2.4.31-mct/drivers/char/Config.in	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/drivers/char/Config.in	2005-10-27 14:52:48.000000000 +0200
 @@ -104,6 +104,8 @@
        if [ "$CONFIG_TXX927_SERIAL" = "y" ]; then
           bool '    TXx927 SIO Console support' CONFIG_TXX927_SERIAL_CONSOLE  
@@ -11461,7 +11411,7 @@ diff -Naru linux-2.4.31/drivers/char/Config.in linux-2.4.31-mct/drivers/char/Con
           if [ "$CONFIG_SIBYTE_SB1250_DUART" = "y" ]; then
 diff -Naru linux-2.4.31/drivers/char/Makefile linux-2.4.31-mct/drivers/char/Makefile
 --- linux-2.4.31/drivers/char/Makefile	2004-08-08 01:26:04.000000000 +0200
-+++ linux-2.4.31-mct/drivers/char/Makefile	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/drivers/char/Makefile	2005-10-27 14:52:48.000000000 +0200
 @@ -217,6 +217,7 @@
  obj-$(CONFIG_HVC_CONSOLE) += hvc_console.o
  obj-$(CONFIG_SERIAL_TX3912) += generic_serial.o serial_tx3912.o
@@ -11472,7 +11422,7 @@ diff -Naru linux-2.4.31/drivers/char/Makefile linux-2.4.31-mct/drivers/char/Make
  obj-$(CONFIG_AU1X00_UART) += au1x00-serial.o
 diff -Naru linux-2.4.31/drivers/char/serial_mct_txx927.c linux-2.4.31-mct/drivers/char/serial_mct_txx927.c
 --- linux-2.4.31/drivers/char/serial_mct_txx927.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/drivers/char/serial_mct_txx927.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/drivers/char/serial_mct_txx927.c	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,1349 @@
 +/*
 + *  drivers/char/serial_txx927.c
@@ -12825,7 +12775,7 @@ diff -Naru linux-2.4.31/drivers/char/serial_mct_txx927.c linux-2.4.31-mct/driver
 +#endif
 diff -Naru linux-2.4.31/drivers/char/tty_io.c linux-2.4.31-mct/drivers/char/tty_io.c
 --- linux-2.4.31/drivers/char/tty_io.c	2005-01-19 15:09:53.000000000 +0100
-+++ linux-2.4.31-mct/drivers/char/tty_io.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/drivers/char/tty_io.c	2005-10-27 14:52:48.000000000 +0200
 @@ -164,6 +164,9 @@
  extern void sb1250_serial_console_init(void);
  extern void arc_console_init(void);
@@ -12848,7 +12798,7 @@ diff -Naru linux-2.4.31/drivers/char/tty_io.c linux-2.4.31-mct/drivers/char/tty_
  #endif
 diff -Naru linux-2.4.31/drivers/ide/ide-iops.c linux-2.4.31-mct/drivers/ide/ide-iops.c
 --- linux-2.4.31/drivers/ide/ide-iops.c	2004-02-18 14:36:31.000000000 +0100
-+++ linux-2.4.31-mct/drivers/ide/ide-iops.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/drivers/ide/ide-iops.c	2005-10-27 14:52:48.000000000 +0200
 @@ -1099,7 +1099,7 @@
  	   use. When they take an IRQ they check STS but also that
  	   the DMA count is not zero (see hpt's own driver)
@@ -12860,7 +12810,7 @@ diff -Naru linux-2.4.31/drivers/ide/ide-iops.c linux-2.4.31-mct/drivers/ide/ide-
  
 diff -Naru linux-2.4.31/drivers/ide/ide-probe.c linux-2.4.31-mct/drivers/ide/ide-probe.c
 --- linux-2.4.31/drivers/ide/ide-probe.c	2004-04-14 15:05:29.000000000 +0200
-+++ linux-2.4.31-mct/drivers/ide/ide-probe.c	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/drivers/ide/ide-probe.c	2005-10-27 14:52:48.000000000 +0200
 @@ -460,6 +460,19 @@
  	ide_delay_50ms();
  	SELECT_DRIVE(drive);
@@ -12881,1522 +12831,9 @@ diff -Naru linux-2.4.31/drivers/ide/ide-probe.c linux-2.4.31-mct/drivers/ide/ide
  	if (hwif->INB(IDE_SELECT_REG) != drive->select.all && !drive->present) {
  		if (drive->select.b.unit != 0) {
  			/* exit with drive0 selected */
-diff -Naru linux-2.4.31/drivers/mtd/Makefile linux-2.4.31-mct/drivers/mtd/Makefile
---- linux-2.4.31/drivers/mtd/Makefile	2003-06-13 16:51:34.000000000 +0200
-+++ linux-2.4.31-mct/drivers/mtd/Makefile	2005-10-04 09:00:00.000000000 +0200
-@@ -57,6 +57,8 @@
- obj-$(CONFIG_FTL)		+= ftl.o
- obj-$(CONFIG_NFTL)		+= nftl.o
- 
-+obj-$(CONFIG_MCT_BOARDS)	+= flash.o
-+
- nftl-objs	:= nftlcore.o nftlmount.o
- 
- include $(TOPDIR)/Rules.make
-diff -Naru linux-2.4.31/drivers/mtd/flash.c linux-2.4.31-mct/drivers/mtd/flash.c
---- linux-2.4.31/drivers/mtd/flash.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/drivers/mtd/flash.c	2005-10-04 09:00:00.000000000 +0200
-@@ -0,0 +1,1497 @@
-+/*
-+* Configuration access system call
-+*/
-+
-+#include <linux/init.h>
-+#include <linux/linkage.h>
-+#include <asm/errno.h>
-+#include <asm/io.h>
-+#include <linux/string.h>
-+#include <linux/mtd/mtd.h>
-+#include <linux/notifier.h>
-+#include <linux/reboot.h>
-+#include <asm/semaphore.h>
-+
-+#include <linux/urlfilter.h>
-+#include <asm/mconfig.h>
-+#include <asm/flash.h>
-+
-+#if defined(CONFIG_MCT_SG100) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SA200)
-+extern void get_switch_status(SWITCH_STATUS *switch_status);
-+#endif
-+
-+extern unsigned char	__fsysbuf, __esysbuf;
-+DECLARE_MUTEX(sysimage_sem);
-+static int	sysimage_state;
-+unsigned char	sysimage_percentage;
-+
-+int	conf_reset_in_progress;
-+
-+GENCONF_CKSUM_BLOCK		genconf_buf;
-+
-+#if defined(CONFIG_MCT_SG100)
-+USERACCOUNT_CKSUM_BLOCK		useraccount_buf;
-+#else
-+EXTCONF_CKSUM_BLOCK		extconf_buf;
-+#endif
-+
-+EVENTLOG_CKSUM_BLOCK		eventlog_buf;
-+DHCPLEASE_CKSUM_BLOCK		dhcplease_buf;
-+#if defined(CONFIG_MCT_SG600) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SG4100_EV) || defined(CONFIG_MCT_SA200)
-+USERSHARE_CKSUM_BLOCK		usershare_buf;
-+LA_USERS_CKSUM_BLOCK		la_user_buf;
-+LA_GRPSHARE_CKSUM_BLOCK		la_grpshare_buf;
-+static void restore_olduser_data(USERSHARE_BLOCK* old ,LA_USERS_BLOCK* new_usr, LA_GRPSHARE_BLOCK* new_grpshare);
-+#endif
-+
-+REGION_INFO genconf_region = {
-+	policy: FL_IMMEDIATE,
-+	base: GENCONF_ADDR,
-+	size: sizeof(GENCONF_CKSUM_BLOCK),
-+	buf_base: &genconf_buf,
-+	sem: __MUTEX_INITIALIZER(genconf_region.sem)
-+};
-+
-+#if defined(CONFIG_MCT_SG100) 
-+REGION_INFO useraccount_region = {
-+	policy: FL_IMMEDIATE,
-+	base: USERACCOUNT_ADDR,
-+	size: sizeof(USERACCOUNT_CKSUM_BLOCK),
-+	buf_base: &useraccount_buf,
-+	sem: __MUTEX_INITIALIZER(useraccount_region.sem)
-+};
-+#else
-+REGION_INFO extconf_region = {
-+	policy: FL_IMMEDIATE,
-+	base: EXTCONF_ADDR,
-+	size: sizeof(EXTCONF_CKSUM_BLOCK),
-+	buf_base: &extconf_buf,
-+	sem: __MUTEX_INITIALIZER(extconf_region.sem)
-+};
-+#endif
-+
-+REGION_INFO eventlog_region = {
-+	policy: FL_IMMEDIATE,
-+	base: EVENTLOG_ADDR,
-+	size: sizeof(EVENTLOG_CKSUM_BLOCK),
-+	buf_base: &eventlog_buf,
-+	sem: __MUTEX_INITIALIZER(eventlog_region.sem)
-+};
-+
-+REGION_INFO dhcplease_region = {
-+	policy: FL_INTERVAL,
-+	short_term_interval: 60 * 60 * 100, /* 1 hour */
-+	long_term_interval: 120 * 60 * 100, /* 2 hours */
-+	dirty: 0,
-+	write_force: 0,
-+	dirty_threshold: 200,
-+	base: DHCPLEASE_ADDR,
-+	size: sizeof(DHCPLEASE_CKSUM_BLOCK),
-+	buf_base: &dhcplease_buf,
-+	last_time_modified: 0,
-+	sem: __MUTEX_INITIALIZER(dhcplease_region.sem)
-+};
-+
-+#if defined(CONFIG_MCT_SG600) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SG4100_EV) || defined(CONFIG_MCT_SA200)
-+/*
-+REGION_INFO usershare_region = {
-+	policy: FL_IMMEDIATE,
-+	base: USERSHARE_ADDR,
-+	dirty: 1,
-+	size: 64*1024,	//sizeof(USERSHARE_CKSUM_BLOCK),
-+	buf_base: &usershare_buf,
-+	sem: __MUTEX_INITIALIZER(usershare_region.sem)
-+};
-+REGION_INFO la_user_region = {
-+	policy: FL_IMMEDIATE,
-+	base: LA_USER_ADDR,
-+	dirty: 1,
-+	size: 64*1024, //sizeof(LA_USERS_CKSUM_BLOCK),
-+	buf_base: &la_user_buf,
-+	sem: __MUTEX_INITIALIZER(la_user_region.sem)
-+};
-+REGION_INFO la_grpshare_region = {
-+	policy: FL_IMMEDIATE,
-+	base: LA_GRPSHARE_ADDR,
-+	dirty: 1,
-+	size: 64*1024,//sizeof(LA_GRPSHARE_CKSUM_BLOCK),	
-+	buf_base: &la_grpshare_buf,
-+	sem: __MUTEX_INITIALIZER(la_grpshare_region.sem)
-+};
-+*/
-+#endif
-+
-+
-+// the region_list is used for initializing timer.
-+REGION_INFO *region_list[] = {
-+	&genconf_region,
-+#if defined(CONFIG_MCT_SG100)
-+	&useraccount_region,
-+#else
-+	&extconf_region,
-+#endif
-+	&eventlog_region,
-+	&dhcplease_region,
-+#if defined(CONFIG_MCT_SG600) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SG4100_EV) || defined(CONFIG_MCT_SA200)
-+//	&usershare_region,
-+//	&la_user_region,
-+//	&la_grpshare_region,
-+#endif
-+};
-+
-+ACCESS_CONF access_conf[] = {
-+	{ MC_NET_CONFIG, offsetof(GENCONF_BLOCK, net_conf), sizeof(REG_NET_CONF), &genconf_region },
-+	{ MC_IPALIAS_CONFIG, offsetof(GENCONF_BLOCK, ipalias_conf), sizeof(REG_IPALIAS_CONF), &genconf_region },
-+	{ MC_MNAT_CONFIG, offsetof(GENCONF_BLOCK, mnat_conf), sizeof(REG_MNAT_CONF), &genconf_region },
-+	{ MC_DHCP_CONFIG, offsetof(GENCONF_BLOCK, dhcp_conf), sizeof(REG_DHCP_CONF), &genconf_region },
-+	{ MC_MACMAPPING_CONFIG, offsetof(GENCONF_BLOCK, macmapping_conf), sizeof(REG_MACMAPPING_CONF), &genconf_region },
-+	{ MC_HOSTMAPPING_CONFIG, offsetof(GENCONF_BLOCK, hostmapping_conf), sizeof(REG_HOSTMAPPING_CONF), &genconf_region },
-+	{ MC_ROUTE_CONFIG, offsetof(GENCONF_BLOCK, route_conf), sizeof(REG_ROUTE_CONF), &genconf_region },
-+	{ MC_IPSEC_CONFIG, offsetof(GENCONF_BLOCK, ipsec_conf), sizeof(REG_IPSEC_CONF), &genconf_region },
-+	{ MC_PPTP_CONFIG, offsetof(GENCONF_BLOCK, pptp_conf), sizeof(REG_PPTP_CONF), &genconf_region },
-+	{ MC_VSERVER_CONFIG, offsetof(GENCONF_BLOCK, vserver_conf), sizeof(REG_VSERVER_CONF), &genconf_region },
-+	{ MC_IP_ACCESS_CONFIG, offsetof(GENCONF_BLOCK, ip_access_conf), sizeof(REG_IP_ACCESS_CONF), &genconf_region },
-+	{ MC_URL_ACCESS_CONFIG, offsetof(GENCONF_BLOCK, url_access_conf), sizeof(REG_URL_ACCESS_CONF), &genconf_region },
-+	{ MC_ANTIHACK_CONFIG, offsetof(GENCONF_BLOCK, antihack_conf), sizeof(REG_ANTIHACK_CONF), &genconf_region },
-+	{ MC_SAMBA_CONFIG, offsetof(GENCONF_BLOCK, smbprn_conf), sizeof(REG_SAMBA_CONF), &genconf_region },
-+	{ MC_ALARM_CONFIG, offsetof(GENCONF_BLOCK, alarm_conf), sizeof(REG_ALARM_CONF), &genconf_region },
-+	{ MC_ADMIN_CONFIG, offsetof(GENCONF_BLOCK, admin_conf), sizeof(REG_ADMIN_CONF), &genconf_region },
-+	{ MC_DDNS_CONFIG, offsetof(GENCONF_BLOCK, ddns_conf), sizeof(REG_DDNS_CONF), &genconf_region },
-+	{ MC_SNMP_CONFIG, offsetof(GENCONF_BLOCK, snmp_conf), sizeof(REG_SNMP_CONF), &genconf_region },
-+#if defined(CONFIG_MCT_SG100)
-+	{ MC_USER_CONFIG, offsetof(USERACCOUNT_BLOCK, useraccount_conf), sizeof(REG_USER_CONF), &useraccount_region },
-+#endif
-+	{ MC_DHCP_LEASE, offsetof(DHCPLEASE_BLOCK, dhcplease_conf), sizeof(REG_DHCP_LEASE), &dhcplease_region },
-+	{ MC_EVENTLOG_CONFIG, offsetof(EVENTLOG_BLOCK, eventlog_conf), sizeof(REG_EVENTLOG_CONF), &eventlog_region },
-+#if defined(CONFIG_MCT_SG600) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SG4100_EV) || defined(CONFIG_MCT_SA200)
-+//	{ MC_USER,   	 offsetof(LA_USERS_BLOCK, users),     sizeof(LA_USERS),		&la_user_region },
-+//	{ MC_GROUP,  	 offsetof(LA_GRPSHARE_BLOCK, groups), sizeof(LA_GROUPS), 	&la_grpshare_region },
-+//	{ MC_SHARE,  	 offsetof(LA_GRPSHARE_BLOCK, shares), sizeof(LA_SHARES), 	&la_grpshare_region },
-+//	{ MC_USER,   	 offsetof(USERSHARE_BLOCK, users),  sizeof(USERS), 		&usershare_region },
-+//	{ MC_GROUP,  	 offsetof(USERSHARE_BLOCK, groups), sizeof(GROUPS), 		&usershare_region },
-+//	{ MC_SHARE,  	 offsetof(USERSHARE_BLOCK, shares), sizeof(SHARES), 		&usershare_region },
-+//	{ MC_USERSHARE,  offsetof(USERSHARE_BLOCK, users), sizeof(USERSHARE_BLOCK), 	&usershare_region },
-+//	{ MC_NFS_CONFIG, offsetof(GENCONF_BLOCK, nfs_conf), sizeof(REG_NFS_CONF), 	&genconf_region },
-+	{ MC_NFS_CONFIG, offsetof(EXTCONF_BLOCK, nfs_conf),  sizeof(REG_NFS_CONF), 	&extconf_region },
-+	{ MC_MAIL_CONFIG,offsetof(EXTCONF_BLOCK, mail_conf), sizeof(REG_MAIL_CONF), 	&extconf_region },
-+	{ MC_W3S_CONFIG, offsetof(EXTCONF_BLOCK, w3s_conf),  sizeof(REG_W3S_CONF), 	&extconf_region },
-+	{ MC_BPA_CONFIG, offsetof(EXTCONF_BLOCK, bpa_conf),  sizeof(REG_BPA_CONF), 	&extconf_region },
-+	{ MC_NTP_CONFIG, offsetof(EXTCONF_BLOCK, ntp_conf),  sizeof(REG_NTP_CONF), 	&extconf_region },
-+	{ MC_PPPOE_MTU,  offsetof(EXTCONF_BLOCK, pppoe_mtu), sizeof(int), 		&extconf_region },
-+	{ MC_DPING,	 offsetof(EXTCONF_BLOCK, en_dping), sizeof(int),		&extconf_region },
-+	{ MC_SAMBA_LANG, offsetof(EXTCONF_BLOCK, smb_lang), sizeof(int),		&extconf_region },
-+	{ MC_TIMEZONE_CONFIG, offsetof(EXTCONF_BLOCK, time_zone),  sizeof(int), 	&extconf_region },
-+ 	{ MC_IDESMART_CONFIG, offsetof(GENCONF_BLOCK,idesmart_conf), sizeof(REG_IDESMART_CONF), 	&genconf_region },
-+ 	{ MC_FTP_PORT, offsetof(EXTCONF_BLOCK, ftp_port_num),  sizeof(int), &extconf_region },
-+ 	{ MC_UPNP_MMS_CONFIG, offsetof(EXTCONF_BLOCK, upnp_mms_enable),  sizeof(int), &extconf_region },
-+ 	{ MC_UPNP_DEVICE_CONFIG, offsetof(EXTCONF_BLOCK, upnp_device_enable), sizeof(int), &extconf_region },
-+#endif
-+};
-+
-+DECLARE_WAIT_QUEUE_HEAD(flash_wq);
-+static struct mtd_info		*mtd;
-+
-+static void erase_callback(struct erase_info *done)
-+{
-+	wait_queue_head_t	*wait_q = (wait_queue_head_t *) done->priv;
-+	wake_up(wait_q);
-+}
-+
-+#define ERASE_SIZE	0x2000
-+#define ERASE_MASK	~(ERASE_SIZE-1)
-+#define ERASE_ALIGN(x)	((x + ERASE_SIZE-1) & ERASE_MASK)
-+
-+static int erase_write(struct mtd_info *mtd, unsigned long pos, int len, const char *buf)
-+{
-+	struct erase_info	erase;
-+	DECLARE_WAITQUEUE(wait, current);
-+	wait_queue_head_t	wq_head;
-+	size_t			retlen;
-+	int			ret;
-+
-+	// erase block
-+	init_waitqueue_head(&wq_head);
-+	erase.mtd = mtd;
-+	erase.callback = erase_callback;
-+	erase.addr = pos;
-+	erase.len = ERASE_ALIGN(len);
-+	erase.priv = (u_long) &wq_head;
-+	set_current_state(TASK_INTERRUPTIBLE);
-+	add_wait_queue(&wq_head, &wait);
-+
-+	ret = MTD_ERASE(mtd, &erase);
-+	if ( ret ) {
-+		set_current_state(TASK_RUNNING);
-+		remove_wait_queue(&wq_head, &wait);
-+		printk(KERN_WARNING "flash: erase of region (0x%08x, 0x%04x) on \"%s\" failed\n", (unsigned int) pos, (unsigned int) len, mtd->name);
-+		return ret;
-+	}
-+
-+	schedule();
-+	remove_wait_queue(&wq_head, &wait);
-+
-+	// write block
-+	ret = MTD_WRITE(mtd, pos, len, &retlen, buf);
-+	if ( ret )
-+		return ret;
-+	if ( retlen != len )
-+		return -EIO;
-+
-+	return 0;
-+}
-+//added by louistsai
-+//To ensure the integrity of updated fw, we should remove the signature on the 
-+//flash first.
-+static int remove_fwsig(struct mtd_info *mtd)
-+{
-+	unsigned long 		sigaddr;
-+	struct erase_info	erase;
-+	DECLARE_WAITQUEUE(wait, current);
-+	wait_queue_head_t	wq_head;
-+	size_t			retlen;
-+	int			ret;
-+
-+	sigaddr = *((unsigned long *) (0xbfc20000 + 0x18));
-+	// erase block
-+	init_waitqueue_head(&wq_head);
-+	erase.mtd = mtd;
-+	erase.callback = erase_callback;
-+	erase.addr = (sigaddr/(64*1024))*(64*1024) - 0xbfc00000;
-+	erase.len = ERASE_ALIGN(64*1024);
-+	erase.priv = (u_long) &wq_head;
-+	set_current_state(TASK_INTERRUPTIBLE);
-+	add_wait_queue(&wq_head, &wait);
-+
-+	ret = MTD_ERASE(mtd, &erase);
-+	if ( ret ) {
-+		set_current_state(TASK_RUNNING);
-+		remove_wait_queue(&wq_head, &wait);
-+		printk(KERN_WARNING "flash: erase of region (0x%08x, 0x%04x) on \"%s\" failed\n", (unsigned int) erase.addr, (unsigned int) erase.len, mtd->name);
-+		return ret;
-+	}
-+	schedule();
-+	remove_wait_queue(&wq_head, &wait);
-+	
-+	return 0;
-+}
-+
-+
-+
-+
-+static void gen_cksum(unsigned int *buf, int size)
-+{
-+	int		i;
-+	unsigned int	cksum = 0xffffffff;
-+
-+	size = (size >> 2) - 1;
-+	for (i = 0; i < size; i++) {
-+		cksum += *buf++;
-+	}
-+
-+	*buf = cksum;
-+}
-+
-+static void set_default_leaseconf(void)
-+{
-+	DHCPLEASE_BLOCK *dhcplease_block;
-+
-+	dhcplease_block = (DHCPLEASE_BLOCK *) dhcplease_region.buf_base;
-+	memset(dhcplease_block, 0, dhcplease_region.size);
-+}
-+
-+static void dhcp_clear_conflict(void)
-+{
-+	int	i;
-+	struct timeval	tv;
-+	REG_DHCP_LEASE	*pconf;
-+	REG_IP_LEASES	*ipleases;
-+	char	zeromac[6] = { 0, 0, 0, 0, 0, 0 };
-+
-+	down(&dhcplease_region.sem);
-+
-+	pconf = &dhcplease_buf.dhcplease_block.dhcplease_conf;
-+	ipleases = pconf->item;
-+
-+	do_gettimeofday(&tv);
-+	
-+	/* clear conflict address if time is expired */
-+	for (i = 0; i < pconf->lease_count; i++) {
-+		if ( memcmp(ipleases[i].mac, zeromac, 6) == 0 && tv.tv_sec > ipleases[i].end ) {
-+			pconf->lease_count--;
-+			if ( i != pconf->lease_count ) {
-+				memcpy(&ipleases[i], &ipleases[pconf->lease_count], sizeof(REG_IP_LEASES));
-+			}
-+			memset(&ipleases[pconf->lease_count], 0, sizeof(REG_IP_LEASES));
-+		}
-+	}
-+
-+	up(&dhcplease_region.sem);
-+}
-+
-+static int dhcp_find_lease_by_chaddr(DHCP_OFFERED_ADDR *lease)
-+{
-+	int	i, retval;
-+	REG_DHCP_LEASE	*pconf;
-+	REG_IP_LEASES	*ipleases;
-+
-+	/* Notice that we trust the user process */
-+	down(&dhcplease_region.sem);
-+
-+	retval = -ENOENT;
-+	pconf = &dhcplease_buf.dhcplease_block.dhcplease_conf;
-+	ipleases = pconf->item;
-+	for (i = 0; i < pconf->lease_count; i++) {
-+		if ( memcmp(lease->chaddr, ipleases[i].mac, 6) == 0 ) {
-+			lease->yiaddr = ipleases[i].ip;
-+			lease->expires = ipleases[i].end;
-+			retval = 0;
-+			break;
-+		}
-+	}
-+
-+	up(&dhcplease_region.sem);
-+
-+	return retval;
-+}
-+
-+static int dhcp_find_lease_by_yiaddr(DHCP_OFFERED_ADDR *lease)
-+{
-+	int	i, retval;
-+	REG_DHCP_LEASE	*pconf;
-+	REG_IP_LEASES	*ipleases;
-+
-+	/* Notice that we trust the user process */
-+	down(&dhcplease_region.sem);
-+
-+	retval = -ENOENT;
-+	pconf = &dhcplease_buf.dhcplease_block.dhcplease_conf;
-+	ipleases = pconf->item;
-+	for (i = 0; i < pconf->lease_count; i++) {
-+		if ( lease->yiaddr == ipleases[i].ip ) {
-+			memcpy(lease->chaddr, ipleases[i].mac, 6);
-+			lease->expires = ipleases[i].end;
-+			retval = 0;
-+			break;
-+		}
-+	}
-+
-+	up(&dhcplease_region.sem);
-+
-+	return retval;
-+}
-+
-+static int dhcp_clear_lease(void)
-+{
-+	down(&dhcplease_region.sem);
-+	set_default_leaseconf();
-+	up(&dhcplease_region.sem);
-+	dhcplease_region.write_force = 1;
-+
-+	return 0;
-+}
-+
-+static int dhcp_add_lease(DHCP_OFFERED_ADDR *lease)
-+{
-+	int	i, retval;
-+	int	iszeromac;
-+	struct timeval	tv;
-+	unsigned int	oldest_lease;
-+	REG_DHCP_LEASE	*pconf;
-+	REG_IP_LEASES	*ipleases, *pslot;
-+
-+	retval = -ENOENT;
-+
-+	dhcp_clear_conflict();
-+
-+	down(&dhcplease_region.sem);
-+	/* clear lease
-+	   if hardware address is zero, DONOT remove the lease because it represents address collision.
-+	*/
-+	for (i = 0; i < 6; i++) {
-+		if ( lease->chaddr[i] != 0 )
-+			break;
-+	}
-+	iszeromac = (i == 6) ? 1 : 0;
-+
-+	pconf = &dhcplease_buf.dhcplease_block.dhcplease_conf;
-+	ipleases = pconf->item;
-+
-+	/* replace lease address if either IP or MAC address match with the current lease adderss */
-+	for (i = 0; i < pconf->lease_count; i++) {
-+		if ( (!iszeromac && memcmp(lease->chaddr, ipleases->mac, 6) == 0) ||
-+			lease->yiaddr == ipleases[i].ip ) {
-+			pconf->lease_count--;
-+			if ( i != pconf->lease_count ) {
-+				memcpy(&ipleases[i], &ipleases[pconf->lease_count], sizeof(REG_IP_LEASES));
-+			}
-+			memset(&ipleases[pconf->lease_count], 0, sizeof(REG_IP_LEASES));
-+			break;
-+		}
-+	}
-+	
-+	do_gettimeofday(&tv);
-+
-+	/* choose the promising "lease slot" */
-+	if ( pconf->lease_count < MAX_DHCP_LEASES_RECORDS ) {
-+		pslot = &ipleases[pconf->lease_count++];
-+	} else {
-+		pslot = NULL;
-+		oldest_lease = tv.tv_sec;
-+		for (i = 0; i < MAX_DHCP_LEASES_RECORDS; i++) {
-+			if ( oldest_lease > ipleases[i].end ) {
-+				pslot = &ipleases[i];
-+				oldest_lease = ipleases[i].end;
-+			}
-+		}
-+	}
-+
-+	if ( pslot ) {
-+		pslot->ip = lease->yiaddr;
-+		pslot->start = tv.tv_sec;
-+		pslot->end = lease->expires;
-+		memcpy(pslot->mac, lease->chaddr, 6);
-+		strncpy(pslot->hostname, lease->hostname, 20);
-+
-+		dhcplease_region.dirty++;
-+		retval = 0;
-+	}
-+
-+	up(&dhcplease_region.sem);
-+
-+	return retval;
-+}
-+
-+
-+unsigned long kernel_read_config(int type)
-+{
-+	int		i, ret, entry, len;
-+	ACCESS_CONF	*paccess;
-+	REGION_INFO	*pregion;
-+	
-+	for (i = 0; i < sizeof(access_conf)/sizeof(ACCESS_CONF); i++) {
-+		paccess = &access_conf[i];
-+		if ( type == paccess->type ) {
-+			pregion = paccess->reg_info;
-+//printk("pregion->base = %x paccess->offset=%x\n", pregion->base+0xbfc00000, paccess->offset);
-+			return (pregion->base+ 0xbfc00000 + paccess->offset);
-+		}
-+	}
-+	return 0;
-+	
-+	
-+}
-+// The "conf" type may be GENCONF_BLOCK, USERACCOUNT_BLOCK, DHCPLEASE_BLOCK
-+asmlinkage int sys_read_config(int type, void *conf)
-+{
-+	int		i, ret, entry, len;
-+	ACCESS_CONF	*paccess;
-+	REGION_INFO	*pregion;
-+	REG_EVENTLOG_CONF	*pconf;
-+	FIRMWARE_STATUS	fwsts;
-+	MEM_ACCESS	mem_data;
-+	
-+#if defined(CONFIG_MCT_SG100) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SA200)
-+	SWITCH_STATUS	switch_status;
-+#endif
-+
-+	switch ( type ) {
-+	case MC_GET_FWVER:
-+		return put_user(*(unsigned short *) 0xbfc20004, (unsigned short *) conf);
-+	case MC_RWMEM:
-+		copy_from_user(&mem_data, (void *)conf, sizeof(MEM_ACCESS));
-+		memcpy(mem_data.buf, (unsigned char *)mem_data.dest_addr, mem_data.size);
-+		return 0;
-+	case MC_UPDATE_STATUS:
-+		fwsts.state = sysimage_state;
-+		fwsts.percentage = sysimage_percentage;
-+		ret = copy_to_user(conf, &fwsts, sizeof(FIRMWARE_STATUS));
-+		if ( ret > 0 )
-+			return -EFAULT;
-+		return 0;
-+	case MC_EVENTLOG_GET_CNT:
-+		down(&eventlog_region.sem);
-+		pconf = &eventlog_buf.eventlog_block.eventlog_conf;
-+		ret = (pconf->tail + MAX_LOGS_NUM - pconf->head) % MAX_LOGS_NUM;
-+		up(&eventlog_region.sem);
-+		return ret;
-+	case MC_EVENTLOG_GET:
-+		down(&eventlog_region.sem);
-+		ret = get_user(entry, (unsigned int *) conf);
-+		if ( ret != 0 ) goto eventlog_err;
-+		pconf = &eventlog_buf.eventlog_block.eventlog_conf;
-+		len = (pconf->tail + MAX_LOGS_NUM - pconf->head) % MAX_LOGS_NUM;
-+		if ( entry > len ) goto eventlog_err;
-+		entry = (pconf->head + entry) % MAX_LOGS_NUM;
-+		ret = copy_to_user((void *) conf+4, &pconf->eventlog[entry], sizeof(EVENTLOG_ENTRY));
-+		up(&eventlog_region.sem);
-+		if ( ret > 0 )
-+			return -EFAULT;
-+
-+		return 0;
-+	case MC_DHCP_FIND_LEASE_BY_CHADDR:
-+//printk("MC_DHCP_FIND_LEASE_BY_CHADDR\n");
-+		return dhcp_find_lease_by_chaddr((DHCP_OFFERED_ADDR *) conf);
-+	case MC_DHCP_FIND_LEASE_BY_YIADDR:
-+//printk("MC_DHCP_FIND_LEASE_BY_YIADDR\n");
-+		return dhcp_find_lease_by_yiaddr((DHCP_OFFERED_ADDR *) conf);
-+
-+	case MC_DHCP_LEASE:
-+		dhcp_clear_conflict();
-+		break;
-+
-+#if defined(CONFIG_MCT_SG100) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SA200)
-+	case MC_SWITCH_STATUS:
-+		get_switch_status(&switch_status);
-+		ret = copy_to_user(conf, &switch_status, sizeof(SWITCH_STATUS));
-+		if ( ret > 0 )
-+			return -EFAULT;
-+		return 0;
-+#endif
-+	}
-+
-+	for (i = 0; i < sizeof(access_conf)/sizeof(ACCESS_CONF); i++) {
-+		paccess = &access_conf[i];
-+		if ( type == paccess->type ) {
-+			pregion = paccess->reg_info;
-+			down(&pregion->sem);
-+			ret = copy_to_user((void *) conf, pregion->buf_base + paccess->offset, paccess->size);
-+//printk("flash=%d\n",ret);
-+			up(&pregion->sem);
-+			if ( ret > 0 )
-+				return -EFAULT;
-+			break;
-+		}
-+	}
-+
-+	if ( i == sizeof(access_conf)/sizeof(ACCESS_CONF) )
-+		return -EIO;
-+
-+	return 0;
-+
-+eventlog_err:
-+	up(&eventlog_region.sem);
-+	return -EFAULT;
-+}
-+
-+static unsigned char	*sysbuf_pos;
-+int set_factory_default(void);
-+#if defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SA200)
-+extern wait_queue_head_t shutdown_wq;
-+extern int shutdown_type;
-+#endif
-+
-+static int mct_replace_str(char *input,int len,char *key,char *repstr)
-+{
-+	int i,start=0,item_len=0,rep_done=0,diff_len=0;
-+	char tmp_input[PAGE_SIZE];
-+
-+	while(start<len) {
-+		if(strstr(input+start,key) != NULL) {
-+			diff_len = strlen(input+start) - strlen(repstr);
-+			strcpy(tmp_input+start,repstr);
-+			rep_done = 1;
-+			break;	
-+		}
-+		else {
-+			strcpy(tmp_input+start+diff_len,input+start);
-+			item_len = strlen(input+start);
-+			start += item_len+1;					
-+		}
-+	}	
-+	
-+	for(i=0;i<len+diff_len;i++) input[i] = tmp_input[i];
-+
-+	if(rep_done) 
-+		return len+diff_len;
-+	else	
-+		return len;
-+}
-+
-+asmlinkage int sys_write_config(int type, void *conf)
-+{
-+	int		i, ret;
-+	ACCESS_CONF	*paccess;
-+	REGION_INFO	*pregion;
-+	unsigned int	size;
-+	EVENTLOG_ENTRY	log;
-+	EVENTLOG_ENTRY	*pentry;
-+	REG_EVENTLOG_CONF	*pconf;
-+	struct timeval	tv;
-+
-+	/* handle special case */
-+	switch ( type ) {
-+#if !defined(CONFIG_MCT_SG100)
-+	case MC_UPDATE_ALL_PID_TIMEZONE:
-+	{
-+		struct task_struct *p;
-+		struct mm_struct *mm;
-+		char buffer[PAGE_SIZE],mct_timezone_str[10];
-+		int res,mct_abs_timezone;
-+		EXTCONF_BLOCK *extconf_block;
-+        	extconf_block = (EXTCONF_BLOCK *) extconf_region.buf_base;
-+
-+		
-+		if(extconf_block->time_zone - 13 > 0) 
-+			mct_abs_timezone = extconf_block->time_zone - 13;
-+		else
-+			mct_abs_timezone = -(extconf_block->time_zone - 13);
-+
-+		sprintf(mct_timezone_str,"TZ=GMT%s%d",(extconf_block->time_zone-13) > 0 ? "-" : "+",mct_abs_timezone);
-+	
-+		printk("mct_timezone_str=%s\n",mct_timezone_str);
-+
-+	        write_lock(&tasklist_lock);
-+	        for_each_task(p) {
-+			int len;
-+			if(current->pid == p->pid) continue;
-+			task_lock(p);
-+			mm = p->mm;
-+        		if (mm)
-+                		atomic_inc(&mm->mm_users);
-+			if (mm) {
-+         		       int len = mm->env_end - mm->env_start;
-+		               if (len > PAGE_SIZE)
-+					len = PAGE_SIZE;
-+			                res = access_process_vm(p, mm->env_start, buffer, len, 0);
-+					if(res>0) {
-+						res = mct_replace_str(buffer,res,"TZ=",mct_timezone_str);
-+						access_process_vm(p, mm->env_start, buffer, res, 1);
-+			                mmput(mm);
-+					}
-+        		}
-+		        task_unlock(p);
-+       		}
-+       		write_unlock(&tasklist_lock);
-+		return 0;
-+	}
-+#endif
-+#if defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SA200)
-+	case MC_POWER_DOWN:
-+		shutdown_type = LINUX_REBOOT_CMD_POWER_OFF;
-+		wake_up_interruptible(&shutdown_wq);
-+		return 0;
-+#endif
-+	case MC_RESET_CONFIG:
-+		if ( !conf_reset_in_progress ) {
-+			conf_reset_in_progress = 1;
-+#if defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SA200)
-+			shutdown_type = LINUX_REBOOT_CMD_RESTART;
-+			wake_up_interruptible(&shutdown_wq);
-+#else
-+			wake_up_interruptible(&flash_wq);
-+#endif
-+		}
-+		return 0;
-+	case MC_UPDATE_SYSTEM_START:
-+		down(&sysimage_sem);
-+		sysimage_state = SI_LOADING;
-+		sysbuf_pos = &__fsysbuf;
-+		up(&sysimage_sem);
-+		return 0;
-+	case MC_START_HEARTBEAT:
-+		hbled_init();
-+		return 0;
-+	case MC_UPDATE_SYSTEM_END:
-+		// check the magic number && product ID
-+		if ( *((unsigned short *) &__fsysbuf) == 0x0503 ) {
-+			printk("magic number : OK\n");
-+			sysimage_state = SI_LOADED;
-+			sysimage_percentage = 0;
-+			wake_up_interruptible(&flash_wq);
-+		}
-+		else if ( *((unsigned short *) &__fsysbuf) == 0x9fc0) {
-+			printk("boot check number(0x9fc0) : OK\n");
-+			sysimage_state = SI_BOOT_LOADED;
-+			sysimage_percentage = 0;
-+			wake_up_interruptible(&flash_wq);
-+		} 
-+		else {
-+			printk("magic number = %04x, product ID = %04x\n",
-+				*((unsigned short *) &__fsysbuf),
-+				*((unsigned short *) (((void *) &__fsysbuf) + 2)));
-+			sysimage_state = SI_ERROR;
-+		}
-+		return 0;
-+	case MC_UPDATE_SYSTEM:
-+		down(&sysimage_sem);
-+		ret = get_user(size, (unsigned long *) conf);
-+#if 0
-+		printk("flash: size = %d\n", size);
-+#endif
-+		if ( ret != 0 ) goto update_sys_err;
-+		if ( sysbuf_pos + size > &__esysbuf ) goto update_sys_err;
-+		ret = copy_from_user(sysbuf_pos, (void *) conf+4, size);
-+		if ( ret > 0 ) goto update_sys_err;
-+		sysbuf_pos += size;
-+		up(&sysimage_sem);
-+		return 0;
-+	case MC_EVENTLOG_ADD:
-+		down(&eventlog_region.sem);
-+		ret = copy_from_user(&log, conf, sizeof(EVENTLOG_ENTRY));
-+		if ( ret > 0 ) {
-+			up(&eventlog_region.sem);
-+			return -EFAULT;
-+		}
-+		pconf = &eventlog_buf.eventlog_block.eventlog_conf;
-+		if ( ((pconf->tail+1)%MAX_LOGS_NUM) == pconf->head ) { // buffer full
-+			pconf->head = (pconf->head + 1) % MAX_LOGS_NUM;
-+		}
-+		pentry = &pconf->eventlog[pconf->tail];
-+		*pentry = log;
-+		do_gettimeofday(&tv);
-+		pentry->time = tv.tv_sec;
-+		pconf->tail = (pconf->tail + 1) % MAX_LOGS_NUM;
-+		up(&eventlog_region.sem);
-+		eventlog_region.dirty++;
-+		wake_up_interruptible(&flash_wq);
-+		return 0;
-+	case MC_EVENTLOG_CLEAR:
-+		down(&eventlog_region.sem);
-+		pconf = &eventlog_buf.eventlog_block.eventlog_conf;
-+		pconf->head = pconf->tail = 0;
-+		up(&eventlog_region.sem);
-+		eventlog_region.dirty++;
-+		wake_up_interruptible(&flash_wq);
-+		return 0;
-+	case MC_DHCP_ADD_LEASE:
-+//printk("MC_DHCP_ADD_LEASE\n");
-+		return dhcp_add_lease((DHCP_OFFERED_ADDR *) conf);
-+	case MC_DHCP_CLEAR_LEASE:
-+		return dhcp_clear_lease();
-+#if defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SG4100_EV) || defined(CONFIG_MCT_SA200)
-+		/*
-+	case MC_DEFAULT_USR_GRP_SHARE:
-+		down(&la_user_region.sem);
-+		set_default_users();
-+		up(&la_user_region.sem);
-+		la_user_region.dirty++;
-+		down(&la_grpshare_region .sem);
-+		set_default_grpshares();
-+		up(&la_grpshare_region .sem);
-+		la_grpshare_region.dirty++;
-+		break;
-+		*/
-+#endif
-+	}
-+
-+	/* handle generic case */
-+	for (i = 0; i < sizeof(access_conf)/sizeof(ACCESS_CONF); i++) {
-+		paccess = &access_conf[i];
-+		if ( type == paccess->type ) {
-+			void *struct_base;
-+
-+			pregion = paccess->reg_info;
-+
-+			down(&pregion->sem);
-+			struct_base = paccess->reg_info->buf_base + paccess->offset;
-+			ret = copy_from_user(struct_base, (void *) conf, paccess->size);
-+			// handle special case
-+			switch ( type ) {
-+			case MC_URL_ACCESS_CONFIG:
-+				submit_url_records((REG_URL_ACCESS_CONF *) struct_base);
-+				break;
-+			}
-+			up(&pregion->sem);
-+
-+			if ( ret > 0 )
-+				return -EFAULT;
-+				
-+			switch ( pregion->policy ) {
-+			case FL_IMMEDIATE:
-+				pregion->dirty++;
-+				wake_up_interruptible(&flash_wq);
-+				break;
-+			case FL_INTERVAL:
-+				pregion->dirty++;
-+				break;
-+			}
-+			break;
-+		}
-+	}
-+
-+	return 0;
-+
-+update_sys_err:
-+	up(&sysimage_sem);
-+	return -EFAULT;
-+}
-+
-+
-+#if defined(CONFIG_ATEN_LED) && defined(CONFIG_MCT_NAS)
-+#define HOST_NAME  "IOGEARNAS"
-+#elif defined(CONFIG_ATEN_LED)
-+#define HOST_NAME "BOSS"
-+#elif defined(CONFIG_MCT_SA200) && defined(CONFIG_MCT_NAS) && !defined(CONFIG_4PORT_USB_SERVER)
-+#define HOST_NAME	"nas200"
-+#elif defined(CONFIG_MCT_SA200) && defined(CONFIG_MCT_NAS) && defined(CONFIG_4PORT_USB_SERVER)
-+#define HOST_NAME	"sa800"
-+#elif defined(CONFIG_MCT_SG600) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SA200)
-+#define HOST_NAME	"nas"
-+#else
-+#define HOST_NAME	"router"
-+#endif
-+
-+static void set_default_genconf(void)
-+{
-+	GENCONF_BLOCK	*genconf;
-+	REG_NET_CONF	*net_conf;
-+	REG_DHCP_CONF	*dhcp_conf;
-+	REG_ANTIHACK_CONF *antihack_conf;
-+	REG_ADMIN_CONF	*admin_conf;
-+	REG_PPTP_CONF	*pptp_conf;
-+#if defined(CONFIG_MCT_SG600) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SG4100_EV) || defined(CONFIG_MCT_SA200)
-+	REG_NFS_CONF	*nfs_conf;
-+	REG_IDESMART_CONF *idesmart_conf;
-+#endif
-+	genconf = (GENCONF_BLOCK *) genconf_region.buf_base;
-+	memset(genconf, 0, genconf_region.size);
-+
-+	net_conf = &genconf->net_conf;
-+	strcpy(net_conf->hostname, HOST_NAME);
-+	net_conf->enable_nat = 1;
-+	
-+#if defined(CONFIG_ATEN_LED) // for iogear model
-+	net_conf->private_ip = IPADDR(192, 168, 2, 1);
-+	net_conf->private_netmask = IPADDR(255, 255, 255, 0);
-+#else
-+	net_conf->private_ip = IPADDR(172, 16, 1, 1);
-+	net_conf->private_netmask = IPADDR(255, 255, 0, 0);
-+#endif
-+	
-+	// set external interface
-+#if 0
-+	net_conf->public_ip = IPADDR(10, 0, 0, 1);
-+	net_conf->public_netmask = IPADDR(255, 0, 0, 0);
-+	net_conf->gateway = IPADDR(10, 0, 0, 2);
-+#endif
-+//marked by Louistsai 2003/7/21 , the shipping product don't use the taiwan dns server as default setting.
-+//	The router dns server will get from isp dhcp server or user keyin.
-+//	net_conf->dns0 = IPADDR(168, 95, 1, 1);
-+	net_conf->public_if = PUBIF_DHCPC;	// dhcp client
-+
-+#if defined(CONFIG_MCT_NAS) && !defined(CONFIG_MCT_SA200) && 0
-+	net_conf->public_ip = IPADDR(192, 168, 1, 252);
-+        net_conf->public_netmask = IPADDR(255, 255, 255, 0);
-+        net_conf->gateway = IPADDR(192, 168, 1, 1);
-+	net_conf->public_if = PUBIF_FIXED;
-+#endif
-+	dhcp_conf = &genconf->dhcp_conf;
-+	dhcp_conf->enable = TRUE;
-+	dhcp_conf->lease_time = 360;
-+	dhcp_conf->range_start0 = IPADDR(172, 16, 1, 2);
-+	dhcp_conf->range_end0 = IPADDR(172, 16, 1, 250);
-+
-+	antihack_conf = &genconf->antihack_conf;
-+	antihack_conf->enable = TRUE;
-+	antihack_conf->EN_SYNFLOOD = FALSE;
-+	antihack_conf->EN_ICMPFLOOD = TRUE;
-+	antihack_conf->EN_UDPFLOOD = TRUE;
-+	antihack_conf->EN_PING_DEATH = TRUE;
-+	antihack_conf->EN_IP_SPOOF = TRUE;
-+	antihack_conf->EN_PORT_SCAN = TRUE;
-+	antihack_conf->EN_TEAR_DROP = TRUE;
-+	antihack_conf->syn_limit = 1;
-+	antihack_conf->icmp_limit = 1;
-+	antihack_conf->udp_limit = 1;
-+
-+	admin_conf = &genconf->admin_conf;
-+	strcpy(admin_conf->password, "admin");
-+	admin_conf->enable_ext = 0;
-+	admin_conf->ext_webport = 8080;
-+#if defined(CONFIG_MCT_NAS)
-+	admin_conf->ext_webport = 80;
-+#endif
-+	pptp_conf = &genconf->pptp_conf;
-+	pptp_conf->enable = FALSE;
-+	pptp_conf->serverip= 254;
-+	pptp_conf->startip = 200;
-+	pptp_conf->endip   = 230;
-+#if defined(CONFIG_MCT_SG600) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SG4100_EV) || defined(CONFIG_MCT_SA200)
-+	nfs_conf = &genconf->nfs_conf;
-+	nfs_conf->enable = FALSE;
-+	nfs_conf->count = 0;
-+	idesmart_conf = &genconf->idesmart_conf;
-+	idesmart_conf->stimer=60;  /* set default standby timer 5 min */
-+#endif	
-+
-+}
-+
-+#if defined(CONFIG_MCT_SG100)
-+static void set_default_userconf(void)
-+{
-+	USERACCOUNT_BLOCK *useraccount_block;
-+	useraccount_block = (USERACCOUNT_BLOCK *) useraccount_region.buf_base;
-+	memset(useraccount_block, 0, useraccount_region.size);
-+}
-+#else
-+static void set_default_extconf(void)
-+{
-+	EXTCONF_BLOCK *extconf_block;
-+	REG_W3S_CONF *www_conf;
-+	REG_NTP_CONF *ntp_conf;
-+	extconf_block = (EXTCONF_BLOCK *) extconf_region.buf_base;
-+	www_conf = &extconf_block->w3s_conf;
-+	ntp_conf = &extconf_block->ntp_conf;
-+	memset(extconf_block, 0, extconf_region.size);
-+	www_conf->port_num = 80;
-+	
-+	extconf_block->time_zone = 21;
-+	extconf_block->ftp_port_num = 21;
-+	extconf_block->upnp_device_enable = 1;
-+	extconf_block->upnp_mms_enable	  = 0;
-+	extconf_block->pppoe_mtu = 1492;
-+	extconf_block->en_dping  = 0;
-+	extconf_block->smb_lang = 850;
-+
-+	ntp_conf->enable = 0;
-+	strcpy(ntp_conf->server, "pool.ntp.org");
-+	ntp_conf->interval = 60;
-+}
-+#endif
-+
-+static void set_default_eventlog(void)
-+{
-+#if 0
-+	EVENTLOG_BLOCK	*eventlog_block;
-+	EVENTLOG_ENTRY	*eventlog;
-+	REG_EVENTLOG_CONF *eventlog_conf;
-+	struct timeval	tv;
-+
-+	eventlog_block = (EVENTLOG_BLOCK *) eventlog_region.buf_base;
-+	memset(eventlog_block, 0, eventlog_region.size);
-+	eventlog_conf = &eventlog_block->eventlog_conf;
-+
-+	eventlog_conf->head = 0;
-+	eventlog_conf->tail = 1;
-+	eventlog = &eventlog_conf->eventlog[0];
-+	eventlog->level = LEVEL_NORMAL;
-+	strcpy(eventlog->msg, "Configuration reset to factory setting");
-+	do_gettimeofday(&tv);
-+	eventlog->time = tv.tv_sec;
-+#else
-+	REG_EVENTLOG_CONF *eventlog_conf;
-+	EVENTLOG_BLOCK	*eventlog_block;
-+	
-+	eventlog_block = (EVENTLOG_BLOCK *) eventlog_region.buf_base;
-+	memset(eventlog_block, 0, eventlog_region.size);
-+	
-+	eventlog_conf = &eventlog_buf.eventlog_block.eventlog_conf;
-+	eventlog_conf->head = eventlog_conf->tail = 0;
-+#endif
-+}
-+
-+#if defined(CONFIG_MCT_SG600) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SG4100_EV) || defined(CONFIG_MCT_SA200)
-+
-+static void set_default_users(void)
-+{
-+	/*
-+	LA_USERS_BLOCK *la_users_block;
-+	la_users_block = (LA_USERS_BLOCK *) la_user_region.buf_base;
-+	memset(la_users_block, 0, sizeof(LA_USERS_BLOCK));
-+	
-+	strcpy(la_users_block->users.usrdata[0].name , "admin");
-+	strcpy(la_users_block->users.usrdata[0].password , "admin");
-+	la_users_block->users.usrdata[0].uid = 0;
-+	strcpy(la_users_block->users.usrdata[1].name , "guest");
-+	strcpy(la_users_block->users.usrdata[1].password , "");
-+	la_users_block->users.usrdata[1].uid = 1;
-+	la_users_block->users.bitstr[0] = 0x00000003;
-+	la_users_block->users.pptp_on[0] = 0x00000000;
-+	*/
-+	
-+}
-+
-+static void set_default_grpshares(void)
-+{
-+	/*
-+	LA_GRPSHARE_BLOCK *la_grpshare_block;
-+	la_grpshare_block = (LA_GRPSHARE_BLOCK *) la_grpshare_region.buf_base;
-+	memset(la_grpshare_block, 0, sizeof(LA_GRPSHARE_BLOCK));
-+		
-+	strcpy(la_grpshare_block->shares.workgrp_name,"Workgroup");
-+	strcpy(la_grpshare_block->shares.computer_des,HOST_NAME);
-+#if defined(CONFIG_MCT_SG600)
-+	la_grpshare_block->shares.cifs_enable = 1;
-+#else
-+	la_grpshare_block->shares.cifs_enable = 0;
-+#endif
-+	la_grpshare_block->shares.mac_enable = 0;
-+	la_grpshare_block->shares.ftp_enable = 0;
-+	strcpy(la_grpshare_block->shares.applezone,"*");
-+	
-+	
-+	strcpy(la_grpshare_block->groups.grpdata[0].name , "everyone");
-+	la_grpshare_block->groups.grpdata[0].gid = 0;
-+	la_grpshare_block->groups.grpdata[0].members[0] = 0x3;
-+	
-+	la_grpshare_block->groups.bitstr[0] = 0x00000001;
-+	la_grpshare_block->groups.pptp_on[0] = 0x00000000;
-+	*/
-+}
-+
-+
-+/* static void set_default_usershare(void)
-+{
-+
-+	USERSHARE_BLOCK *usershare_block;
-+	usershare_block = (USERSHARE_BLOCK *) usershare_region.buf_base;
-+	memset(usershare_block, 0,sizeof(USERSHARE_CKSUM_BLOCK));
-+		
-+	strcpy(usershare_block->shares.workgrp_name,"Workgroup");
-+	strcpy(usershare_block->shares.computer_des,HOST_NAME);
-+#if defined(CONFIG_MCT_SG600)
-+	usershare_block->shares.cifs_enable = 1;
-+#else
-+	usershare_block->shares.cifs_enable = 0;
-+#endif
-+	usershare_block->shares.mac_enable = 0;
-+	usershare_block->shares.ftp_enable = 0;
-+	strcpy(usershare_block->shares.applezone,"*");
-+	
-+	strcpy(usershare_block->users.usrdata[0].name , "admin");
-+	strcpy(usershare_block->users.usrdata[0].password , "admin");
-+	usershare_block->users.usrdata[0].uid = 0;
-+	strcpy(usershare_block->users.usrdata[1].name , "guest");
-+	strcpy(usershare_block->users.usrdata[1].password , "");
-+	usershare_block->users.usrdata[1].uid = 1;
-+	usershare_block->users.bitstr[0] = 0x00000003;
-+	usershare_block->users.pptp_on[0] = 0x00000000;
-+	
-+	strcpy(usershare_block->groups.grpdata[0].name , "everyone");
-+	usershare_block->groups.grpdata[0].gid = 0;
-+//	usershare_block->groups.grpdata[0].nr_members = 2;
-+	usershare_block->groups.grpdata[0].members[0] = 0x3;
-+	
-+	usershare_block->groups.bitstr[0] = 0x00000001;
-+	usershare_block->groups.pptp_on[0] = 0x00000000;
-+	
-+	
-+}
-+*/
-+#endif 
-+
-+
-+int set_factory_default(void)
-+{
-+	down(&genconf_region.sem);
-+	set_default_genconf();
-+	up(&genconf_region.sem);
-+	genconf_region.dirty++;
-+
-+#if 0	/* Don't remove user account settings */
-+	down(&useraccount_region.sem);
-+	set_default_userconf();
-+	up(&useraccount_region.sem);
-+	useraccount_region.dirty++;
-+#endif
-+
-+#if 1
-+	down(&dhcplease_region.sem);
-+	set_default_leaseconf();
-+	up(&dhcplease_region.sem);
-+	dhcplease_region.write_force = 1;
-+#endif
-+
-+	down(&eventlog_region.sem);
-+	set_default_eventlog();
-+	up(&eventlog_region.sem);
-+	eventlog_region.dirty++;
-+	
-+#if defined(CONFIG_MCT_SG600) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SG4100_EV) || defined(CONFIG_MCT_SA200)
-+	/*
-+	down(&usershare_region.sem);
-+//	set_default_usershare();
-+	up(&usershare_region.sem);
-+	usershare_region.dirty++;
-+	
-+	down(&extconf_region.sem);
-+	set_default_extconf();
-+	up(&extconf_region.sem);
-+	extconf_region.dirty++;
-+	*/
-+#endif
-+
-+	return 0;
-+}
-+
-+static int cksum_ok(unsigned int *buf, int size)
-+{
-+	int		i;
-+	unsigned int	cksum = 0xffffffff;
-+
-+	size = (size >> 2) - 1;
-+	for (i = 0; i < size; i++) {
-+		cksum += *buf++;
-+	}
-+
-+	return (cksum == *buf) ? 1 : 0;
-+}
-+
-+static int handle_flash_write(void)
-+{
-+	int		i;
-+	int		ret = 0;
-+	REGION_INFO	*pregion;
-+
-+	for (i = 0; i < sizeof(region_list)/sizeof(void*); i++) {
-+		pregion = region_list[i];
-+		switch ( pregion->policy ) {
-+		case FL_IMMEDIATE:
-+			if ( pregion->dirty ) {
-+				int size;
-+				down(&pregion->sem);
-+				size = pregion->size;
-+#if defined(CONFIG_MCT_SG600) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SG4100_EV) || defined(CONFIG_MCT_SA200)
-+				/*
-+				if ( pregion == &usershare_region ) {
-+					size = sizeof(USERSHARE_CKSUM_BLOCK);
-+					//printk("user share block, size = %08x\n", size);
-+				}
-+				if ( pregion == &la_user_region ) {
-+					size = sizeof(LA_USERS_CKSUM_BLOCK);
-+//					printk("user block, size = %08x\n", size);
-+				}
-+				if ( pregion == &la_grpshare_region ) {
-+					size = sizeof(LA_GRPSHARE_CKSUM_BLOCK);
-+//					printk("grpshare block, size = %08x\n", size);
-+				}
-+//printk("flash write\n");	
-+				*/
-+#endif
-+				gen_cksum(pregion->buf_base, size);
-+				ret = erase_write(mtd, pregion->base, pregion->size, pregion->buf_base);
-+				pregion->dirty = 0;
-+				up(&pregion->sem);
-+			}
-+			break;
-+		case FL_INTERVAL:
-+			if ( pregion->write_force ||
-+				(pregion->dirty >= pregion->dirty_threshold && time_after_eq(jiffies, pregion->last_time_modified+pregion->short_term_interval)) ||
-+				(pregion->dirty && time_after_eq(jiffies, pregion->last_time_modified+pregion->long_term_interval)) ) {
-+				down(&pregion->sem);
-+				gen_cksum(pregion->buf_base, pregion->size);
-+				ret = erase_write(mtd, pregion->base, pregion->size, pregion->buf_base);
-+				pregion->write_force = 0;
-+				pregion->dirty = 0;
-+				pregion->last_time_modified = jiffies;
-+				up(&pregion->sem);
-+			}
-+			break;
-+		}
-+
-+		if ( ret < 0 )
-+			break;
-+	}
-+
-+	// update system image
-+	if ( sysimage_state == SI_LOADED ) {
-+		unsigned int	steps, total_steps;
-+		unsigned long	flash_addr;
-+		unsigned char	*bufpos;
-+
-+		down(&sysimage_sem);
-+		sysimage_state = SI_WRITING;
-+		total_steps = ((unsigned int) (sysbuf_pos - &__fsysbuf) + SYSIMAGE_SECTOR_SIZE - 1) / SYSIMAGE_SECTOR_SIZE;
-+		bufpos = &__fsysbuf;
-+		flash_addr = SYSIMAGE_ADDR;
-+		steps = 0;
-+		//added by louistsai 2004/7/9
-+		remove_fwsig(mtd);
-+		while ( bufpos < sysbuf_pos ) {
-+			printk("flash: address = %08x\n", (unsigned int) flash_addr);
-+			ret = erase_write(mtd, flash_addr, SYSIMAGE_SECTOR_SIZE, bufpos);
-+			bufpos += SYSIMAGE_SECTOR_SIZE;
-+			flash_addr += SYSIMAGE_SECTOR_SIZE;
-+			sysimage_percentage = (unsigned char) (steps * 100 / total_steps);
-+			steps += 1;
-+		}
-+		sysimage_percentage = 100;
-+		sysimage_state = SI_COMPLETED;
-+		up(&sysimage_sem);
-+	} 
-+	else if( sysimage_state == SI_BOOT_LOADED ) {
-+		unsigned int	steps, total_steps;
-+		unsigned long	flash_addr;
-+		unsigned char	*bufpos;
-+		int sector_size = 0;
-+
-+		down(&sysimage_sem);
-+		sysimage_state = SI_WRITING;
-+		total_steps = 9 ; // 8k*8 + 64k sectors
-+		bufpos = &__fsysbuf;
-+		flash_addr = 0x00000000; // boot code zone
-+		steps = 0;
-+		while ( bufpos < sysbuf_pos ) {
-+			printk("flash: address = %08x\n", (unsigned int) flash_addr);
-+			if(steps <8)
-+				sector_size = 8 * 1024;
-+			else
-+				sector_size = 64 * 1024;
-+			
-+			if(steps == 0 || steps == 8)
-+				ret = erase_write(mtd, flash_addr, sector_size, bufpos);
-+			bufpos += sector_size;
-+			flash_addr += sector_size;
-+			sysimage_percentage = (unsigned char) (steps * 100 / total_steps);
-+			steps += 1;
-+		}
-+		sysimage_percentage = 100;
-+		sysimage_state = SI_COMPLETED;
-+		up(&sysimage_sem);
-+	}
-+
-+	return ret;
-+}
-+
-+extern long sys_reboot(int magic1, int magic2, unsigned int cmd, void *arg);
-+static int flash_thread(void *dummy)
-+{
-+	struct task_struct *tsk = current;
-+	DECLARE_WAITQUEUE(wait, tsk);
-+
-+	tsk->session = 1;
-+	tsk->pgrp = 1;
-+	tsk->flags |= PF_MEMALLOC;
-+	strcpy(tsk->comm, "flashd");
-+	tsk->tty = NULL;
-+	spin_lock_irq(&tsk->sigmask_lock);
-+	sigfillset(&tsk->blocked);
-+	recalc_sigpending(tsk);
-+	spin_unlock_irq(&tsk->sigmask_lock);
-+	exit_mm(tsk);
-+	exit_files(tsk);
-+	exit_sighand(tsk);
-+	exit_fs(tsk);
-+
-+	while ( 1 ) {
-+		add_wait_queue(&flash_wq, &wait);
-+		set_current_state(TASK_INTERRUPTIBLE);
-+		schedule_timeout(6 * HZ);
-+		if ( conf_reset_in_progress ) {
-+			printk(KERN_INFO "Flash Update: set configuration to factory default\n");
-+			set_factory_default();
-+			handle_flash_write();
-+			sys_reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_RESTART, 0);
-+			conf_reset_in_progress = 0;
-+		} else {
-+			handle_flash_write();
-+		}
-+		remove_wait_queue(&flash_wq, &wait);
-+	}
-+
-+	return 0;
-+}
-+
-+int flash_notifier_reboot(struct notifier_block *notifier, unsigned long code, void *x)
-+{
-+	int		i;
-+	REGION_INFO	*pregion;
-+
-+	switch ( code ) {
-+	case SYS_RESTART:
-+	case SYS_HALT:
-+	case SYS_POWER_OFF:
-+		printk(KERN_INFO "flash: write back all configuration data\n");
-+		for (i = 0; i < sizeof(region_list)/sizeof(void*); i++) {
-+			pregion = region_list[i];
-+			//added by louistsai, if no, we nerver write lease file to flash before 
-+			//short term or long term interval.
-+			
-+			if ( !conf_reset_in_progress && (pregion == &dhcplease_region)) pregion->write_force = 1;
-+			
-+			while ( (pregion->policy == FL_IMMEDIATE && pregion->dirty) ||
-+				(pregion->policy == FL_INTERVAL && pregion->write_force) ) {
-+				schedule_timeout(1);
-+			}
-+		}
-+
-+		while ( sysimage_state == SI_WRITING )
-+			schedule_timeout(5);
-+	}
-+
-+	return NOTIFY_DONE;
-+}
-+
-+struct notifier_block flash_notifier = {
-+	notifier_call: flash_notifier_reboot,
-+	next: NULL,
-+	priority: INT_MAX,
-+};
-+
-+extern void conf_reset_init(void);
-+
-+// The function should be called after MTD was initialized.
-+int __init sysconf_init(void)
-+{
-+	int	retlen;
-+	//EVENTLOG_ENTRY	log;
-+
-+	printk(KERN_INFO "Loading system configuration data from flash\n");
-+	// load configuration data
-+	mtd = __get_mtd_device(NULL, 0);
-+	mtd->read(mtd, GENCONF_ADDR, sizeof(GENCONF_CKSUM_BLOCK), &retlen, (char *) &genconf_buf);
-+	if ( retlen != sizeof(GENCONF_CKSUM_BLOCK) ) {
-+		printk(KERN_NOTICE "Sysconf: read error during reading general config\n");
-+	} else {
-+		if ( !cksum_ok((unsigned int *) &genconf_buf, retlen) ) {
-+			printk(KERN_NOTICE "Sysconf: invalid general config checksum\n");
-+			set_default_genconf();
-+		}
-+	}
-+
-+#if defined(CONFIG_MCT_SG100)
-+	mtd->read(mtd, USERACCOUNT_ADDR, sizeof(USERACCOUNT_CKSUM_BLOCK), &retlen, (char *) &useraccount_buf);
-+	if ( retlen != sizeof(USERACCOUNT_CKSUM_BLOCK) ) {
-+		printk(KERN_NOTICE "Sysconf: error during reading user account\n");
-+	} else {
-+		if ( !cksum_ok((unsigned int *) &useraccount_buf, retlen) ) {
-+			printk(KERN_NOTICE "Sysconf: invalid user account checksum\n");
-+			set_default_userconf();
-+		}
-+	}
-+#else
-+	mtd->read(mtd, EXTCONF_ADDR, sizeof(EXTCONF_CKSUM_BLOCK), &retlen, (char *) &extconf_buf);
-+	if ( retlen != sizeof(EXTCONF_CKSUM_BLOCK) ) {
-+		printk(KERN_NOTICE "Sysconf: error during reading user account\n");
-+	} 
-+	else {
-+		if ( !cksum_ok((unsigned int *) &extconf_buf, retlen) ) {
-+			printk(KERN_NOTICE "Sysconf: invalid extend config checksum\n");
-+			set_default_extconf();
-+		}
-+	}
-+#endif
-+
-+	mtd->read(mtd, DHCPLEASE_ADDR, sizeof(DHCPLEASE_CKSUM_BLOCK), &retlen, (char *) &dhcplease_buf);
-+	if ( retlen != sizeof(DHCPLEASE_CKSUM_BLOCK) ) {
-+		printk(KERN_NOTICE "Sysconf: error during reading dhcp lease config\n");
-+	} else {
-+		if ( !cksum_ok((unsigned int *) &dhcplease_buf, retlen) ) {
-+			printk(KERN_NOTICE "Sysconf: invalid dhcp lease checksum\n");
-+			set_default_leaseconf();
-+		}
-+	}
-+	
-+	mtd->read(mtd, EVENTLOG_ADDR, sizeof(EVENTLOG_CKSUM_BLOCK), &retlen, (char *) &eventlog_buf);
-+	if ( retlen != sizeof(EVENTLOG_CKSUM_BLOCK) ) {
-+		printk(KERN_NOTICE "Sysconf: error during reading event log config\n");
-+	} else {
-+		if ( !cksum_ok((unsigned int *) &eventlog_buf, retlen) ) {
-+			printk(KERN_NOTICE "Sysconf: invalid event log checksum\n");
-+			set_default_eventlog();
-+		}
-+	}
-+
-+#if defined(CONFIG_MCT_SG600) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SG4100_EV) || defined(CONFIG_MCT_SA200)
-+	/*
-+	mtd->read(mtd, USERSHARE_ADDR, sizeof(USERSHARE_CKSUM_BLOCK), &retlen, (char *) &usershare_buf);
-+	if ( retlen != sizeof(USERSHARE_CKSUM_BLOCK) ) {
-+		printk(KERN_NOTICE "Sysconf: error during usershare config\n");
-+	} else {
-+		if ( cksum_ok((unsigned int *) &usershare_buf, retlen) ) {
-+			restore_olduser_data(&usershare_buf,&la_user_buf,&la_grpshare_buf);
-+			printk(KERN_NOTICE "Sysconf: restore old user data\n");
-+		}
-+		else {
-+			mtd->read(mtd, LA_USER_ADDR, sizeof(LA_USERS_CKSUM_BLOCK), &retlen, (char *) &la_user_buf);
-+			if ( retlen != sizeof(LA_USERS_CKSUM_BLOCK) ) {
-+				printk(KERN_NOTICE "Sysconf: error during reading users data\n");
-+			} else {
-+				if ( !cksum_ok((unsigned int *) &la_user_buf, retlen) ) {
-+					printk(KERN_NOTICE "Sysconf: invalid users data checksum\n");
-+					set_default_users();
-+				}
-+			}
-+			mtd->read(mtd, LA_GRPSHARE_ADDR, sizeof(LA_GRPSHARE_CKSUM_BLOCK), &retlen, (char *) &la_grpshare_buf);
-+			if ( retlen != sizeof(LA_GRPSHARE_CKSUM_BLOCK) ) {
-+				printk(KERN_NOTICE "Sysconf: error during reading group & share data\n");
-+			} else {
-+				if ( !cksum_ok((unsigned int *) &la_grpshare_buf, retlen) ) {
-+					printk(KERN_NOTICE "Sysconf: invalid group & shares data checksum\n");
-+					set_default_grpshares();
-+				}
-+			}
-+		}
-+	}
-+	*/
-+#endif	
-+	
-+	// start kernel thread
-+	kernel_thread(flash_thread, NULL, CLONE_FS|CLONE_FILES|CLONE_SIGHAND);
-+
-+#if !defined(CONFIG_MCT_SG4100)
-+	// initialization routine for button of resetting config setting.
-+	conf_reset_init();
-+#endif
-+
-+	// initialization for system image
-+	//printk("sysbuf: start = %08x, end = %08x\n", &__fsysbuf, &__esysbuf);
-+	sysimage_state = SI_NORMAL;
-+	sysimage_percentage = 0;
-+
-+	// set URL filter patterns
-+	submit_url_records(&genconf_buf.genconf_block.url_access_conf);
-+
-+	// register reboot notifier
-+	register_reboot_notifier(&flash_notifier);
-+
-+	// log system startup time
-+	// Marked by Louistsai ,because all log must be reported on app level 
-+	//log.level = LEVEL_NORMAL;
-+	//log.msgid = IDS_SYSTEM_START;
-+	//sys_write_config(MC_EVENTLOG_ADD, &log);
-+
-+	return 0;
-+}
-+
-+static void restore_olduser_data(USERSHARE_BLOCK* old ,LA_USERS_BLOCK* new_user, LA_GRPSHARE_BLOCK* new_grpshare)
-+{
-+	/*
-+	int i,j;
-+	
-+	//update users
-+	memset(new_user,0,sizeof(LA_USERS_BLOCK));
-+	memset(new_grpshare,0,sizeof(LA_GRPSHARE_BLOCK));
-+	
-+	for(i=0;i<MAX_USERS;i++) {
-+		strcpy(new_user->users.usrdata[i].name,old->users.usrdata[i].name);
-+		strcpy(new_user->users.usrdata[i].password,old->users.usrdata[i].password);
-+		new_user->users.usrdata[i].uid = old->users.usrdata[i].uid; 
-+	}
-+	for(i=0;i<8;i++) {
-+		new_user->users.bitstr[i] = old->users.bitstr[i];
-+		new_user->users.pptp_on[i] = old->users.pptp_on[i];
-+	}
-+	//update groups
-+	for(i=0;i<MAX_GROUPS;i++) {
-+		strcpy(new_grpshare->groups.grpdata[i].name,old->groups.grpdata[i].name);
-+		new_grpshare->groups.grpdata[i].gid = old->groups.grpdata[i].gid ;
-+		for(j=0;j<8;j++) new_grpshare->groups.grpdata[i].members[j] = old->groups.grpdata[i].members[j];
-+	}
-+	for(i=0;i<8;i++) {
-+		new_grpshare->groups.bitstr[i] = old->groups.bitstr[i];
-+		new_grpshare->groups.pptp_on[i] = old->groups.pptp_on[i];
-+	}
-+	//update share
-+	for(i=0;i<MAX_SHARES;i++){
-+		strcpy(new_grpshare->shares.shadata[i].name,old->shares.shadata[i].name);
-+		new_grpshare->shares.shadata[i].attr = old->shares.shadata[i].attr;
-+		for(j=0;j<8;j++) {
-+			new_grpshare->shares.shadata[i].r_users[j] = old->shares.shadata[i].r_users[j];
-+			new_grpshare->shares.shadata[i].r_grps[j]  = old->shares.shadata[i].r_grps[j];
-+			new_grpshare->shares.shadata[i].w_users[j] = old->shares.shadata[i].w_users[j];
-+			new_grpshare->shares.shadata[i].w_grps[j]  = old->shares.shadata[i].w_grps[j];
-+		}
-+	}
-+	new_grpshare->shares.cifs_enable = old->shares.cifs_enable;
-+	new_grpshare->shares.ftp_enable  = old->shares.ftp_enable ;
-+	new_grpshare->shares.mac_enable  = old->shares.mac_enable ;
-+	strcpy(new_grpshare->shares.applezone,old->shares.applezone);
-+	new_grpshare->shares.count = old->shares.count;
-+	strcpy(new_grpshare->shares.workgrp_name,old->shares.workgrp_name);
-+	strcpy(new_grpshare->shares.computer_des,old->shares.computer_des);
-+	*/
-+}
-+
-+
-+module_init(sysconf_init);
 diff -Naru linux-2.4.31/drivers/mtd/maps/Config.in linux-2.4.31-mct/drivers/mtd/maps/Config.in
 --- linux-2.4.31/drivers/mtd/maps/Config.in	2003-06-13 16:51:34.000000000 +0200
-+++ linux-2.4.31-mct/drivers/mtd/maps/Config.in	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/drivers/mtd/maps/Config.in	2005-10-27 14:52:48.000000000 +0200
 @@ -63,6 +63,7 @@
        int '    Bus width in octets' CONFIG_MTD_CSTM_MIPS_IXX_BUSWIDTH 2
     fi
@@ -14407,7 +12844,7 @@ diff -Naru linux-2.4.31/drivers/mtd/maps/Config.in linux-2.4.31-mct/drivers/mtd/
  
 diff -Naru linux-2.4.31/drivers/mtd/maps/Makefile linux-2.4.31-mct/drivers/mtd/maps/Makefile
 --- linux-2.4.31/drivers/mtd/maps/Makefile	2003-06-13 16:51:34.000000000 +0200
-+++ linux-2.4.31-mct/drivers/mtd/maps/Makefile	2005-10-04 09:00:30.000000000 +0200
++++ linux-2.4.31-mct/drivers/mtd/maps/Makefile	2005-10-27 14:52:48.000000000 +0200
 @@ -61,5 +61,7 @@
  obj-$(CONFIG_MTD_UCLINUX)	+= uclinux.o
  obj-$(CONFIG_MTD_NETtel)	+= nettel.o
@@ -14418,8 +12855,8 @@ diff -Naru linux-2.4.31/drivers/mtd/maps/Makefile linux-2.4.31-mct/drivers/mtd/m
  include $(TOPDIR)/Rules.make
 diff -Naru linux-2.4.31/drivers/mtd/maps/mct.c linux-2.4.31-mct/drivers/mtd/maps/mct.c
 --- linux-2.4.31/drivers/mtd/maps/mct.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/drivers/mtd/maps/mct.c	2005-10-04 09:00:00.000000000 +0200
-@@ -0,0 +1,161 @@
++++ linux-2.4.31-mct/drivers/mtd/maps/mct.c	2005-10-27 15:19:49.000000000 +0200
+@@ -0,0 +1,156 @@
 +/*
 + * MCT flash driver
 + */
@@ -14437,11 +12874,6 @@ diff -Naru linux-2.4.31/drivers/mtd/maps/mct.c linux-2.4.31-mct/drivers/mtd/maps
 + * single flash device into. If the size if zero we use up to the end of the
 + * device. */
 +static struct mtd_partition partition_info[] = {
-+        {
-+                name: "main partition",
-+                size:  0,
-+                offset: 0,
-+        },
 +        {
 +                name: "Kernel",
 +                size:  1024 * 1024,
@@ -14475,78 +12907,78 @@ diff -Naru linux-2.4.31/drivers/mtd/maps/mct.c linux-2.4.31-mct/drivers/mtd/maps
 +
 +static struct mtd_info *mymtd;
 +
-+__u8 claxan_flash_read8(struct map_info *map, unsigned long ofs)
++__u8 mct_flash_read8(struct map_info *map, unsigned long ofs)
 +{
 +	return __raw_readb(map->map_priv_1 + ofs);
 +}
 +
-+__u16 claxan_flash_read16(struct map_info *map, unsigned long ofs)
++__u16 mct_flash_read16(struct map_info *map, unsigned long ofs)
 +{
 +	return __raw_readw(map->map_priv_1 + ofs);
 +}
 +
-+__u32 claxan_flash_read32(struct map_info *map, unsigned long ofs)
++__u32 mct_flash_read32(struct map_info *map, unsigned long ofs)
 +{
 +	return __raw_readl(map->map_priv_1 + ofs);
 +}
 +
-+void claxan_flash_copy_from(struct map_info *map, void *to, unsigned long from, ssize_t len)
++void mct_flash_copy_from(struct map_info *map, void *to, unsigned long from, ssize_t len)
 +{
 +	memcpy_fromio(to, map->map_priv_1 + from, len);
 +}
 +
-+void claxan_flash_write8(struct map_info *map, __u8 d, unsigned long adr)
++void mct_flash_write8(struct map_info *map, __u8 d, unsigned long adr)
 +{
 +	__raw_writeb(d, map->map_priv_1 + adr);
 +	mb();
 +}
 +
-+void claxan_flash_write16(struct map_info *map, __u16 d, unsigned long adr)
++void mct_flash_write16(struct map_info *map, __u16 d, unsigned long adr)
 +{
 +	__raw_writew(d, map->map_priv_1 + adr);
 +	mb();
 +}
 +
-+void claxan_flash_write32(struct map_info *map, __u32 d, unsigned long adr)
++void mct_flash_write32(struct map_info *map, __u32 d, unsigned long adr)
 +{
 +	__raw_writel(d, map->map_priv_1 + adr);
 +	mb();
 +}
 +
-+void claxan_flash_copy_to(struct map_info *map, unsigned long to, const void *from, ssize_t len)
++void mct_flash_copy_to(struct map_info *map, unsigned long to, const void *from, ssize_t len)
 +{
 +	memcpy_toio(map->map_priv_1 + to, from, len);
 +}
 +
-+struct map_info claxan_flash_map = {
++struct map_info mct_flash_map = {
 +	name: "MCT flash memory",
 +	size: WINDOW_SIZE,
 +	buswidth: 4,
-+	read8: claxan_flash_read8,
-+	read16: claxan_flash_read16,
-+	read32: claxan_flash_read32,
-+	copy_from: claxan_flash_copy_from,
-+	write8: claxan_flash_write8,
-+	write16: claxan_flash_write16,
-+	write32: claxan_flash_write32,
-+	copy_to: claxan_flash_copy_to
++	read8: mct_flash_read8,
++	read16: mct_flash_read16,
++	read32: mct_flash_read32,
++	copy_from: mct_flash_copy_from,
++	write8: mct_flash_write8,
++	write16: mct_flash_write16,
++	write32: mct_flash_write32,
++	copy_to: mct_flash_copy_to
 +};
 +
-+int __init init_claxan_flash(void)
++int __init init_mct_flash(void)
 +{
 +       	printk(KERN_NOTICE "MCT flash driver (size->0x%X mem->0x%X)\n", WINDOW_SIZE, WINDOW_ADDR);
-+	claxan_flash_map.map_priv_1 = (unsigned long)ioremap(WINDOW_ADDR, WINDOW_SIZE);
++	mct_flash_map.map_priv_1 = (unsigned long)ioremap(WINDOW_ADDR, WINDOW_SIZE);
 +
-+	if (!claxan_flash_map.map_priv_1) {
++	if (!mct_flash_map.map_priv_1) {
 +		printk("Failed to ioremap\n");
 +		return -EIO;
 +	}
 +
-+	mymtd = do_map_probe("cfi_probe", &claxan_flash_map);
++	mymtd = do_map_probe("cfi_probe", &mct_flash_map);
 +	if (!mymtd) {
-+	    claxan_flash_map.buswidth = 2;
++	    mct_flash_map.buswidth = 2;
 +	
-+	    mymtd = do_map_probe("cfi_probe", &claxan_flash_map);
++	    mymtd = do_map_probe("cfi_probe", &mct_flash_map);
 +	}
 +	    
 +	if (mymtd) {
@@ -14558,157 +12990,32 @@ diff -Naru linux-2.4.31/drivers/mtd/maps/mct.c linux-2.4.31-mct/drivers/mtd/maps
 +		return 0;
 +	}
 +
-+	iounmap((void *)claxan_flash_map.map_priv_1);
++	iounmap((void *)mct_flash_map.map_priv_1);
 +	return -ENXIO;
 +}
 +
-+static void __exit cleanup_claxan_flash(void)
++static void __exit cleanup_mct_flash(void)
 +{
 +	if (mymtd) {
 +		del_mtd_partitions(mymtd);
 +		map_destroy(mymtd);
 +	}
-+	if (claxan_flash_map.map_priv_1) {
-+		iounmap((void *)claxan_flash_map.map_priv_1);
-+		claxan_flash_map.map_priv_1 = 0;
++	if (mct_flash_map.map_priv_1) {
++		iounmap((void *)mct_flash_map.map_priv_1);
++		mct_flash_map.map_priv_1 = 0;
 +	}
 +}
 +
-+module_init(init_claxan_flash);
-+module_exit(cleanup_claxan_flash);
++module_init(init_mct_flash);
++module_exit(cleanup_mct_flash);
 +
 +
 +MODULE_LICENSE("GPL");
 +MODULE_AUTHOR("Andi <andi@void.at>");
 +MODULE_DESCRIPTION("MTD map driver for MCT boards");
-diff -Naru linux-2.4.31/drivers/net/8139too.c linux-2.4.31-mct/drivers/net/8139too.c
---- linux-2.4.31/drivers/net/8139too.c	2004-11-17 12:54:21.000000000 +0100
-+++ linux-2.4.31-mct/drivers/net/8139too.c	2005-10-04 09:00:00.000000000 +0200
-@@ -73,7 +73,7 @@
- 
- 		Jean-Jacques Michel - bug fix
- 
--		Tobias Ringström - Rx interrupt status checking suggestion
-+		Tobias Ringstrï¿½ - Rx interrupt status checking suggestion
- 
- 		Andrew Morton - Clear blocked signals, avoid
- 		buffer overrun setting current->comm.
-@@ -113,6 +113,17 @@
- #include <asm/io.h>
- #include <asm/uaccess.h>
- 
-+#include <asm/mconfig.h>
-+#include <asm/flash.h>
-+
-+#ifdef CONFIG_MCT_SG4100
-+#undef CONFIG_MCT_BOARDS
-+#elif defined(CONFIG_MCT_SA200) && !defined(CONFIG_4PORT_USB_SERVER)
-+#include <asm/tx4925.h>
-+#define ETHER_IN_LED(i)         tx4925_pioptr->dout = (tx4925_pioptr->din & 0xf0ffffff) | (((((unsigned long) 0xff) << i) & 0x0f) << 24);
-+#define ETHER_OUT_LED(i)        tx4925_pioptr->dout = (tx4925_pioptr->din & 0x0fffffff) | (((((unsigned long) 0xff) << i) & 0x0f) << 28);
-+#endif
-+
- #define RTL8139_DRIVER_NAME   DRV_NAME " Fast Ethernet driver " DRV_VERSION
- #define PFX DRV_NAME ": "
- 
-@@ -917,6 +928,62 @@
- 	return rc;
- }
- 
-+#if defined(CONFIG_MCT_BOARDS)
-+#if defined(CONFIG_MCT_SG100)
-+#define ETHER_IN_LED		0xb4001400
-+#define ETHER_OUT_LED		0xb4001800
-+#elif defined(CONFIG_MCT_SG600) || defined(CONFIG_MCT_SA100)
-+#define ETHER_LED		0xb4000000
-+#else
-+
-+#endif
-+
-+static struct timer_list	ethled_timer;
-+static struct net_device_stats	*wan_stats;
-+static unsigned long		pre_tx_bytes, pre_rx_bytes;
-+static unsigned long		throughput_led[] = { 
-+	10*1024/10, 50*1024/10, 100*1024/10, 500*1024/10 };
-+
-+static void ethled_callback(unsigned long dummy)
-+{
-+	int		i, j;
-+	unsigned long	diff_tx_bytes, diff_rx_bytes;
-+
-+	diff_tx_bytes = wan_stats->tx_bytes - pre_tx_bytes;
-+	diff_rx_bytes = wan_stats->rx_bytes - pre_rx_bytes;
-+	pre_tx_bytes = wan_stats->tx_bytes;
-+	pre_rx_bytes = wan_stats->rx_bytes;
-+
-+	for (i = 0; i < 4; i++) {
-+		if ( diff_tx_bytes < throughput_led[i] )
-+			break;
-+	}
-+
-+	for (j = 0; j < 4; j++) {
-+		if ( diff_rx_bytes < throughput_led[j] )
-+			break;
-+	}
-+
-+#if defined(CONFIG_MCT_SG100)
-+	*((volatile unsigned char *) ETHER_OUT_LED) = (0xff << i) & 0x0f;
-+	*((volatile unsigned char *) ETHER_IN_LED) = (0xff << j) & 0x0f;
-+#elif (defined(CONFIG_MCT_SG600) || defined(CONFIG_MCT_SA100)) && !defined(CONFIG_ATEN_LED)
-+	*((volatile unsigned char *) ETHER_LED) = (0x0f >> i) | ((0xff >> j) & 0xf0);
-+#elif defined(CONFIG_MCT_SA200) && !defined(CONFIG_MCT_NAS) && !defined(CONFIG_ATEN_LED) && !defined(CONFIG_4PORT_USB_SERVER)
-+	ETHER_IN_LED(j)
-+	ETHER_OUT_LED(i)
-+#endif
-+
-+#if 0
-+	printk("diff tx = %ld, rx = %ld\n", diff_tx_bytes, diff_rx_bytes);
-+#endif
-+
-+	init_timer(&ethled_timer);
-+	ethled_timer.function = ethled_callback;
-+	ethled_timer.expires = jiffies + HZ / 10;
-+	add_timer(&ethled_timer);
-+}
-+#endif
- 
- static int __devinit rtl8139_init_one (struct pci_dev *pdev,
- 				       const struct pci_device_id *ent)
-@@ -1081,6 +1148,31 @@
- 	if (rtl_chip_info[tp->chipset].flags & HasHltClk)
- 		RTL_W8 (HltClk, 'H');	/* 'R' would leave the clock running. */
- 
-+#if defined(CONFIG_MCT_BOARDS)
-+#if 0
-+	printk("ether interface: bus = %x, devfn = %02x\n", pdev->bus->number, pdev->devfn);
-+#endif
-+	if ( pdev->bus->number == 0 && pdev->devfn == 0x60 ) {
-+		printk("External ether interface is found\n");
-+
-+		init_timer(&ethled_timer);
-+		ethled_timer.function = ethled_callback;
-+		ethled_timer.expires = jiffies + HZ / 10;
-+		add_timer(&ethled_timer);
-+
-+		wan_stats = &tp->stats; 
-+	}
-+#endif
-+#if 0 
-+	{
-+		int i,j;
-+		for(i=0;i<10;i++) {
-+			for(j=0;j<16;j++) 
-+				printk("%.2x ",RTL_R8(i*16+j));
-+			printk("\n");
-+		}
-+	}
-+#endif
- 	return 0;
- 
- err_out:
 diff -Naru linux-2.4.31/drivers/pci/Makefile linux-2.4.31-mct/drivers/pci/Makefile
 --- linux-2.4.31/drivers/pci/Makefile	2003-08-25 13:44:42.000000000 +0200
-+++ linux-2.4.31-mct/drivers/pci/Makefile	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/drivers/pci/Makefile	2005-10-27 14:52:48.000000000 +0200
 @@ -29,6 +29,7 @@
  obj-$(CONFIG_SUPERH) += setup-bus.o setup-irq.o
  obj-$(CONFIG_PPC32) += setup-irq.o
@@ -14719,7 +13026,7 @@ diff -Naru linux-2.4.31/drivers/pci/Makefile linux-2.4.31-mct/drivers/pci/Makefi
  obj-y += syscall.o
 diff -Naru linux-2.4.31/include/asm-mips/bootinfo.h linux-2.4.31-mct/include/asm-mips/bootinfo.h
 --- linux-2.4.31/include/asm-mips/bootinfo.h	2004-02-18 14:36:32.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/bootinfo.h	2005-10-04 09:15:14.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/bootinfo.h	2005-10-27 14:52:48.000000000 +0200
 @@ -36,6 +36,7 @@
  #define MACH_GROUP_NEC_VR41XX  19 /* NEC Vr41xx based boards/gadgets        */
  #define MACH_GROUP_HP_LJ       20 /* Hewlett Packard LaserJet               */
@@ -14755,7 +13062,7 @@ diff -Naru linux-2.4.31/include/asm-mips/bootinfo.h linux-2.4.31-mct/include/asm
  #define MACH_LASAT_100		0	/* Masquerade II/SP100/SP50/SP25 */
 diff -Naru linux-2.4.31/include/asm-mips/cpu.h linux-2.4.31-mct/include/asm-mips/cpu.h
 --- linux-2.4.31/include/asm-mips/cpu.h	2005-01-19 15:10:11.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/cpu.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/cpu.h	2005-10-27 14:52:48.000000000 +0200
 @@ -158,6 +158,7 @@
  #define CPU_VR41XX		41
  #define CPU_R5500		42
@@ -14766,7 +13073,7 @@ diff -Naru linux-2.4.31/include/asm-mips/cpu.h linux-2.4.31-mct/include/asm-mips
  #define CPU_VR4111		46
 diff -Naru linux-2.4.31/include/asm-mips/delay.h linux-2.4.31-mct/include/asm-mips/delay.h
 --- linux-2.4.31/include/asm-mips/delay.h	2005-01-19 15:10:11.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/delay.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/delay.h	2005-10-27 14:52:48.000000000 +0200
 @@ -10,13 +10,11 @@
  #define _ASM_DELAY_H
  
@@ -14844,7 +13151,7 @@ diff -Naru linux-2.4.31/include/asm-mips/delay.h linux-2.4.31-mct/include/asm-mi
  #endif /* _ASM_DELAY_H */
 diff -Naru linux-2.4.31/include/asm-mips/dma.h linux-2.4.31-mct/include/asm-mips/dma.h
 --- linux-2.4.31/include/asm-mips/dma.h	2003-08-25 13:44:43.000000000 +0200
-+++ linux-2.4.31-mct/include/asm-mips/dma.h	2005-10-04 09:12:04.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/dma.h	2005-10-27 14:52:48.000000000 +0200
 @@ -75,7 +75,14 @@
   *
   */
@@ -14863,7 +13170,7 @@ diff -Naru linux-2.4.31/include/asm-mips/dma.h linux-2.4.31-mct/include/asm-mips
   * The maximum address in KSEG0 that we can perform a DMA transfer to on this
 diff -Naru linux-2.4.31/include/asm-mips/fdc37m81x.h linux-2.4.31-mct/include/asm-mips/fdc37m81x.h
 --- linux-2.4.31/include/asm-mips/fdc37m81x.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/fdc37m81x.h	2005-10-04 09:15:18.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/fdc37m81x.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,71 @@
 +/*
 + * fdc37m81x.h: Configuration Register Description for the
@@ -14936,54 +13243,9 @@ diff -Naru linux-2.4.31/include/asm-mips/fdc37m81x.h linux-2.4.31-mct/include/as
 +#endif
 +
 +#endif
-diff -Naru linux-2.4.31/include/asm-mips/flash.h linux-2.4.31-mct/include/asm-mips/flash.h
---- linux-2.4.31/include/asm-mips/flash.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/flash.h	2005-10-04 09:00:00.000000000 +0200
-@@ -0,0 +1,41 @@
-+#ifndef __FLASH_H__
-+#define __FLASH_H__
-+
-+enum {
-+	FL_IMMEDIATE,
-+	FL_INTERVAL,
-+};
-+
-+#define GENCONF_ADDR		0x2000
-+#define USERACCOUNT_ADDR	0x4000
-+#define EXTCONF_ADDR		0x4000
-+#define DHCPLEASE_ADDR		0x6000
-+#define EVENTLOG_ADDR		0xa000
-+#define LA_GRPSHARE_ADDR	0x3e0000
-+#define LA_USER_ADDR		0x3f0000
-+#define USERSHARE_ADDR		0x3f0000
-+
-+typedef struct {
-+	int		policy;
-+
-+	int		short_term_interval;
-+	int		long_term_interval;
-+	int		dirty;
-+	int		dirty_threshold;
-+	int		write_force;
-+
-+	unsigned int	base;
-+	unsigned int	size;
-+	void		*buf_base;
-+	int		last_time_modified;
-+	struct semaphore sem;
-+} REGION_INFO;
-+
-+typedef struct {
-+	int		type;
-+	unsigned int	offset;
-+	unsigned int	size;
-+	REGION_INFO	*reg_info;
-+} ACCESS_CONF;
-+
-+#endif	// __FLASH_H__
 diff -Naru linux-2.4.31/include/asm-mips/mconfig.h linux-2.4.31-mct/include/asm-mips/mconfig.h
 --- linux-2.4.31/include/asm-mips/mconfig.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/mconfig.h	2005-10-04 09:12:44.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/mconfig.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,800 @@
 +/********************************************************************************
 +*
@@ -15787,7 +14049,7 @@ diff -Naru linux-2.4.31/include/asm-mips/mconfig.h linux-2.4.31-mct/include/asm-
 +#endif	// __ASM_MCONFIG_H__
 diff -Naru linux-2.4.31/include/asm-mips/mct-boards/dma.h linux-2.4.31-mct/include/asm-mips/mct-boards/dma.h
 --- linux-2.4.31/include/asm-mips/mct-boards/dma.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/mct-boards/dma.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/mct-boards/dma.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,150 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/dma.c
@@ -15941,7 +14203,7 @@ diff -Naru linux-2.4.31/include/asm-mips/mct-boards/dma.h linux-2.4.31-mct/inclu
 +#endif /* __ASM_TOSHIBA_BOARDS_DMA_H */
 diff -Naru linux-2.4.31/include/asm-mips/mct-boards/irq.h linux-2.4.31-mct/include/asm-mips/mct-boards/irq.h
 --- linux-2.4.31/include/asm-mips/mct-boards/irq.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/mct-boards/irq.h	2005-10-04 09:15:19.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/mct-boards/irq.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,46 @@
 +/*
 + *  linux/include/asm-mips/toshiba-boards/irq.h
@@ -15991,7 +14253,7 @@ diff -Naru linux-2.4.31/include/asm-mips/mct-boards/irq.h linux-2.4.31-mct/inclu
 +#endif /* __ASM_TOSHIBA_BOARDS_IRQ_H */
 diff -Naru linux-2.4.31/include/asm-mips/mct-boards/jmi39io2.h linux-2.4.31-mct/include/asm-mips/mct-boards/jmi39io2.h
 --- linux-2.4.31/include/asm-mips/mct-boards/jmi39io2.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/mct-boards/jmi39io2.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/mct-boards/jmi39io2.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,106 @@
 +/*
 + * Defines for the TJSYS JMI-3927IO2.
@@ -16101,7 +14363,7 @@ diff -Naru linux-2.4.31/include/asm-mips/mct-boards/jmi39io2.h linux-2.4.31-mct/
 +#endif /* __ASM_TOSHIBA_BOARDS_JMI39IO2_H */
 diff -Naru linux-2.4.31/include/asm-mips/mct-boards/jmr3927.h linux-2.4.31-mct/include/asm-mips/mct-boards/jmr3927.h
 --- linux-2.4.31/include/asm-mips/mct-boards/jmr3927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/mct-boards/jmr3927.h	2005-10-04 09:15:24.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/mct-boards/jmr3927.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,206 @@
 +/*
 + * Defines for the TJSYS JMR-TX3927
@@ -16311,7 +14573,7 @@ diff -Naru linux-2.4.31/include/asm-mips/mct-boards/jmr3927.h linux-2.4.31-mct/i
 +#endif /* __ASM_TOSHIBA_BOARDS_JMR3927_H */
 diff -Naru linux-2.4.31/include/asm-mips/mct-boards/pci.h linux-2.4.31-mct/include/asm-mips/mct-boards/pci.h
 --- linux-2.4.31/include/asm-mips/mct-boards/pci.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/mct-boards/pci.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/mct-boards/pci.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,23 @@
 +/*
 + *  linux/include/asm-mips/toshiba-boards/pci.h
@@ -16338,7 +14600,7 @@ diff -Naru linux-2.4.31/include/asm-mips/mct-boards/pci.h linux-2.4.31-mct/inclu
 +#endif /* __ASM_TOSHIBA_BOARDS_PCI_H */
 diff -Naru linux-2.4.31/include/asm-mips/mct-boards/pmon.h linux-2.4.31-mct/include/asm-mips/mct-boards/pmon.h
 --- linux-2.4.31/include/asm-mips/mct-boards/pmon.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/mct-boards/pmon.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/mct-boards/pmon.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,49 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -16391,7 +14653,7 @@ diff -Naru linux-2.4.31/include/asm-mips/mct-boards/pmon.h linux-2.4.31-mct/incl
 +#endif /* __ASM_TOSHIBA_BOARDS_PMON_H */
 diff -Naru linux-2.4.31/include/asm-mips/mct-boards/rbtx4925.h linux-2.4.31-mct/include/asm-mips/mct-boards/rbtx4925.h
 --- linux-2.4.31/include/asm-mips/mct-boards/rbtx4925.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/mct-boards/rbtx4925.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/mct-boards/rbtx4925.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,277 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -16672,7 +14934,7 @@ diff -Naru linux-2.4.31/include/asm-mips/mct-boards/rbtx4925.h linux-2.4.31-mct/
 +#endif /* __ASM_TOSHIBA_BOARDS_RBTX4925_H */
 diff -Naru linux-2.4.31/include/asm-mips/mct-boards/rbtx4927.h linux-2.4.31-mct/include/asm-mips/mct-boards/rbtx4927.h
 --- linux-2.4.31/include/asm-mips/mct-boards/rbtx4927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/mct-boards/rbtx4927.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/mct-boards/rbtx4927.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,181 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -16857,7 +15119,7 @@ diff -Naru linux-2.4.31/include/asm-mips/mct-boards/rbtx4927.h linux-2.4.31-mct/
 +#endif /* __ASM_TOSHIBA_BOARDS_RBTX4927_H */
 diff -Naru linux-2.4.31/include/asm-mips/mct-boards/tsdb.h linux-2.4.31-mct/include/asm-mips/mct-boards/tsdb.h
 --- linux-2.4.31/include/asm-mips/mct-boards/tsdb.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/mct-boards/tsdb.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/mct-boards/tsdb.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,275 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -17136,7 +15398,7 @@ diff -Naru linux-2.4.31/include/asm-mips/mct-boards/tsdb.h linux-2.4.31-mct/incl
 +#endif /* __ASM_TOSHIBA_BOARDS_TSDB_H */
 diff -Naru linux-2.4.31/include/asm-mips/mct-boards/tx4927evb.h linux-2.4.31-mct/include/asm-mips/mct-boards/tx4927evb.h
 --- linux-2.4.31/include/asm-mips/mct-boards/tx4927evb.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/mct-boards/tx4927evb.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/mct-boards/tx4927evb.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,275 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -17415,7 +15677,7 @@ diff -Naru linux-2.4.31/include/asm-mips/mct-boards/tx4927evb.h linux-2.4.31-mct
 +#endif /* __ASM_TOSHIBA_BOARDS_TX4927EVB_H */
 diff -Naru linux-2.4.31/include/asm-mips/parport.h linux-2.4.31-mct/include/asm-mips/parport.h
 --- linux-2.4.31/include/asm-mips/parport.h	2002-08-03 02:39:45.000000000 +0200
-+++ linux-2.4.31-mct/include/asm-mips/parport.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/parport.h	2005-10-27 14:52:48.000000000 +0200
 @@ -6,10 +6,26 @@
  #ifndef _ASM_PARPORT_H
  #define _ASM_PARPORT_H
@@ -17445,7 +15707,7 @@ diff -Naru linux-2.4.31/include/asm-mips/parport.h linux-2.4.31-mct/include/asm-
  #endif /* _ASM_PARPORT_H */
 diff -Naru linux-2.4.31/include/asm-mips/pci.h linux-2.4.31-mct/include/asm-mips/pci.h
 --- linux-2.4.31/include/asm-mips/pci.h	2003-11-28 19:26:21.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/pci.h	2005-10-04 09:12:29.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/pci.h	2005-10-27 14:52:48.000000000 +0200
 @@ -49,6 +49,13 @@
  #define PCIBIOS_MIN_MEM		0x1000000
  #endif
@@ -17462,7 +15724,7 @@ diff -Naru linux-2.4.31/include/asm-mips/pci.h linux-2.4.31-mct/include/asm-mips
  /*
 diff -Naru linux-2.4.31/include/asm-mips/serial_txx927.h linux-2.4.31-mct/include/asm-mips/serial_txx927.h
 --- linux-2.4.31/include/asm-mips/serial_txx927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/serial_txx927.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/serial_txx927.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,17 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -17483,7 +15745,7 @@ diff -Naru linux-2.4.31/include/asm-mips/serial_txx927.h linux-2.4.31-mct/includ
 +#endif /* __ASM_SERIAL_TXX927_H */
 diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/dma.h linux-2.4.31-mct/include/asm-mips/toshiba-boards/dma.h
 --- linux-2.4.31/include/asm-mips/toshiba-boards/dma.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/dma.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/dma.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,150 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/dma.c
@@ -17637,7 +15899,7 @@ diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/dma.h linux-2.4.31-mct/i
 +#endif /* __ASM_TOSHIBA_BOARDS_DMA_H */
 diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/irq.h linux-2.4.31-mct/include/asm-mips/toshiba-boards/irq.h
 --- linux-2.4.31/include/asm-mips/toshiba-boards/irq.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/irq.h	2005-10-04 09:15:24.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/irq.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,46 @@
 +/*
 + *  linux/include/asm-mips/toshiba-boards/irq.h
@@ -17687,7 +15949,7 @@ diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/irq.h linux-2.4.31-mct/i
 +#endif /* __ASM_TOSHIBA_BOARDS_IRQ_H */
 diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/jmi39io2.h linux-2.4.31-mct/include/asm-mips/toshiba-boards/jmi39io2.h
 --- linux-2.4.31/include/asm-mips/toshiba-boards/jmi39io2.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/jmi39io2.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/jmi39io2.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,106 @@
 +/*
 + * Defines for the TJSYS JMI-3927IO2.
@@ -17797,7 +16059,7 @@ diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/jmi39io2.h linux-2.4.31-
 +#endif /* __ASM_TOSHIBA_BOARDS_JMI39IO2_H */
 diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/jmr3927.h linux-2.4.31-mct/include/asm-mips/toshiba-boards/jmr3927.h
 --- linux-2.4.31/include/asm-mips/toshiba-boards/jmr3927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/jmr3927.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/jmr3927.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,206 @@
 +/*
 + * Defines for the TJSYS JMR-TX3927
@@ -18007,7 +16269,7 @@ diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/jmr3927.h linux-2.4.31-m
 +#endif /* __ASM_TOSHIBA_BOARDS_JMR3927_H */
 diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/pci.h linux-2.4.31-mct/include/asm-mips/toshiba-boards/pci.h
 --- linux-2.4.31/include/asm-mips/toshiba-boards/pci.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/pci.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/pci.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,23 @@
 +/*
 + *  linux/include/asm-mips/toshiba-boards/pci.h
@@ -18034,7 +16296,7 @@ diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/pci.h linux-2.4.31-mct/i
 +#endif /* __ASM_TOSHIBA_BOARDS_PCI_H */
 diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/pmon.h linux-2.4.31-mct/include/asm-mips/toshiba-boards/pmon.h
 --- linux-2.4.31/include/asm-mips/toshiba-boards/pmon.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/pmon.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/pmon.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,49 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -18087,7 +16349,7 @@ diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/pmon.h linux-2.4.31-mct/
 +#endif /* __ASM_TOSHIBA_BOARDS_PMON_H */
 diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/rbtx4925.h linux-2.4.31-mct/include/asm-mips/toshiba-boards/rbtx4925.h
 --- linux-2.4.31/include/asm-mips/toshiba-boards/rbtx4925.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/rbtx4925.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/rbtx4925.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,279 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -18370,7 +16632,7 @@ diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/rbtx4925.h linux-2.4.31-
 +#endif /* __ASM_TOSHIBA_BOARDS_RBTX4925_H */
 diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/rbtx4927.h linux-2.4.31-mct/include/asm-mips/toshiba-boards/rbtx4927.h
 --- linux-2.4.31/include/asm-mips/toshiba-boards/rbtx4927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/rbtx4927.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/rbtx4927.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,181 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -18555,7 +16817,7 @@ diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/rbtx4927.h linux-2.4.31-
 +#endif /* __ASM_TOSHIBA_BOARDS_RBTX4927_H */
 diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/tsdb.h linux-2.4.31-mct/include/asm-mips/toshiba-boards/tsdb.h
 --- linux-2.4.31/include/asm-mips/toshiba-boards/tsdb.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/tsdb.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/tsdb.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,275 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -18834,7 +17096,7 @@ diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/tsdb.h linux-2.4.31-mct/
 +#endif /* __ASM_TOSHIBA_BOARDS_TSDB_H */
 diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/tx4927evb.h linux-2.4.31-mct/include/asm-mips/toshiba-boards/tx4927evb.h
 --- linux-2.4.31/include/asm-mips/toshiba-boards/tx4927evb.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/tx4927evb.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/toshiba-boards/tx4927evb.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,275 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -19113,7 +17375,7 @@ diff -Naru linux-2.4.31/include/asm-mips/toshiba-boards/tx4927evb.h linux-2.4.31
 +#endif /* __ASM_TOSHIBA_BOARDS_TX4927EVB_H */
 diff -Naru linux-2.4.31/include/asm-mips/tx3927.h linux-2.4.31-mct/include/asm-mips/tx3927.h
 --- linux-2.4.31/include/asm-mips/tx3927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/tx3927.h	2005-10-04 09:15:20.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/tx3927.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,363 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -19480,7 +17742,7 @@ diff -Naru linux-2.4.31/include/asm-mips/tx3927.h linux-2.4.31-mct/include/asm-m
 +#endif /* __ASM_TX3927_H */
 diff -Naru linux-2.4.31/include/asm-mips/tx4925.h linux-2.4.31-mct/include/asm-mips/tx4925.h
 --- linux-2.4.31/include/asm-mips/tx4925.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/tx4925.h	2005-10-04 09:12:47.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/tx4925.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,511 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -19995,7 +18257,7 @@ diff -Naru linux-2.4.31/include/asm-mips/tx4925.h linux-2.4.31-mct/include/asm-m
 +#endif /* __ASM_MIPS_TX4925_H */
 diff -Naru linux-2.4.31/include/asm-mips/tx4927.h linux-2.4.31-mct/include/asm-mips/tx4927.h
 --- linux-2.4.31/include/asm-mips/tx4927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/tx4927.h	2005-10-04 09:15:20.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/tx4927.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,507 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -20506,7 +18768,7 @@ diff -Naru linux-2.4.31/include/asm-mips/tx4927.h linux-2.4.31-mct/include/asm-m
 +#endif /* __ASM_MIPS_TX4927_H */
 diff -Naru linux-2.4.31/include/asm-mips/txx927.h linux-2.4.31-mct/include/asm-mips/txx927.h
 --- linux-2.4.31/include/asm-mips/txx927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/txx927.h	2005-10-04 09:00:00.000000000 +0200
++++ linux-2.4.31-mct/include/asm-mips/txx927.h	2005-10-27 14:52:48.000000000 +0200
 @@ -0,0 +1,180 @@
 +/*
 + * Common difinitins for TX3927/TX4927
@@ -20688,99 +18950,9 @@ diff -Naru linux-2.4.31/include/asm-mips/txx927.h linux-2.4.31-mct/include/asm-m
 + */
 +
 +#endif /* __ASM_TXX927_H */
-diff -Naru linux-2.4.31/include/asm-mips/unistd.h linux-2.4.31-mct/include/asm-mips/unistd.h
---- linux-2.4.31/include/asm-mips/unistd.h	2005-01-19 15:10:12.000000000 +0100
-+++ linux-2.4.31-mct/include/asm-mips/unistd.h	2005-10-04 09:00:00.000000000 +0200
-@@ -257,16 +257,24 @@
- #define __NR_futex			(__NR_Linux + 238)
- #define __NR_sched_setaffinity		(__NR_Linux + 239)
- #define __NR_sched_getaffinity		(__NR_Linux + 240)
--
-+/* add by Louis Tsai 2002/1/21 */
-+#define __NR_read_config                (__NR_Linux + 241)
-+#define __NR_write_config               (__NR_Linux + 242)
-+#define __NR_get_urllog                 (__NR_Linux + 243)
-+#define __NR_get_netstats               (__NR_Linux + 244)
-+#define __NR_tx4926DesDMACTriple        (__NR_Linux + 245)
- /*
-- * Offset of the last Linux o32 flavoured syscall
-+ * Offset of the last Linux flavoured syscall
-  */
--#define __NR_Linux_syscalls		240
-+
-+//#define __NR_Linux_syscalls           240
-+////modified by louistsai 2002/4/11
-+#define __NR_Linux_syscalls             245
- 
- #endif /* _MIPS_SIM == _MIPS_SIM_ABI32 */
- 
- #define __NR_O32_Linux			4000
--#define __NR_O32_Linux_syscalls		240
-+#define __NR_O32_Linux_syscalls		245
- 
- #if _MIPS_SIM == _MIPS_SIM_ABI64
- 
-diff -Naru linux-2.4.31/include/linux/mctnet.h linux-2.4.31-mct/include/linux/mctnet.h
---- linux-2.4.31/include/linux/mctnet.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/linux/mctnet.h	2005-10-04 09:00:00.000000000 +0200
-@@ -0,0 +1,14 @@
-+#ifndef __MCTNET_H__
-+#define __MCTNET_H__
-+
-+/* added by Ethan on 07/12/2002 */
-+struct net_stats
-+{
-+	char		name[20];
-+	unsigned long	tx_packets, rx_packets;
-+	unsigned long	tx_bytes, rx_bytes;
-+	unsigned long	tx_errors, rx_errors;
-+};
-+
-+#endif
-+
-diff -Naru linux-2.4.31/include/linux/urlfilter.h linux-2.4.31-mct/include/linux/urlfilter.h
---- linux-2.4.31/include/linux/urlfilter.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.31-mct/include/linux/urlfilter.h	2005-10-04 09:12:44.000000000 +0200
-@@ -0,0 +1,36 @@
-+#ifndef __URLFILTER_H__
-+#define __URLFILTER_H__
-+
-+#ifdef __KERNEL__
-+#include <asm/mconfig.h>
-+#include <linux/skbuff.h>
-+#include <linux/list.h>
-+#endif
-+
-+#define URLLOG_MAX	1024
-+#define URLLOG_HASH_SIZE 199
-+#define URL_TARGET_SIZE	128
-+
-+#ifdef __KERNEL__
-+// the following structure is used for kernel manipulation
-+typedef struct {
-+        struct list_head        list;
-+        struct list_head        hash_list;
-+        unsigned long           time;
-+        unsigned long           srcip;
-+	char			target[URL_TARGET_SIZE];
-+} URLLOG;
-+
-+extern void submit_url_records(REG_URL_ACCESS_CONF *);
-+extern int process_url_access(struct sk_buff *skb);
-+#endif
-+
-+// the structure provides application view
-+typedef struct {
-+        unsigned long           time;
-+        unsigned long           srcip;
-+	char			target[URL_TARGET_SIZE];
-+} URLLOG_INFO;
-+ 
-+#endif	// __URLFILTER_H__
-+
 diff -Naru linux-2.4.31/init/do_mounts.c linux-2.4.31-mct/init/do_mounts.c
 --- linux-2.4.31/init/do_mounts.c	2003-11-28 19:26:21.000000000 +0100
-+++ linux-2.4.31-mct/init/do_mounts.c	2005-10-04 09:02:01.000000000 +0200
++++ linux-2.4.31-mct/init/do_mounts.c	2005-10-27 15:11:42.000000000 +0200
 @@ -344,15 +344,28 @@
  	}
  	*s = '\0';
@@ -20889,81 +19061,3 @@ diff -Naru linux-2.4.31/init/do_mounts.c linux-2.4.31-mct/init/do_mounts.c
  }
  
  #ifdef CONFIG_BLK_DEV_INITRD
-@@ -853,16 +879,19 @@
- 	ROOT_DEV = real_root_dev;
- 	mount_root();
- 
--	printk(KERN_NOTICE "Trying to move old root to /initrd ... ");
-+	//printk(KERN_NOTICE "Trying to move old root to /initrd ... ");
-+	printk("Trying to move old root to /initrd ... ");
- 	error = sys_mount("/old", "/root/initrd", NULL, MS_MOVE, NULL);
- 	if (!error)
- 		printk("okay\n");
- 	else {
- 		int fd = open("/dev/root.old", O_RDWR, 0);
- 		printk("failed\n");
--		printk(KERN_NOTICE "Unmounting old root\n");
-+		//printk(KERN_NOTICE "Unmounting old root\n");
-+		printk("Unmounting old root\n");
- 		sys_umount("/old", MNT_DETACH);
--		printk(KERN_NOTICE "Trying to free ramdisk memory ... ");
-+		//printk(KERN_NOTICE "Trying to free ramdisk memory ... ");
-+		printk("Trying to free ramdisk memory ... ");
- 		if (fd < 0) {
- 			error = fd;
- 		} else {
-diff -Naru linux-2.4.31/net/core/dev.c linux-2.4.31-mct/net/core/dev.c
---- linux-2.4.31/net/core/dev.c	2005-04-04 03:42:20.000000000 +0200
-+++ linux-2.4.31-mct/net/core/dev.c	2005-10-04 09:00:00.000000000 +0200
-@@ -104,6 +104,7 @@
- #include <linux/wireless.h>		/* Note : will define WIRELESS_EXT */
- #include <net/iw_handler.h>
- #endif	/* CONFIG_NET_RADIO || CONFIG_NET_PCMCIA_RADIO */
-+#include <linux/mctnet.h>
- #ifdef CONFIG_PLIP
- extern int plip_init(void);
- #endif
-@@ -1769,6 +1770,43 @@
- 	return 0;
- }
- 
-+int sys_get_netstats(struct net_stats *arg)
-+{
-+	int     ret;
-+	struct net_device *dev;
-+	struct net_stats net;
-+
-+	if ( copy_from_user(&net, arg, sizeof(struct net_stats)) > 0 )
-+		return -EFAULT;
-+
-+	ret = 0;
-+	read_lock(&dev_base_lock);
-+	for (dev = dev_base; dev != NULL; dev = dev->next) {
-+		if ( strcmp(dev->name, net.name) == 0 ) {
-+			struct net_device_stats *stats = (dev->get_stats ? dev->get_stats(dev) : NULL);
-+			if ( stats ) {
-+				net.tx_packets = stats->tx_packets;
-+				net.rx_packets = stats->rx_packets;
-+				net.tx_bytes = stats->tx_bytes;
-+				net.rx_bytes = stats->rx_bytes;
-+				net.tx_errors = stats->tx_errors;
-+				net.rx_errors = stats->rx_errors;
-+			} else {
-+				ret = -EIO;
-+			}
-+			break;
-+		}
-+	}
-+	if ( dev == NULL )
-+		ret = -EIO;
-+
-+	read_unlock(&dev_base_lock);
-+
-+	if ( copy_to_user(arg, &net, sizeof(struct net_stats)) > 0 )
-+		ret = -EFAULT;
-+
-+	return ret;
-+}
- /*
-  *	This is invoked by the /proc filesystem handler to display a device
-  *	in detail.
