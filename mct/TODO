@@ -1,0 +1,12 @@
+* Create needed devices /dev/* by script	outstanding
+  Check Busybox link generation and make it
+  similar.
+
+* Split /etc/rc.d/rcSlocal to /etc/init.d/*	work in progress
+
+* Create Dropbear links for MCT by script	outstanding
+
+* Create Busybox links for MCT by script	done, acki, 20051025
+
+* Create Busybox links forced			done, acki, 20051024
+
