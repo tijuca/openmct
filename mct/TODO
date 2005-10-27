@@ -1,3 +1,8 @@
+* build.void.at: OTF by Image repacking		outstanding
+
+* build.void.at: Nightly Build Image		outstanding
+  and NAS-Kern	
+
 * Create VHost http://build.void.at		done, acki, 20051027
 
 * Create needed devices /dev/* by script	outstanding
