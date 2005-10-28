@@ -5,10 +5,3 @@ PATH=/bin:/sbin:/var/bin
 for i in /etc/rc.d/rcSlocal.d/S* ; do
  $i start
 done
-
-if [ ! -f /etc/dropbear/dropbear_dss_host_key ]; then
-   dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key
-fi
-
-echo Starting SSH daemon
-dropbear
