@@ -950,15 +950,6 @@ diff -Naru linux-2.4.31/Documentation/Configure.help linux-2.4.31-grsecurity-2.1
 diff -Naru linux-2.4.31/Makefile linux-2.4.31-grsecurity-2.1.6/Makefile
 --- linux-2.4.31/Makefile	2005-10-27 15:40:23.000000000 +0200
 +++ linux-2.4.31-grsecurity-2.1.6/Makefile	2005-10-27 15:55:19.000000000 +0200
-@@ -1,7 +1,7 @@
- VERSION = 2
- PATCHLEVEL = 4
- SUBLEVEL = 31
--EXTRAVERSION =
-+EXTRAVERSION = -grsec
- 
- KERNELRELEASE=$(VERSION).$(PATCHLEVEL).$(SUBLEVEL)$(EXTRAVERSION)
- 
 @@ -126,9 +126,10 @@
  
  CORE_FILES	=kernel/kernel.o mm/mm.o fs/fs.o ipc/ipc.o
