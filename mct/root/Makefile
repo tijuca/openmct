@@ -74,6 +74,7 @@ prepareroot:
 	$(shell if [ -d $(ROOTDIR) ]; then rm -rf $(ROOTDIR); fi)
 	@$(RM) $(OUTPUTDIR)/$(ROOTSQUASHFS)
 	@$(TAR) xfz $(ROOTTARGZ)
+	@$(RM) -rf $(NEWROOTDIR)
 	@$(CP) -a $(ROOTDIR) $(NEWROOTDIR)
 	@$(RM) -rf $(NEWROOTDIR)/home
 	@$(RM) -rf $(NEWROOTDIR)/mnt
@@ -82,6 +83,8 @@ prepareroot:
 	@$(RM) -rf $(NEWROOTDIR)/usr
 	@$(RM) -rf $(NEWROOTDIR)/etc
 	@$(RM) -f $(NEWROOTDIR)/lib/libstdc++*
+	@$(LN) -s /usr/home $(NEWROOTDIR)/home
+	@$(LN) -s /usr/var $(NEWROOTDIR)/var
 	@$(CP) -a $(ACTDIR)/etc $(NEWROOTDIR)
 	@$(CP) -a $(SRCDIR)/$(MCT_FLASH) $(NEWROOTDIR)/sbin
 
@@ -92,9 +95,8 @@ prepareroot:
 	@$(ECHO) MAKE SYMLINKS FOR $(BUSYBOX)
 	$(foreach link, $(shell cat busybox.mct.links), $(shell ln -s --force /sbin/busybox $(NEWROOTDIR)$(link)))
 
-	@$(ECHO) INSTALL $(MCT_FLASH)
-	@$(CP) $(SRCDIR)/$(MCT_FLASH) $(NEWROOTDIR)/sbin
-	@$(SSTRIP) $(NEWROOTDIR)/sbin/$(MCT_FLASH)
+	@$(ECHO) CREATE $(IMAGEVERSIONFILENAME)
+	@$(ECHO) OpenMCT $(IMAGEVERSION) $(IMAGESUBVERSION) $(IMAGEPRODCODE) > $(NEWROOTDIR)/$(IMAGEVERSIONFILENAME)
 
 	@$(MKSQUASHFS) $(NEWROOTDIR)/* $(OUTPUTDIR)/$(ROOTSQUASHFS) $(SQUASHFSOPTS)
 

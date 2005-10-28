@@ -1,5 +1,5 @@
 #
-# MCT Firmware Builder
+# OpenMCT Firmware Builder
 #
 # Andi <andi@void.at>
 
@@ -10,14 +10,6 @@ include $(TOP)Rules
 # Directories
 KERNELDIR=$(ACTDIR)/kernel
 ROOTDIR=$(ACTDIR)/root
-
-# Image Information
-IMAGEPRODCODE=0x04
-IMAGEMODE=0x0503
-IMAGEVERSION=0x107
-IMAGESUBVERSION=0x01
-IMAGEFLASHMAP=1024,2176,704
-IMAGEFILENAME=VOID_$(IMAGEVERSION)_$(IMAGESUBVERSION)_$(IMAGEPRODCODE).bin
 
 # Main
 all:	directories etc_jffs2 mct_modify kernel_bin root_squashfs image

@@ -23,3 +23,7 @@
 
 * Remove flash.c from Kernel Tree (flash via	done, andi
   mtd Tools)
+
+* Create .version in Root Filesystem / Makefile
+  Remove Firmware Infos to Rules file
+  Rename VOID to OpenMCT                        done, andi
