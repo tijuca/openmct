@@ -1,0 +1,15 @@
+. ../actions/functions
+html
+thead
+echo 'Making changes persistent (/etc/dnrd/master) ... '
+echo "domain $FORM_dn $FORM_ns +auth" > /etc/dnrd/master
+for num in 1 2 3 4 5
+do
+ name=$(eval "echo \$FORM_name$num")
+ ip=$(  eval "echo \$FORM_ip$num")
+ echo "$ip $name" >> /etc/dnrd/master
+done
+echo 'done. </p><p><pre>'
+vexec 'cat /etc/dnrd/master'
+vexec '/etc/init.d/dns reload'
+tfoot

@@ -1,0 +1,14 @@
+# IPTables (Firewalling)
+DOWNLOAD=	http://www.netfilter.org/projects/iptables/files/iptables-1.3.3.tar.bz2
+
+MAKEENV=	CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc LD=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-ld
+
+MAKEARGS=	COPT_FLAGS="-Os" KERNEL_DIR=$(PACKAGEDIR)/$(KERNEL) IPT_LIBDIR="/lib/iptables"
+
+INSTALL=	$(CP) $(SRCDIR)/{iptables,iptables-restore,iptables-save} $(NEWROOTDIR)/sbin && \
+		$(STRIP) $(NEWROOTDIR)/sbin/{iptables,iptables-restore,iptables-save} && \
+		$(MKDIR) $(NEWROOTDIR)/lib/iptables && \
+		$(CP) $(SRCDIR)/extensions/*.so $(NEWROOTDIR)/lib/iptables && \
+		$(STRIP) $(NEWROOTDIR)/lib/iptables/*.so
+
+include		$(OPENMCT_DEVEL_PREFIX)Rules

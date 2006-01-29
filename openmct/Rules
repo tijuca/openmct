@@ -1,0 +1,198 @@
+#
+# General OpenMCT Parameters
+#
+
+# Target
+TARGET=mipsel-linux
+
+# Binaries
+ECHO=/bin/echo
+WGET=/usr/bin/wget -Nc --passive-ftp
+TAR=/bin/tar
+CP=/bin/cp
+MV=/bin/mv
+PATCH=/usr/bin/patch
+ZCAT=/bin/zcat
+GZIP=/bin/gzip
+MAKE=/usr/bin/make
+TOUCH=/usr/bin/touch
+LN=/bin/ln
+MKDIR=/bin/mkdir
+MKFSJFFS2=/usr/bin/mkfs.jffs2
+MKSQUASHFS=/usr/sbin/mksquashfs
+MAKE=/usr/bin/make
+GCC=/usr/bin/gcc
+CHMOD=/bin/chmod
+PERL=/usr/bin/perl
+
+# Directories
+ACTDIR=$(shell /bin/pwd)
+ifndef OPENMCT_DEVEL_PREFIX
+OPENMCT_DEVEL_PREFIX=$(ACTDIR)
+endif
+CONFIGDIR=configs
+CONFIGMCTDIR=$(CONFIGDIR)/mct
+PATCHDIR=$(ACTDIR)/patches
+BUILDDIR=$(OPENMCT_DEVEL_PREFIX)/build
+PACKAGEDIR=$(OPENMCT_DEVEL_PREFIX)/packages
+OUTPUTDIR=$(OPENMCT_DEVEL_PREFIX)/output
+TARGETDIR=$(OUTPUTDIR)/$(TARGET)
+ROOTDIR=$(OUTPUTDIR)/root
+NEWROOTDIR=$(OUTPUTDIR)/newroot
+ETCDIR=$(OPENMCT_DEVEL_PREFIX)/etc
+NEWETCDIR=$(OUTPUTDIR)/newetc
+SCRIPTDIR=$(OPENMCT_DEVEL_PREFIX)/scripts
+SRCDIR=src
+INSTALLDIR=usr
+
+# Binaries
+STRIP=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-sstrip
+
+# Info Files
+PATCHED=.patched
+CONFIG=.config
+DEPEND=.depend
+INSTALLED=.installed
+
+# Output Files
+VMLINUXBIN=vmlinux.bin
+KERNEL=$(VMLINUXBIN).gz
+ROOTSQUASHFS=root.squashfs
+ETCJFFS2=etc.jffs2
+MCT_MODIFY=mct_modify
+MCT_FLASH=mct_flash
+PROCCGI=proccgi
+FCP=fcp
+
+# Options
+SQUASHFSOPTS=-le -all-root
+
+# Scripts
+PATCHSOURCE=$(SCRIPTDIR)/patch-source.sh
+MAKESYMLINKS=$(SCRIPTDIR)/make-symlinks.sh
+REMOVESYMLINKS=$(SCRIPTDIR)/remove-symlinks.sh
+SUBSTITUTE=$(SCRIPTDIR)/substitute.sh
+REMOVESVN=$(SCRIPTDIR)/remove-svn.sh
+
+# tar options
+TAROPT=--strip-path=1
+#TAROPT=--strip-components=1
+
+# default configure enviornment arguments
+CONFIGUREENV=CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc CFLAGS="-Os"
+
+ifdef DOWNLOAD
+# get filename from download url
+FILENAME=$(shell basename $(DOWNLOAD))
+# set suffix
+SUFFIX=$(shell (echo $(FILENAME) | sed -e 's/.*\.\(.*\)$/\1//' | tr '[A-Z]' '[a-z]'))
+endif
+
+ifndef BUILD
+BUILD=$(MAKEENV) $(MAKE) $(MAKEARGS)
+endif
+
+ifndef CLEAN
+CLEAN=$(RM) -rf $(SRCDIR)
+endif
+
+ifndef EXTRACT
+EXTRACT=$(TAR) -C $(SRCDIR) $(TAROPT) $(TARMODE) $(FILENAME)
+endif
+
+ifndef PREFIX
+PREFIX=/
+endif
+
+ifeq ($(SUFFIX),gz)
+TARMODE=-xzf
+endif
+
+ifeq ($(SUFFIX),bz2)
+TARMODE=-xjf
+endif
+
+do-all: $(FILENAME) $(SRCDIR) $(SRCDIR)$(SRCDIRSUFFIX)/$(CONFIG) do-build do-install
+
+# default do-download target
+ifdef DOWNLOAD
+$(FILENAME):
+	@$(ECHO) -e "\033[1;33mDOWNLOAD \033[1;32m$(FILENAME)\033[0m"
+	@$(WGET) $(DOWNLOAD)
+else
+$(FILENAME):
+	@$(ECHO) -e "\033[1;33mNO DOWNLOAD\033[0m"
+endif
+
+# default do-extract target
+ifdef DOWNLOAD
+$(SRCDIR):	$(FILENAME)
+	@if [ ! -d $(SRCDIR) ]; then \
+		$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(SRCDIR)\033[0m" && \
+		$(MKDIR) $(SRCDIR) ; \
+	fi
+	@$(ECHO) -e "\033[1;33mUNPACK \033[1;32m$(FILENAME)\033[0m"
+	@$(EXTRACT)
+	@if [ -d $(PATCHDIR) ]; then \
+		$(ECHO) -e "\033[1;33mPATCH \033[1;32m$(FILENAME)\033[0m" ; \
+		$(PATCHSOURCE) $(SRCDIR) $(PATCHDIR) *.patch ; \
+	fi
+else
+$(SRCDIR):	
+endif
+
+# default do-configure target
+$(SRCDIR)$(SRCDIRSUFFIX)/$(CONFIG):
+	@if [ -f $(SRCDIR)$(SRCDIRSUFFIX)/configure ]; then \
+		$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32m$(FILENAME)\033[0m" ; \
+		cd $(SRCDIR)$(SRCDIRSUFFIX) && $(CONFIGUREENV) \
+		./configure --prefix=$(PREFIX) --host=$(TARGET) $(CONFIGUREARGS) && \
+		cd $(ACTDIR) ; \
+	elif [ -f configs/config ]; then \
+		$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32m$(FILENAME)\033[0m" ; \
+		cp configs/config $(SRCDIR)/.config && \
+		cd $(SRCDIR)$(SRCDIRSUFFIX) && $(MAKE) oldconfig && \
+		cd $(ACTDIR) ; \
+	fi 
+	$(TOUCH) $(SRCDIR)$(SRCDIRSUFFIX)/$(CONFIG)
+
+# default do-build target
+do-build:	$(SRCDIR)
+	@$(ECHO) -e "\033[1;33mBUILD \033[1;32m$(FILENAME)\033[0m"
+	@cd $(SRCDIR)$(SRCDIRSUFFIX) && $(BUILD) && cd $(ACTDIR)
+
+# default do-install target
+do-install:	$(SRCDIR)
+	@$(ECHO) -e "\033[1;33mINSTALL \033[1;32m$(FILENAME)\033[0m"
+	@$(INSTALL)
+
+# default do-uninstall target
+do-uninstall:
+	$(UNINSTALL)
+
+do-clean:
+	@if [ -d $(SRCDIR) ]; then \
+		$(ECHO) -e "\033[1;33mREMOVE  \033[1;32m$(SRCDIR)\033[0m" ; \
+		$(CLEAN) ; \
+	fi
+	@if [ -f $(CONFIG) ]; then \
+		$(RM) $(CONFIG) ; \
+	fi
+	@if [ -f $(PATCHED) ]; then \
+		$(RM) $(PATCHED) ; \
+	fi
+	@if [ -f $(CONFIG) ]; then \
+		$(RM) $(CONFIG) ; \
+	fi
+
+do-distclean:	do-clean
+	@if [ -f $(FILENAME) ]; then \
+		$(ECHO) -e "\033[1;33mREMOVE  \033[1;32m$(FILENAME)\033[0m" ; \
+		$(RM) $(FILENAME) $(DOWNLOADED) ; \
+	fi
+
+do-package:
+	@if [ -d $(INSTALLDIR) ]; then \
+		$(ECHO) -e "\033[1;33mCREATE PACKAGE  \033[1;32m$(OPENMCT_PACKAGE)\033[0m" ; \
+		$(TAR) cfz $(OPENMCT_PACKAGE) $(INSTALLDIR) ; \
+	fi

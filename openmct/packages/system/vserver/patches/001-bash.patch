@@ -1,0 +1,73 @@
+diff -Naru util-vserver-0.30/scripts/distrib-info util-vserver-0.30-mct/scripts/distrib-info
+--- util-vserver-0.30/scripts/distrib-info	2004-04-19 23:33:18.000000000 +0200
++++ util-vserver-0.30-mct/scripts/distrib-info	2005-11-23 12:43:13.474321420 +0100
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ # Copyright (C) 2003 Enrico Scholz <enrico.scholz@informatik.tu-chemnitz.de>
+ # based on distrib-info by Jacques Gelinas
+diff -Naru util-vserver-0.30/scripts/util-vserver-vars.subst util-vserver-0.30-mct/scripts/util-vserver-vars.subst
+--- util-vserver-0.30/scripts/util-vserver-vars.subst	2003-10-30 15:42:36.000000000 +0100
++++ util-vserver-0.30-mct/scripts/util-vserver-vars.subst	2005-11-23 12:43:13.475320893 +0100
+@@ -1,3 +1,3 @@
+-PKGLIBDIR='@PKGLIBDIR@'
+-SBINDIR='@SBINDIR@'
+-VROOTDIR='@VSERVERDIR@'
++PKGLIBDIR='/sbin'
++SBINDIR='/sbin'
++VROOTDIR='/vservers'
+diff -Naru util-vserver-0.30/scripts/vserver util-vserver-0.30-mct/scripts/vserver
+--- util-vserver-0.30/scripts/vserver	2004-02-06 23:10:50.000000000 +0100
++++ util-vserver-0.30-mct/scripts/vserver	2005-11-23 12:46:11.866303614 +0100
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ 
+ # Copyright (C) 2003 Enrico Scholz <enrico.scholz@informatik.tu-chemnitz.de>
+ # based on vserver by Jacques Gelinas
+@@ -554,9 +554,9 @@
+ 		exit 1
+ 	else
+ 		. /var/run/vservers/$1.ctx
+-		NB=$($USR_SBIN/vps ax | awk '{print $2}' | grep \^$S_CONTEXT\$ | wc -l)
+-		#NB=`$CHCONTEXT_CMD --silent --ctx $S_CONTEXT ps ax | wc -l`
+-		#NB=`eval expr $NB + 0`
++		#NB=$($USR_SBIN/vps ax | awk '{print $2}' | grep \^$S_CONTEXT\$ | wc -l)
++		NB=`$CHCONTEXT_CMD --silent --ctx $S_CONTEXT ps | wc -l`
++		NB=`eval expr $NB - 3`
+ 		if [ "$NB" -gt 0 ] ; then
+ 			echo Server $1 is running
+ 			exit 0
+@@ -569,7 +569,9 @@
+ 	if $0 $1 running
+ 	then
+ 		. /var/run/vservers/$1.ctx
+-		NB=$($USR_SBIN/vps ax | awk '{print $2}' | grep \^$S_CONTEXT\$ | wc -l)
++		#NB=$($USR_SBIN/vps ax | awk '{print $2}' | grep \^$S_CONTEXT\$ | wc -l)
++		NB=`$CHCONTEXT_CMD --silent --ctx $S_CONTEXT ps | wc -l`
++		NB=`eval expr $NB - 3`
+ 		echo $NB processes running
+ 		echo Vserver uptime: `$USR_LIB_VSERVER/filetime /var/run/vservers/$1.ctx`
+ 	fi
+@@ -762,17 +764,17 @@
+ 	exec $0 $NODEV $SILENT $VSERVER exec /sbin/service "$@"
+ elif [ "$2" = "chkconfig" ] ; then
+ 	VSERVER=$1
+-	LEVELS=()
++	LEVELS=""
+ 	shift
+ 	shift
+ 	if [ "$1" = "--level" ] ; then
+-		LEVELS=( --level "$2" )
++		LEVELS=" --level \"$2\" "
+ 		shift 2
+ 	fi
+ 	if [ $# != 2 -a ! -x $VROOTDIR/$VSERVER/sbin/chkconfig ] ; then
+ 		echo Invalid argument, expected vserver name chkconfig [ --level nnn ] service on\|off
+ 	elif [ -x $VROOTDIR/$VSERVER/sbin/chkconfig ] ; then
+-		exec $0 --silent $VSERVER exec /sbin/chkconfig "${LEVELS[@]}" "$@"
++		exec $0 --silent $VSERVER exec /sbin/chkconfig "$LEVELS" "$@"
+ 	elif [ -x $VROOTDIR/$VSERVER/usr/sbin/update-rc.d ] ; then
+ 		if [ "$2" = "on" -o "$2" = "start" ] ; then
+ 			$0 --silent $VSERVER exec /usr/sbin/update-rc.d -f $1 remove >/dev/null

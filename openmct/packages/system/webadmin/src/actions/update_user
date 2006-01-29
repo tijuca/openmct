@@ -1,0 +1,13 @@
+. ../actions/functions
+html
+thead
+ entry=$(grep "^$FORM_uid:" /etc/passwd)
+ ehead=$(echo "$entry"|cut -f1-4 -d':')
+ etail=$(echo "$entry"|cut -f6   -d':')
+ if [ "$FORM_resetpw" == "yes" ]; then
+  ugid=$(echo "$ehead"|cut -f3,4 -d':')
+  ehead="$FORM_uid:VDK6mJ\/BLlRlQ:$ugid"
+ fi
+ vexec "sed -ie '/^$FORM_uid:.*/d' /etc/passwd"
+ vexec "echo '$ehead:$FORM_desc:$etail:/bin/$FORM_shell' >> /etc/passwd"
+tfoot

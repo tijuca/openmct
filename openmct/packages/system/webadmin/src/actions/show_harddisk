@@ -1,0 +1,7 @@
+. ../actions/functions
+html
+thead
+vexec 'cat /proc/ide/hda/model'
+vexec 'cat /proc/ide/hda/driver'
+vexec 'cat /proc/ide/hda/settings'
+tfoot

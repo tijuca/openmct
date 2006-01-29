@@ -1,0 +1,117 @@
+--- proftpd-1.2.10/configure	2004-05-26 04:17:24.000000000 +0200
++++ proftpd-1.2.10-mct/configure	2005-11-22 19:14:41.262901586 +0100
+@@ -12920,59 +12920,7 @@
+ if test "${ac_cv_func_setpgrp_void+set}" = set; then
+   echo $ECHO_N "(cached) $ECHO_C" >&6
+ else
+-  if test "$cross_compiling" = yes; then
+-  { { echo "$as_me:$LINENO: error: cannot check setpgrp when cross compiling" >&5
+-echo "$as_me: error: cannot check setpgrp when cross compiling" >&2;}
+-   { (exit 1); exit 1; }; }
+-else
+-  cat >conftest.$ac_ext <<_ACEOF
+-#line $LINENO "configure"
+-/* confdefs.h.  */
+-_ACEOF
+-cat confdefs.h >>conftest.$ac_ext
+-cat >>conftest.$ac_ext <<_ACEOF
+-/* end confdefs.h.  */
+-#if HAVE_UNISTD_H
+-# include <unistd.h>
+-#endif
+-
+-int
+-main ()
+-{
+-/* If this system has a BSD-style setpgrp which takes arguments,
+-  setpgrp(1, 1) will fail with ESRCH and return -1, in that case
+-  exit successfully. */
+-  exit (setpgrp (1,1) == -1 ? 0 : 1);
+-  ;
+-  return 0;
+-}
+-_ACEOF
+-rm -f conftest$ac_exeext
+-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+-  (eval $ac_link) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+-  (eval $ac_try) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); }; }; then
+-  ac_cv_func_setpgrp_void=no
+-else
+-  echo "$as_me: program exited with status $ac_status" >&5
+-echo "$as_me: failed program was:" >&5
+-sed 's/^/| /' conftest.$ac_ext >&5
+-
+-( exit $ac_status )
+-ac_cv_func_setpgrp_void=yes
+-fi
+-rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+-fi
+-fi
+-echo "$as_me:$LINENO: result: $ac_cv_func_setpgrp_void" >&5
+-echo "${ECHO_T}$ac_cv_func_setpgrp_void" >&6
+-if test $ac_cv_func_setpgrp_void = yes; then
++  ac_cv_func_setpgrp_void=yes
+ 
+ cat >>confdefs.h <<\_ACEOF
+ #define SETPGRP_VOID 1
+@@ -15799,52 +15747,7 @@
+ if test "${ac_cv_func_setgrent_void+set}" = set; then
+   echo $ECHO_N "(cached) $ECHO_C" >&6
+ else
+-  if test "$cross_compiling" = yes; then
+-  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+-See \`config.log' for more details." >&5
+-echo "$as_me: error: cannot run test program while cross compiling
+-See \`config.log' for more details." >&2;}
+-   { (exit 1); exit 1; }; }
+-else
+-  cat >conftest.$ac_ext <<_ACEOF
+-
+-    #include <sys/types.h>
+-    #include <grp.h>
+-    int main(int argc, char *argv) {
+-      int i = 0;
+-      getgrent();
+-      i = setgrent();
+-      return (i != 1);
+-    }
+-
+-_ACEOF
+-rm -f conftest$ac_exeext
+-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+-  (eval $ac_link) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+-  (eval $ac_try) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); }; }; then
+-  ac_cv_func_setgrent_void=no
+-else
+-  echo "$as_me: program exited with status $ac_status" >&5
+-echo "$as_me: failed program was:" >&5
+-sed 's/^/| /' conftest.$ac_ext >&5
+-
+-( exit $ac_status )
+-ac_cv_func_setgrent_void=yes
+-fi
+-rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+-fi
+-fi
+-echo "$as_me:$LINENO: result: $ac_cv_func_setgrent_void" >&5
+-echo "${ECHO_T}$ac_cv_func_setgrent_void" >&6
+-
+-if test $ac_cv_func_setgrent_void = yes; then
++  ac_cv_func_setgrent_void=yes
+ 
+ cat >>confdefs.h <<\_ACEOF
+ #define SETGRENT_VOID 1

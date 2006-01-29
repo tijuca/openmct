@@ -1,0 +1,63 @@
+#! /bin/sh
+#
+# description: Initialises VServers
+#
+
+#
+# /etc/init.d/vservers
+#
+
+cfg=/etc/sysconfig/vservers
+
+[ ! -f ${cfg} ] && exit 0
+
+# source function library
+. /etc/init.d/functions
+
+# source config
+. ${cfg}
+
+echo -n "vservers - initialise vservers ......"
+
+[ "${START}" == "no" ] && skipped && exit 0
+
+[ ! -d /usr/vservers ] && mkdir /usr/vservers
+
+success
+
+[ "$2" == "--force" ] && START=yes
+
+start() {
+ for vserver in /etc/vservers/*.conf
+ do
+  . $vserver
+  if [ "$ONBOOT" == "yes" ]; then
+   vserver=$(basename $vserver .conf)
+   PATH='/bin:/sbin'; vserver --silent $vserver start
+  fi
+ done
+}
+
+stop() {
+ for vserver in /etc/vservers/*.conf
+ do
+  vserver=$(basename $vserver .conf)
+  PATH='/bin:/sbin'; vserver --silent $vserver stop
+ done
+}
+
+case "$1" in
+ start)
+  start
+  ;;
+ stop)
+  stop
+  ;;
+ status)
+  vserver-stat
+  ;;
+ *)
+  echo "Usage: $0 {start [--force]|stop [--force]|status}"
+esac
+
+exit 0

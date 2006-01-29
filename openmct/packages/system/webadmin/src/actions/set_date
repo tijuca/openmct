@@ -1,0 +1,9 @@
+. ../actions/functions
+html
+thead
+if [ "$FORM_date" != "" ]; then
+ vexec "date $FORM_date"
+else
+ echo "ERROR: Enter/select a valid date (MMDDhhmmYYYY)!"
+fi
+tfoot

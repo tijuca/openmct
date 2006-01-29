@@ -1,0 +1,19 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html><head><meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
+<link rel="stylesheet" type="text/css" href="../openmct.css">
+</head><body class="contentarea">
+<h2> Server // Services // NFS exports </h2><p> Here you can edit
+the NFS exports (/etc/exports) of Open MCT. </p><p>The file /etc/exports serves as
+the access control list for file systems which may be exported to
+NFS clients. </p> <p> The file format is similar to the SunOS 
+exports file. Each line contains an export point and a whitespace-separated 
+list of clients allowed to mount the file system at that point. Each 
+listed client may be immediately followed by a parenthesized, 
+comma-separated list of export options for  that client. No whitespace
+is permitted between a client and its option list.</p> <p> For a complete
+list of all options please visit <a href="http://nfs.sourceforge.net/nfs-howto/server.html#EXPORTS"
+target="_blank">Linux NFS-HOWTO</a> </p>
+<p><form action="/cgi-bin/action">
+__replace__
+</p><p><input type="submit" name="do"  value="update exports"></form></p></body></html>

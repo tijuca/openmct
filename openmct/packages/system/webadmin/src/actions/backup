@@ -1,0 +1,7 @@
+. ../actions/constants
+. ../actions/functions
+html
+createdir $ARCHIVEDIR
+thead
+vexec "tar cvf $ARCHIVEDIR/$(date +"backup_%Y-%m-%d_%H:%M:%S").tar /etc"
+tfoot

@@ -1,0 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html><head><meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
+<link rel="stylesheet" type="text/css" href="../openmct.css">
+<script type="text/javascript">
+function sure () {
+ return confirm( "Are you sure you want to delete ?" );
+}
+</script></head><body class="contentarea">
+<h2> System // Archive </h2><p> The archive menu enables you to 
+make one or more backups of your configuration (residing in /etc)
+and also restore them. </p><p><form action="/cgi-bin/action">
+<div class="portlet"><div><h5> existing backups </h5>
+<div class="portletBody"><div class="portletContent odd">
+<table>
+__replace__
+</table></div></div></div></div></p>
+<p><input type="submit" name="do" value="backup"> <input 
+type="submit" name="do" value="restore"> <input type="submit"
+name="do" value="delete archive" onClick="return sure();"></form></p>
+</body>
+</html>

@@ -1,0 +1,2 @@
+START=yes
+OPTIONS="/dev/discs/disc0/part2"

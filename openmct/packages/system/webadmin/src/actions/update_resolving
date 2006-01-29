@@ -1,0 +1,17 @@
+. ../actions/functions
+html
+thead
+echo 'Making changes persistent (/etc/resolv.conf) ... <pre>'
+vexec "echo '' > /etc/resolv.conf"
+c=0
+while [ $c -lt $FORM_cnt ]
+do
+ c=$(($c+1))
+ ns=$(eval "echo \$FORM_ns$c")
+ if [ "$ns" != "" ];then
+  vexec "echo 'nameserver $ns' >> /etc/resolv.conf"
+ fi
+done
+echo '</pre> ... done. </p><p><pre>'
+vexec 'cat /etc/resolv.conf'
+tfoot

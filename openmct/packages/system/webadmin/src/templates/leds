@@ -1,0 +1,16 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html><head><meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
+<link rel="stylesheet" type="text/css" href="../openmct.css">
+</head><body class="contentarea">
+<h2> Hardware // LEDs HB &amp; IN &amp; OUT  </h2><p> The LEDs
+HB, IN and OUT can be configured via the <code>/proc</code> 
+filesystem to fit your needs. At system boot the HB LED will
+be configured by the OPTION parameter in 
+<code>/etc/sysconfig/leds</code>. </p><p><pre>
+__replace__
+</div></div></div></div>
+<input type="submit" name="do" value="change leds"> <input
+type="checkbox" name="persistent" value="on"> persistent
+</form>
+</body></html>

@@ -1,0 +1,35 @@
+--- vserver-debiantools/dupvserver.sh	2004-10-06 07:28:43.000000000 +0200
++++ vserver-debiantools-mct/dupvserver	2005-12-01 09:10:46.635611422 +0100
+@@ -170,12 +170,12 @@
+ $FINDTOREPNAME2
+ $FINDTOREPNAME3
+ $FINDTOREPNAME4" | sort -u)
+-    perl -pi -e "s#$FROM#$TO#g;" \
++    sed -ie "s/$FROM/$TO/g" \
+ 	$FINDTOREPNAME
+     if [ "$FROMIP" != "$TOIP" -o "$FORCE" = "yes" ] ; then
+ 	FINDTOREPIP=$(rgrep "$FROMIP" $VSERVERS_ROOT/$TO/etc/ 2>&1 | sed -e "s/:.*//;" | grep -v "^grep$" | sort -u)
+ 	if [ -n "$FINDTOREPIP" ] ; then
+-	    perl -pi -e "s#$FROMIP#$TOIP#g;" \
++	    sed -ie "s/$FROMIP/$TOIP/g" \
+ 		$FINDTOREPIP
+ 	fi
+     fi
+@@ -186,14 +186,14 @@
+ 
+ if [ ! -r /etc/vservers/$TO.conf -o "$FORCE" = "yes" ] ; then
+     cp /etc/vservers/$FROM.conf /etc/vservers/$TO.conf
+-    perl -pi -e "s#$FROM#$TO#g;" \
++    sed -ie "s/$FROM/$TO/g" \
+ 	/etc/vservers/$TO.conf
+     if [ "$FROMIP" != "$TOIP" ] ; then
+-	perl -pi -e "s#$FROMIP#$TOIP#g;" \
++	sed -ie "s/$FROMIP/$TOIP/g" \
+ 	    /etc/vservers/$TO.conf
+     fi
+     if [ "$FROMDEV" != "$TODEV" -a -n "$TODEV" ] ; then
+-	perl -pi -e "s#$FROMDEV#$TODEV#g;" \
++	sed -ie "s/$FROMDEV/$TODEV/g" \
+ 	    /etc/vservers/$TO.conf
+     fi
+ fi

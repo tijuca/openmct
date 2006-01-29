@@ -1,0 +1,10 @@
+. ../actions/functions
+html
+thead
+DLDIR=/tmp/update.$$
+vexec "mkdir $DLDIR"
+vexec "wget -q -P $DLDIR http://$FORM_host/main/update"
+[ -r $DLDIR/update ] && \
+  vexec "sh $DLDIR/update $FORM_host $FORM_revision check"
+vexec "rm -rf $DLDIR"
+tfoot

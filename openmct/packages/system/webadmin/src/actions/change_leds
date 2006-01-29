@@ -1,0 +1,13 @@
+. ../actions/functions
+html
+thead
+vexec "echo '$FORM_hb' > /proc/mct/led/hb"
+vexec "echo '$FORM_intin $FORM_dirin $FORM_spdin' > /proc/mct/led/in"
+vexec "echo '$FORM_intout $FORM_dirout $FORM_spdout' > /proc/mct/led/out"
+if [ "$FORM_persistent" == "on" ]
+then
+ vexec "echo 'OPTION_HB=\"$FORM_hb\"' > /etc/sysconfig/leds"
+ vexec "echo 'OPTION_IN=\"$FORM_intin $FORM_dirin $FORM_spdin\"' >> /etc/sysconfig/leds"
+ vexec "echo 'OPTION_OUT=\"$FORM_intout $FORM_dirout $FORM_spdout\"' >> /etc/sysconfig/leds"
+fi
+tfoot

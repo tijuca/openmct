@@ -1,0 +1,9 @@
+. ../actions/functions
+html
+thead
+echo 'Making changes persistent (/etc/vsftpd.conf) ... '
+echo "$FORM_vsftpd" > /etc/vsftpd.conf
+echo 'done. </p><p><pre>'
+vexec 'cat /etc/vsftpd.conf'
+vexec '/etc/init.d/ftpd reload'
+tfoot

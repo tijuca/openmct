@@ -1,0 +1,12 @@
+diff -Naru rp-pppoe-3.7/src/configure rp-pppoe-3.7-mct/src/configure
+--- rp-pppoe-3.7/src/configure	2005-11-17 03:14:32.000000000 +0100
++++ rp-pppoe-3.7-mct/src/configure	2005-12-06 18:31:47.740554732 +0100
+@@ -5730,7 +5730,7 @@
+ echo "$as_me:$LINENO: checking packing order of bit fields" >&5
+ echo $ECHO_N "checking packing order of bit fields... $ECHO_C" >&6
+ if test "$cross_compiling" = yes; then
+-  $ECHO "no defaults for cross-compiling"; exit 0
++  rpppoe_cv_pack_bitfields=normal
+ else
+   cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */

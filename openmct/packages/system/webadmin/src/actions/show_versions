@@ -1,0 +1,7 @@
+. ../actions/functions
+html
+thead
+vexec 'cat /etc/openmct-release'
+vexec 'uname -a'
+vexec 'busybox'
+tfoot

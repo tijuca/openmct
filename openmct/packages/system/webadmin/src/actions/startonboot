@@ -1,0 +1,24 @@
+. ../actions/functions
+html
+thead
+col=0
+for service in dns ftpd httpd nfs ntpdate portmap pptpd smartd sshd \
+               swap syslogd telnetd vservers
+do
+ col=$((${col}+1))
+ grep -q 'START=yes' /etc/sysconfig/$service
+ rc=$?
+ [ $col -eq 1 ] && echo '<tr>'
+ echo "<td> $service </td><td><select name=\"$service\">"
+ if [ $rc -eq 0 ]; then
+  echo '<option selected="selected">yes</option><option>no</option>'
+ else
+  echo '<option>yes</option><option selected="selected">no</option>'
+ fi
+ echo '</select></td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>'
+ if [ $col -gt 2 ]; then 
+  echo '</tr>'
+  col=0
+ fi
+done
+tfoot

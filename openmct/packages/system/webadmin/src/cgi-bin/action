@@ -1,0 +1,11 @@
+#!/bin/sh
+
+eval "`/sbin/proccgi $*`"
+
+d=$(echo "$FORM_do" | tr ' ' '_')
+a=../actions
+
+if [ -r "$a/$d" ]; then . "$a/$d" $(/sbin/proccgi)
+else
+ echo "Unknown command '$FORM_do'"
+fi

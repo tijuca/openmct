@@ -1,0 +1,11 @@
+. ../actions/functions
+html
+thead
+if [ "$FORM_uid" != "" ]; then
+ homedir=$(grep $FORM_uid /etc/passwd|cut -f6 -d":")
+ vexec "deluser $FORM_uid; rm -rf $(grep $FORM_uid /etc/passwd|cut -f6 -d":")"
+ vexec "rm -rf $homedir"
+else
+ echo "ERROR: no user selected!"
+fi
+tfoot

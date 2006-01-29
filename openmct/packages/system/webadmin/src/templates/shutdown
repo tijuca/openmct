@@ -1,0 +1,19 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html><head><meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
+<link rel="stylesheet" type="text/css" href="../openmct.css">
+<script type="text/javascript">
+function sure ( cmd ) {
+ return confirm( "Are you sure you want to " + cmd + " ?" );
+}
+</script></head><body class="contentarea">
+<h2> System // Shutdown </h2><p> The shutdown menu enables you 
+to <code>reboot</code>, <code>halt</code> or <code>powerdown</code>
+your OpenMCT. </p><p><pre>
+__replace__
+</pre></p>
+<p><form action="/cgi-bin/action"> <input type="submit" name="do" 
+value="halt" onClick="return sure('halt');"> <input type="submit" 
+name="do" value="poweroff" onClick="return sure('poweroff');"> <input 
+type="submit" name="do" value="reboot" onClick="return sure('reboot');">
+</form></p></body></html>

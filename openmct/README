@@ -1,0 +1,85 @@
+ABOUT OPENMCT
+=============
+
+OpenMCT is the OpenSource approach to develop a even better
+software environment for the MCT (Magic Control Technology)
+based NAS (Network Attached Storage) or SA (Server Appliance).
+
+The main MCT branding are from Claxan, Intellinet, Tritton or
+IOGear. The folliwing list gives an overview of the product
+names:
+
+ Claxan SA 110 / SA 113 / NAS 110
+ Intellinet SOHO SERVER / SOHO NAS
+ IOGEAR BOSS
+ Tritton TRI-ASA1120/200 / TRI-ASA2120/200 / TRI-NAS080/120/200
+
+
+FEATURES
+========
+
+* Kernel Linux 2.4.32
+  with squashfs devfs grsecurity mppe-mppc vserver cryptoloop
+
+* Buildroot uClibc Snapshot (Cross Compiler, Libs, etc..)
+  http://buildroot.uclibc.org
+
+* Busybox Snapshot (Basic Shell Utils)
+  http://www.busybox.net
+
+* Dropbear 0.46 (Tiny SSH Set)
+  http://matt.ucc.asn.au/dropbear/dropbear.html
+
+* IPTables 1.3.3 (Firewalling)
+  http://www.netfilter.org/projects/iptables
+
+* DNRD 2.20 (Domain Name Relay Daemon)
+  http://dnrd.sourceforge.net
+
+* Smartmontools 5.33 (Harddisk Monitoring)
+  http://smartmontools.sourceforge.net
+
+* RSync 2.6.6 (Fast Incremental File Transfer)
+  http://rsync.samba.org
+
+* PPP 2.4.3 (Point-to-Point Protocol)
+  http://ppp.samba.org
+
+* PPTP Server 1.2.3 (Point-To-Point Tunneling Protocol)
+  http://poptop.sourceforge.net
+
+* PPTP Client 1.7.0 (Point-To-Point Tunneling Protocol)
+  http://pptpclient.sourceforge.net
+
+* PPPOE 0.3 (Point-to-Point Over Ethernet)
+  http://www.ecf.toronto.edu/~stras/pppoe
+
+* TCP Wrapper 7.6 (IP Security and Logging)
+  ftp://ftp.porcupine.org/pub/security
+
+* Portmap (Replacement portmapper with access control)
+  ftp://ftp.porcupine.org/pub/security
+
+* NFS Utils 1.0.7 (Network Filesystem)
+  http://nfs.sourceforge.net
+
+* Debian Debootstrap 0.2.45-0.2 (Bootstrap a basic Debian system)
+  http://packages.debian.org/stable/admin/debootstrap
+
+* VServer 0.30 (Kernel-based Virtual Servers)
+  http://linux-vserver.org
+
+* Debian VServer Utils 0.1.10 (Manage Debian Virtual Servers)
+  http://packages.debian.org/unstable/utils/vserver-debiantools
+
+* Dynarch 1.0 (DHTML / JavaScript Calendar)
+  www.dynarch.com/projects/calendar
+
+* DynarchMenu 2.8.1 (Coolest DHTML / JavaScript Menu and Toolbar)
+  http://www.dynarch.com/products/dhtml-menu
+
+* vsftpd 2.0.3 (Secure and fast FTP server for UNIX)
+  http://vsftpd.beasts.org
+
+* ProFTPD 1.2.10 (Highly configurable GPL-licensed FTP server)
+  http://proftpd.org

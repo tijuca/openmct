@@ -1,0 +1,80 @@
+#! /bin/sh
+#
+# description: Starts vsftpd ftp daemon
+#
+
+#
+# /etc/init.d/ftpd
+#
+
+exe=/sbin/vsftpd
+cfg=/etc/sysconfig/ftpd
+
+# source function library
+. /etc/init.d/functions
+
+# source config
+. ${cfg}
+
+start() {
+ echo -n "ftpd - Start vsftpd ftp daemon ......"
+ 
+ if [ ! -x ${exe} -o ! -f ${cfg} ]; then
+  failure
+  exit 1
+ fi
+
+ eval "$(grep secure_chroot_dir /etc/vsftpd.conf)"
+ [ ! -d $secure_chroot_dir ] && mkdir -p $secure_chroot_dir
+
+ if [ "${START}" == "no" ]; then
+  skipped
+  exit 0
+ else
+  ${exe} $OPTIONS &
+  rc=$?
+ 
+  if [ $rc -eq 0 ]; then
+   success
+  else
+   failure
+  fi
+ fi
+}
+
+stop() {
+ echo -n "ftpd - Stopping vsftpd ftp daemon ..."
+
+ if [ ! -x ${exe} -o ! -f ${cfg} ]; then
+  failure
+  exit 1
+ fi
+ 
+ if [ "${START}" == "no" ]; then
+  skipped
+  exit 0
+ else
+  killall -q $(basename ${exe})
+ fi
+}
+
+[ "$2" == "--force" ] && START=yes
+
+case "$1" in
+ start)
+  start
+  ;;
+ stop)
+  stop
+  ;;
+ status)
+  _status
+  ;;
+ reload)
+  killall -q -SIGHUP httpd
+  ;;
+ *)
+  echo "Usage: $0 {start [--force]|stop [--force]|reload|status}"
+esac
+
+exit $rc

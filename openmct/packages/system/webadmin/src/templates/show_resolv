@@ -1,0 +1,12 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html><head><meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
+<link rel="stylesheet" type="text/css" href="../openmct.css">
+</head><body class="contentarea">
+<h2> Server // Network // Set name & ip resolving </h2><p> Here you can edit
+the nameservers to be used for name and ip resolving. You can enter as many
+nameservers you like but only the first three will be used by OpenMCT. To 
+remove a nameserver erase the input field and click <code> update resolving</code>.
+</p><p><form action="/cgi-bin/action">
+__replace__
+</p><p><input type="submit" name="do"  value="update resolving"></form></p></body></html>

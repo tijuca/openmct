@@ -1,0 +1,5 @@
+. ../actions/functions
+html
+thead
+vexec "/etc/init.d/$FORM_service start --force"
+tfoot

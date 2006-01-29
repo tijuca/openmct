@@ -1,0 +1,25 @@
+. ../actions/functions
+html
+thead
+entries=$(wc -l /etc/passwd|tr -d ' '|cut -f1 -d'/')
+loffset=0
+
+echo -n '<table>'
+
+while [ ${loffset} -lt ${entries} ]
+do
+ loffset=$((${loffset}+1))
+ pwentry="$(sed -ne "${loffset}p" /etc/passwd)"
+ uid=$(echo "$pwentry"|cut -f3 -d ':')
+ if [ $uid -ge 500 -a $uid -lt 65000 ]
+ then
+  nme=$(echo "$pwentry"|cut -f1 -d ':')
+  dsc=$(echo "$pwentry"|cut -f5 -d ':')
+  echo -n '<tr><td> <input type="radio" name="uid" value="'
+  echo -n "$nme\" /> </td><td><img src="/images/user.gif"></td><td> $nme </td><td> ($dsc) </td></tr>"
+ fi
+done
+
+echo -n '</table>'
+
+tfoot

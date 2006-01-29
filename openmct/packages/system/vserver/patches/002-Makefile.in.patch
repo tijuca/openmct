@@ -1,0 +1,25 @@
+--- util-vserver-0.30/Makefile.in	2004-07-03 00:51:03.000000000 +0200
++++ util-vserver-0.30-mct/Makefile.in	2006-01-25 11:57:18.000000000 +0100
+@@ -2171,9 +2171,7 @@
+ 
+ scripts/%:		scripts/%.subst
+ 			@mkdir -p $$(dirname '$@')
+-			sed -e 's!@'PKGLIBDIR'@!$(pkglibdir)!g; \
+-				s!@'SBINDIR'@!$(sbindir)!g; \
+-				s!@'VSERVERDIR'@!$(vserverdir)!g' '$<' >'$@.tmp'
++			sed -e 's!@'PKGLIBDIR'@!$(pkglibdir)!g; s!@'SBINDIR'@!$(sbindir)!g; s!@'VSERVERDIR'@!$(vserverdir)!g' '$<' >'$@.tmp'
+ 			@-chmod --reference='$<' '$@.tmp'
+ 			@-rm -f '$@'
+ 			mv '$@.tmp' '$@'
+@@ -2181,10 +2179,7 @@
+ 
+ sysv/%:			sysv/%.subst
+ 			@mkdir -p $$(dirname '$@')
+-			sed -e 's!/usr/lib/util-vserver!$(pkglibdir)!g; \
+-				s!^USR_SBIN=/usr/sbin$$!USR_SBIN=$(sbindir)!g; \
+-                                s!^VROOTDIR=/vservers$$!VROOTDIR=$(vserverdir)!g; \
+-			       ' '$<' >'$@.tmp'
++			sed -e 's!/usr/lib/util-vserver!$(pkglibdir)!g; s!^USR_SBIN=/usr/sbin$$!USR_SBIN=$(sbindir)!g; s!^VROOTDIR=/vservers$$!VROOTDIR=$(vserverdir)!g; ' '$<' >'$@.tmp'
+ 			if cmp -s '$<' '$@.tmp'; then \
+ 				cp -p '$<' '$@'; \
+ 			else \

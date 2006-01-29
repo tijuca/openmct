@@ -1,0 +1,33 @@
+. ../actions/functions
+html
+thead
+echo '<div class="portlet"><div><h5> services </h5><div class="portletBody"><div '
+echo 'class="portletContent odd"><table cellpadding="5">'
+col=0
+for service in dns ftpd httpd nfs portmap pptpd smartd syslogd
+do
+ col=$((${col}+1))
+ ps=$(/etc/init.d/$service status|grep 'not running')
+ [ $col -eq 1 ] && echo '<tr>'
+ if [ "$ps" != "" ]
+ then
+  echo "<td> <font color=\"red\">$service</font> not running </td>"
+  echo '<td>&nbsp;</td><td><form action="/cgi-bin/action">'
+  echo "<input type=\"hidden\" name=\"service\" value=\"$service\" />"
+  echo '<input type="submit" name="do" value="start service" />'
+  echo '<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>'
+ else
+  echo "<td> <font color=\"green\">$service</font> running"
+  echo ' </td><td>&nbsp;</td><td><form action="/cgi-bin/action">'
+  echo "<input type=\"hidden\" name=\"service\" value=\"$service\" />"
+  echo '<input type="submit" name="do" value="stop service" />'
+  echo '<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>'
+ fi
+ echo '</form></td>'
+ if [ $col -gt 1 ]; then 
+  echo '</tr>'
+  col=0
+ fi
+done
+echo '</table></div></div></div></div>'
+tfoot

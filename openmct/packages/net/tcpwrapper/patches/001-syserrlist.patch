@@ -1,0 +1,12 @@
+diff -Naru tcp_wrappers_7.6/percent_m.c tcp_wrappers_7.6-mct/percent_m.c
+--- tcp_wrappers_7.6/percent_m.c	1994-12-28 17:42:37.000000000 +0100
++++ tcp_wrappers_7.6-mct/percent_m.c	2005-11-03 12:13:56.261572844 +0100
+@@ -14,7 +14,7 @@
+ 
+ extern int errno;
+ #ifndef SYS_ERRLIST_DEFINED
+-extern char *sys_errlist[];
++/* extern char *sys_errlist[]; */
+ extern int sys_nerr;
+ #endif
+ 

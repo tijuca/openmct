@@ -1,0 +1,21 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html><head><meta name="ROBOTS" content="NOINDEX, NOFOLLOW"><link 
+rel="stylesheet" type="text/css" href="../openmct.css">
+<link rel="stylesheet" type="text/css" media="all" 
+href="/jscal/calendar-system.css" title="system" /><script 
+type="text/javascript" src="/jscal/calendar_stripped.js"></script>
+<script type="text/javascript" src="/jscal/calendar-en.js"></script>
+<script type="text/javascript" src="/jscal/calendar-setup_stripped.js">
+</script></head><body class="contentarea">
+<h2> Hardware // Datetime </h2><p> Read and set the date/time of
+your OpenMCT. </p><p><pre>
+__replace__
+</pre></p>
+<p><form name="f" action="/cgi-bin/action"><table>
+<tr><td>Date:</td><td><input type="text" name="date" id="date"><img
+src="/images/jscal.gif" id="trigger"> <script type="text/javascript">
+ Calendar.setup({ inputField : "date", ifFormat : "%m%d%H%M%Y", button : 
+ "trigger", align : "Tl", singleClick : true, showsTime : true });
+</script></td></tr></table><br/><input type="submit" name="do"
+value="set date"></form></p></body></html>

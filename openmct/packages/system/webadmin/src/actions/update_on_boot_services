@@ -1,0 +1,10 @@
+. ../actions/functions
+html
+thead
+for service in dns ftpd httpd nfs ntpdate portmap pptpd smartd sshd \
+               swap syslogd telnetd vservers
+do
+ eval "value=\$FORM_$service"
+ vexec "sed -ie 's/^START=.*$/START=$value/' /etc/sysconfig/$service"
+done
+tfoot

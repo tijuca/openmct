@@ -1,0 +1,41 @@
+. ../actions/functions
+html
+ints=$(cat /var/run/iplink|grep -B 1 'link/ether'|grep "^.:"|cut -f2 -d':')
+thead
+vexec 'cat /proc/mct/led/hb'
+vexec 'cat /proc/mct/led/in; cat /proc/mct/led/out'
+echo -n '</pre></p><form action="/cgi-bin/action">'
+echo -n '<div class="portlet"><div><h5> behavior </h5>'
+echo -n '<div class="portletBody"><div class="portletContent odd">'
+echo -n '<table><tr><td>HB</td><td><select name="hb"><option>cpu</option>'
+echo -n '<option>blink 50 50</option><option>blink 10 90</option>'
+echo -n '<option>blink 90 10</option><option>on</option><option>off</option>'
+echo -n '</select></td></tr>'
+echo '<tr><td>IN</td><td><select name="intin">'
+for int in $ints
+do
+ echo "<option>$int</option>"
+done
+echo '</select><select name="dirin"><option value="r">receive</option>'
+echo '<option value="t">transmit</option></select><select name="spdin">'
+echo '<option value="16">16 kByte/s (128 kBit/s)</option><option value="25">25 kByte/s (196 kBit/s)</option>'
+echo '<option value="32">32 kByte/s (256 kBit/s)</option><option value="64">64 kByte/s (512 kBit/s)</option>'
+echo '<option value="128">128 kByte/s (1 MBit/s)</option><option value="256">256 kByte/s (2 MBit/s)</option>'
+echo '<option value="384">384 kByte/s (3 MBit/s)</option><option value="768">768 kByte/s (6 MBit/s)</option>'
+echo '<option value="1280">1.2 MByte/s (10 MBit/s)</option><option value="12800">12 MByte/s (100 MBit/s)</option>'
+echo '</select></tr>'
+echo '<tr><td>OUT</td><td><select name="intout">'
+for int in $ints
+do
+ echo "<option>$int</option>"
+done
+echo '</select><select name="dirout"><option value="t">transmit</option>'
+echo '<option value="r">receive</option></select><select name="spdout">'
+echo '<option value="16">16 kByte/s (128 kBit/s)</option><option value="25">25 kByte/s (196 kBit/s)</option>'
+echo '<option value="32">32 kByte/s (256 kBit/s)</option><option value="64">64 kByte/s (512 kBit/s)</option>'
+echo '<option value="128">128 kByte/s (1 MBit/s)</option><option value="256">256 kByte/s (2 MBit/s)</option>'
+echo '<option value="384">384 kByte/s (3 MBit/s)</option><option value="768">768 kByte/s (6 MBit/s)</option>'
+echo '<option value="1280">1.2 MByte/s (10 MBit/s)</option><option value="12800">12 MByte/s (100 MBit/s)</option>'
+echo '</select></tr>'
+echo '</table><br />'
+tfoot

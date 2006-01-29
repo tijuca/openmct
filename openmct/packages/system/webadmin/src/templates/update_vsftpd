@@ -1,0 +1,9 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html><head><meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
+<link rel="stylesheet" type="text/css" href="../openmct.css">
+<body class="contentarea">
+<h2> Server // Services // FTP configuration // Update vsftpd </h2><p> 
+Update FTP configuration (/etc/vsftpd.conf). </p><p>
+__replace__
+</pre></p></body></html>

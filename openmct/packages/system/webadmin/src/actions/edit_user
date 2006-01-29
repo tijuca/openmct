@@ -1,0 +1,20 @@
+. ../actions/functions
+html
+thead
+if [ "$FORM_uid" != "" ]; then
+ entry=$(grep "^$FORM_uid:" /etc/passwd)
+ desc=$(echo "$entry"|cut -f5 -d':')
+ echo -n '<tr><td> Login name: </td><td> <input type="text" name="uid" '
+ echo -n "value=\"$FORM_uid\" readonly=\"readonly\" /> (readonly)</td></tr>"
+ echo -n '<tr><td> Description: </td><td> <input type="text" name="desc" '
+ echo -n "value=\"$desc\" /></td></tr>"
+ echo -n '<tr><td> Login allow: </td><td> <select name="shell">'
+ echo -n '<option value="sh">yes (shell=/bin/sh)</option>'
+ echo -n '<option value="false">no (shell=/bin/false)</option>'
+ echo -n '<tr><td> Reset password: </td><td> <input type="checkbox" name="resetpw" '
+ echo -n 'value="yes" /> (to: <code>168Mct168</code>) </td></tr>'
+ echo -n '</select></td></tr>'
+else
+ echo "ERROR: no user selected!"
+fi
+tfoot

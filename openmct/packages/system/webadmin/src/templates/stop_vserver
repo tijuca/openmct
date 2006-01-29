@@ -1,0 +1,10 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html><head><meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
+<link rel="stylesheet" type="text/css" href="../openmct.css">
+</head><body class="contentarea">
+<h2> Server // Manage VServers // Stop vserver </h2><p>
+The selected vserver will be stopped. Don't leave this page until
+server is fully stopped (<em>Ready</em> at end of page).</p><p><pre>
+__replace__
+</pre></p><p>Ready: VServer stopped</p></body></html>

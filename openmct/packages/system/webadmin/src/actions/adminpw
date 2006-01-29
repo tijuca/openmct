@@ -1,0 +1,14 @@
+. ../actions/functions
+html
+thead
+echo -n '<div class="portlet"><div><h5> WebAdmin </h5>'
+echo -n '<div class="portletBody"><div class="portletContent odd">'
+admname=$(grep "^/:" /etc/httpd.conf|cut -f2 -d":")
+echo -n '<table><tr><td> Administrator: </td><td> <input type="text" size="15" '
+echo -n "name=\"name\" value=\"$admname\"></td></tr><tr><td> Current password: "
+echo -n '</td><td> <input type="password" size="15" name="oldpw" value=""></td>'
+echo -n '</tr><tr><td> New password: </td><td> <input type="password" size="15" '
+echo -n 'name="pw0" value=""></td></tr><tr><td> Confirm password: </td><td> '
+echo -n '<input type="password" size="15" name="pw1" value=""></td></tr></table>'
+echo -n '</div></div></div></div>'
+tfoot

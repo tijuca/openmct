@@ -1,0 +1,7 @@
+. ../actions/functions
+html
+thead
+echo -n '<textarea name="exports" cols="50" rows="10" wrap="off">'
+cat /etc/exports
+echo -n '</textarea>'
+tfoot

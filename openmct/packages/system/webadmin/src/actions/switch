@@ -1,0 +1,47 @@
+. ../actions/functions
+html
+speed() {
+ if [ "$1" == "100" ]; then echo -n 'green'
+ else echo -n 'lightgreen'; fi
+}
+link() {
+ if [ "$1" == "0" ]; then echo -n 'red'
+ elif [ "$2" == "1" ]; then echo -n 'green'
+ else echo -n 'lightgreen'; fi
+}
+speed0=$(cat /proc/mct/switch/0/speed)
+speed1=$(cat /proc/mct/switch/1/speed)
+speed2=$(cat /proc/mct/switch/2/speed)
+speed3=$(cat /proc/mct/switch/3/speed)
+duplx0=$(cat /proc/mct/switch/0/fullduplex)
+duplx1=$(cat /proc/mct/switch/1/fullduplex)
+duplx2=$(cat /proc/mct/switch/2/fullduplex)
+duplx3=$(cat /proc/mct/switch/3/fullduplex)
+lnkup0=$(cat /proc/mct/switch/0/linkup)
+lnkup1=$(cat /proc/mct/switch/0/linkup)
+lnkup2=$(cat /proc/mct/switch/0/linkup)
+lnkup3=$(cat /proc/mct/switch/0/linkup)
+thead
+echo -n ' Status of the switch ports </p><p>'
+echo -n '<table border="0" width="80%" bgcolor="#C5C5C5">'
+echo -n '<tr><td colspan="3">&nbsp;</td></tr>'
+echo -n '<tr><td>&nbsp;</td><td align="center" bgcolor="black"><br />'
+echo -n '<table border="0" rules="all" cellpadding="5" callspacing="2">'
+echo -n '<tr><td>&nbsp;</td><th colspan="4"><font color="white">WAN</font></th></tr>'
+echo -n '<tr align="center"><th><font color="white">Link</font></th>'
+echo -n  '<td bgcolor="'; link $lnkup0 duplx0; echo -n '"><img src="/images/1px.gif" width="20" height="20"></td>'
+echo -n  '<td bgcolor="'; link $lnkup1 duplx1; echo -n '"><img src="/images/1px.gif" width="20" height="20"></td>'
+echo -n  '<td bgcolor="'; link $lnkup2 duplx2; echo -n '"><img src="/images/1px.gif" width="20" height="20"></td>'
+echo -n  '<td bgcolor="'; link $lnkup3 duplx3; echo -n '"><img src="/images/1px.gif" width="20" height="20"></td>'
+echo -n '</tr>'
+echo -n '<tr align="center"><th><font color="white">10/100</font></th>'
+echo -n  '<td bgcolor="'; speed $speed0; echo -n '"><img src="/images/1px.gif" width="20" height="20"></td>'
+echo -n  '<td bgcolor="'; speed $speed1; echo -n '"><img src="/images/1px.gif" width="20" height="20"></td>'
+echo -n  '<td bgcolor="'; speed $speed2; echo -n '"><img src="/images/1px.gif" width="20" height="20"></td>'
+echo -n  '<td bgcolor="'; speed $speed3; echo -n '"><img src="/images/1px.gif" width="20" height="20"></td>'
+echo -n '</tr>'
+echo -n '</table>'
+echo -n '<br /></td><td>&nbsp;</td></tr>'
+echo -n '<tr><td colspan="3">&nbsp;OpenMCT SA</td></tr>'
+echo -n '</table>'
+tfoot

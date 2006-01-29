@@ -1,0 +1,7 @@
+. ../actions/functions
+html
+thead
+echo -n '<textarea name="vsftpd" cols="50" rows="10" wrap="off">'
+cat /etc/vsftpd.conf
+echo -n '</textarea>'
+tfoot

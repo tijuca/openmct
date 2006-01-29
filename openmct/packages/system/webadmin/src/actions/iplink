@@ -1,0 +1,2 @@
+[ ! -d /var/run ] && mkdir -p /var/run
+ip link > /var/run/iplink

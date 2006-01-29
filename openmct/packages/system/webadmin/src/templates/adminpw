@@ -1,0 +1,13 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html><head><meta name="ROBOTS" content="NOINDEX, NOFOLLOW"><link 
+rel="stylesheet" type="text/css" href="../openmct.css">
+</script></head><body class="contentarea">
+<h2> System // WebAdmin </h2><p> Enter credentials to be used
+for WebAdmin interface authentication. </p>
+<p><form action="/cgi-bin/action">
+__replace__
+</p>
+</td></tr></table><br/><input type="submit" name="do" value="set credentials"> 
+<input type="checkbox" name="flush" value="on"> flush now
+</form></p></body></html>

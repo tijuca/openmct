@@ -1,0 +1,54 @@
+. ../actions/functions
+html
+thead
+. ../actions/vserver-stat
+entries=$(wc -l /var/run/vserver-stat|tr -d ' '|cut -f1 -d'/')
+
+echo -n '<tr><td> </td><td> CTX </td><td> PROC </td><td> VSZ '
+echo -n '</td><td> RSS </td><td> userTIME </td><td> sysTIME '
+echo -n '</td><td> UPTIME </td><td> NAME </td><td> DESCRIPTION '
+echo -n '</td></tr>'
+
+head=$(sed -ne "2p" /var/run/vserver-stat|tr -s " ")
+echo -n '<tr><td> - host system - </td><td>'
+echo -n "$head"|sed -e "s/ /<\/td><td>/g"
+echo -n '</td></tr>'
+
+for vserver in /etc/vservers/*.conf
+do
+ vserver=$(basename $vserver .conf)
+ loffset=1
+ run=0
+ while [ ${loffset} -lt ${entries} ]
+ do
+  loffset=$((${loffset}+1))
+  entrie=$(sed -ne "${loffset}p" /var/run/vserver-stat|tr -s " ")
+  nme=$(echo "$entrie"|cut -f8 -d ' ')
+  if [ "$nme" == "$vserver" ]; then
+   ctx=$(echo "$entrie"|cut -f1 -d ' ')
+   pro=$(echo "$entrie"|cut -f2 -d ' ')
+   vsz=$(echo "$entrie"|cut -f3 -d ' ')
+   rss=$(echo "$entrie"|cut -f4 -d ' ')
+   usr=$(echo "$entrie"|cut -f5 -d ' ')
+   sys=$(echo "$entrie"|cut -f6 -d ' ')
+   upt=$(echo "$entrie"|cut -f7 -d ' ')
+   dsc=$(echo "$entrie"|cut -f9 -d ' ')
+   echo -n '<tr><form action="/cgi-bin/action"><input type="hidden" '
+   echo -n "name=\"vserver\" value=\"$nme\" /><td><input type=\"submit\" "
+   echo -n 'name="do" value="stop vserver"/></td><td>'
+   echo -n "$ctx</td><td>$pro</td><td>$vsz</td><td>$rss</td><td>$usr</td>"
+   echo -n "<td>$sys</td><td>$upt</td><td>$nme</td><td>$dsc</td></form></tr>"
+   run=1
+   break
+  fi
+ done
+ if [ $run -eq 0 ]; then
+  echo -n '<tr><form action="/cgi-bin/action"><input type="hidden" '
+  echo -n "name=\"vserver\" value=\"$vserver\" /><td><input type=\"submit\" "
+  echo -n 'name="do" value="start vserver"/></td><td>'
+  echo -n " </td><td> </td><td> </td><td> </td><td> </td>"
+  echo -n "<td> </td><td> </td><td>$vserver</td><td> </td></form></tr>"
+ fi
+done
+
+tfoot

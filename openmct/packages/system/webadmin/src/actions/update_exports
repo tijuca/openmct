@@ -1,0 +1,11 @@
+. ../actions/functions
+html
+thead
+[ ! -d /var/lib/nfs ] && mkdir -p /var/lib/nfs
+[ ! -r /var/lib/nfs/rmtab ] && touch /var/lib/nfs/rmtab
+echo 'Making changes persistent (/etc/exports) ... '
+echo "$FORM_exports" > /etc/exports
+echo 'done. </p><p><pre>'
+vexec 'cat /etc/exports'
+vexec '/sbin/exportfs -a'
+tfoot

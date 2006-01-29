@@ -1,0 +1,12 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html><head><meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
+<link rel="stylesheet" type="text/css" href="../openmct.css">
+</head><body class="contentarea">
+<h2>  Server // Network // Switch Status </h2><p>
+__replace__
+</p><p><br /><small>Color legend 
+<table border="0" rules="all" cellpadding="5" callspacing="2">
+<tr><td>LINK</td><td bgcolor="green">FULL</td><td bgcolor="lightgreen">HALF</td><td bgcolor="red">DOWN</td></tr>
+<tr><td>SPEED</td><td bgcolor="green">100MBit/s</td><td bgcolor="lightgreen">10MBit/s</td></tr></table></small>
+</p></body></html>

@@ -1,0 +1,10 @@
+# on ..................... = LED permanent on
+# off .................... = LED permanent off
+# blink [ontime [offtime]] = LED blinks, default 1sec on then
+#                            1sec off. units are 1/10 seconds.
+# cpu .................... = LED blink modulated by CPU-idle
+#                            time. If idle aprox. 1,5 seconds
+#                            the LED went off for 60ms.
+OPTION_HB="cpu"
+OPTION_IN="eth0 r 100"
+OPTION_OUT="eth0 t 100"

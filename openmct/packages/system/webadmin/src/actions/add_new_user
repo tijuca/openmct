@@ -1,0 +1,10 @@
+. ../actions/functions
+html
+thead
+if [ "$FORM_new_uid" != "" ]; then
+ vexec "adduser -g '$FORM_new_desc' -G nogroup -D $FORM_new_uid && \
+sed -ie 's/^$FORM_new_uid:x:/$FORM_new_uid:VDK6mJ\/BLlRlQ:/' /etc/passwd"
+else
+ echo "ERROR: no login name entered!"
+fi
+tfoot

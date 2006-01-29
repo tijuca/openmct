@@ -1,0 +1,5 @@
+. ../actions/functions
+html
+thead
+vexec 'date'
+tfoot

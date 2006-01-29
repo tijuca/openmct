@@ -1,0 +1,24 @@
+diff -Naru pptpd-1.2.3/configure pptpd-1.2.3-mct/configure
+--- pptpd-1.2.3/configure	2005-02-17 02:49:13.000000000 +0100
++++ pptpd-1.2.3-mct/configure	2005-11-03 11:24:40.533328299 +0100
+@@ -5950,7 +5950,7 @@
+ 
+   else
+     cat >>confdefs.h <<\_ACEOF
+-#define PPP_BINARY "/usr/sbin/pppd"
++#define PPP_BINARY "/sbin/pppd"
+ _ACEOF
+ 
+   fi
+diff -Naru pptpd-1.2.3/configure.in pptpd-1.2.3-mct/configure.in
+--- pptpd-1.2.3/configure.in	2005-02-17 02:48:46.000000000 +0100
++++ pptpd-1.2.3-mct/configure.in	2005-11-03 11:24:09.658600186 +0100
+@@ -168,7 +168,7 @@
+   if test "$SLIRP" = "yes"; then
+     AC_DEFINE(PPP_BINARY, "/bin/slirp")
+   else
+-    AC_DEFINE(PPP_BINARY, "/usr/sbin/pppd")
++    AC_DEFINE(PPP_BINARY, "/sbin/pppd")
+   fi
+ fi
+ 

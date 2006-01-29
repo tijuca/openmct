@@ -1,0 +1,5 @@
+. ../actions/functions
+html
+thead
+vexec "PATH='/bin:/sbin'; /sbin/vserver $FORM_vserver start"
+tfoot

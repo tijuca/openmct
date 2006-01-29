@@ -1,0 +1,84 @@
+diff -Naru vserver-debiantools/newnfsvserver.sh vserver-debiantools-mct/newnfsvserver.sh
+--- vserver-debiantools/newnfsvserver.sh	2005-03-12 16:28:27.000000000 +0100
++++ vserver-debiantools-mct/newnfsvserver.sh	2005-11-22 21:46:37.000000000 +0100
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ VERSION='0.3.2'
+ #
+ # Copyright (C) 2002       Mark Lawrence <nomad@null.net>
+@@ -325,7 +325,7 @@
+ VROOTDIR="${VROOTDIR%/}"
+ 
+ # Check we've got debootstrap available
+-if [ ! -x /usr/sbin/debootstrap ]; then
++if [ ! -x /sbin/debootstrap ]; then
+   cat << EOF 1>&2
+ ${0##*/}: Requires the debootstrap package to bootstrap Debian
+   Debian Host:	apt-get install debootstrap
+@@ -370,7 +370,7 @@
+ 
+ # Fire off `debootstrap' to do all the hard work
+ # like downloading and installing
+-if ! /usr/sbin/debootstrap $ARCH_ARGUMENT \
++if ! /sbin/debootstrap $ARCH_ARGUMENT \
+ 	"--include=$INSTALL_PACKAGES" "--exclude=$REMOVE_PACKAGES" \
+ 	"$DIST" "$VROOTDIR/$VHOST" "$MIRROR" ; then
+     echo "${0##*/}: error: debootstrap failure. Cannot continue."
+diff -Naru vserver-debiantools/newvserver.sh vserver-debiantools-mct/newvserver.sh
+--- vserver-debiantools/newvserver.sh	2005-03-12 16:28:27.000000000 +0100
++++ vserver-debiantools-mct/newvserver.sh	2005-11-23 08:56:01.453795963 +0100
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ VERSION='0.3.2'
+ #
+ # Copyright (C) 2002       Mark Lawrence <nomad@null.net>
+@@ -342,7 +342,7 @@
+ 
+ 
+ # Check we've got debootstrap available
+-if [ ! -x /usr/sbin/debootstrap ]; then
++if [ ! -x /sbin/debootstrap ]; then
+   cat << EOF 1>&2
+ ${0##*/}: Requires the debootstrap package to bootstrap Debian
+   Debian Host:	apt-get install debootstrap
+@@ -387,7 +387,7 @@
+ 
+ # Fire off `debootstrap' to do all the hard work
+ # like downloading and installing
+-if ! /usr/sbin/debootstrap $ARCH_ARGUMENT \
++if ! /sbin/debootstrap $ARCH_ARGUMENT \
+ 	"--include=$INSTALL_PACKAGES" "--exclude=$REMOVE_PACKAGES" \
+ 	"$DIST" "$VROOTDIR/$VHOST" "$MIRROR" ; then
+     echo "${0##*/}: error: debootstrap failure. Cannot continue."
+@@ -409,9 +409,9 @@
+ # Fix up the available device nodes, for security
+ if cd "$VROOTDIR/$VHOST/dev"; then
+     mkdir -p /var/lib/vserver-debiantools
+-    tar cfp /var/lib/vserver-debiantools/dev.tar.$$ full null ptmx random tty urandom zero
++    tar cf /var/lib/vserver-debiantools/dev.tar.$$ full null ptmx random tty urandom zero
+     rm -rf *
+-    tar xfp /var/lib/vserver-debiantools/dev.tar.$$
++    tar xf /var/lib/vserver-debiantools/dev.tar.$$
+     rm -f /var/lib/vserver-debiantools/dev.tar.$$
+     mkdir pts
+     mkdir shm
+@@ -566,7 +566,7 @@
+ EOF
+ 
+ if [ -n "$EXTRA_PACKAGES" ]; then
+-    EXTRA_PACKAGES_INSTALL="apt-get --assume-yes install ${EXTRA_PACKAGES//,/ }"
++    EXTRA_PACKAGES_INSTALL="apt-get --assume-yes install $(echo $EXTRA_PACKAGES | sed -e 's/,/ /g')"
+ fi
+ 
+ # ------------------------------------------------------------
+diff -Naru vserver-debiantools/stripserver.sh vserver-debiantools-mct/stripserver.sh
+--- vserver-debiantools/stripserver.sh	2005-03-12 16:28:27.000000000 +0100
++++ vserver-debiantools-mct/stripserver.sh	2005-11-22 21:46:37.000000000 +0100
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ VERSION='0.3.2'
+ #
+ # Copyright (C) 2002, Mark Lawrence <nomad@null.net>
