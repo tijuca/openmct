@@ -55,8 +55,8 @@ struct mct_h_t {
 #define MCT_DEFAULT_SIGNATURE 		(0xAA5555AAUL)
 #define	MCT_DEFAULT_FIRMWARESIZE	0x800000
 #define MCT_DEFAULT_FILELIST 		"root.squashfs,etc.jffs2"
-#define MCT_DEFAULT_OFFSETLIST		"2112,704"
-#define MCT_DEFAULT_FLASHSIZE		3904
+#define MCT_DEFAULT_OFFSETLIST		"1088,2112"
+#define MCT_DEFAULT_MAXRAMDISKSIZE	2816
 
 enum 	MCT_MODI 			{ EXTRACT, CREATE, CREATEEXT } mode;
 
@@ -134,7 +134,7 @@ int mct_modify_help(int argc, char **argv) {
 	printf("-s ... signature (default: 0x%08lx)\n", MCT_DEFAULT_SIGNATURE);
 	printf("-l ... File List (default: %s)\n", MCT_DEFAULT_FILELIST);
 	printf("-a ... Offset List in Flash (default: %s)\n", MCT_DEFAULT_OFFSETLIST);
-	printf("-z ... Flash size (default: 0x%08lx)\n", MCT_DEFAULT_FLASHSIZE);
+	printf("-z ... Maximal Ramdisk Size in 1k blocks (default: %d)\n", MCT_DEFAULT_MAXRAMDISKSIZE);
 
 	printf("\nexamples:\n");
 	printf("$ %s -x -i kfs_sa113_v152_040405.bin\n", argv[0]);
@@ -420,6 +420,7 @@ int mct_modify_createramdisk(char *ramdisk, int size_ramdisk, int size_kernel, c
 		} else if (cnt_files != cnt_offsets) {
 			printf("[*] please specifiy the same count of files and offsets\n");
 		} else {
+			memset(buf_ramdisk, -1, size_ramdisk * 1024);
 			for (i = 0; i < cnt_files; i++) {
 				fd_file = open(array_files[i], O_RDONLY);
 				if (fd_file != -1) {
@@ -520,7 +521,7 @@ int main(int argc, char **argv) {
 	int		flashbase = MCT_DEFAULT_FLASHBASE;
 	int		updateoffset = MCT_DEFAULT_UPDATEOFFSET;
 	int		signature = MCT_DEFAULT_SIGNATURE;
-	int		flashsize = MCT_DEFAULT_FLASHSIZE;
+	int		maxramdisksize = MCT_DEFAULT_MAXRAMDISKSIZE;
 	int		kernelsize = 0;
 	char		fill_kernel[MCT_FILENAME_SIZE];
 	struct mct_h_t 	header;
@@ -563,7 +564,7 @@ int main(int argc, char **argv) {
 				case 'a': offsetlist = optarg;
 					  sscanf(offsetlist, "%d", &kernelsize);
 					  break;
-				case 'z': sscanf(optarg, "0x%08x", &flashsize);
+				case 'z': sscanf(optarg, "%d", &maxramdisksize);
 					  break;
 				default:
 					  printf("[*] unknown option: '%c'\n", opt);
@@ -587,7 +588,7 @@ int main(int argc, char **argv) {
                                 if (mode == CREATEEXT) {
 					printf("[*] ramdisk/flash map (%s)...\n", offsetlist);
 					printf("[*] create fake '%s' with '%s' and '%s'...\n", ramdisk, filelist, offsetlist);
-                                        mct_modify_createramdisk(ramdisk, flashsize - kernelsize, kernelsize, filelist, offsetlist);
+                                        mct_modify_createramdisk(ramdisk, maxramdisksize, kernelsize, filelist, offsetlist);
 					snprintf(fill_kernel, sizeof(fill_kernel), "%s%s", kernel, MCT_FILL_SUFFIX);
 					printf("[*] fill up size (up: %d) kernel '%s' to '%s'...\n", kernelsize, kernel, fill_kernel);
                                         mct_modify_createkernel(kernel, kernelsize, fill_kernel);

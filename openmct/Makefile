@@ -65,6 +65,7 @@ pkgdistclean:
 
 packages/system/linux/$(SRCDIR)/$(CONFIG):
 	@$(MAKE) -C packages/system/linux OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ $(SRCDIR)
+	@$(CP) packages/system/linux/configs/$(IMAGEKERNELCONFIG) packages/system/linux/configs/config
 	@$(MAKE) -C packages/system/linux OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ $(SRCDIR)/$(CONFIG)
 	@$(ECHO) -e "\033[1;33mPATCH \033[1;32m$(KERNEL)\033[0m : FLASH KERNEL SIZE"
 	@$(PERL) -pi -e 's/1088/$(IMAGEFLASHKERNELSIZE)/g' packages/system/linux/src/drivers/mtd/maps/mct.c
@@ -150,4 +151,5 @@ $(IMAGEFILENAME):	$(OUTPUTDIR)/$(MCT_MODIFY) $(OUTPUTDIR)/$(KERNEL) pkg $(OUTPUT
 	@$(OUTPUTDIR)/$(MCT_MODIFY) -w -i $(IMAGEFILENAME) -m $(IMAGEMODE) -p $(IMAGEPRODCODE) \
 		-v $(IMAGEVERSION) -n $(IMAGESUBVERSION) -k $(OUTPUTDIR)/$(KERNEL) \
                 -l $(OUTPUTDIR)/$(ROOTSQUASHFS),$(OUTPUTDIR)/$(ETCJFFS2) \
-                -a $(IMAGEFLASHKERNELSIZE),$(shell expr $(IMAGEFLASHKERNELSIZE) + $(IMAGEFLASHROOTSIZE))
+                -a $(IMAGEFLASHKERNELSIZE),$(shell expr $(IMAGEFLASHKERNELSIZE) + $(IMAGEFLASHROOTSIZE)) \
+		-z $(shell expr $(IMAGEFLASHKERNELSIZE) + $(IMAGEFLASHROOTSIZE))

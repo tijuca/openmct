@@ -639,16 +639,14 @@ int rtl81x9_diag(int vendor_id, int device_id, long ioaddr, int part_idx)
 	int chip_cmd;
 	int chip_active = 0;
 	int i;
-	unsigned *p = ioaddr;
 
 	printf("A\n");
 	
 	// intr_status = inw(ioaddr + IntrStatus);
-	printf("%p\n", p);
-	printf("%p\n", p + IntrStatus);
-	intr_status = *(p + IntrStatus);
+	memcpy(&intr_status, (0x8000 + IntrStatus), 2);
 	printf("B\n");
-	chip_cmd = inb(ioaddr + ChipCmd);
+	// chip_cmd = inb(ioaddr + ChipCmd);
+	memcpy(&chip_cmd, (0x8000 + ChipCmd), 1);
 	printf("C\n");
 
 	/* It's mostly safe to examine the registers and EEPROM during
