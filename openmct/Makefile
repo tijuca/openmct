@@ -36,13 +36,21 @@ show:
 	$(ECHO) -e "" ; \
 	$(ECHO) -e "choose one of the following targets: " ; \
 	$(ECHO) -e "" ; \
-	$(ECHO) -e "\033[1;32msa\033[0m\tClaxan SA 110 / Claxan SA 113 / Intellinet SOHO SERVER /" ; \
-	$(ECHO) -e "\tTritton TRI-ASA1120/200 / Tritton TRI-ASA2120/200 " ; \
+	$(ECHO) -e "\033[1;32msa200\033[0m\tClaxan SA 200" ; \
 	$(ECHO) -e "" ; \
-	$(ECHO) -e "\033[1;32mnas\033[0m\tClaxan NAS 110 / Intellinet SOHO NAS /" ; \
-	$(ECHO) -e "\tTritton TRI-NAS080/120/200 " ; \
+	$(ECHO) -e "\033[1;32msa113\033[0m\tClaxan SA 113" ; \
 	$(ECHO) -e "" ; \
-	$(ECHO) -e "\033[1;32mcustom\033[0m\tIOGEAR BOSS " ; \
+	$(ECHO) -e "\033[1;32msa110\033[0m\tClaxan SA 110" ; \
+	$(ECHO) -e "\tIntellinet SOHO SERVER : Server Appliance SA-130/110" ; \
+	$(ECHO) -e "\tTritton Server Appliance : TRI-ASA1120/200 / TRI-ASA2120/200" ; \
+	$(ECHO) -e "" ; \
+	$(ECHO) -e "\033[1;32mnas200\033[0m\tClaxan NAS 200" ; \
+	$(ECHO) -e "" ; \
+	$(ECHO) -e "\033[1;32mnas110\033[0m\tClaxan NAS 110" ; \
+	$(ECHO) -e "\tIntellinet SOHO NAS : Network Attached Storage NAS-130/110" ; \
+	$(ECHO) -e "\tTritton Wired SOHO NAS : TRI-NAS080/120/200" ; \
+	$(ECHO) -e "" ; \
+	$(ECHO) -e "\033[1;32mboss\033[0m\tIOGEAR BOSS " ; \
 	$(ECHO) -e "" ; \
 
 clean:	pkgclean

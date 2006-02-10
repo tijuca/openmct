@@ -1,0 +1,42 @@
+#
+# Image OpenMCT Parameters
+#
+# Claxan NAS 200 
+#
+
+# Image Information
+IMAGEPRODCODE=0x2001
+IMAGEMODE=0x0503
+IMAGEVERSION=0x100
+IMAGESUBVERSION=0x00
+IMAGEFLASHKERNELSIZE=1088
+IMAGEFLASHROOTSIZE=4928
+IMAGEFLASHETCSIZE=704
+IMAGEKERNELCONFIG=sa200
+IMAGEFILENAME=OpenMCT_$(IMAGEVERSION)_$(IMAGESUBVERSION)_$(IMAGEPRODCODE).bin
+IMAGERELEASEFILENAME=openmct-release
+IMAGEHOSTNAME=nas200
+ETH0IPADDR=192.168.1.254
+IMAGEPACKAGES=	packages/base/busybox \
+		packages/net/dnrd \
+		packages/net/iptables \
+		packages/net/nfsutils \
+		packages/net/ntp \
+		packages/net/ppp \
+		packages/net/pptp \
+		packages/net/pppoe \
+		packages/net/rsync \
+		packages/net/tcpwrapper \
+		packages/net/portmap \
+		packages/net/pptpd \
+		packages/net/vsftpd \
+		packages/system/debootstrap \
+		packages/system/ethtool \
+		packages/system/gradm \
+		packages/system/fcp \
+		packages/system/proccgi \
+		packages/system/mii-diag \
+		packages/system/smartd \
+		packages/system/vserver \
+		packages/system/vserverdebiantools \
+		packages/system/webadmin
