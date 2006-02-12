@@ -134,6 +134,9 @@ ifdef ETH0NETMASK
 else
 	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWETCDIR)/network/interfaces
 endif
+ifdef ETH0DEFAULTGW
+	@$(ECHO) -e "\tgateway $(ETH0DEFAULTGW)" >> $(NEWETCDIR)/network/interfaces
+endif
 	@$(ECHO) "" >> $(NEWETCDIR)/network/interfaces 
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hosts\033[0m"
 	@$(ECHO) $(ETH0IPADDR) $(IMAGEHOSTNAME) > $(NEWETCDIR)/hosts
@@ -147,6 +150,9 @@ ifdef ETH1NETMASK
 	@$(ECHO) -e "\tnetmask $(ETH1NETMASK)" >> $(NEWETCDIR)/network/interfaces
 else
 	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWETCDIR)/network/interfaces
+endif
+ifdef ETH1DEFAULTGW
+	@$(ECHO) -e "\tgateway $(ETH1DEFAULTGW)" >> $(NEWETCDIR)/network/interfaces
 endif
 	@$(ECHO) "" >> $(NEWETCDIR)/network/interfaces 
 endif
