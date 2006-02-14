@@ -12,11 +12,6 @@ INSTALL=	if [ ! -d $(NEWROOTDIR) ]; then \
 			$(RM) -rf $(NEWROOTDIR)/usr ; \
 			$(RM) -rf $(NEWROOTDIR)/var ; \
 			$(RM) -rf $(NEWROOTDIR)/etc ; \
-			$(MKDIR) -p $(NEWROOTDIR)/etc/rc.d ; \
-			$(CP) $(CONFIGDIR)/fstab $(NEWROOTDIR)/etc ; \
-			$(CP) $(CONFIGDIR)/inittab $(NEWROOTDIR)/etc ; \
-			$(CP) $(CONFIGDIR)/rcS $(NEWROOTDIR)/etc/rc.d ; \
-			$(CHMOD) 755 $(NEWROOTDIR)/etc/rc.d/rcS ; \
 			$(RM) -f $(NEWROOTDIR)/lib/libstdc++* ; \
 			$(MKDIR) $(NEWROOTDIR)/usr ; \
 			$(MKDIR) $(NEWROOTDIR)/usr/home ; \

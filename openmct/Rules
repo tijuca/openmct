@@ -57,15 +57,13 @@ INSTALLED=.installed
 # Output Files
 VMLINUXBIN=vmlinux.bin
 KERNEL=$(VMLINUXBIN).gz
-ROOTSQUASHFS=root.squashfs
-ETCJFFS2=etc.jffs2
+ROOT=root.bin
 MCT_MODIFY=mct_modify
-MCT_FLASH=mct_flash
 PROCCGI=proccgi
 FCP=fcp
 
 # Options
-SQUASHFSOPTS=-le -all-root
+ROOTOPTS=-l -q
 
 # Scripts
 PATCHSOURCE=$(SCRIPTDIR)/patch-source.sh
@@ -105,6 +103,10 @@ PREFIX=/
 endif
 
 ifeq ($(SUFFIX),gz)
+TARMODE=-xzf
+endif
+
+ifeq ($(SUFFIX),tgz)
 TARMODE=-xzf
 endif
 

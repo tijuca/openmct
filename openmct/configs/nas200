@@ -10,25 +10,23 @@ IMAGEMODE=0x0503
 IMAGEVERSION=0x100
 IMAGESUBVERSION=0x00
 IMAGEFLASHKERNELSIZE=1088
-IMAGEFLASHROOTSIZE=4928
-IMAGEFLASHETCSIZE=704
+IMAGEFLASHROOTSIZE=6912
 IMAGEKERNELCONFIG=sa200
 IMAGEFILENAME=OpenMCT_$(IMAGEVERSION)_$(IMAGESUBVERSION)_$(IMAGEPRODCODE).bin
 IMAGERELEASEFILENAME=openmct-release
 IMAGEHOSTNAME=nas200
 ETH0IPADDR=192.168.1.254
+ETH0DEFAULTGW=192.168.1.1
 IMAGEPACKAGES=	packages/base/busybox \
-		packages/net/iptables \
+		packages/net/dropbear \
 		packages/net/nfsutils \
 		packages/net/ntp \
-		packages/net/rsync \
 		packages/net/tcpwrapper \
 		packages/net/portmap \
 		packages/net/vsftpd \
 		packages/system/debootstrap \
-		packages/system/ethtool \
-		packages/system/gradm \
 		packages/system/fcp \
+		packages/system/ethtool \
 		packages/system/mii-diag \
 		packages/system/smartd \
 		packages/system/vserver \

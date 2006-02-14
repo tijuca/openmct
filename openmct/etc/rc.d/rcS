@@ -9,8 +9,17 @@ fi
 
 . /etc/rc.conf
 
-echo Mounting Data
+echo -n "Mounting Data ... "
 /bin/mount -a
+echo ""
+
+echo -n "Setting Hostname ... "
+/bin/hostname `cat /etc/hostname`
+echo ""
+
+echo -n "Starting Network ..."
+/sbin/ifup -a
+echo ""
 
 # Telnetd for Remote Access
 if [ "$START_TELNETD" == "yes" ]; then
@@ -63,7 +72,7 @@ fi
 # FTP Daemon (VSFTPD)
 if [ "$START_FTPD" == "yes" ]; then
    echo -n "Starting FTP daemon ... "
-   /sbin/vsftpd
+   /sbin/vsftpd &
    echo ""
 fi
 
@@ -92,4 +101,4 @@ if [ "$START_VSERVERS" == "yes" ]; then
    echo -n "Starting Vservers ... "
    [ ! -d /usr/vservers ] && mkdir /usr/vservers
    echo ""
-fi   
+fi  

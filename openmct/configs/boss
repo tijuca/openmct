@@ -11,31 +11,23 @@ IMAGEVERSION=0x100
 IMAGESUBVERSION=0x00
 IMAGEFLASHKERNELSIZE=1088
 IMAGEFLASHROOTSIZE=2112
-IMAGEFLASHETCSIZE=704
+IMAGEKERNELCONFIG=sa100
 IMAGEFILENAME=OpenMCT_$(IMAGEVERSION)_$(IMAGESUBVERSION)_$(IMAGEPRODCODE).bin
 IMAGERELEASEFILENAME=openmct-release
 IMAGEHOSTNAME=boss
 ETH0IPADDR=192.168.1.254
+ETH0DEFAULTGW=192.168.1.1
 IMAGEPACKAGES=	packages/base/busybox \
-		packages/base/coreutils \
-		packages/net/dnrd \
 		packages/net/dropbear \
-		packages/net/iptables \
 		packages/net/nfsutils \
 		packages/net/ntp \
-		packages/net/ppp \
-		packages/net/pptp \
-		packages/net/pppoe \
-		packages/net/rsync \
 		packages/net/tcpwrapper \
 		packages/net/portmap \
-		packages/net/pptpd \
 		packages/net/vsftpd \
 		packages/system/debootstrap \
 		packages/system/fcp \
-		packages/system/proccgi \
+		packages/system/ethtool \
 		packages/system/mii-diag \
 		packages/system/smartd \
 		packages/system/vserver \
-		packages/system/vserverdebiantools \
-		packages/system/webadmin
+		packages/system/vserverdebiantools
