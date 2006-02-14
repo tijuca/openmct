@@ -1,0 +1,2 @@
+::sysinit:/etc/rc.d/rcS
+::respawn:/sbin/getty -L /dev/tts/0 115200 vt100

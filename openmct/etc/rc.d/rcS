@@ -1,0 +1,95 @@
+#!/bin/sh
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+
+# Recovery Mode ;)
+if [ ! -f /etc/rc.conf ]; then
+   /sbin/telnetd
+   exit 
+fi
+
+. /etc/rc.conf
+
+echo Mounting Data
+/bin/mount -a
+
+# Telnetd for Remote Access
+if [ "$START_TELNETD" == "yes" ]; then
+   echo -n "Starting telnet daemon ... "
+   /sbin/telnetd
+   echo ""
+fi
+
+# SWAP Partitition
+if [ "$START_SWAP" == "yes" ]; then
+   echo -n "Enable SWAP partition ... "
+   /sbin/swapon $OPTIONS_SWAP
+fi
+
+# Syslog Daemon
+if [ "$START_SYSLOGD" == "yes" ]; then
+   echo -n "Starting Syslog daemon ... "
+   [ ! -d /var/log ] && mkdir -p /var/log
+   /sbin/syslogd
+fi
+
+# LED Display
+if [ "$START_LEDS" == "yes" ]; then
+   echo -n "Starting Led display ... "
+   echo $OPTIONS_LEDS_HB > /proc/mct/led/hb
+   echo $OPTIONS_LEDS_IN > /proc/mct/led/in
+   echo $OPTIONS_LEDS_OUT > /proc/mct/led/out
+fi
+
+# SSH Daemon (Dropbear)
+if [ "$START_SSHD" == "yes" ]; then
+   if [ ! -d /etc/dropbear ]; then
+      mkdir /etc/dropbear
+   fi
+   if [ ! -f /etc/dropbear/dropbear_dss_host_key ]; then
+      /sbin/dropbearkey -f /etc/dropbear/dropbear_dss_host_key -t dss
+   fi
+   echo -n "Starting SSH daemon ... "
+   /sbin/dropbear
+   echo ""
+fi
+
+# Portmap (RPC)
+if [ "$START_PORTMAP" == "yes" ]; then
+   echo -n "Starting Portmap daemon ... "
+   /sbin/portmap
+   echo ""
+fi
+
+# FTP Daemon (VSFTPD)
+if [ "$START_FTPD" == "yes" ]; then
+   echo -n "Starting FTP daemon ... "
+   /sbin/vsftpd
+   echo ""
+fi
+
+# Harddisk Monitoring (SMARTD)
+if [ "$START_SMARTD" == "yes" ]; then
+   echo -n "Starting S.M.A.R.T. daemon ... "
+   /sbin/smartd
+   echo ""
+fi
+
+# Network File System Daemons (NFS)
+if [ "$START_NFS" == "yes" ]; then
+   echo -n "Starting NFS daemons ..."
+   [ ! -d /var/lib/nfs ] && mkdir -p /var/lib/nfs
+   [ ! -d /var/run     ] && mkdir -p /var/run
+   [ ! -f /var/lib/nfs/etab ] && touch /var/lib/nfs/etab
+   [ ! -f /var/lib/nfs/rmtab ] && touch /var/lib/nfs/rmtab
+   /sbin/rpc.mountd
+   /sbin/rpc.nfsd
+   /sbin/rpc.rquotad
+   echo ""
+fi
+
+# Virtual Servers
+if [ "$START_VSERVERS" == "yes" ]; then
+   echo -n "Starting Vservers ... "
+   [ ! -d /usr/vservers ] && mkdir /usr/vservers
+   echo ""
+fi   
