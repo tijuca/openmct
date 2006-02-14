@@ -1,7 +1,0 @@
-#!/bin/sh
-PATH=/bin:/sbin:/var/bin
-
-# Now run the START scripts.
-for i in /etc/rc.d/rcSlocal.d/S* ; do
- $i start
-done

@@ -1,2 +1,0 @@
-START=yes
-OPTIONS="-sbu -t 2 pool.ntp.org"
