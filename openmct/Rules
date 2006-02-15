@@ -77,7 +77,7 @@ REMOVESVN=$(SCRIPTDIR)/remove-svn.sh
 TAROPT=--strip-components=1
 
 # default configure enviornment arguments
-CONFIGUREENV=CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc CFLAGS="-Os"
+CONFIGUREENV=CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc CXX=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-g++ CFLAGS="-Os"
 
 ifdef DOWNLOAD
 # get filename from download url
