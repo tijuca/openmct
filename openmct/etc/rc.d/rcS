@@ -28,6 +28,13 @@ if [ "$START_TELNETD" == "yes" ]; then
    echo ""
 fi
 
+# IDE Options
+if [ "$START_HDPARM" == "yes" ]; then
+   echo -n "Enable IDE settings ... "
+   /sbin/hdparm $OPTIONS_HDPARM
+   echo ""
+fi
+
 # SWAP Partitition
 if [ "$START_SWAP" == "yes" ]; then
    echo -n "Enable SWAP partition ... "
