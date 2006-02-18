@@ -150,6 +150,11 @@ $(SRCDIR)$(SRCDIRSUFFIX)/$(CONFIG):
 		cd $(SRCDIR)$(SRCDIRSUFFIX) && $(CONFIGUREENV) \
 		./configure --prefix=$(PREFIX) --host=$(TARGET) $(CONFIGUREARGS) && \
 		cd $(ACTDIR) ; \
+	elif [ -f $(SRCDIR)$(SRCDIRSUFFIX)/Configure ]; then \
+		$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32m$(FILENAME)\033[0m" ; \
+		cd $(SRCDIR)$(SRCDIRSUFFIX) && $(CONFIGUREENV) \
+		./Configure $(CONFIGUREARGS) && \
+		cd $(ACTDIR) ; \
 	elif [ -f configs/config ]; then \
 		$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32m$(FILENAME)\033[0m" ; \
 		cp configs/config $(SRCDIR)/.config && \

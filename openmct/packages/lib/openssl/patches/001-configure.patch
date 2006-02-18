@@ -1,0 +1,13 @@
+diff -Naru openssl-0.9.8a/Configure openssl-0.9.8a-mct/Configure
+--- openssl-0.9.8a/Configure	2005-08-02 12:59:42.000000000 +0200
++++ openssl-0.9.8a-mct/Configure	2006-02-18 15:02:02.000000000 +0100
+@@ -525,6 +525,9 @@
+ ##### Compaq Non-Stop Kernel (Tandem)
+ "tandem-c89","c89:-Ww -D__TANDEM -D_XOPEN_SOURCE -D_XOPEN_SOURCE_EXTENDED=1 -D_TANDEM_SOURCE -DB_ENDIAN::(unknown):::THIRTY_TWO_BIT:::",
+ 
++##### OpenMCT
++"openmct-mipsel",   "gcc:-DL_ENDIAN -DTERMIO -Os -g -Wall::-D_REENTRANT::-ldl:BN_LLONG RC2_CHAR RC4_INDEX DES_INT DES_UNROLL DES_RISC2::::::::::::dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
++
+ );
+ 
+ my @MK1MF_Builds=qw(VC-WIN64I VC-WIN64A
