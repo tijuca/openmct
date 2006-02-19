@@ -1,0 +1,41 @@
+diff -Naru gdbm-1.8.3/Makefile.in gdbm-1.8.3-mct/Makefile.in
+--- gdbm-1.8.3/Makefile.in	2002-10-08 18:09:12.000000000 +0200
++++ gdbm-1.8.3-mct/Makefile.in	2006-02-19 12:06:00.000000000 +0100
+@@ -14,10 +14,6 @@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+ INSTALL_DATA = @INSTALL_DATA@
+ 
+-# File ownership and group
+-BINOWN = bin
+-BINGRP = bin
+-
+ MAKEINFO = makeinfo
+ TEXI2DVI = texi2dvi
+ 
+@@ -131,11 +127,11 @@
+ 		$(INSTALL_ROOT)$(includedir) $(INSTALL_ROOT)$(man3dir) \
+ 		$(INSTALL_ROOT)$(infodir)
+ 	$(LIBTOOL) $(INSTALL) -c libgdbm.la $(INSTALL_ROOT)$(libdir)/libgdbm.la
+-	$(INSTALL_DATA) -o $(BINOWN) -g $(BINGRP) gdbm.h \
++	$(INSTALL_DATA) gdbm.h \
+ 		$(INSTALL_ROOT)$(includedir)/gdbm.h
+-	$(INSTALL_DATA) -o $(BINOWN) -g $(BINGRP) $(srcdir)/gdbm.3 \
++	$(INSTALL_DATA) $(srcdir)/gdbm.3 \
+ 		$(INSTALL_ROOT)$(man3dir)/gdbm.3
+-	$(INSTALL_DATA) -o $(BINOWN) -g $(BINGRP) $(srcdir)/gdbm.info \
++	$(INSTALL_DATA) $(srcdir)/gdbm.info \
+ 		$(INSTALL_ROOT)$(infodir)/gdbm.info
+ 
+ install-compat:
+@@ -143,9 +139,9 @@
+ 		$(INSTALL_ROOT)$(includedir)
+ 	$(LIBTOOL) $(INSTALL) -c libgdbm_compat.la \
+ 		$(INSTALL_ROOT)$(libdir)/libgdbm_compat.la
+-	$(INSTALL_DATA) -o $(BINOWN) -g $(BINGRP) $(srcdir)/dbm.h \
++	$(INSTALL_DATA) $(srcdir)/dbm.h \
+ 		$(INSTALL_ROOT)$(includedir)/dbm.h
+-	$(INSTALL_DATA) -o $(BINOWN) -g $(BINGRP) $(srcdir)/ndbm.h \
++	$(INSTALL_DATA) $(srcdir)/ndbm.h \
+ 		$(INSTALL_ROOT)$(includedir)/ndbm.h
+ 
+ #libgdbm.a: $(OBJS) gdbm.h

@@ -114,6 +114,10 @@ ifeq ($(SUFFIX),bz2)
 TARMODE=-xjf
 endif
 
+ifndef CONFIGUREARGS
+CONFIGUREARGS=--prefix=$(PREFIX) --host=$(TARGET)
+endif
+
 do-all: $(FILENAME) $(SRCDIR) $(SRCDIR)$(SRCDIRSUFFIX)/$(CONFIG) do-build do-install
 
 # default do-download target
@@ -148,7 +152,7 @@ $(SRCDIR)$(SRCDIRSUFFIX)/$(CONFIG):
 	@if [ -f $(SRCDIR)$(SRCDIRSUFFIX)/configure ]; then \
 		$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32m$(FILENAME)\033[0m" ; \
 		cd $(SRCDIR)$(SRCDIRSUFFIX) && $(CONFIGUREENV) \
-		./configure --prefix=$(PREFIX) --host=$(TARGET) $(CONFIGUREARGS) && \
+		./configure $(CONFIGUREARGS) && \
 		cd $(ACTDIR) ; \
 	elif [ -f $(SRCDIR)$(SRCDIRSUFFIX)/Configure ]; then \
 		$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32m$(FILENAME)\033[0m" ; \
