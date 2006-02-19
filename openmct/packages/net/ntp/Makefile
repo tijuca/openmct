@@ -1,8 +1,8 @@
 # NTP
 DOWNLOAD=	http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2.0.tar.gz
-CONFIGUREARGS=	--enable-all-clocks=no \
-	        --without-crypto --without-electricfence --with-sntp \
-	        --without-arlib
+CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET) \
+		--enable-all-clocks=no --without-arlib \
+	        --without-crypto --without-electricfence --with-sntp
 
 CONFIGUREENV=	CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc CFLAGS="-Os"
 

@@ -6,7 +6,8 @@ CONFIGUREENV=	CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc \
 		LD=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-ld \
 		CFLAGS="-Os"
 
-CONFIGUREARGS=	--with-kerneldir=../../linux/src --disable-internal-headers
+CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET) \
+		--with-kerneldir=../../linux/src --disable-internal-headers
 
 INSTALL=	$(CP) $(SRCDIR)/src/capchroot			$(NEWROOTDIR)/sbin/ && \
 		$(CP) $(SRCDIR)/src/chbind			$(NEWROOTDIR)/sbin/ && \
