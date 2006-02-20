@@ -1,6 +1,8 @@
 # ID3TAG
 DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/mad/libid3tag-0.15.1b.tar.gz
 
+DEPENDSON=	packages/lib/zlib
+
 CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET)
 
 INSTALL=	$(CP) $(SRCDIR)/.libs/libid3tag.so.0.3.0 $(NEWROOTDIR)/lib && \
