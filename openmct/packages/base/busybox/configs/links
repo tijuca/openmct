@@ -17,6 +17,7 @@
 /bin/clear
 /bin/cmp
 /bin/cp
+/bin/crontab
 /bin/cut
 /bin/date
 /bin/dd
@@ -126,6 +127,7 @@
 /bin/zcat
 /sbin/addgroup
 /sbin/adduser
+/sbin/crond
 /sbin/delgroup
 /sbin/deluser
 /sbin/dumpleases

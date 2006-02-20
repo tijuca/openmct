@@ -108,4 +108,11 @@ if [ "$START_VSERVERS" == "yes" ]; then
    echo -n "Starting Vservers ... "
    [ ! -d /usr/vservers ] && mkdir /usr/vservers
    echo ""
-fi  
+fi
+
+# Crond
+if [ "$START_CROND" == "yes" ]; then
+   echo -n "Starting Crond ... "
+   /sbin/crond
+   echo ""
+fi
