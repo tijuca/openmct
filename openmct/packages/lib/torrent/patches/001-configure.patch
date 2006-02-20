@@ -1,0 +1,32 @@
+diff -Naru libtorrent-0.8.5/configure libtorrent-0.8.5-mct/configure
+--- libtorrent-0.8.5/configure	2006-02-11 17:12:49.000000000 +0100
++++ libtorrent-0.8.5-mct/configure	2006-02-20 13:12:38.000000000 +0100
+@@ -20938,13 +20938,6 @@
+             STUFF_LIBS=`$PKG_CONFIG --libs "sigc++-2.0"`
+             echo "$as_me:$LINENO: result: $STUFF_LIBS" >&5
+ echo "${ECHO_T}$STUFF_LIBS" >&6
+-        else
+-            STUFF_CFLAGS=""
+-            STUFF_LIBS=""
+-            ## If we have a custom action on failure, don't print errors, but
+-            ## do set a variable so people can do so.
+-            STUFF_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "sigc++-2.0"`
+-            echo $STUFF_PKG_ERRORS
+         fi
+ 
+ 
+@@ -20955,14 +20948,8 @@
+      fi
+   fi
+ 
+-  if test $succeeded = yes; then
+      CXXFLAGS="$CXXFLAGS $STUFF_CFLAGS";
+ 		  LIBS="$LIBS $STUFF_LIBS"
+-  else
+-     { { echo "$as_me:$LINENO: error: Library requirements (sigc++-2.0) not met; consider adjusting the PKG_CONFIG_PATH environment variable if your libraries are in a nonstandard prefix so pkg-config can find them." >&5
+-echo "$as_me: error: Library requirements (sigc++-2.0) not met; consider adjusting the PKG_CONFIG_PATH environment variable if your libraries are in a nonstandard prefix so pkg-config can find them." >&2;}
+-   { (exit 1); exit 1; }; }
+-  fi
+ 
+ 
+ 

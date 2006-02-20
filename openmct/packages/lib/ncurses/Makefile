@@ -1,7 +1,9 @@
 # NCurses
 DOWNLOAD=	http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.5.tar.gz
 
-CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET) --with-shared
+CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET) --with-shared \
+		--with-terminfo-dirs=/etc/terminfo \
+		--with-default-terminfo-dir=/etc/terminfo
 
 INSTALL=	$(CP) $(SRCDIR)/lib/libncurses.so.5.5 $(NEWROOTDIR)/lib && \
 		$(STRIP) $(NEWROOTDIR)/lib/libncurses.so.5.5 && \
