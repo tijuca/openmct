@@ -120,7 +120,17 @@ ifndef CONFIGUREARGS
 CONFIGUREARGS=--prefix=$(PREFIX) --host=$(TARGET)
 endif
 
-do-all: $(FILENAME) $(SRCDIR) $(SRCDIR)$(SRCDIRSUFFIX)/$(CONFIG) do-build do-install
+do-all: do-depends $(FILENAME) $(SRCDIR) $(SRCDIR)$(SRCDIRSUFFIX)/$(CONFIG) do-build do-install
+
+# default do-depends target
+ifdef DEPENDSON
+do-depends:
+	@$(ECHO) -e "\033[1;33mDEPENDENCIES \033[1;32m$(FILENAME)\033[0m"
+	@$(foreach package,$(DEPENDSON),$(MAKE) -C $(OPENMCT_DEVEL_PREFIX)/$(package) OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ do-all ; )
+else
+do-depends:
+	@$(ECHO) -e "\033[1;33mNO DEPENDENCIES\033[0m"
+endif
 
 # default do-download target
 ifdef DOWNLOAD
