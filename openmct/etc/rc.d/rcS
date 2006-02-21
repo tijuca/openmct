@@ -13,6 +13,10 @@ echo -n "Mounting Data ... "
 /bin/mount -a
 echo ""
 
+echo -n "Added /usr/lib directory ... "
+/sbin/ldconfig /usr/lib
+echo ""
+
 echo -n "Setting Hostname ... "
 /bin/hostname `cat /etc/hostname`
 echo ""
