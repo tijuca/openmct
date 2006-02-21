@@ -25,6 +25,7 @@ CONFIGUREARGS=	--host=$(TARGET) \
                 --with-automount \
                 --with-tdbsam
 
-INSTALL=
+INSTALL=	$(CP) $(SRCDIR)/source/bin/{smbd,nmbd,smbpasswd} $(NEWROOTDIR)/sbin && \
+		$(STRIP) $(NEWROOTDIR)/sbin/{smbd,nmbd,smbpasswd}
 
 include		$(OPENMCT_DEVEL_PREFIX)Rules

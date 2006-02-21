@@ -5,4 +5,7 @@ CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET) --disable-lzo
 
 DEPENDSON=	packages/lib/openssl
 
+INSTALL=	$(CP) $(SRCDIR)/openvpn $(NEWROOTDIR)/sbin && \
+		$(STRIP) $(NEWROOTDIR)/sbin/openvpn
+
 include		$(OPENMCT_DEVEL_PREFIX)Rules
