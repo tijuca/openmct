@@ -120,3 +120,11 @@ if [ "$START_CROND" == "yes" ]; then
    /sbin/crond
    echo ""
 fi
+
+# Samba
+if [ "$START_SAMBA" == "yes" ]; then
+   echo -n "Starting Samba ... "
+   /sbin/nmbd -D
+   /sbin/smbd -D
+   echo ""
+fi
