@@ -161,18 +161,20 @@ endif
 
 # default do-configure target
 $(SRCDIR)$(SRCDIRSUFFIX)/$(CONFIG):
-	@if [ -f $(SRCDIR)$(SRCDIRSUFFIX)/configure ]; then \
-		$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32m$(FILENAME)\033[0m" ; \
+	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32m$(FILENAME)\033[0m"
+	@if [ -f configs/config.cache ]; then \
+		cd $(SRCDIR)$(SRCDIRSUFFIX) && $(CONFIGUREENV) \
+		./configure --cache-file=$(ACTDIR)/configs/config.cache && \
+		cd $(ACTDIR) ; \
+	elif [ -f $(SRCDIR)$(SRCDIRSUFFIX)/configure ]; then \
 		cd $(SRCDIR)$(SRCDIRSUFFIX) && $(CONFIGUREENV) \
 		./configure $(CONFIGUREARGS) && \
 		cd $(ACTDIR) ; \
 	elif [ -f $(SRCDIR)$(SRCDIRSUFFIX)/Configure ]; then \
-		$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32m$(FILENAME)\033[0m" ; \
 		cd $(SRCDIR)$(SRCDIRSUFFIX) && $(CONFIGUREENV) \
 		./Configure $(CONFIGUREARGS) && \
 		cd $(ACTDIR) ; \
 	elif [ -f configs/config ]; then \
-		$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32m$(FILENAME)\033[0m" ; \
 		cp configs/config $(SRCDIR)/.config && \
 		cd $(SRCDIR)$(SRCDIRSUFFIX) && $(MAKE) oldconfig && \
 		cd $(ACTDIR) ; \
