@@ -96,7 +96,14 @@ $(OUTPUTDIR)/$(MCT_MODIFY): packages/build/mct_modify/src/mct_modify.c
 	@$(MAKE) -C packages/build/mct_modify OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-all
 
 $(NEWROOTDIR):
-	$(MAKE) -C packages/build/buildroot OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-all
+ifdef OPENMCT_CROSS_BUILD
+	@$(MAKE) -C packages/build/buildroot OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-all
+else
+	@if [ ! -d $(NEWROOTDIR) ]; then \
+		$(CP) -a $(OPENMCT_CROSS_BASE)/root $(NEWROOTDIR) ; \
+		$(CLEANUPROOT) $(NEWROOTDIR) ; \
+	fi
+endif
 	@$(ECHO) -e "\033[1;33mCOPY base \033[1;32m/etc\033[0m" 
 	@$(MKDIR) $(NEWROOTDIR)/etc
 	@$(CP) -a $(ETCDIR)/* $(NEWROOTDIR)/etc

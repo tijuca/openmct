@@ -78,6 +78,7 @@ MAKESYMLINKS=$(SCRIPTDIR)/make-symlinks.sh
 REMOVESYMLINKS=$(SCRIPTDIR)/remove-symlinks.sh
 SUBSTITUTE=$(SCRIPTDIR)/substitute.sh
 REMOVESVN=$(SCRIPTDIR)/remove-svn.sh
+CLEANUPROOT=$(SCRIPTDIR)/cleanup-root.sh
 
 # tar options
 #TAROPT=--strip-path=1
