@@ -1,12 +1,12 @@
 # VServer
 DOWNLOAD=	http://www.13thfloor.at/vserver/s_release/v1.2.10/util-vserver-0.30.tar.bz2
 
-CONFIGUREENV=	CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc \
-		CXX=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-g++ \
-		LD=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-ld \
+CONFIGUREENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc \
+		CXX=$(OPENMCT_CROSS_COMPILE)g++ \
+		LD=$(OPENMCT_CROSS_COMPILE)ld \
 		CFLAGS="-Os"
 
-CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET) \
+CONFIGUREARGS=	--prefix=$(PREFIX) --host=$(TARGET) \
 		--with-kerneldir=../../linux/src --disable-internal-headers
 
 INSTALL=	$(CP) $(SRCDIR)/src/capchroot			$(NEWROOTDIR)/sbin/ && \

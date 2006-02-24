@@ -1,4 +1,4 @@
-# 
+# ethtool
 DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/gkernel/ethtool-3.tar.gz
 
 INSTALL=	$(CP) $(SRCDIR)/ethtool $(NEWROOTDIR)/sbin && \

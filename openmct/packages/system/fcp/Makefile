@@ -1,7 +1,7 @@
 # fcp
 FILENAME=	fcp.c
 
-BUILD=          $(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc -Os $(FILENAME) -o fcp
+BUILD=          $(OPENMCT_CROSS_COMPILE)gcc -Os $(FILENAME) -o fcp
 
 INSTALL=        $(CP) $(SRCDIR)/fcp $(NEWROOTDIR)/sbin && \
 		$(STRIP) $(NEWROOTDIR)/sbin/fcp

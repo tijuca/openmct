@@ -1,7 +1,7 @@
 # Debootstrap
-DOWNLOAD=http://ftp.debian.org/debian/pool/main/d/debootstrap/debootstrap_0.2.45-0.2.tar.gz
+DOWNLOAD=	http://ftp.debian.org/debian/pool/main/d/debootstrap/debootstrap_0.2.45-0.2.tar.gz
 
-BUILD=		$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc -Os \
+BUILD=		$(OPENMCT_CROSS_COMPILE)gcc -Os \
 		-o pkgdetails pkgdetails.c
 
 INSTALL= 	$(MKDIR) $(NEWROOTDIR)/lib/debootstrap && \
