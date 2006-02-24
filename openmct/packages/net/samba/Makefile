@@ -8,7 +8,7 @@ CONFIGUREARGS=	--host=$(TARGET) \
                 --enable-shared \
                 --enable-static \
                 --disable-pie \
-                --prefix=/ \
+                --prefix=$(PREFIX) \
                 --sysconfdir=/etc \
                 --libdir=/etc/samba \
                 --with-privatedir=/etc/samba \

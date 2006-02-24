@@ -1,7 +1,7 @@
 # IPTables (Firewalling)
 DOWNLOAD=	http://www.netfilter.org/projects/iptables/files/iptables-1.3.3.tar.bz2
 
-MAKEENV=	CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc LD=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-ld
+MAKEENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc LD=$(OPENMCT_CROSS_COMPILE)ld
 
 MAKEARGS=	COPT_FLAGS="-Os" KERNEL_DIR=$(PACKAGEDIR)/$(KERNEL) IPT_LIBDIR="/lib/iptables"
 

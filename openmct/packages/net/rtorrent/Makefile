@@ -5,12 +5,12 @@ DEPENDSON=	packages/lib/curl \
 		packages/lib/sigc \
 		packages/lib/torrent 
 
-CONFIGUREENV=	CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc \
-		CXX=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-g++ \
-		RANLIB=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-ranlib \
-		AR=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-ar \
+CONFIGUREENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc \
+		CXX=$(OPENMCT_CROSS_COMPILE)g++ \
+		RANLIB=$(OPENMCT_CROSS_COMPILE)ranlib \
+		AR=$(OPENMCT_CROSS_COMPILE)ar \
 		CFLAGS="-Os" \
-		CXXFLAGS="-Os -I$(OUTPUTDIR)/$(TARGET)/include/ncurses -I$(OUTPUTDIR)/$(TARGET)/include/sigc++-2.0" \
+		CXXFLAGS="-Os -I$(OPENMCT_CROSS_INCLUDE)/ncurses -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.0" \
 		STUFF_LIBS="-ltorrent -lsigc-2.0 -lcurl"
 
 INSTALL=	$(CP) $(SRCDIR)/src/rtorrent $(NEWROOTDIR)/bin && \

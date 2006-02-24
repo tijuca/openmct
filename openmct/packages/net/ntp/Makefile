@@ -1,10 +1,10 @@
 # NTP
 DOWNLOAD=	http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2.0.tar.gz
-CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET) \
+CONFIGUREARGS=	--prefix=$(PREFIX) --host=$(TARGET) \
 		--enable-all-clocks=no --without-arlib \
 	        --without-crypto --without-electricfence --with-sntp
 
-CONFIGUREENV=	CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc CFLAGS="-Os"
+CONFIGUREENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc CFLAGS="-Os"
 
 MAKEARGS=	-C ntpdate 
 

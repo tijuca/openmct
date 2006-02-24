@@ -1,7 +1,7 @@
 # NFS Utils
 DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/nfs/nfs-utils-1.0.7.tar.gz
 
-CONFIGUREARGS=  --prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET) --disable-nfsv4 --disable-gss
+CONFIGUREARGS=  --prefix=$(PREFIX) --host=$(TARGET) --disable-nfsv4 --disable-gss
 
 INSTALL=	$(CP) $(SRCDIR)/utils/exportfs/exportfs $(NEWROOTDIR)/sbin && \
 		$(STRIP) $(NEWROOTDIR)/sbin/exportfs && \

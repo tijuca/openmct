@@ -3,9 +3,9 @@ DOWNLOAD=	http://www.roaringpenguin.com/penguin/pppoe/rp-pppoe-3.7.tar.gz
 
 SRCDIRSUFFIX=	/src
 
-CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET) \
-		CFLAGS="-Wall -Os" CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc \
-		RANLIB=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-ranlib
+CONFIGUREARGS=	--prefix=$(PREFIX) --host=$(TARGET) \
+		CFLAGS="-Wall -Os" CC=$(OPENMCT_CROSS_COMPILE)gcc \
+		RANLIB=$(OPENMCT_CROSS_COMPILE)ranlib
 
 INSTALL=	$(CP) $(SRCDIR)$(SRCDIRSUFFIX)/{pppoe,pppoe-relay,pppoe-server,pppoe-sniff} $(NEWROOTDIR)/sbin && \
 		$(STRIP) $(NEWROOTDIR)/sbin/{pppoe,pppoe-relay,pppoe-server,pppoe-sniff}

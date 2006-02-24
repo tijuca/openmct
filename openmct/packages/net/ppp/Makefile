@@ -1,6 +1,7 @@
 # PPP
 DOWNLOAD=	ftp://ftp.samba.org/pub/ppp/ppp-2.4.3.tar.gz
-MAKEARGS=	CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc COPTS=-Os FILTER=
+
+MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc COPTS=-Os FILTER=
 
 INSTALL=	$(CP) $(SRCDIR)/pppd/pppd $(NEWROOTDIR)/sbin && \
 		$(STRIP) $(NEWROOTDIR)/sbin/pppd && \

@@ -1,7 +1,7 @@
 # VSFTPD
 DOWNLOAD=	ftp://vsftpd.beasts.org/users/cevans/vsftpd-2.0.3.tar.gz
 
-MAKEARGS=	CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc LIBS="-lcrypt"
+MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc LIBS="-lcrypt"
 
 INSTALL=	$(CP) $(SRCDIR)/vsftpd $(NEWROOTDIR)/sbin && \
 		$(STRIP) $(NEWROOTDIR)/sbin/vsftpd
