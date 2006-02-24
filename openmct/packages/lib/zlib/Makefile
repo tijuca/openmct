@@ -1,9 +1,9 @@
 # zlib
 DOWNLOAD=	http://www.zlib.net/zlib-1.2.3.tar.bz2
 
-CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --shared
+CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --shared
 
-MAKEARGS=	CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc CFLAGS="-Os"
+MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc CFLAGS="-Os"
 
 INSTALL=	$(CP) $(SRCDIR)/libz.so.1.2.3 $(NEWROOTDIR)/lib && \
 		$(STRIP) $(NEWROOTDIR)/lib/libz.so.1.2.3 && \

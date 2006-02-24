@@ -3,7 +3,7 @@ DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/mad/libid3tag-0.15.1b.tar.g
 
 DEPENDSON=	packages/lib/zlib
 
-CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET)
+CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET)
 
 INSTALL=	$(CP) $(SRCDIR)/.libs/libid3tag.so.0.3.0 $(NEWROOTDIR)/lib && \
 		$(STRIP) $(NEWROOTDIR)/lib/libid3tag.so.0.3.0 && \

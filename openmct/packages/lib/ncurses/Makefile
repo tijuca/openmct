@@ -1,7 +1,7 @@
 # NCurses
 DOWNLOAD=	http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.5.tar.gz
 
-CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET) --with-shared \
+CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --with-shared \
 		--with-terminfo-dirs=/etc/terminfo \
 		--with-default-terminfo-dir=/etc/terminfo
 

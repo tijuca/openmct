@@ -1,12 +1,12 @@
 # torrent
 DOWNLOAD=	http://libtorrent.rakshasa.no/downloads/libtorrent-0.8.3.tar.gz
 
-CONFIGUREENV=	CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc \
-		CXX=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-g++ \
-		CFLAGS="-Os -I$(OUTPUTDIR)/$(TARGET)/include/sigc++-2.0 -I$(OUTPUTDIR)/$(TARGET)/include/sigc++-2.0/sigc++" \
-		CXXFLAGS="-Os -I$(OUTPUTDIR)/$(TARGET)/include/sigc++-2.0 -I$(OUTPUTDIR)/$(TARGET)/include/sigc++-2.0/sigc++"
+CONFIGUREENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc \
+		CXX=$(OPENMCT_CROSS_COMPILE)g++ \
+		CFLAGS="-Os -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.0 -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.0/sigc++" \
+		CXXFLAGS="-Os -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.0 -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.0/sigc++"
 
-CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET) --enable-shared --disable-aligned
+CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-shared --disable-aligned
 
 INSTALL=	$(CP) $(SRCDIR)/src/.libs/libtorrent.so.6.0.2 $(NEWROOTDIR)/lib && \
 		$(STRIP) $(NEWROOTDIR)/lib/libtorrent.so.6.0.2 && \

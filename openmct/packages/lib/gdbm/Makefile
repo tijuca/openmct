@@ -1,7 +1,7 @@
 # GDBM
 DOWNLOAD=	ftp://ftp.gnu.org/gnu/gdbm/gdbm-1.8.3.tar.gz
 
-CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET)
+CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET)
 
 INSTALL=	$(CP) $(SRCDIR)/.libs/{libgdbm.so.3.0.0,libgdbm_compat.so.3.0.0} $(NEWROOTDIR)/lib && \
 		$(STRIP) $(NEWROOTDIR)/lib/{libgdbm.so.3.0.0,libgdbm_compat.so.3.0.0} && \

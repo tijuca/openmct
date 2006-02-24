@@ -1,9 +1,9 @@
 # gettext
 DOWNLOAD=	http://ftp.gnu.org/gnu/gettext/gettext-0.14.5.tar.gz	
 
-CONFIGUREARGS=	--prefix=$(OUTPUTDIR)/$(TARGET) --host=$(TARGET) --enable-shared
+CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-shared
 
-MAKEARGS=	CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc CFLAGS="-Os"
+MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc CFLAGS="-Os"
 
 INSTALL=	cd $(SRCDIR) && make install && cd ..
 
