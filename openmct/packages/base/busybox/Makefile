@@ -1,7 +1,7 @@
 # Busybox (Basic Shell Utils)
 DOWNLOAD=	http://www.busybox.net/downloads/snapshots/busybox-snapshot.tar.bz2
 
-MAKEARGS=	CROSS=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-
+MAKEARGS=	CROSS=$(OPENMCT_CROSS_COMPILE)
 
 INSTALL=	$(CP) $(SRCDIR)/busybox $(NEWROOTDIR)/sbin ; \
 		$(STRIP) $(NEWROOTDIR)/sbin/busybox ; \
