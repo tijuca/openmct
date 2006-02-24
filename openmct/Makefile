@@ -59,7 +59,9 @@ clean:	pkgclean
 distclean:	pkgdistclean
 	@$(MAKE) -C packages/system/linux OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-distclean
 	@$(RM) packages/system/linux/configs/config
+ifdef OPENMCT_CROSS_BUILD
 	@$(MAKE) -C packages/build/buildroot OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-distclean
+endif	
 	@$(shell if [ -d $(OUTPUTDIR) ]; then rm -rf $(OUTPUTDIR); fi)
 	@$(shell if [ -f $(CONFIG) ]; then rm -rf $(CONFIG); fi)
 
