@@ -1,7 +1,7 @@
 # Buildroot
 DOWNLOAD=	http://buildroot.uclibc.org/downloads/snapshots/buildroot-20051202.tar.bz2
 
-MAKEARGS=	BUILD_DIR=$(OUTPUTDIR)/$(TARGET)
+MAKEARGS=	BUILD_DIR=$(OUTPUTDIR)
 
 INSTALL=	if [ ! -d $(NEWROOTDIR) ]; then \
 			$(CP) -a $(ROOTDIR) $(NEWROOTDIR) ; \
