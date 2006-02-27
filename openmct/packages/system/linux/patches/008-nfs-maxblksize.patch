@@ -1,0 +1,15 @@
+diff -Naru linux-2.4.32/include/linux/nfsd/const.h linux-2.4.32-nfs/include/linux/nfsd/const.h
+--- linux-2.4.32/include/linux/nfsd/const.h	2004-11-17 12:54:22.000000000 +0100
++++ linux-2.4.32-nfs/include/linux/nfsd/const.h	2006-02-26 13:03:40.000000000 +0100
+@@ -25,11 +25,7 @@
+  * 2) is a multiple of page size 3) can be successfully kmalloc()ed
+  * by each nfsd.   
+  */
+-#if PAGE_SIZE > (16*1024)
+ #define NFSSVC_MAXBLKSIZE	(32*1024)
+-#else
+-#define NFSSVC_MAXBLKSIZE	(2*PAGE_SIZE)
+-#endif
+ 
+ #ifdef __KERNEL__
+ 

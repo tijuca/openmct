@@ -1,6 +1,15 @@
 diff -Naru samba-3.0.21b/source/configure samba-3.0.21b-mct/source/configure
 --- samba-3.0.21b/source/configure	2006-01-30 20:39:38.000000000 +0100
-+++ samba-3.0.21b-mct/source/configure	2006-02-19 20:01:55.000000000 +0100
++++ samba-3.0.21b-mct/source/configure	2006-02-27 13:49:42.000000000 +0100
+@@ -5046,7 +5046,7 @@
+ rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+ fi
+ 	CPPFLAGS="$old_CPPFLAGS"
+-	if test x$LINUX_LFS_SUPPORT = xyes ; then
++	if test x$LINUX_LFS_SUPPORT = xyes || test x$LINUX_LFS_SUPPORT = xcross ; then
+ 		CPPFLAGS="-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE $CPPFLAGS"
+ 
+ cat >>confdefs.h <<\_ACEOF
 @@ -19332,179 +19332,6 @@
  rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
  
