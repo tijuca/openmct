@@ -1,6 +1,6 @@
 diff -Naru samba-3.0.21b/source/configure samba-3.0.21b-mct/source/configure
 --- samba-3.0.21b/source/configure	2006-01-30 20:39:38.000000000 +0100
-+++ samba-3.0.21b-mct/source/configure	2006-02-27 13:49:42.000000000 +0100
++++ samba-3.0.21b-mct/source/configure	2006-02-28 10:04:51.000000000 +0100
 @@ -5046,7 +5046,7 @@
  rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
  fi
@@ -190,6 +190,15 @@ diff -Naru samba-3.0.21b/source/configure samba-3.0.21b-mct/source/configure
  # stat64 family may need <sys/stat.h> on some systems, notably ReliantUNIX
  #
  
+@@ -26564,7 +26391,7 @@
+ fi
+ echo "$as_me:$LINENO: result: $samba_cv_HAVE_DEV64_T" >&5
+ echo "${ECHO_T}$samba_cv_HAVE_DEV64_T" >&6
+-if test x"$samba_cv_HAVE_DEV64_T" = x"yes"; then
++if test x"$samba_cv_HAVE_DEV64_T" = x"yes" || test x"$samba_cv_HAVE_DEV64_T" = x"cross" ; then
+ 
+ cat >>confdefs.h <<\_ACEOF
+ #define HAVE_DEV64_T 1
 @@ -27112,59 +26939,10 @@
  
  fi
