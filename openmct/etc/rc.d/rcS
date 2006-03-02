@@ -45,6 +45,12 @@ if [ "$START_SWAP" == "yes" ]; then
    /sbin/swapon $OPTIONS_SWAP
 fi
 
+# NTPDate Client
+if [ "$START_NTPDATE" == "yes" ]; then
+   echo -n "Running ntp client ... "
+   /sbin/ntpdate $OPTIONS_NTPDATE
+fi
+
 # Syslog Daemon
 if [ "$START_SYSLOGD" == "yes" ]; then
    echo -n "Starting Syslog daemon ... "
