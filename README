@@ -1,0 +1,12 @@
+Whats this?
+
+This Files are Part of the software collection to build own Images
+of OpenMCT Firmware.
+
+First you have to run ./preepare.sh .
+After this run the builded configure with the arguments you want.
+Finally just type 'make' an wait some fee minutes.
+
+After all you will find in ~/mct-build/images the separates Images.
+
+carsten
