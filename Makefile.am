@@ -28,9 +28,13 @@ buildroot: directory download
 	rm -rf $(BUILDDIR)/buildroot/dl
 	ln -s $(ARCHIVDIR)/dl $(BUILDDIR)/buildroot/dl
 # copy the buildroot config to the buildroot dir 
-	cd $(BUILDDIR)/buildroot && patch -p1 < $(PATCHDIR)/buildroot.patch001
-	cp $(ACTDIR)/configs/buildroot.config $(BUILDDIR)/buildroot/.config;\
-	cd $(BUILDDIR)/buildroot && make oldconfig && make BR2_STAGING_DIR=$(CCDIR)/mipsel-linux
+	cd $(BUILDDIR)/buildroot; \
+	if [ ! -f .patched ]; then \
+	    patch -p1 < $(PATCHDIR)/buildroot.patch001; \
+	    touch .patched; \
+	    cp $(ACTDIR)/configs/buildroot.config $(BUILDDIR)/buildroot/.config; \
+	    cd $(BUILDDIR)/buildroot && make oldconfig && make BR2_STAGING_DIR=$(CCDIR)/mipsel-linux; \
+	fi
 #	echo Oldconfig erstellt; \
 #	rm -rf $(BUILDDIR)/buildroot/toolchain_build_mipsel/linux; \
 #	mkdir $(BUILDDIR)/buildroot/toolchain_build_mipsel; \
