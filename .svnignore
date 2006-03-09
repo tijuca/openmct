@@ -13,4 +13,5 @@ config.sub
 config.h.in
 install-sh
 missing
+mkinstalldirs
 stamp-h1

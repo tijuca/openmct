@@ -45,6 +45,7 @@ buildroot: directory download
 
 directory:
 	test -d $(BUILDDIR) || mkdir $(BUILDDIR)
+	test -d $(ARCHIVDIR)/dl || mkdir $(ARCHIVDIR)/dl
 	test -d $(CCDIR) || mkdir $(CCDIR)
 
 download: $(ARCHIVDIR)/linux-$(KERNEL).tar.bz2 \

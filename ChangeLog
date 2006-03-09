@@ -1,2 +1,6 @@
+Do 09 Mär 2006 08:40:51 CET §carsten r.348
+fixed up a missing directory check for symbolic link
+of the download dir from buildroot
+
 Di 07 Mär 2006 20:58:17 CET §carsten r.345
 initial collection
