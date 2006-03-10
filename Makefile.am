@@ -11,17 +11,32 @@ ARCHIVDIR=${prefix}/archives
 BUILDDIR=${prefix}/build
 CCDIR=${prefix}/cdk
 PATCHDIR=${ACTDIR}/patches
+KERNELPATCH=kernel_mct.patch\
+            kernel_squashfs.patch\
+	    kernel_mppe-mppc.patch\
+	    kernel_cryptoloop.patch\
+	    kernel_vserver.patch\
+	    kernel_grsecurity.patch\
+	    kernel_vserver-mips-syscall.patch\
+	    kernel_nfs-maxblksize.patch
 
 all: buildroot
 
 buildroot: directory download
 # its not clear, some testing have to included yet (directorys etc.)
-# bevor we start wie have to unpack the kernel if not allready unpacked
+# bevor we start we have to unpack the kernel if not allready unpacked
 	cd $(BUILDDIR); \
 	if [ ! -d linux-$(KERNEL) ]; then \
 	    tar xjfv $(ARCHIVDIR)/linux-$(KERNEL).tar.bz2; \
 	    ln -s linux-$(KERNEL) linux; \
-	fi 
+	fi
+	cd $(BUILDDIR)/linux-$(KERNEL); \
+	if [ ! -f .patched ]; then \
+	    for i in $(KERNELPATCH); do \
+		patch -p1 < $(PATCHDIR)/$$i; \
+	    done; \
+	    touch .patched; \
+	fi
 # next we unpack buildroot an make symbolic link to the global downloaddir
 	cd $(BUILDDIR); \
 	test -d $(BUILDDIR)/buildroot || tar xjfv $(ARCHIVDIR)/buildroot-$(BUILDROOTDAY).tar.bz2; \
@@ -30,18 +45,11 @@ buildroot: directory download
 # copy the buildroot config to the buildroot dir 
 	cd $(BUILDDIR)/buildroot; \
 	if [ ! -f .patched ]; then \
-	    patch -p1 < $(PATCHDIR)/buildroot.patch001; \
+	    patch -p1 < $(PATCHDIR)/buildroot.patch; \
 	    touch .patched; \
 	    cp $(ACTDIR)/configs/buildroot.config $(BUILDDIR)/buildroot/.config; \
-	    cd $(BUILDDIR)/buildroot && make oldconfig && make BR2_STAGING_DIR=$(CCDIR)/mipsel-linux; \
 	fi
-#	echo Oldconfig erstellt; \
-#	rm -rf $(BUILDDIR)/buildroot/toolchain_build_mipsel/linux; \
-#	mkdir $(BUILDDIR)/buildroot/toolchain_build_mipsel; \
-#	ln -s $(BUILDIR)/linux-$(KERNEL) $(BUILDDIR)/buildroot/toolchain_build_mipsel/linux; \
-#	make BR2_STAGING_DIR=$(CCDIR)/mipsel-linux
-	
-	
+	cd $(BUILDDIR)/buildroot && make oldconfig && make BR2_STAGING_DIR=$(CCDIR)/mipsel-linux
 
 directory:
 	test -d $(BUILDDIR) || mkdir $(BUILDDIR)

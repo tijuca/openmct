@@ -41,7 +41,7 @@ AC_CHECK_FUNCS([select strerror strncasecmp])
 
 AC_PREFIX_DEFAULT(mct-build)
 if test "$prefix" = "NONE"; then
-        prefix=$HOME/mct-build
+        prefix=$HOME/openmct-build
 fi
 AC_SUBST(prefix)
 
