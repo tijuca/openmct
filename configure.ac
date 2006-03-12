@@ -10,6 +10,8 @@ AC_CANONICAL_BUILD
 #AC_CANONICAL_HOST
 # so we use different target_cpu we define even target_cpu, target_vendor and target_os
 AC_CANONICAL_TARGET
+target="mipsel-linux"
+AC_SUBST(target)
 
 
 AM_INIT_AUTOMAKE

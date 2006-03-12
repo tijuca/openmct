@@ -3,13 +3,14 @@
 
 # prefix is default $HOME/mct-build, comes from configure.ac
 prefix=@prefix@
-
+hostprefix=
 ACTDIR:= $(shell pwd)
 KERNEL=2.4.32
 BUILDROOTDAY=20051202
 ARCHIVDIR=${prefix}/archives
 BUILDDIR=${prefix}/build
-CCDIR=${prefix}/cdk
+CCDIR=${prefix}/cdk/@target@/bin
+DEPDIR=${prefix}/cdk/.deps
 PATCHDIR=${ACTDIR}/patches
 KERNELPATCH=kernel_mct.patch\
             kernel_squashfs.patch\
@@ -20,11 +21,27 @@ KERNELPATCH=kernel_mct.patch\
 	    kernel_vserver-mips-syscall.patch\
 	    kernel_nfs-maxblksize.patch
 
-all: buildroot
+PATH := ${CCDIR}:$(PATH)
 
-buildroot: directory download
-# its not clear, some testing have to included yet (directorys etc.)
-# bevor we start we have to unpack the kernel if not allready unpacked
+# $(targetprefix) is now not yet implemented!
+# still looking for the right CFLAGS and LDFLAGS
+
+BUILDENV := \
+	AR=$(target)-ar \
+	AS=$(target)-as \
+	CC=$(target)-gcc \
+	CXX=$(target)-g++ \
+	NM=$(target)-nm \
+	RANLIB=$(target)-ranlib \
+	CFLAGS="$(TARGET_CFLAGS)" \
+	CXXFLAGS="$(TARGET_CFLAGS)" \
+	LDFLAGS="$(TARGET_LDFLAGS)" \
+	PKG_CONFIG_PATH=$(targetprefix)/lib/pkgconfig
+
+
+all: prepare buildroot kernel
+
+prepare: directory
 	cd $(BUILDDIR); \
 	if [ ! -d linux-$(KERNEL) ]; then \
 	    tar xjfv $(ARCHIVDIR)/linux-$(KERNEL).tar.bz2; \
@@ -37,24 +54,39 @@ buildroot: directory download
 	    done; \
 	    touch .patched; \
 	fi
-# next we unpack buildroot an make symbolic link to the global downloaddir
 	cd $(BUILDDIR); \
 	test -d $(BUILDDIR)/buildroot || tar xjfv $(ARCHIVDIR)/buildroot-$(BUILDROOTDAY).tar.bz2; \
 	rm -rf $(BUILDDIR)/buildroot/dl
 	ln -s $(ARCHIVDIR)/dl $(BUILDDIR)/buildroot/dl
-# copy the buildroot config to the buildroot dir 
-	cd $(BUILDDIR)/buildroot; \
-	if [ ! -f .patched ]; then \
-	    patch -p1 < $(PATCHDIR)/buildroot.patch; \
-	    touch .patched; \
-	    cp $(ACTDIR)/configs/buildroot.config $(BUILDDIR)/buildroot/.config; \
-	fi
-	cd $(BUILDDIR)/buildroot && make oldconfig && make BR2_STAGING_DIR=$(CCDIR)/mipsel-linux
 
-directory:
+buildroot: prepare
+	if [ ! -f $(DEPDIR)/$@ ]; then \
+	    cd $(BUILDDIR)/buildroot; \
+		if [ ! -f .patched ]; then \
+		patch -p1 < $(PATCHDIR)/buildroot.patch; \
+		touch .patched; \
+		cp $(ACTDIR)/configs/buildroot.config $(BUILDDIR)/buildroot/.config; \
+	    fi; \
+	    cd $(BUILDDIR)/buildroot && $(MAKE) oldconfig && $(MAKE) BR2_STAGING_DIR=$(CCDIR)/mipsel-linux; \
+	    touch $(DEPDIR)/$@; \
+	fi
+
+kernel: buildroot
+	if [ ! -f $(DEPDIR)/$@ ]; then \
+	    cd $(BUILDDIR)/linux-$(KERNEL) && \
+	    $(BUILDENV) \
+	    cp $(ACTDIR)/configs/kernel.config $(BUILDDIR)/linux-$(KERNEL)/.config; \
+	    $(MAKE) oldconfig && \
+	    $(MAKE) vmlinux CROSS_COMPILE=$(target)-; \
+	    touch $(DEPDIR)/$@; \
+	fi
+
+
+directory: download
 	test -d $(BUILDDIR) || mkdir $(BUILDDIR)
 	test -d $(ARCHIVDIR)/dl || mkdir $(ARCHIVDIR)/dl
 	test -d $(CCDIR) || mkdir $(CCDIR)
+	test -d $(CCDIR)/.deps || mkdir $(CCDIR)/.deps
 
 download: $(ARCHIVDIR)/linux-$(KERNEL).tar.bz2 \
           $(ARCHIVDIR)/buildroot-$(BUILDROOTDAY).tar.bz2
