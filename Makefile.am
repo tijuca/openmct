@@ -1,5 +1,6 @@
 # main Makefile for mct-image builds
 @SET_MAKE@
+SUBDIRS = tools progs
 
 # prefix is default $HOME/mct-build, comes from configure.ac
 prefix=@prefix@
@@ -39,7 +40,7 @@ BUILDENV := \
 	PKG_CONFIG_PATH=$(targetprefix)/lib/pkgconfig
 
 
-all: prepare buildroot kernel
+all: prepare buildroot kernel tools progs
 
 prepare: directory
 	cd $(BUILDDIR); \
@@ -81,12 +82,20 @@ kernel: buildroot
 	    touch $(DEPDIR)/$@; \
 	fi
 
+tools:
+	cd tools && \
+	$(MAKE)
+
+progs:
+	cd progs && \
+	$(MAKE)
 
 directory: download
 	test -d $(BUILDDIR) || mkdir $(BUILDDIR)
 	test -d $(ARCHIVDIR)/dl || mkdir $(ARCHIVDIR)/dl
 	test -d $(CCDIR) || mkdir $(CCDIR)
 	test -d $(CCDIR)/.deps || mkdir $(CCDIR)/.deps
+#	test -d ${prefix}/cdk/mct-fs || mkdir ${prefix}/cdk/mct-fs
 
 download: $(ARCHIVDIR)/linux-$(KERNEL).tar.bz2 \
           $(ARCHIVDIR)/buildroot-$(BUILDROOTDAY).tar.bz2

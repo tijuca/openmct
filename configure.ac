@@ -116,5 +116,10 @@ Your specified device:           $device
 ])
 
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([
+Makefile
+progs/Makefile
+tools/Makefile
+])
+
 AC_OUTPUT
