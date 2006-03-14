@@ -31,15 +31,15 @@ AC_PROG_MAKE_SET
 # Checks for libraries.
 
 # Checks for header files.
-AC_HEADER_STDC
-AC_CHECK_HEADERS([stdlib.h string.h sys/time.h unistd.h])
+#AC_HEADER_STDC
+#AC_CHECK_HEADERS([stdlib.h string.h sys/time.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_TIME
+#AC_HEADER_TIME
 
 # Checks for library functions.
-AC_FUNC_SELECT_ARGTYPES
-AC_CHECK_FUNCS([select strerror strncasecmp])
+#AC_FUNC_SELECT_ARGTYPES
+#AC_CHECK_FUNCS([select strerror strncasecmp])
 
 AC_PREFIX_DEFAULT(mct-build)
 if test "$prefix" = "NONE"; then
@@ -84,7 +84,9 @@ dnl We have to check if the given device is in the list of possibile devices!
 
 if test "$device" = "nas110" || \
    test "$device" = "sa110"  || \
-   test "$device" = "sa113" ; then 
+   test "$device" = "sa113"  || \
+   test "$device" = "nas200" || \
+   test "$device" = "sa200" ; then 
    devicetest="ok"
 else
     devicetest="fail"

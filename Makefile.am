@@ -88,6 +88,7 @@ tools:
 
 progs:
 	cd progs && \
+	$(BUILDENV)
 	$(MAKE)
 
 directory: download
@@ -110,5 +111,5 @@ $(ARCHIVDIR)/buildroot-$(BUILDROOTDAY).tar.bz2:
 	if [ ! -f $(ARCHIVDIR)/buildroot-$(BUILDROOTDAY).tar.bz2 ]; then \
 	    wget -c -P $(ARCHIVDIR) http://buildroot.uclibc.org/downloads/snapshots/buildroot-$(BUILDROOTDAY).tar.bz2; \
 	fi
-	
+
 
