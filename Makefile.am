@@ -10,8 +10,9 @@ KERNEL=2.4.32
 BUILDROOTDAY=20051202
 ARCHIVDIR=${prefix}/archives
 BUILDDIR=${prefix}/build
-CCDIR=${prefix}/cdk/@target@/bin
-DEPDIR=${prefix}/cdk/.deps
+CDK=${prefix}/cdk
+CCDIR=$(CDK)/@target@/bin
+DEPDIR=$(CDK)/.deps
 PATCHDIR=${ACTDIR}/patches
 KERNELPATCH=kernel_mct.patch\
             kernel_squashfs.patch\
@@ -57,6 +58,7 @@ prepare: directory
 	fi
 	cd $(BUILDDIR); \
 	test -d $(BUILDDIR)/buildroot || tar xjfv $(ARCHIVDIR)/buildroot-$(BUILDROOTDAY).tar.bz2; \
+	find -type d -name ".svn" -print0 | xargs -0 rm -rf; \
 	rm -rf $(BUILDDIR)/buildroot/dl
 	ln -s $(ARCHIVDIR)/dl $(BUILDDIR)/buildroot/dl
 
@@ -81,6 +83,20 @@ kernel: buildroot
 	    $(MAKE) vmlinux CROSS_COMPILE=$(target)-; \
 	    touch $(DEPDIR)/$@; \
 	fi
+
+basic-fs:
+	cp -R $(BUILDDIR)/buildroot/build_mipsel/root/* $(CDK)/mct-fs
+	rm -rf $(CDK)/mct-fs/etc \
+	       $(CDK)/mct-fs/home \
+	       $(CDK)/mct-fs/var \
+	       $(CDK)/mct-fs/opt
+	svn export --force --quiet fs/ $(CDK)/mct-fs
+	mkdir $(CDK)/mct-fs/usr/home \
+	      $(CDK)/mct-fs/usr/var \
+	      $(CDK)/mct-fs/usr/vservers
+	ln -s $(CDK)/mct-fs/usr/home $(CDK)/mct-fs/home
+	ln -s $(CDK)/mct-fs/usr/var $(CDK)/mct-fs/var
+	ln -s $(CDK)/mct-fs/usr/vservers $(CDK)/mct-fs/vservers
 
 tools:
 	cd tools && \

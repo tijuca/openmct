@@ -3,6 +3,7 @@
 CC = @CC@
 
 #mct_modify_SOURCES = mct_modify.c
+all: tools
 
-mct_modify:
+tools:
 	$(CC) $(CFLAGS) mct_modify.c -o mct_modify
