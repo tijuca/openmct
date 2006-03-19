@@ -1,0 +1,1254 @@
+diff -Naru wpa_supplicant-0.4.8/.config wpa_supplicant-0.4.8-mct/.config
+--- wpa_supplicant-0.4.8/.config	1970-01-01 01:00:00.000000000 +0100
++++ wpa_supplicant-0.4.8-mct/.config	2006-03-19 02:03:05.000000000 +0100
+@@ -0,0 +1,179 @@
++# Example wpa_supplicant build time configuration
++#
++# This file lists the configuration options that are used when building the
++# hostapd binary. All lines starting with # are ignored. Configuration option
++# lines must be commented out complete, if they are not to be included, i.e.,
++# just setting VARIABLE=n is not disabling that variable.
++#
++# This file is included in Makefile, so variables like CFLAGS and LIBS can also
++# be modified from here. In most cass, these lines should use += in order not
++# to override previous values of the variables.
++
++
++# Uncomment following two lines and fix the paths if you have installed openssl
++# in non-default location
++#CFLAGS += -I/usr/local/openssl/include
++#LIBS += -L/usr/local/openssl/lib
++
++# Example configuration for various cross-compilation platforms
++
++#### sveasoft (e.g., for Linksys WRT54G) ######################################
++#CC=mipsel-uclibc-gcc
++#CC=/opt/brcm/hndtools-mipsel-uclibc/bin/mipsel-uclibc-gcc
++#CFLAGS += -Os
++#CPPFLAGS += -I../src/include -I../../src/router/openssl/include
++#LIBS += -L/opt/brcm/hndtools-mipsel-uclibc-0.9.19/lib -lssl
++###############################################################################
++
++#### openwrt (e.g., for Linksys WRT54G) #######################################
++#CC=mipsel-uclibc-gcc
++#CC=/opt/brcm/hndtools-mipsel-uclibc/bin/mipsel-uclibc-gcc
++#CFLAGS += -Os
++#CPPFLAGS=-I../src/include -I../openssl-0.9.7d/include \
++#	-I../WRT54GS/release/src/include
++#LIBS = -lssl
++###############################################################################
++
++
++# Driver interface for Host AP driver
++CONFIG_DRIVER_HOSTAP=y
++
++# Driver interface for Agere driver
++#CONFIG_DRIVER_HERMES=y
++# Change include directories to match with the local setup
++#CFLAGS += -I../../hcf -I../../include -I../../include/hcf
++#CFLAGS += -I../../include/wireless
++
++# Driver interface for madwifi driver
++#CONFIG_DRIVER_MADWIFI=y
++# Change include directories to match with the local setup
++#CFLAGS += -I../madwifi/wpa
++
++# Driver interface for Prism54 driver
++# (Note: Prism54 is not yet supported, i.e., this will not work as-is and is
++# for developers only)
++#CONFIG_DRIVER_PRISM54=y
++
++# Driver interface for ndiswrapper
++#CONFIG_DRIVER_NDISWRAPPER=y
++
++# Driver interface for Atmel driver
++CONFIG_DRIVER_ATMEL=y
++
++# Driver interface for Broadcom driver
++#CONFIG_DRIVER_BROADCOM=y
++# Example path for wlioctl.h; change to match your configuration
++#CFLAGS += -I/opt/WRT54GS/release/src/include
++
++# Driver interface for Intel ipw2100/2200 driver
++#CONFIG_DRIVER_IPW=y
++
++# Driver interface for Zydas zd1211 driver
++CONFIG_DRIVER_ZD1211=y
++
++# Driver interface for generic Linux wireless extensions
++CONFIG_DRIVER_WEXT=y
++
++# Driver interface for FreeBSD net80211 layer (e.g., Atheros driver)
++#CONFIG_DRIVER_BSD=y
++#CFLAGS += -I/usr/local/include
++#LIBS += -L/usr/local/lib
++
++# Driver interface for Windows NDIS
++#CONFIG_DRIVER_NDIS=y
++#CFLAGS += -I/usr/include/w32api/ddk
++#LIBS += -L/usr/local/lib
++# For native build using mingw
++#CONFIG_NATIVE_WINDOWS=y
++# Additional directories for cross-compilation on Linux host for mingw target
++#CFLAGS += -I/opt/mingw/mingw32/include/ddk
++#LIBS += -L/opt/mingw/mingw32/lib
++#CC=mingw32-gcc
++
++# Driver interface for development testing
++#CONFIG_DRIVER_TEST=y
++
++# Driver interface for wired Ethernet drivers
++CONFIG_DRIVER_WIRED=y
++
++# Enable IEEE 802.1X Supplicant (automatically included if any EAP method is
++# included)
++CONFIG_IEEE8021X_EAPOL=y
++
++# EAP-MD5 (automatically included if EAP-TTLS is enabled)
++CONFIG_EAP_MD5=y
++
++# EAP-MSCHAPv2 (automatically included if EAP-PEAP is enabled)
++CONFIG_EAP_MSCHAPV2=y
++
++# EAP-TLS
++CONFIG_EAP_TLS=y
++
++# EAL-PEAP
++CONFIG_EAP_PEAP=y
++
++# EAP-TTLS
++CONFIG_EAP_TTLS=y
++
++# EAP-GTC
++CONFIG_EAP_GTC=y
++
++# EAP-OTP
++CONFIG_EAP_OTP=y
++
++# EAP-SIM (enable CONFIG_PCSC, if EAP-SIM is used)
++#CONFIG_EAP_SIM=y
++
++# EAP-PSK (experimental; this is _not_ needed for WPA-PSK)
++#CONFIG_EAP_PSK=y
++
++# EAP-PAX
++#CONFIG_EAP_PAX=y
++
++# LEAP
++CONFIG_EAP_LEAP=y
++
++# EAP-AKA (enable CONFIG_PCSC, if EAP-AKA is used)
++#CONFIG_EAP_AKA=y
++
++# PKCS#12 (PFX) support (used to read private key and certificate file from
++# a file that usually has extension .p12 or .pfx)
++CONFIG_PKCS12=y
++
++# Smartcard support (i.e., private key on a smartcard), e.g., with openssl
++# engine.
++CONFIG_SMARTCARD=y
++
++# PC/SC interface for smartcards (USIM, GSM SIM)
++# Enable this if EAP-SIM or EAP-AKA is included
++#CONFIG_PCSC=y
++
++# Development testing
++#CONFIG_EAPOL_TEST=y
++
++# Replace native Linux implementation of packet sockets with libdnet/libpcap.
++# This will be automatically set for non-Linux OS.
++#CONFIG_DNET_PCAP=y
++
++# Include control interface for external programs, e.g, wpa_cli
++CONFIG_CTRL_IFACE=y
++
++# Include support for GNU Readline and History Libraries in wpa_cli.
++# When building a wpa_cli binary for distribution, please note that these
++# libraries are licensed under GPL and as such, BSD license may not apply for
++# the resulting binary.
++#CONFIG_READLINE=y
++
++# Remove debugging code that is printing out debug message to stdout.
++# This can be used to reduce the size of the wpa_supplicant considerably
++# if debugging code is not needed. The size reduction can be around 35%
++# (e.g., 90 kB).
++#CONFIG_NO_STDOUT_DEBUG=y
++
++# Remove WPA support, e.g., for wired-only IEEE 802.1X supplicant, to save
++# 35-50 kB in code size.
++#CONFIG_NO_WPA=y
++
++# Select configuration backend:
++# file = text file (e.g., wpa_supplicant.conf)
++CONFIG_BACKEND=file
+diff -Naru wpa_supplicant-0.4.8/Makefile wpa_supplicant-0.4.8-mct/Makefile
+--- wpa_supplicant-0.4.8/Makefile	2006-02-09 05:01:45.000000000 +0100
++++ wpa_supplicant-0.4.8-mct/Makefile	2006-03-19 02:05:47.000000000 +0100
+@@ -3,7 +3,7 @@
+ endif
+ 
+ ifndef CFLAGS
+-CFLAGS = -MMD -O2 -Wall -g
++CFLAGS = -MMD -Os
+ endif
+ 
+ # Include directories for CVS version
+@@ -108,6 +108,12 @@
+ CONFIG_WIRELESS_EXTENSION=y
+ endif
+ 
++ifdef CONFIG_DRIVER_ZD1211
++CFLAGS += -DCONFIG_DRIVER_ZD1211
++OBJS_d += driver_zd1211.o
++CONFIG_WIRELESS_EXTENSION=y
++endif
++
+ ifdef CONFIG_DRIVER_BSD
+ CFLAGS += -DCONFIG_DRIVER_BSD
+ OBJS_d += driver_bsd.o
+diff -Naru wpa_supplicant-0.4.8/Makefile.orig wpa_supplicant-0.4.8-mct/Makefile.orig
+--- wpa_supplicant-0.4.8/Makefile.orig	1970-01-01 01:00:00.000000000 +0100
++++ wpa_supplicant-0.4.8-mct/Makefile.orig	2006-02-09 05:01:45.000000000 +0100
+@@ -0,0 +1,523 @@
++ifndef CC
++CC=gcc
++endif
++
++ifndef CFLAGS
++CFLAGS = -MMD -O2 -Wall -g
++endif
++
++# Include directories for CVS version
++CFLAGS += -I. -I../utils -I../hostapd
++
++ALL=wpa_supplicant wpa_passphrase wpa_cli
++
++all: verify_config $(ALL)
++
++verify_config:
++	@if [ ! -r .config ]; then \
++		echo 'Building wpa_supplicant requires a configuration file'; \
++		echo '(.config). See README for more instructions. You can'; \
++		echo 'run "cp defconfig .config" to create an example'; \
++		echo 'configuration.'; \
++		exit 1; \
++	fi
++
++mkconfig:
++	@if [ -e .config ]; then \
++		echo '.config exists - did not replace it'; \
++		exit 1; \
++	fi
++	echo CONFIG_DRIVER_HOSTAP=y >> .config
++	echo CONFIG_DRIVER_WEXT=y >> .config
++	echo CONFIG_WIRELESS_EXTENSION=y >> .config
++
++install: all
++	mkdir -p $(DESTDIR)/usr/local/sbin/
++	for i in $(ALL); do cp $$i $(DESTDIR)/usr/local/sbin/$$i; done
++
++OBJS = config.o \
++	eloop.o common.o md5.o \
++	rc4.o sha1.o
++OBJS_p = wpa_passphrase.o sha1.o md5.o
++OBJS_c = wpa_cli.o wpa_ctrl.o
++
++-include .config
++
++ifdef CONFIG_EAPOL_TEST
++CFLAGS += -Werror -DEAPOL_TEST
++endif
++
++ifndef CONFIG_BACKEND
++CONFIG_BACKEND=file
++endif
++
++ifeq ($(CONFIG_BACKEND), file)
++OBJS += config_file.o base64.o
++CFLAGS += -DCONFIG_BACKEND_FILE
++endif
++
++ifdef CONFIG_DRIVER_HOSTAP
++CFLAGS += -DCONFIG_DRIVER_HOSTAP
++OBJS_d += driver_hostap.o
++CONFIG_WIRELESS_EXTENSION=y
++endif
++
++ifdef CONFIG_DRIVER_WEXT
++CFLAGS += -DCONFIG_DRIVER_WEXT
++CONFIG_WIRELESS_EXTENSION=y
++endif
++
++ifdef CONFIG_DRIVER_PRISM54
++CFLAGS += -DCONFIG_DRIVER_PRISM54
++OBJS_d += driver_prism54.o
++CONFIG_WIRELESS_EXTENSION=y
++endif
++
++ifdef CONFIG_DRIVER_HERMES
++CFLAGS += -DCONFIG_DRIVER_HERMES
++OBJS_d += driver_hermes.o
++CONFIG_WIRELESS_EXTENSION=y
++endif
++
++ifdef CONFIG_DRIVER_MADWIFI
++CFLAGS += -DCONFIG_DRIVER_MADWIFI
++OBJS_d += driver_madwifi.o
++CONFIG_WIRELESS_EXTENSION=y
++endif
++
++ifdef CONFIG_DRIVER_ATMEL
++CFLAGS += -DCONFIG_DRIVER_ATMEL
++OBJS_d += driver_atmel.o
++CONFIG_WIRELESS_EXTENSION=y
++endif
++
++ifdef CONFIG_DRIVER_NDISWRAPPER
++CFLAGS += -DCONFIG_DRIVER_NDISWRAPPER
++OBJS_d += driver_ndiswrapper.o
++CONFIG_WIRELESS_EXTENSION=y
++endif
++
++ifdef CONFIG_DRIVER_BROADCOM
++CFLAGS += -DCONFIG_DRIVER_BROADCOM
++OBJS_d += driver_broadcom.o
++endif
++
++ifdef CONFIG_DRIVER_IPW
++CFLAGS += -DCONFIG_DRIVER_IPW
++OBJS_d += driver_ipw.o
++CONFIG_WIRELESS_EXTENSION=y
++endif
++
++ifdef CONFIG_DRIVER_BSD
++CFLAGS += -DCONFIG_DRIVER_BSD
++OBJS_d += driver_bsd.o
++CONFIG_DNET_PCAP=y
++CONFIG_L2_FREEBSD=y
++endif
++
++ifdef CONFIG_DRIVER_NDIS
++CFLAGS += -DCONFIG_DRIVER_NDIS
++OBJS_d += driver_ndis.o driver_ndis_.o
++CONFIG_DNET_PCAP=y
++CONFIG_WINPCAP=y
++endif
++
++ifdef CONFIG_DRIVER_WIRED
++CFLAGS += -DCONFIG_DRIVER_WIRED
++OBJS_d += driver_wired.o
++endif
++
++ifdef CONFIG_DRIVER_TEST
++CFLAGS += -DCONFIG_DRIVER_TEST
++OBJS_d += driver_test.o
++endif
++
++ifdef CONFIG_DNET_PCAP
++CFLAGS += -DUSE_DNET_PCAP
++ifdef CONFIG_WINPCAP
++OBJS += l2_packet_pcap.o
++CFLAGS += -DCONFIG_WINPCAP
++LIBS += -lwpcap -lpacket
++LIBS_w += -lwpcap
++else
++ifdef CONFIG_L2_FREEBSD
++OBJS += l2_packet_freebsd.o
++LIBS += -lpcap
++else
++OBJS += l2_packet_pcap.o
++LIBS += -ldnet -lpcap
++endif
++endif
++else
++OBJS += l2_packet_linux.o
++endif
++
++ifdef CONFIG_EAP_TLS
++# EAP-TLS
++CFLAGS += -DEAP_TLS
++OBJS += eap_tls.o
++TLS_FUNCS=y
++CONFIG_IEEE8021X_EAPOL=y
++endif
++
++ifdef CONFIG_EAP_PEAP
++# EAP-PEAP
++CFLAGS += -DEAP_PEAP
++OBJS += eap_peap.o
++TLS_FUNCS=y
++CONFIG_EAP_MSCHAPV2=y
++CONFIG_IEEE8021X_EAPOL=y
++CONFIG_EAP_TLV=y
++endif
++
++ifdef CONFIG_EAP_TTLS
++# EAP-TTLS
++CFLAGS += -DEAP_TTLS
++OBJS += eap_ttls.o
++MS_FUNCS=y
++TLS_FUNCS=y
++CONFIG_EAP_MD5=y
++CONFIG_IEEE8021X_EAPOL=y
++endif
++
++ifdef CONFIG_EAP_MD5
++# EAP-MD5 (also used by EAP-TTLS)
++CFLAGS += -DEAP_MD5
++OBJS += eap_md5.o
++CONFIG_IEEE8021X_EAPOL=y
++endif
++
++# backwards compatibility for old spelling
++ifdef CONFIG_MSCHAPV2
++CONFIG_EAP_MSCHAPV2=y
++endif
++
++ifdef CONFIG_EAP_MSCHAPV2
++# EAP-MSCHAPv2 (also used by EAP-PEAP)
++CFLAGS += -DEAP_MSCHAPv2
++OBJS += eap_mschapv2.o
++MS_FUNCS=y
++CONFIG_IEEE8021X_EAPOL=y
++endif
++
++ifdef CONFIG_EAP_GTC
++# EAP-GTC (also used by EAP-PEAP)
++CFLAGS += -DEAP_GTC
++OBJS += eap_gtc.o
++CONFIG_IEEE8021X_EAPOL=y
++endif
++
++ifdef CONFIG_EAP_OTP
++# EAP-OTP
++CFLAGS += -DEAP_OTP
++OBJS += eap_otp.o
++CONFIG_IEEE8021X_EAPOL=y
++endif
++
++ifdef CONFIG_EAP_SIM
++# EAP-SIM
++CFLAGS += -DEAP_SIM
++OBJS += eap_sim.o
++CONFIG_IEEE8021X_EAPOL=y
++CONFIG_EAP_SIM_COMMON=y
++endif
++
++ifdef CONFIG_EAP_LEAP
++# EAP-LEAP
++CFLAGS += -DEAP_LEAP
++OBJS += eap_leap.o
++MS_FUNCS=y
++CONFIG_IEEE8021X_EAPOL=y
++endif
++
++ifdef CONFIG_EAP_PSK
++# EAP-PSK
++CFLAGS += -DEAP_PSK
++OBJS += eap_psk.o eap_psk_common.o
++CONFIG_IEEE8021X_EAPOL=y
++NEED_AES=y
++endif
++
++ifdef CONFIG_EAP_AKA
++# EAP-AKA
++CFLAGS += -DEAP_AKA
++OBJS += eap_aka.o
++CONFIG_IEEE8021X_EAPOL=y
++CONFIG_EAP_SIM_COMMON=y
++endif
++
++ifdef CONFIG_EAP_SIM_COMMON
++OBJS += eap_sim_common.o
++NEED_AES=y
++endif
++
++ifdef CONFIG_EAP_TLV
++# EAP-TLV
++CFLAGS += -DEAP_TLV
++OBJS += eap_tlv.o
++endif
++
++ifdef CONFIG_EAP_FAST
++# EAP-FAST
++CFLAGS += -DEAP_FAST
++OBJS += eap_fast.o
++TLS_FUNCS=y
++endif
++
++ifdef CONFIG_EAP_PAX
++# EAP-PAX
++CFLAGS += -DEAP_PAX
++OBJS += eap_pax.o eap_pax_common.o
++CONFIG_IEEE8021X_EAPOL=y
++endif
++
++ifdef CONFIG_IEEE8021X_EAPOL
++# IEEE 802.1X/EAPOL state machines (e.g., for RADIUS authentication)
++CFLAGS += -DIEEE8021X_EAPOL
++OBJS += eapol_sm.o eap.o
++endif
++
++ifdef CONFIG_PCSC
++# PC/SC interface for smartcards (USIM, GSM SIM)
++CFLAGS += -DPCSC_FUNCS -I/usr/include/PCSC
++OBJS += pcsc_funcs.o
++# -lpthread may not be needed depending on how pcsc-lite was configured
++LIBS += -lpcsclite -lpthread
++endif
++
++ifndef CONFIG_TLS
++CONFIG_TLS=openssl
++endif
++
++ifdef TLS_FUNCS
++# Shared TLS functions (needed for EAP_TLS, EAP_PEAP, EAP_TTLS, and EAP_FAST)
++CFLAGS += -DEAP_TLS_FUNCS
++OBJS += eap_tls_common.o
++ifeq ($(CONFIG_TLS), openssl)
++OBJS += tls_openssl.o
++LIBS += -lssl -lcrypto
++LIBS_p += -lcrypto
++endif
++ifeq ($(CONFIG_TLS), gnutls)
++OBJS += tls_gnutls.o
++LIBS += -lgnutls -lgcrypt -lgpg-error
++LIBS_p += -lgcrypt
++endif
++ifeq ($(CONFIG_TLS), schannel)
++OBJS += tls_schannel.o
++# Using OpenSSL for crypto at the moment; to be replaced
++LIBS += -lcrypto
++LIBS_p += -lcrypto
++endif
++ifdef CONFIG_SMARTCARD
++ifndef CONFIG_NATIVE_WINDOWS
++ifndef CONFIG_L2_FREEBSD
++LIBS += -ldl
++endif
++endif
++endif
++NEED_CRYPTO=y
++else
++OBJS += tls_none.o
++endif
++
++ifdef CONFIG_PKCS12
++CFLAGS += -DPKCS12_FUNCS
++endif
++
++ifdef CONFIG_SMARTCARD
++CFLAGS += -DCONFIG_SMARTCARD
++endif
++
++ifdef MS_FUNCS
++OBJS += ms_funcs.o
++NEED_CRYPTO=y
++endif
++
++ifdef NEED_CRYPTO
++ifndef TLS_FUNCS
++ifeq ($(CONFIG_TLS), openssl)
++LIBS += -lcrypto
++LIBS_p += -lcrypto
++endif
++ifeq ($(CONFIG_TLS), gnutls)
++LIBS += -lgcrypt
++LIBS_p += -lgcrypt
++endif
++ifeq ($(CONFIG_TLS), schannel)
++# Using OpenSSL for crypto at the moment; to be replaced
++LIBS += -lcrypto
++LIBS_p += -lcrypto
++endif
++endif
++ifeq ($(CONFIG_TLS), openssl)
++OBJS += crypto.o
++OBJS_p += crypto.o
++endif
++ifeq ($(CONFIG_TLS), gnutls)
++OBJS += crypto_gnutls.o
++OBJS_p += crypto_gnutls.o
++endif
++ifeq ($(CONFIG_TLS), schannel)
++# Using OpenSSL for crypto at the moment; to be replaced
++OBJS += crypto.o
++OBJS_p += crypto.o
++endif
++endif
++
++ifdef CONFIG_WIRELESS_EXTENSION
++CFLAGS += -DCONFIG_WIRELESS_EXTENSION
++OBJS_d += driver_wext.o
++endif
++
++ifdef CONFIG_CTRL_IFACE
++CFLAGS += -DCONFIG_CTRL_IFACE
++OBJS += ctrl_iface.o
++endif
++
++ifdef CONFIG_READLINE
++CFLAGS += -DCONFIG_READLINE
++LIBS_c += -lncurses -lreadline
++endif
++
++ifdef CONFIG_NATIVE_WINDOWS
++CFLAGS += -DCONFIG_NATIVE_WINDOWS -DCONFIG_CTRL_IFACE_UDP
++LIBS += -lws2_32 -lgdi32 -lcrypt32
++LIBS_c += -lws2_32
++endif
++
++ifdef CONFIG_NO_STDOUT_DEBUG
++CFLAGS += -DCONFIG_NO_STDOUT_DEBUG
++endif
++
++ifdef CONFIG_IPV6
++# for eapol_test only
++CFLAGS += -DCONFIG_IPV6
++endif
++
++ifndef CONFIG_NO_WPA
++OBJS += wpa.o preauth.o
++NEED_AES=y
++else
++CFLAGS += -DCONFIG_NO_WPA
++endif
++
++ifdef NEED_AES
++OBJS += aes_wrap.o
++endif
++
++OBJS += wpa_supplicant.o events.o
++OBJS_t := $(OBJS) eapol_test.o radius.o radius_client.o
++OBJS_t2 := $(OBJS) preauth_test.o
++OBJS += main.o drivers.o $(OBJS_d)
++
++wpa_supplicant: .config $(OBJS)
++	$(CC) -o wpa_supplicant $(OBJS) $(LIBS)
++
++eapol_test: .config $(OBJS_t)
++	$(CC) -o eapol_test $(OBJS_t) $(LIBS)
++
++preauth_test: .config $(OBJS_t2) 
++	$(CC) -o preauth_test $(OBJS_t2) $(LIBS)
++
++wpa_passphrase: $(OBJS_p)
++	$(CC) -o wpa_passphrase $(OBJS_p) $(LIBS_p)
++
++wpa_cli: $(OBJS_c)
++	$(CC) -o wpa_cli $(OBJS_c) $(LIBS_c)
++
++win_if_list: win_if_list.c
++	$(CC) -o $@ win_if_list.c $(CFLAGS) $(LIBS_w)
++
++# parameters for Microsoft Visual C++ Toolkit 2003 compiler
++CL=cl
++CLDIR=C:\Program Files\Microsoft Visual C++ Toolkit 2003
++PSDKDIR=C:\Program Files\Microsoft Platform SDK for Windows XP SP2
++CLFLAGS=-O
++CLLIBS=wbemuuid.lib libcmt.lib kernel32.lib uuid.lib ole32.lib oleaut32.lib \
++	ws2_32.lib
++
++ndis_events: ndis_events.cpp
++	INCLUDE="$(CLDIR)\include;$(PSDKDIR)\Include" \
++	LIB="$(CLDIR)\lib;$(PSDKDIR)\Lib" \
++	$(CL) $(CLFLAGS) -o ndis_events.exe ndis_events.cpp \
++		/link -nodefaultlib $(CLLIBS)
++
++wpa_supplicant.exe: wpa_supplicant
++	mv -f $< $@
++wpa_cli.exe: wpa_cli
++	mv -f $< $@
++wpa_passphrase.exe: wpa_passphrase
++	mv -f $< $@
++win_if_list.exe: win_if_list
++	mv -f $< $@
++eapol_test.exe: eapol_test
++	mv -f $< $@
++
++WINALL=wpa_supplicant.exe wpa_cli.exe wpa_passphrase.exe win_if_list.exe
++
++windows-bin: $(WINALL)
++	$(STRIP) $(WINALL)
++
++wpa_gui/Makefile:
++	qmake -o wpa_gui/Makefile wpa_gui/wpa_gui.pro 
++
++wpa_gui: wpa_gui/Makefile
++	$(MAKE) -C wpa_gui
++
++TEST_SRC_MS_FUNCS = ms_funcs.c crypto.c sha1.c md5.c
++test-ms_funcs: $(TEST_SRC_MS_FUNCS)
++	$(CC) -o test-ms_funcs -Wall -Werror $(TEST_SRC_MS_FUNCS) \
++		-DTEST_MAIN_MS_FUNCS -lcrypto -I../hostapd -I.
++	./test-ms_funcs
++	rm test-ms_funcs
++
++TEST_SRC_SHA1 = sha1.c
++test-sha1: $(TEST_SRC_SHA1)
++	$(CC) -o test-sha1 -Wall -Werror $(TEST_SRC_SHA1) \
++		-DTEST_MAIN -I../hostad -I.
++	./test-sha1
++	rm test-sha1
++
++TEST_SRC_AES_WRAP = aes_wrap.c
++test-aes_wrap: $(TEST_SRC_AES_WRAP)
++	$(CC) -o test-aes_wrap -Wall -Werror $(TEST_SRC_AES_WRAP) \
++		-DTEST_MAIN -I../hostad -I.
++	./test-aes_wrap
++	rm test-aes_wrap
++
++TEST_SRC_EAP_SIM_COMMON = eap_sim_common.c sha1.c md5.c \
++	aes_wrap.c common.c
++test-eap_sim_common: $(TEST_SRC_EAP_SIM_COMMON)
++	$(CC) -o test-eap_sim_common -Wall -Werror $(TEST_SRC_EAP_SIM_COMMON) \
++		-DTEST_MAIN_EAP_SIM_COMMON -I../hostapd -I.
++	./test-eap_sim_common
++	rm test-eap_sim_common
++
++tests: test-ms_funcs test-sha1 test-aes_wrap test-eap_sim_common
++
++clean:
++	rm -f core *~ *.o *.d $(ALL) $(WINALL)
++
++%.eps: %.fig
++	fig2dev -L eps $*.fig $*.eps
++
++%.png: %.fig
++	fig2dev -L png -m 3 $*.fig | pngtopnm | pnmscale 0.4 | pnmtopng \
++		> $*.png
++
++docs-pics: doc/wpa_supplicant.png doc/wpa_supplicant.eps
++
++docs: docs-pics
++	doxygen doc/doxygen.full
++	$(MAKE) -C doc/latex
++	cp doc/latex/refman.pdf wpa_supplicant-devel.pdf
++
++docs-fast: docs-pics
++	doxygen doc/doxygen.fast
++
++clean-docs:
++	rm -rf doc/latex doc/html
++	rm -f doc/wpa_supplicant.{eps,png} wpa_supplicant-devel.pdf
++
++-include $(OBJS:%.o=%.d)
+diff -Naru wpa_supplicant-0.4.8/defconfig wpa_supplicant-0.4.8-mct/defconfig
+--- wpa_supplicant-0.4.8/defconfig	2005-09-24 20:30:43.000000000 +0200
++++ wpa_supplicant-0.4.8-mct/defconfig	2006-03-19 02:02:31.000000000 +0100
+@@ -68,6 +68,9 @@
+ # Driver interface for Intel ipw2100/2200 driver
+ #CONFIG_DRIVER_IPW=y
+ 
++# Driver interface for Zydas zd1211 driver
++CONFIG_DRIVER_ZD1211=y
++
+ # Driver interface for generic Linux wireless extensions
+ CONFIG_DRIVER_WEXT=y
+ 
+diff -Naru wpa_supplicant-0.4.8/driver_zd1211.c wpa_supplicant-0.4.8-mct/driver_zd1211.c
+--- wpa_supplicant-0.4.8/driver_zd1211.c	1970-01-01 01:00:00.000000000 +0100
++++ wpa_supplicant-0.4.8-mct/driver_zd1211.c	2006-03-19 02:02:31.000000000 +0100
+@@ -0,0 +1,408 @@
++#include <stdlib.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <string.h>
++#include <sys/ioctl.h>
++#include <errno.h>
++
++#include "common.h"
++#include "driver.h"
++#include "driver_wext.h"
++#include "eloop.h"
++#include "wireless_copy.h"
++#include "wpa_supplicant.h"
++
++#include "zd1211_common.h"
++
++
++struct wpa_driver_zd1211_data {
++	void *ctx;
++	void *wext; /* private data for driver_wext */
++	char ifname[IFNAMSIZ + 1];
++	int sock;
++};
++
++
++static int zd1211_ioctl(struct wpa_driver_zd1211_data *zd1211_drv, struct zd1211_wlan_param *param, int len, int show_err) {
++	struct iwreq iwr;
++
++	memset(&iwr, 0, sizeof(iwr));
++	strncpy(iwr.ifr_name, zd1211_drv->ifname, IFNAMSIZ);
++	iwr.u.data.pointer = (caddr_t) param;
++	iwr.u.data.length = len;
++
++	if (ioctl(zd1211_drv->sock, ZD_IOCTL_WPA, &iwr) < 0) {
++		int ret;
++
++		ret = errno;
++		if (show_err) 
++			perror("ioctl[ZD_IOCTL_WPA]");
++		return ret;
++	}
++
++	return 0;
++}
++
++
++static int zd1211_set_param(struct wpa_driver_zd1211_data *zd1211_drv, int op, int arg, int show_err) {
++	struct iwreq iwr;
++	int *i, ret = 0;
++
++	memset(&iwr, 0, sizeof(iwr));
++	strncpy(iwr.ifr_name, zd1211_drv->ifname, IFNAMSIZ);
++	i = (int *) iwr.u.name;
++	*i++ = op;
++	*i++ = arg;
++
++	if (ioctl(zd1211_drv->sock, ZD_IOCTL_PARAM, &iwr) < 0) {
++		perror("ioctl[ZD_IOCTL_PARAM]");
++		ret = -1;
++	}
++
++	return ret;
++}
++
++
++static int wpa_driver_zd1211_get_scan_results(void *priv, struct wpa_scan_result *results, size_t max_size) {
++	struct wpa_driver_zd1211_data *zd1211_drv;
++
++	zd1211_drv = priv;
++	return wpa_driver_wext_get_scan_results(zd1211_drv->wext, results, max_size);
++}
++
++
++static int wpa_driver_zd1211_get_bssid(void *priv, u8 *bssid) {
++	struct wpa_driver_zd1211_data *zd1211_drv;
++
++	zd1211_drv = priv;
++	return wpa_driver_wext_get_bssid(zd1211_drv->wext, bssid);
++}
++
++
++static int wpa_driver_zd1211_get_ssid(void *priv, u8 *ssid) {
++	struct wpa_driver_zd1211_data *zd1211_drv;
++
++	zd1211_drv = priv;
++	return wpa_driver_wext_get_ssid(zd1211_drv->wext, ssid);
++}
++
++
++static int wpa_driver_zd1211_set_auth_alg(void *priv, int auth_alg) {
++	struct wpa_driver_zd1211_data *zd1211_drv = priv;
++	int algs = 0;
++
++	if (auth_alg & AUTH_ALG_OPEN_SYSTEM)
++		algs = 0;
++	if (auth_alg & AUTH_ALG_SHARED_KEY)
++		algs = 1;
++
++	return zd1211_set_param(zd1211_drv, ZD_PARAM_AUTH_ALGS, algs, 1);
++}
++
++
++static int wpa_driver_zd1211_set_countermeasures(void *priv, int enabled) {
++	struct wpa_driver_zd1211_data *zd1211_drv = priv;
++
++	/* Enable the countermeasure */
++	wpa_printf(MSG_DEBUG, "%s: enabled=%d", __FUNCTION__, enabled);
++	return zd1211_set_param(zd1211_drv, ZD_PARAM_COUNTERMEASURES, enabled, 1);
++}
++
++
++static int wpa_driver_zd1211_set_drop_unencrypted(void *priv, int enabled) {
++	struct wpa_driver_zd1211_data *zd1211_drv = priv;
++
++	/* Enable the countermeasure */
++	wpa_printf(MSG_DEBUG, "%s: enabled=%d", __FUNCTION__, enabled);
++	return zd1211_set_param(zd1211_drv, ZD_PARAM_DROPUNENCRYPTED, enabled, 1);
++}
++
++
++static int wpa_driver_zd1211_set_key(void *priv, wpa_alg alg,
++					const u8 *addr, int key_idx,
++					int set_tx, const u8 *seq, size_t seq_len,
++					const u8 *key, size_t key_len) {
++	struct wpa_driver_zd1211_data *zd1211_drv = priv;
++	struct zd1211_wlan_param *param;
++	u8 *buf;
++	size_t blen;
++	int ret = 0;
++	char *alg_name;
++
++	switch (alg) {
++		case WPA_ALG_NONE:
++			alg_name = "NONE";
++			break;
++		case WPA_ALG_WEP:
++			alg_name = "WEP";
++			break;
++		case WPA_ALG_TKIP:
++			alg_name = "TKIP";
++			break;
++		case WPA_ALG_CCMP:
++			alg_name = "CCMP";
++			break;
++		default:
++			return -1;
++	}
++
++	wpa_printf(MSG_DEBUG, "%s: alg=%s key_idx=%d set_tx=%d seq_len=%d "
++		   "key_len=%d", __FUNCTION__, alg_name, key_idx, set_tx,
++		   seq_len, key_len);
++
++	if (seq_len > 8)
++		return -2;
++
++	blen = sizeof(*param) + key_len;
++	buf = malloc(blen);
++	if (buf == NULL)
++		return -1;
++	memset(buf, 0, blen);
++
++	param = (struct zd1211_wlan_param *) buf;
++	param->cmd = ZD_CMD_SET_ENCRYPT_KEY;
++	/* TODO: In theory, STA in client mode can use five keys; four default
++	 * keys for receiving (with keyidx 0..3) and one individual key for
++	 * both transmitting and receiving (keyidx 0) _unicast_ packets. Now,
++	 * keyidx 0 is reserved for this unicast use and default keys can only
++	 * use keyidx 1..3 (i.e., default key with keyidx 0 is not supported).
++	 * This should be fine for more or less all cases, but for completeness
++	 * sake, the driver could be enhanced to support the missing key. */
++#if 0
++	if (addr == NULL)
++		memset(param->sta_addr, 0xff, ETH_ALEN);
++	else
++		memcpy(param->sta_addr, addr, ETH_ALEN);
++#else
++	memset(param->sta_addr, 0xff, ETH_ALEN);
++#endif
++	strncpy(param->u.crypt.alg, alg_name, ZD_CRYPT_ALG_NAME_LEN);
++	param->u.crypt.flags = set_tx ? ZD_FLAG_SET_TX_KEY : 0;
++	param->u.crypt.idx = key_idx;
++	memcpy(param->u.crypt.seq, seq, seq_len);
++	param->u.crypt.key_len = key_len;
++	memcpy((u8 *) param->u.crypt.key, key, key_len);
++
++	/* Dump key context */
++	if(alg == WPA_ALG_TKIP) {
++		int ii;
++
++		wpa_printf(MSG_DEBUG, "Key Context:");
++		for(ii = 0; ii < key_len; ) {
++			printf("0x%02x ", key[ii]);
++
++			if((++ii % 16) == 0)
++				printf("\n");
++		}
++
++		printf("\n");
++	}
++
++	if (zd1211_ioctl(zd1211_drv, param, blen, 1)) {
++		wpa_printf(MSG_WARNING, "Failed to set encryption.");
++		//show_set_key_error(param);
++		ret = -1;
++	}
++	free(buf);
++
++	return ret;
++}
++
++
++static int wpa_driver_zd1211_set_wpa_ie(struct wpa_driver_zd1211_data *zd1211_drv, const u8 *wpa_ie, size_t wpa_ie_len) {
++	int res;
++	struct zd1211_wlan_param *param;
++	size_t blen = ZD_GENERIC_ELEMENT_HDR_LEN + wpa_ie_len;
++
++	if (blen < sizeof(*param))
++		blen = sizeof(*param);
++
++	param = (struct zd1211_wlan_param *) malloc(blen);
++	if (param == NULL)
++		return -1;
++
++	memset(param, 0, blen);
++	param->cmd = ZD_CMD_SET_GENERIC_ELEMENT;
++	param->u.generic_elem.len = wpa_ie_len;
++	memcpy(param->u.generic_elem.data, wpa_ie, wpa_ie_len);
++	res = zd1211_ioctl(zd1211_drv, param, blen, 1);
++
++	free(param);
++
++	return res;
++}
++
++
++static int wpa_driver_zd1211_set_wpa(void *priv, int enabled) {
++	struct wpa_driver_zd1211_data *zd1211_drv = priv;
++	int ret = 0;
++
++	wpa_printf(MSG_DEBUG, "%s: enabled=%d", __FUNCTION__, enabled);
++
++	if (!enabled && wpa_driver_zd1211_set_wpa_ie(zd1211_drv, NULL, 0) < 0)
++		ret = -1;
++	if (zd1211_set_param(zd1211_drv, ZD_PARAM_ROAMING, enabled, 1) < 0)
++		ret = -1;
++	if (zd1211_set_param(zd1211_drv, ZD_PARAM_PRIVACY, enabled, 1) < 0)
++		ret = -1;
++	if (zd1211_set_param(zd1211_drv, ZD_PARAM_WPA, enabled, 1) < 0)
++		ret = -1;
++
++	return ret;
++}
++
++
++static int wpa_driver_zd1211_associate(void *priv, struct wpa_driver_associate_params *params) {
++	struct wpa_driver_zd1211_data *zd1211_drv = priv;
++	int ret = 0;
++
++	wpa_printf(MSG_DEBUG, "%s", __FUNCTION__);
++
++	/* Because there might be the case, two or more APs with the same
++	 * SSID, in order to identify them, we need to set the BSSID. */
++	if (wpa_driver_zd1211_set_wpa_ie(zd1211_drv, params->wpa_ie, params->wpa_ie_len) < 0)
++		ret = -1;
++	if (wpa_driver_wext_set_ssid(zd1211_drv->wext, params->ssid, params->ssid_len) < 0)
++		ret = -1;
++
++	// Mark for test
++	//if (wpa_driver_wext_set_bssid(ifname, bssid) < 0)
++	//	ret = -1;
++
++#if 0
++	/* Allow unencrypted EAPOL messages even if pairwise keys are set when
++	 * not using WPA. IEEE 802.1X specifies that these frames are not
++	 * encrypted, but WPA encrypts them when pairwise keys are in use. */
++	if (key_mgmt_suite == KEY_MGMT_802_1X ||
++	    key_mgmt_suite == KEY_MGMT_PSK)
++		allow_unencrypted_eapol = 0;
++	else
++		allow_unencrypted_eapol = 1;
++	
++	if (prism2param(ifname, PRISM2_PARAM_IEEE_802_1X,
++			allow_unencrypted_eapol) < 0) {
++		wpa_printf(MSG_DEBUG, "hostap: Failed to configure "
++			   "ieee_802_1x param");
++		/* Ignore this error.. driver_hostap.c can also be used with
++		 * other drivers that do not support this prism2_param. */
++	}
++#endif
++
++	return ret;
++}
++
++
++static int wpa_driver_zd1211_deauthenticate(void *priv, const u8 *addr, int reason_code) {
++	struct zd1211_wlan_param *param;
++	struct wpa_driver_zd1211_data *zd1211_drv = priv;
++	int blen;
++        int ret;
++
++	wpa_printf(MSG_DEBUG, "%s", __FUNCTION__);
++
++	blen = sizeof(*param);
++	param = (struct zd1211_wlan_param *) malloc(blen);
++	if (param == NULL)
++		return -1;
++
++	memset(param, 0, blen);
++	param->cmd = ZD_CMD_SET_MLME;
++	param->u.mlme.cmd = MLME_STA_DEAUTH;
++	param->u.mlme.reason_code = reason_code;
++	memcpy(param->sta_addr, addr, ETH_ALEN);
++	ret = zd1211_ioctl(zd1211_drv, param, blen, 1);
++        usleep(100000);
++        free(param);
++        return ret;
++}
++
++
++static int wpa_driver_zd1211_disassociate(void *priv, const u8 *addr, int reason_code) {
++	struct zd1211_wlan_param *param;
++	struct wpa_driver_zd1211_data *zd1211_drv = priv;
++	int blen;
++        int ret;
++
++	wpa_printf(MSG_DEBUG, "%s", __FUNCTION__);
++
++	blen = sizeof(*param);
++	param = (struct zd1211_wlan_param *) malloc(blen);
++	if (param == NULL)
++		return -1;
++
++	memset(param, 0, blen);
++	param->cmd = ZD_CMD_SET_MLME;
++	param->u.mlme.cmd = MLME_STA_DISASSOC;
++	param->u.mlme.reason_code = reason_code;
++	memcpy(param->sta_addr, addr, ETH_ALEN);
++	ret = zd1211_ioctl(zd1211_drv, param, blen, 1);
++        free(param);
++        return ret;
++}
++
++
++static int wpa_driver_zd1211_scan(void *priv, const u8 *ssid, size_t ssid_len) {
++	struct wpa_driver_zd1211_data *zd1211_drv;
++
++	zd1211_drv = priv;
++	return wpa_driver_wext_scan(zd1211_drv->wext, ssid, ssid_len);
++}
++
++
++static void * wpa_driver_zd1211_init(void *ctx, const char *ifname) {
++	struct wpa_driver_zd1211_data *zd1211_drv;
++
++	zd1211_drv = malloc(sizeof(*zd1211_drv));
++	if (zd1211_drv == NULL)
++		return NULL;
++	memset(zd1211_drv, 0, sizeof(*zd1211_drv));
++
++	zd1211_drv->wext = wpa_driver_wext_init(ctx, ifname);
++	if (zd1211_drv->wext == NULL)
++		goto exit_no_wext;
++
++	zd1211_drv->ctx = ctx;
++	strncpy(zd1211_drv->ifname, ifname, sizeof(zd1211_drv->ifname));
++
++	zd1211_drv->sock = socket(PF_INET, SOCK_DGRAM, 0);
++	if (zd1211_drv->sock < 0)
++		goto exit_no_socket;
++
++	return zd1211_drv;
++
++exit_no_socket:
++	wpa_driver_wext_deinit(zd1211_drv->wext);
++exit_no_wext:
++	free(zd1211_drv);
++	return NULL;
++}
++
++
++static void wpa_driver_zd1211_deinit(void *ctx) {
++	struct wpa_driver_zd1211_data *zd1211_drv = ctx;
++
++	wpa_driver_wext_deinit(zd1211_drv->wext);
++	close(zd1211_drv->sock);
++	free(zd1211_drv);
++}
++
++
++struct wpa_driver_ops wpa_driver_zd1211_ops = {
++	.name = "zd1211",
++	.desc = "Zydas zd1211 drivers",
++	.init			= wpa_driver_zd1211_init,
++	.deinit			= wpa_driver_zd1211_deinit,
++	.associate		= wpa_driver_zd1211_associate,
++	.deauthenticate		= wpa_driver_zd1211_deauthenticate,
++	.disassociate		= wpa_driver_zd1211_disassociate,
++	.get_bssid		= wpa_driver_zd1211_get_bssid,
++	.get_scan_results	= wpa_driver_zd1211_get_scan_results,
++	.get_ssid		= wpa_driver_zd1211_get_ssid,
++//	.get_capa		= wpa_driver_zd1211_get_capa,
++	.scan			= wpa_driver_zd1211_scan,
++	.set_auth_alg		= wpa_driver_zd1211_set_auth_alg,
++	.set_countermeasures	= wpa_driver_zd1211_set_countermeasures,
++	.set_drop_unencrypted	= wpa_driver_zd1211_set_drop_unencrypted,
++	.set_key		= wpa_driver_zd1211_set_key,
++	.set_wpa		= wpa_driver_zd1211_set_wpa,
++};
+diff -Naru wpa_supplicant-0.4.8/drivers.c wpa_supplicant-0.4.8-mct/drivers.c
+--- wpa_supplicant-0.4.8/drivers.c	2005-02-20 01:15:54.000000000 +0100
++++ wpa_supplicant-0.4.8-mct/drivers.c	2006-03-19 02:02:31.000000000 +0100
+@@ -55,6 +55,9 @@
+ #ifdef CONFIG_DRIVER_TEST
+ extern struct wpa_driver_ops wpa_driver_test_ops; /* driver_test.c */
+ #endif /* CONFIG_DRIVER_TEST */
++#ifdef CONFIG_DRIVER_ZD1211
++extern struct wpa_driver_ops wpa_driver_zd1211_ops; /* driver_zd1211.c */
++#endif /* CONFIG_DRIVER_ZD1211 */
+ 
+ 
+ struct wpa_driver_ops *wpa_supplicant_drivers[] =
+@@ -98,5 +101,8 @@
+ #ifdef CONFIG_DRIVER_TEST
+ 	&wpa_driver_test_ops,
+ #endif /* CONFIG_DRIVER_TEST */
++#ifdef CONFIG_DRIVER_ZD1211
++	&wpa_driver_zd1211_ops,
++#endif /* CONFIG_DRIVER_ZD1211 */
+ 	NULL
+ };
+diff -Naru wpa_supplicant-0.4.8/zd1211_common.h wpa_supplicant-0.4.8-mct/zd1211_common.h
+--- wpa_supplicant-0.4.8/zd1211_common.h	1970-01-01 01:00:00.000000000 +0100
++++ wpa_supplicant-0.4.8-mct/zd1211_common.h	2006-03-19 02:02:31.000000000 +0100
+@@ -0,0 +1,68 @@
++#ifndef ZD1211_COMMON_H
++#define ZD1211_COMMON_H
++
++
++#define ZD_IOCTL_WPA			(SIOCDEVPRIVATE + 1)
++#define ZD_IOCTL_PARAM			(SIOCDEVPRIVATE + 2)
++
++#define ZD_PARAM_ROAMING		0x0001
++#define ZD_PARAM_PRIVACY		0x0002
++#define ZD_PARAM_WPA			0x0003
++#define ZD_PARAM_COUNTERMEASURES	0x0004
++#define ZD_PARAM_DROPUNENCRYPTED	0x0005
++#define ZD_PARAM_AUTH_ALGS		0x0006
++
++#define ZD_CMD_SET_ENCRYPT_KEY		0x0001
++#define ZD_CMD_SET_MLME			0x0002
++//#define ZD_CMD_SCAN_REQ			0x0003
++#define ZD_CMD_SET_GENERIC_ELEMENT	0x0004
++
++#define ZD_FLAG_SET_TX_KEY              0x0001
++
++#define ZD_GENERIC_ELEMENT_HDR_LEN \
++((int) (&((struct zd1211_wlan_param *) 0)->u.generic_elem.data))
++
++#define ZD_CRYPT_ALG_NAME_LEN		16
++#define ZD_MAX_KEY_SIZE			32
++#define ZD_MAX_GENERIC_SIZE		64
++
++/* structure definition */
++
++struct zd1211_wlan_param {
++	u32 cmd;
++	u8 sta_addr[ETH_ALEN];
++	union {
++		struct {
++			u8 alg[ZD_CRYPT_ALG_NAME_LEN];
++			u32 flags;
++			u32 err;
++			u8 idx;
++			u8 seq[8]; /* sequence counter (set: RX, get: TX) */
++			u16 key_len;
++			u8 key[ZD_MAX_KEY_SIZE];
++		} crypt;
++/*
++		struct {
++			u32 flags_and;
++			u32 flags_or;
++		} set_flags_sta;
++*/
++		struct {
++			u8 len;
++			u8 data[ZD_MAX_GENERIC_SIZE];
++		} generic_elem;
++		struct {
++#define MLME_STA_DEAUTH 0
++#define MLME_STA_DISASSOC 1
++			u16 cmd;
++			u16 reason_code;
++		} mlme;
++		struct {
++			u8 ssid_len;
++			u8 ssid[32];
++		} scan_req;
++	} u;
++};
++
++
++#endif
