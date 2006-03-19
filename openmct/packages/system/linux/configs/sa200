@@ -1016,6 +1016,8 @@ CONFIG_USB_SCANNER=y
 # CONFIG_USB_CATC is not set
 # CONFIG_USB_CDCETHER is not set
 # CONFIG_USB_USBNET is not set
+# CONFIG_USB_ZD1211 is not set
+# CONFIG_USB_RT2570 is not set
 # CONFIG_USB_USS720 is not set
 
 #
