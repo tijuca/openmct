@@ -21,7 +21,8 @@ KERNELPATCH=kernel_mct.patch\
 	    kernel_vserver.patch\
 	    kernel_grsecurity.patch\
 	    kernel_vserver-mips-syscall.patch\
-	    kernel_nfs-maxblksize.patch
+	    kernel_nfs-maxblksize.patch\
+	    kernel_usb-wlan.patch
 
 PATH := ${CCDIR}:$(PATH)
 
@@ -41,7 +42,7 @@ BUILDENV := \
 	PKG_CONFIG_PATH=$(targetprefix)/lib/pkgconfig
 
 
-all: prepare buildroot kernel tools progs
+all: prepare buildroot kernel basic-fs tools progs
 
 prepare: directory
 	cd $(BUILDDIR); \
@@ -65,12 +66,12 @@ prepare: directory
 buildroot: prepare
 	if [ ! -f $(DEPDIR)/$@ ]; then \
 	    cd $(BUILDDIR)/buildroot; \
-		if [ ! -f .patched ]; then \
+	    if [ ! -f .patched ]; then \
 		patch -p1 < $(PATCHDIR)/buildroot.patch; \
 		touch .patched; \
 		cp $(ACTDIR)/configs/buildroot.config $(BUILDDIR)/buildroot/.config; \
 	    fi; \
-	    cd $(BUILDDIR)/buildroot && $(MAKE) oldconfig && $(MAKE) BR2_STAGING_DIR=$(CCDIR)/mipsel-linux; \
+	    cd $(BUILDDIR)/buildroot && $(MAKE) oldconfig && $(MAKE) BR2_STAGING_DIR="$(CDK)/mipsel-linux" && \
 	    touch $(DEPDIR)/$@; \
 	fi
 
@@ -80,6 +81,7 @@ kernel: buildroot
 	    $(BUILDENV) \
 	    cp $(ACTDIR)/configs/kernel.config $(BUILDDIR)/linux-$(KERNEL)/.config; \
 	    $(MAKE) oldconfig && \
+	    $(MAKE) dep && \
 	    $(MAKE) vmlinux CROSS_COMPILE=$(target)-; \
 	    touch $(DEPDIR)/$@; \
 	fi
@@ -110,8 +112,8 @@ progs:
 directory: download
 	test -d $(BUILDDIR) || mkdir $(BUILDDIR)
 	test -d $(ARCHIVDIR)/dl || mkdir $(ARCHIVDIR)/dl
-	test -d $(CCDIR) || mkdir $(CCDIR)
-	test -d $(CCDIR)/.deps || mkdir $(CCDIR)/.deps
+	test -d $(CCDIR) || mkdir -p $(CCDIR)
+	test -d $(DEPDIR) || mkdir -p $(DEPDIR)
 #	test -d ${prefix}/cdk/mct-fs || mkdir ${prefix}/cdk/mct-fs
 
 download: $(ARCHIVDIR)/linux-$(KERNEL).tar.bz2 \
