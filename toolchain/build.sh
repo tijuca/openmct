@@ -1,4 +1,4 @@
 #!/bin/sh
-PREFIX=~/claxan
+PREFIX=~/mct
 export PATH=$PREFIX/bin:$PATH
 make PREFIX=$PREFIX

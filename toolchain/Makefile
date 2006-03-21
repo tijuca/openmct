@@ -62,7 +62,7 @@ $(BUILD_GCCCORE): $(BUILDDIR)/gcc-core-3.3.4
 		./configure --target=$(TARGET) \
 		--prefix=$(PREFIX) --enable-languages="c" --with-gnu-as \
 		--with-gnu-ld --disable-threads --disable-shared && \
-		make all install && cd ../.. && $(TOUCH) $(BUILD_GCCCORE)
+		make all-gcc install-gcc && cd ../.. && $(TOUCH) $(BUILD_GCCCORE)
 
 # Linux 2.4.16
 $(DOWNLOADDIR)/linux-$(ARCH).tar.bz2:
@@ -119,5 +119,6 @@ $(BUILDDIR)/uClibc-0.9.14:
 
 $(BUILD_UCLIBC): $(BUILDDIR)/uClibc-0.9.14
 		@PATH=$(PREFIX)/bin:$(PATH) cd $(BUILDDIR)/uClibc-0.9.14 && \
-		make KERNEL_SOURCE=$(shell pwd)/$(BUILDDIR)/linux DEVEL_PREFIX=$(PREFIX)/$(TARGET)-uclibc SYSTEM_DEVEL_PREFIX=$(PREFIX)/$(TARGET)-uclibc all install && \
+		make KERNEL_SOURCE=$(shell pwd)/$(BUILDDIR)/linux DEVEL_PREFIX=$(PREFIX)/$(TARGET)-uclibc SYSTEM_DEVEL_PREFIX=$(PREFIX)/$(TARGET)-uclibc all && \
+		make DEVEL_PREFIX=$(PREFIX)/$(TARGET)-uclibc install && \
 		cd ../.. && $(TOUCH) $(BUILD_UCLIBC)
