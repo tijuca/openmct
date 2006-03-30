@@ -113,6 +113,10 @@ ifndef PREFIX
 PREFIX=/
 endif
 
+ifeq ($(SUFFIX),z)
+TARMODE=-xzf
+endif
+
 ifeq ($(SUFFIX),gz)
 TARMODE=-xzf
 endif
