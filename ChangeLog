@@ -1,3 +1,6 @@
+Mi 05 Apr 2006 21:13:14 CEST §carsten
+* adding subdirectory for some progs in /bin and /sbin
+
 Do 09 Mär 2006 08:40:51 CET §carsten r.348-350
 *fixed up a missing directory check for symbolic link
 of the download dir from buildroot

@@ -1,0 +1,107 @@
+--- nano-1.2.5/configure	2005-04-15 05:01:40.000000000 +0200
++++ nano-old/configure	2006-04-05 19:44:03.000000000 +0200
+@@ -5800,58 +5800,58 @@
+ echo "${ECHO_T}$ac_cv_header_regex_h" >&6
+ 
+ fi
+-if test $ac_cv_header_regex_h = yes; then
+-  echo "$as_me:$LINENO: checking for broken regexec" >&5
+-echo $ECHO_N "checking for broken regexec... $ECHO_C" >&6
+-    if test "$cross_compiling" = yes; then
+-  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+-See \`config.log' for more details." >&5
+-echo "$as_me: error: cannot run test program while cross compiling
+-See \`config.log' for more details." >&2;}
+-   { (exit 1); exit 1; }; }
+-else
+-  cat >conftest.$ac_ext <<_ACEOF
+-/* confdefs.h.  */
+-_ACEOF
+-cat confdefs.h >>conftest.$ac_ext
+-cat >>conftest.$ac_ext <<_ACEOF
+-/* end confdefs.h.  */
++#if test $ac_cv_header_regex_h = yes; then
++#  echo "$as_me:$LINENO: checking for broken regexec" >&5
++#echo $ECHO_N "checking for broken regexec... $ECHO_C" >&6
++#    if test "$cross_compiling" = yes; then
++#  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
++#See \`config.log' for more details." >&5
++#echo "$as_me: error: cannot run test program while cross compiling
++#See \`config.log' for more details." >&2;}
++#   { (exit 1); exit 1; }; }
++#else
++#  cat >conftest.$ac_ext <<_ACEOF
++#/* confdefs.h.  */
++#_ACEOF
++#cat confdefs.h >>conftest.$ac_ext
++#cat >>conftest.$ac_ext <<_ACEOF
++#/* end confdefs.h.  */
+ 
+ #include <sys/types.h>
+ #include <regex.h>
+-int main () { regex_t reg; size_t n = 1; regmatch_t r; regcomp(&reg, "\\<", 0); regexec(&reg, "", n, &r, 0); regfree(&reg); return 0; }
+-_ACEOF
+-rm -f conftest$ac_exeext
+-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+-  (eval $ac_link) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+-  (eval $ac_try) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); }; }; then
+-  echo "$as_me:$LINENO: result: no" >&5
+-echo "${ECHO_T}no" >&6
+-else
+-  echo "$as_me: program exited with status $ac_status" >&5
+-echo "$as_me: failed program was:" >&5
+-sed 's/^/| /' conftest.$ac_ext >&5
+-
+-( exit $ac_status )
+-echo "$as_me:$LINENO: result: yes" >&5
+-echo "${ECHO_T}yes" >&6;
+-cat >>confdefs.h <<\_ACEOF
++#int main () { regex_t reg; size_t n = 1; regmatch_t r; regcomp(&reg, "\\<", 0); regexec(&reg, "", n, &r, 0); regfree(&reg); return 0; }
++#_ACEOF
++#rm -f conftest$ac_exeext
++#if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
++#  (eval $ac_link) 2>&5
++#  ac_status=$?
++#  echo "$as_me:$LINENO: \$? = $ac_status" >&5
++#  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
++#  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
++#  (eval $ac_try) 2>&5
++#  ac_status=$?
++#  echo "$as_me:$LINENO: \$? = $ac_status" >&5
++#  (exit $ac_status); }; }; then
++#  echo "$as_me:$LINENO: result: no" >&5
++#echo "${ECHO_T}no" >&6
++#else
++#  echo "$as_me: program exited with status $ac_status" >&5
++#echo "$as_me: failed program was:" >&5
++#sed 's/^/| /' conftest.$ac_ext >&5
++
++#( exit $ac_status )
++#echo "$as_me:$LINENO: result: yes" >&5
++#echo "${ECHO_T}yes" >&6;
++#cat >>confdefs.h <<\_ACEOF
+ #define BROKEN_REGEXEC 1
+-_ACEOF
++#_ACEOF
+ 
+ 
+-fi
+-rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+-fi
+-
+-fi
++#fi
++#rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
++#fi
++#
++#fi
+ 
+ 
+ 

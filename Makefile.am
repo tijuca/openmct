@@ -1,6 +1,7 @@
 # main Makefile for mct-image builds
 @SET_MAKE@
-SUBDIRS = tools progs
+SUBDIRS = tools progs libs
+VPATH=@srcdir@
 
 # prefix is default $HOME/mct-build, comes from configure.ac
 prefix=@prefix@
@@ -13,7 +14,7 @@ BUILDDIR=${prefix}/build
 CDK=${prefix}/cdk
 CCDIR=$(CDK)/@target@/bin
 DEPDIR=$(CDK)/.deps
-PATCHDIR=${ACTDIR}/patches
+#PATCHDIR=${ACTDIR}/patches
 KERNELPATCH=kernel_mct.patch\
             kernel_squashfs.patch\
 	    kernel_mppe-mppc.patch\

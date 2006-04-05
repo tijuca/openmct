@@ -47,6 +47,11 @@ if test "$prefix" = "NONE"; then
 fi
 AC_SUBST(prefix)
 
+
+ACTDIR=pwd
+PATCHDIR=$ACTDIR/patches
+AC_SUBST(PATCHDIR)
+
 # Checks for user options.
 
 AC_MSG_CHECKING([for prefix directory])
@@ -117,11 +122,15 @@ configure results:
 Your specified device:           $device
 ])
 
+#AC_CONFIG_SUBDIRS([
+#progs
+#])
 
 AC_CONFIG_FILES([
 Makefile
 progs/Makefile
 tools/Makefile
+libs/Makefile
 ])
 
 AC_OUTPUT
