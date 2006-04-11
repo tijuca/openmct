@@ -40,7 +40,7 @@ bin_PROGRAMS    = fcp proccgi
 fcp_SOURCES     = fcp.c
 proccgi_SOURCES = proccgi.c
 
-all: bbox
+all: bbox coreutils nano
 
 bbox:
 	cd $(ARCHIVDIR); \
@@ -73,7 +73,7 @@ nano:
 	    cd nano-$(nanover); \
 	    patch -p1 < $(PATCHDIR)/nano.patch; \
 	    touch .patched; \
-	    fi; exit
+	fi;
 	cd nano-$(nanover) && \
 	    $(BUILDENV) \
 	    ./configure \
@@ -82,35 +82,15 @@ nano:
 	    $(MAKE) CFLAGS+=-I$(CCDIR)/include/ncurses
 
 
-ncurses:
-	cd $(ARCHIVDIR); \
-	test -f ncurses-$(ncursesver).tar.gz || wget ftp://ftp.gnu.org/pub/gnu/ncurses/ncurses-$(ncursesver).tar.gz
-	test -d ncurses-$(ncursesver) || tar xzvf $(ARCHIVDIR)/ncurses-$(ncursesver).tar.gz
-	cd ncurses-$(ncursesver); \
-	./configure --build=$(build) \
-		    --host=$(target) \
-		    --prefix=$(CCDIR) \
-		    --with-shared \
-		    --disable-ext-funcs \
-		    --with-progs \
-		    $(BUILDENV) &&\
-		    $(MAKE) && \
-		    $(MAKE) install.includes && \
-		    $(MAKE) install.libs && \
-		    $(MAKE) install.man
-
 screen:
 	cd $(ARCHIVDIR); \
 	test -f screen-$(sver).tar.gz || wget ftp://ftp.gnu.org/gnu/screen/screen-$(sver).tar.gz
 	test -d screen-$(sver) || tar xzvf $(ARCHIVDIR)/screen-$(sver).tar.gz
 	cd screen-$(sver); \
-	./configure --build=$(build) \
-		    --host=$(target) \
-		    --prefix=$(prefix)/bin \
-		    $(BUILDENV) && \
-		    $(MAKE); \
+	    $(BUILDENV) \
+	    ./configure \
+		--build=$(build) \
+		--host=$(target) \
+		--prefix=$(prefix)/bin \
+	    $(MAKE); \
 	cp screen/screen $(prefix)/bin	
-
-
-#CC=$(target)-gcc -I$(CCDIR)/include
-	

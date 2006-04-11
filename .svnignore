@@ -13,6 +13,7 @@ config.sub
 config.h.in
 depcomp
 install-sh
+libs
 missing
 mkinstalldirs
 stamp-h1

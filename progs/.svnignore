@@ -4,7 +4,6 @@ Makefile.in
 busybox-1.1.0
 coreutils-5.93
 nano-1.2.5
-ncurses-5.5
 screen-4.0.2
 fcp
 proccgi
