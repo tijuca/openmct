@@ -12,8 +12,10 @@ cuver=5.93
 nanover=1.2.5
 #ncurses version
 ncursesver=5.5
-#screen versiom
+#screen version
 sver=4.0.2
+#mp3info version
+mp3infover=0.8.4
 
 ARCHIVDIR=@prefix@/archives
 PATCHDIR=../../patches
@@ -40,7 +42,7 @@ bin_PROGRAMS    = fcp proccgi
 fcp_SOURCES     = fcp.c
 proccgi_SOURCES = proccgi.c
 
-all: bbox coreutils nano
+all: bbox coreutils nano mp3info
 
 bbox:
 	cd $(ARCHIVDIR); \
@@ -50,20 +52,20 @@ bbox:
 	cd busybox-$(bbver) && \
 	    $(BUILDENV) \
 	    $(MAKE) dep all && \
-	    $(STRIP) busybox &&\
-	    $(MAKE) install PREFIX=$(prefix) 
+	    $(STRIP) busybox && \
+	    $(MAKE) install PREFIX=$(prefix)/mct-fs 
 
 coreutils:
 	cd $(ARCHIVDIR); \
 	test -f coreutils-$(cuver).tar.gz || wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-$(cuver).tar.gz
 	test -d coreutils-$(cuver) || tar xzvf $(ARCHIVDIR)/coreutils-$(cuver).tar.gz
 	cd coreutils-$(cuver) && \
-	    $(BUILDENV)
+	    $(BUILDENV) \
 	    ./configure \
-		--prefix=$(prefix)/bin \
+		--prefix=$(prefix)/mct-fs/bin \
 		--host=i686 && \
 	    $(MAKE) && \
-	    cp src/su $(prefix)/bin	
+	    cp src/su $(prefix)/mct-fs/bin	
 
 nano:
 	cd $(ARCHIVDIR); \
@@ -80,6 +82,20 @@ nano:
 	        --build=$(build) \
 	        --host=$(target) && \
 	    $(MAKE) CFLAGS+=-I$(CCDIR)/include/ncurses
+
+mp3info:
+	cd $(ARCHIVDIR); \
+	test -f mp3info-$(mp3infover).tgz || wget ftp://ftp.ibiblio.org/pub/linux/apps/sound/mp3-utils/mp3info/mp3info-$(mp3infover).tgz
+	test -d mp3info-$(mp3infover) || tar xzvf $(ARCHIVDIR)/mp3info-$(mp3infover).tgz
+	if [ ! -f mp3info-$(mp3infover)/.patched ]; then \
+	    cd mp3info-$(mp3infover); \
+	    patch -p1 < $(PATCHDIR)/mp3info.patch; \
+	    touch .patched; \
+	fi;
+	cd mp3info-$(mp3infover) && \
+	    $(MAKE) CFLAGS+="-Os" mp3info \
+	    $(BUILDENV) && \
+	cp mp3info $(prefix)/mct-fs/sbin
 
 
 screen:

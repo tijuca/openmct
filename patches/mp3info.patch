@@ -1,0 +1,12 @@
+diff -Naru mp3info-0.8.4/mp3info.h mp3info-0.8.4-mct/mp3info.h
+--- mp3info-0.8.4/mp3info.h	2001-07-17 07:29:56.000000000 +0200
++++ mp3info-0.8.4-mct/mp3info.h	2006-03-19 02:10:41.000000000 +0100
+@@ -29,7 +29,7 @@
+ #include <sys/stat.h>
+ #include <ctype.h>
+ #include <string.h>
+-#include <curses.h>
++#include <ncurses/curses.h>
+ #include <signal.h>
+ #ifdef __CYGWIN32__
+ #include <getopt.h>
