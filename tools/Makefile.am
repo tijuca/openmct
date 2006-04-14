@@ -7,3 +7,6 @@ all: tools
 
 tools:
 	$(CC) $(CFLAGS) mct_modify.c -o mct_modify
+
+clean:
+	rm mct_modify

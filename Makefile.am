@@ -1,13 +1,14 @@
 # main Makefile for mct-image builds
 @SET_MAKE@
-SUBDIRS = tools progs libs
+SUBDIRS = tools progs
 VPATH=@srcdir@
 
+AUTOMAKE_OPTION = foreign
 # ncurses version
 ncursesver=5.5
 
 
-# prefix is default $HOME/mct-build, comes from configure.ac
+# prefix is default $HOME/openmct-build, comes from configure.ac
 prefix=@prefix@
 ACTDIR:= $(shell pwd)
 KERNEL=2.4.32
@@ -17,7 +18,7 @@ BUILDDIR=${prefix}/build
 CDK=${prefix}/cdk
 CCDIR=$(CDK)/@target@
 DEPDIR=$(CDK)/.deps
-#PATCHDIR=${ACTDIR}/patches
+PATCHDIR=${ACTDIR}/patches
 KERNELPATCH=kernel_mct.patch\
             kernel_squashfs.patch\
 	    kernel_mppe-mppc.patch\
@@ -40,6 +41,7 @@ BUILDENV := \
 	CXX=$(target)-g++ \
 	NM=$(target)-nm \
 	RANLIB=$(target)-ranlib \
+	STRIP=$(target)-sstrip \
 	CFLAGS="$(TARGET_CFLAGS)" \
 	CXXFLAGS="$(TARGET_CFLAGS)" \
 	LDFLAGS="$(TARGET_LDFLAGS)" \
@@ -58,6 +60,9 @@ prepare: directory
 	cd $(BUILDDIR)/linux-$(KERNEL); \
 	if [ ! -f .patched ]; then \
 	    for i in $(KERNELPATCH); do \
+		echo ; \
+		echo "patching with $$i"; \
+		echo ; \
 		patch -p1 < $(PATCHDIR)/$$i; \
 	    done; \
 	    touch .patched; \
@@ -78,11 +83,14 @@ buildroot: prepare
 	    if [ ! -f .patched ]; then \
 		patch -p1 < $(PATCHDIR)/buildroot.patch; \
 		touch .patched; \
-		cp $(ACTDIR)/configs/buildroot.config $(BUILDDIR)/buildroot/.config; \
 	    fi; \
-	    cd $(BUILDDIR)/buildroot && $(MAKE) oldconfig && $(MAKE) BR2_STAGING_DIR="$(CDK)/mipsel-linux" && \
+	    cp $(ACTDIR)/configs/buildroot.config $(BUILDDIR)/buildroot/.config; \
+	    cd $(BUILDDIR)/buildroot && \
+	    $(MAKE) oldconfig && \
+	    $(MAKE) BR2_STAGING_DIR="$(CDK)/mipsel-linux" && \
 	    touch $(DEPDIR)/$@; \
 	fi
+
 
 kernel: buildroot
 	if [ ! -f $(DEPDIR)/$@ ]; then \
@@ -92,6 +100,7 @@ kernel: buildroot
 	    $(MAKE) oldconfig && \
 	    $(MAKE) dep && \
 	    $(MAKE) vmlinux CROSS_COMPILE=$(target)-; \
+	    cp $(BUILDDIR)/linux-$(KERNEL)/include/linux/version.h $(CCDIR)/include; \
 	    touch $(DEPDIR)/$@; \
 	fi
 
@@ -134,12 +143,10 @@ basic-fs:
 
 tools:
 	cd tools && \
-	$(MAKE)
+	    $(MAKE) all
 
 progs:
-	cd progs && \
-	$(BUILDENV)
-	$(MAKE)
+	$(MAKE) -C progs/ all
 
 directory: download
 	test -d $(BUILDDIR) || mkdir $(BUILDDIR)
@@ -149,13 +156,13 @@ directory: download
 	test -d ${prefix}/cdk/mct-fs || mkdir ${prefix}/cdk/mct-fs
 
 download: $(ARCHIVDIR)/linux-$(KERNEL).tar.bz2 \
-          $(ARCHIVDIR)/buildroot-$(BUILDROOTDAY).tar.bz2
+          $(ARCHIVDIR)/buildroot-$(BUILDROOTDAY).tar.bz2 \
+	  $(ARCHIVDIR)/ncurses-$(ncursesver).tar.gz
 
 $(ARCHIVDIR)/linux-$(KERNEL).tar.bz2:
 	if [ ! -f $(ARCHIVDIR)/linux-$(KERNEL).tar.bz2 ]; then \
 	    wget -c -P $(ARCHIVDIR) http://www.de.kernel.org/pub/linux/kernel/v2.4/linux-$(KERNEL).tar.bz2; \
 	fi
-
 
 $(ARCHIVDIR)/buildroot-$(BUILDROOTDAY).tar.bz2:
 	if [ ! -f $(ARCHIVDIR)/buildroot-$(BUILDROOTDAY).tar.bz2 ]; then \
@@ -163,6 +170,6 @@ $(ARCHIVDIR)/buildroot-$(BUILDROOTDAY).tar.bz2:
 	fi
 
 $(ARCHIVDIR)/ncurses-$(ncursesver).tar.gz:
-	if [ ! -f $(ARCHIVDIR)/ncurses-$(ncursesver).tar.gz; then \
+	if [ ! -f $(ARCHIVDIR)/ncurses-$(ncursesver).tar.gz ]; then \
 	    wget -c -P $(ARCHIVDIR) ftp://ftp.gnu.org/pub/gnu/ncurses/ncurses-$(ncursesver).tar.gz; \
 	fi

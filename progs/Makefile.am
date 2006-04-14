@@ -52,7 +52,6 @@ bbox:
 	cd busybox-$(bbver) && \
 	    $(BUILDENV) \
 	    $(MAKE) dep all && \
-	    $(STRIP) busybox && \
 	    $(MAKE) install PREFIX=$(prefix)/mct-fs 
 
 coreutils:

@@ -130,7 +130,8 @@ AC_CONFIG_FILES([
 Makefile
 progs/Makefile
 tools/Makefile
-libs/Makefile
 ])
+
+#libs/Makefile
 
 AC_OUTPUT

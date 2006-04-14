@@ -206,7 +206,8 @@ diff -Naru buildroot/toolchain/uClibc/uclibc.mk buildroot.mct/toolchain/uClibc/u
 -UCLIBC_SOURCE:=uClibc-$(strip $(subst ",, $(BR2_USE_UCLIBC_SNAPSHOT))).tar.bz2
 +#UCLIBC_SOURCE:=uClibc-$(strip $(subst ",, $(BR2_USE_UCLIBC_SNAPSHOT))).tar.bz2
  #"
-+UCLIBC_SOURCE:=uClibc-20050828.tar.bz2
- UCLIBC_SITE:=http://www.uclibc.org/downloads/snapshots
++UCLIBC_SOURCE:=uClibc-0.9.28.tar.bz2
+-UCLIBC_SITE:=http://www.uclibc.org/downloads/snapshots
++UCLIBC_SITE:=http://www.uclibc.org/downloads/
  else
  UCLIBC_VER:=0.9.28
