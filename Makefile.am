@@ -12,7 +12,8 @@ ncursesver=5.5
 prefix=@prefix@
 ACTDIR:= $(shell pwd)
 KERNEL=2.4.32
-BUILDROOTDAY=20051202
+#BUILDROOTDAY=20051202
+BUILDROOTDAY=0.9.27
 ARCHIVDIR=${prefix}/archives
 BUILDDIR=${prefix}/build
 CDK=${prefix}/cdk
@@ -166,7 +167,7 @@ $(ARCHIVDIR)/linux-$(KERNEL).tar.bz2:
 
 $(ARCHIVDIR)/buildroot-$(BUILDROOTDAY).tar.bz2:
 	if [ ! -f $(ARCHIVDIR)/buildroot-$(BUILDROOTDAY).tar.bz2 ]; then \
-	    wget -c -P $(ARCHIVDIR) http://buildroot.uclibc.org/downloads/snapshots/buildroot-$(BUILDROOTDAY).tar.bz2; \
+	    wget -c -P $(ARCHIVDIR) http://buildroot.uclibc.org/downloads/old/buildroot-$(BUILDROOTDAY).tar.bz2; \
 	fi
 
 $(ARCHIVDIR)/ncurses-$(ncursesver).tar.gz:
