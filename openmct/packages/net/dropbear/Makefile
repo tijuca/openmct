@@ -1,5 +1,5 @@
 # Dropbear (Tiny SSH Set)
-DOWNLOAD=	http://matt.ucc.asn.au/dropbear/releases/dropbear-0.46.tar.bz2
+DOWNLOAD=	http://matt.ucc.asn.au/dropbear/releases/dropbear-0.48.1.tar.gz
 
 CONFIGUREARGS=	--prefix=$(PREFIX) --host=$(TARGET) --disable-zlib
 
