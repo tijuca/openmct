@@ -1,7 +1,7 @@
-diff -Naru samba-3.0.21b/source/configure samba-3.0.21b-mct/source/configure
---- samba-3.0.21b/source/configure	2006-01-30 20:39:38.000000000 +0100
-+++ samba-3.0.21b-mct/source/configure	2006-02-28 10:04:51.000000000 +0100
-@@ -5046,7 +5046,7 @@
+diff -Naru samba-3.0.22/source/configure samba-3.0.22-mct/source/configure
+--- samba-3.0.22/source/configure	2006-03-30 06:53:13.000000000 +0200
++++ samba-3.0.22-mct/source/configure	2006-04-20 09:02:37.000000000 +0200
+@@ -5047,7 +5047,7 @@
  rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
  fi
  	CPPFLAGS="$old_CPPFLAGS"
@@ -10,7 +10,7 @@ diff -Naru samba-3.0.21b/source/configure samba-3.0.21b-mct/source/configure
  		CPPFLAGS="-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE $CPPFLAGS"
  
  cat >>confdefs.h <<\_ACEOF
-@@ -19332,179 +19332,6 @@
+@@ -19333,179 +19333,6 @@
  rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
  
  #
@@ -190,16 +190,25 @@ diff -Naru samba-3.0.21b/source/configure samba-3.0.21b-mct/source/configure
  # stat64 family may need <sys/stat.h> on some systems, notably ReliantUNIX
  #
  
-@@ -26564,7 +26391,7 @@
+@@ -26343,7 +26170,7 @@
+ fi
+ echo "$as_me:$LINENO: result: $samba_cv_HAVE_OFF64_T" >&5
+ echo "${ECHO_T}$samba_cv_HAVE_OFF64_T" >&6
+-if test x"$samba_cv_HAVE_OFF64_T" = x"yes"; then
++if test x"$samba_cv_HAVE_OFF64_T" = x"yes" || test x"$samba_cv_HAVE_OFF64_T" = x"cross" ; then
+ 
+ cat >>confdefs.h <<\_ACEOF
+ #define HAVE_OFF64_T 1
+@@ -26567,7 +26394,7 @@
  fi
  echo "$as_me:$LINENO: result: $samba_cv_HAVE_DEV64_T" >&5
  echo "${ECHO_T}$samba_cv_HAVE_DEV64_T" >&6
 -if test x"$samba_cv_HAVE_DEV64_T" = x"yes"; then
-+if test x"$samba_cv_HAVE_DEV64_T" = x"yes" || test x"$samba_cv_HAVE_DEV64_T" = x"cross" ; then
++if test x"$samba_cv_HAVE_DEV64_T" = x"yes" || test x"$samba_cv_HAVE_DEV64_T" = x"cross"; then
  
  cat >>confdefs.h <<\_ACEOF
  #define HAVE_DEV64_T 1
-@@ -27112,59 +26939,10 @@
+@@ -27115,59 +26942,10 @@
  
  fi
  
@@ -259,7 +268,7 @@ diff -Naru samba-3.0.21b/source/configure samba-3.0.21b-mct/source/configure
  echo "$as_me:$LINENO: checking for va_copy" >&5
  echo $ECHO_N "checking for va_copy... $ECHO_C" >&6
  if test "${samba_cv_HAVE_VA_COPY+set}" = set; then
-@@ -30303,65 +30081,10 @@
+@@ -30306,65 +30084,10 @@
  fi
  
  
@@ -325,3 +334,82 @@ diff -Naru samba-3.0.21b/source/configure samba-3.0.21b-mct/source/configure
  
  if test $seteuid = no; then
  echo "$as_me:$LINENO: checking for setreuid" >&5
+@@ -42151,78 +41874,10 @@
+   fi
+ fi
+ 
+-#
+-# As a gating factor for large file support, in order to
+-# use <4GB files we must have the following minimal support
+-# available.
+-# long long, and a 64 bit off_t or off64_t.
+-# If we don't have all of these then disable large
+-# file support.
+-#
+-echo "$as_me:$LINENO: checking if large file support can be enabled" >&5
+-echo $ECHO_N "checking if large file support can be enabled... $ECHO_C" >&6
+-cat >conftest.$ac_ext <<_ACEOF
+-/* confdefs.h.  */
+-_ACEOF
+-cat confdefs.h >>conftest.$ac_ext
+-cat >>conftest.$ac_ext <<_ACEOF
+-/* end confdefs.h.  */
+-
+-#if defined(HAVE_LONGLONG) && (defined(HAVE_OFF64_T) || (defined(SIZEOF_OFF_T) && (SIZEOF_OFF_T == 8)))
+-#include <sys/types.h>
+-#else
+-__COMPILE_ERROR_
+-#endif
+-
+-int
+-main ()
+-{
+-int i
+-  ;
+-  return 0;
+-}
+-_ACEOF
+-rm -f conftest.$ac_objext
+-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+-  (eval $ac_compile) 2>conftest.er1
+-  ac_status=$?
+-  grep -v '^ *+' conftest.er1 >conftest.err
+-  rm -f conftest.er1
+-  cat conftest.err >&5
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); } &&
+-	 { ac_try='test -z "$ac_c_werror_flag"
+-			 || test ! -s conftest.err'
+-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+-  (eval $ac_try) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); }; } &&
+-	 { ac_try='test -s conftest.$ac_objext'
+-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+-  (eval $ac_try) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); }; }; then
+-  samba_cv_HAVE_EXPLICIT_LARGEFILE_SUPPORT=yes
+-else
+-  echo "$as_me: failed program was:" >&5
+-sed 's/^/| /' conftest.$ac_ext >&5
+-
+-samba_cv_HAVE_EXPLICIT_LARGEFILE_SUPPORT=no
+-fi
+-rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+-if test x"$samba_cv_HAVE_EXPLICIT_LARGEFILE_SUPPORT" = x"yes"; then
+-
+ cat >>confdefs.h <<\_ACEOF
+ #define HAVE_EXPLICIT_LARGEFILE_SUPPORT 1
+ _ACEOF
+ 
+-fi
+-echo "$as_me:$LINENO: result: $samba_cv_HAVE_EXPLICIT_LARGEFILE_SUPPORT" >&5
+-echo "${ECHO_T}$samba_cv_HAVE_EXPLICIT_LARGEFILE_SUPPORT" >&6
+-
+-
+ # Check whether --with-spinlocks or --without-spinlocks was given.
+ if test "${with_spinlocks+set}" = set; then
+   withval="$with_spinlocks"

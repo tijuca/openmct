@@ -1,5 +1,5 @@
 # Samba 3.x
-DOWNLOAD=	http://www.samba.org/samba/ftp/stable/samba-3.0.21b.tar.gz
+DOWNLOAD=	http://www.samba.org/samba/ftp/stable/samba-3.0.22.tar.gz
 
 SRCDIRSUFFIX=	/source
 
