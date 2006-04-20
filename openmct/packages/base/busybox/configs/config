@@ -4,6 +4,10 @@
 HAVE_DOT_CONFIG=y
 
 #
+# Busybox Settings
+#
+
+#
 # General Configuration
 #
 # CONFIG_FEATURE_BUFFERS_USE_MALLOC is not set
@@ -24,6 +28,7 @@ CONFIG_FEATURE_SUID=y
 # Build Options
 #
 # CONFIG_STATIC is not set
+# CONFIG_DISABLE_SHARED is not set
 # CONFIG_BUILD_LIBBUSYBOX is not set
 # CONFIG_FEATURE_FULL_LIBBUSYBOX is not set
 # CONFIG_FEATURE_SHARED_BUSYBOX is not set
@@ -34,6 +39,15 @@ EXTRA_CFLAGS_OPTIONS=""
 # CONFIG_BUILD_AT_ONCE is not set
 
 #
+# Debugging Options
+#
+# CONFIG_DEBUG is not set
+# CONFIG_NO_DEBUG_LIB is not set
+# CONFIG_DMALLOC is not set
+# CONFIG_EFENCE is not set
+CONFIG_DEBUG_YANK_SUSv2=y
+
+#
 # Installation Options
 #
 CONFIG_INSTALL_NO_USR=y
@@ -41,6 +55,15 @@ CONFIG_INSTALL_APPLET_SYMLINKS=y
 # CONFIG_INSTALL_APPLET_HARDLINKS is not set
 # CONFIG_INSTALL_APPLET_DONT is not set
 PREFIX="./_install"
+
+#
+# Busybox Library Tuning
+#
+CONFIG_MD5_SIZE_VS_SPEED=2
+
+#
+# Applets
+#
 
 #
 # Archival Utilities
@@ -132,7 +155,6 @@ CONFIG_FEATURE_LS_USERNAME=y
 CONFIG_FEATURE_LS_COLOR=y
 CONFIG_FEATURE_LS_COLOR_IS_DEFAULT=y
 CONFIG_MD5SUM=y
-CONFIG_MD5SUM_SIZE_VS_SPEED=2
 CONFIG_MKDIR=y
 CONFIG_MKFIFO=y
 CONFIG_MKNOD=y
@@ -368,6 +390,7 @@ CONFIG_FEATURE_MOUNT_NFS=y
 # CONFIG_PIVOT_ROOT is not set
 # CONFIG_RDATE is not set
 # CONFIG_READPROFILE is not set
+# CONFIG_SETARCH is not set
 CONFIG_SWAPONOFF=y
 CONFIG_SWITCH_ROOT=y
 CONFIG_UMOUNT=y
@@ -412,7 +435,7 @@ CONFIG_FEATURE_HDPARM_HDIO_GETSET_DMA=y
 # CONFIG_FEATURE_MAKEDEVS_TABLE is not set
 # CONFIG_MOUNTPOINT is not set
 # CONFIG_MT is not set
-# BB_APPLET_RUNLEVEL is not set
+# CONFIG_RUNLEVEL is not set
 # CONFIG_RX is not set
 CONFIG_STRINGS=y
 # CONFIG_SETSID is not set
@@ -463,9 +486,25 @@ CONFIG_INETD=y
 # CONFIG_FEATURE_INETD_RPC is not set
 CONFIG_IP=y
 CONFIG_FEATURE_IP_ADDRESS=y
+
+#
+#   address (forced enabled for ipaddr)
+#
 CONFIG_FEATURE_IP_LINK=y
+
+#
+#   link (forced enabled for iplink)
+#
 CONFIG_FEATURE_IP_ROUTE=y
-# CONFIG_FEATURE_IP_TUNNEL is not set
+
+#
+#   route (forced enabled for iproute)
+#
+CONFIG_FEATURE_IP_TUNNEL=y
+
+#
+#   tunnel (forced enabled for iptunnel)
+#
 # CONFIG_IPCALC is not set
 # CONFIG_FEATURE_IPCALC_FANCY is not set
 CONFIG_IPADDR=y
@@ -585,12 +624,3 @@ CONFIG_FEATURE_IPC_SYSLOG_BUFFER_SIZE=0
 # CONFIG_FEATURE_LOGREAD_REDUCED_LOCKING is not set
 CONFIG_KLOGD=y
 CONFIG_LOGGER=y
-
-#
-# Debugging Options
-#
-# CONFIG_DEBUG is not set
-# CONFIG_NO_DEBUG_LIB is not set
-# CONFIG_DMALLOC is not set
-# CONFIG_EFENCE is not set
-CONFIG_DEBUG_YANK_SUSv2=y
