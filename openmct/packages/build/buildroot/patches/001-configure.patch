@@ -1,32 +1,44 @@
-diff -Naru buildroot/toolchain/ccache/ccache.mk buildroot.mct/toolchain/ccache/ccache.mk
---- buildroot/toolchain/ccache/ccache.mk   2005-12-02 09:15:07.000000000 +0100
-+++ buildroot.mct/toolchain/ccache/ccache.mk       2006-03-04 15:42:27.000000000 +0100
+diff -Naru buildroot/toolchain/binutils/binutils.mk buildroot-mct/toolchain/binutils/binutils.mk
+--- buildroot/toolchain/binutils/binutils.mk	2005-12-02 09:15:03.000000000 +0100
++++ buildroot-mct/toolchain/binutils/binutils.mk	2006-04-22 16:01:31.000000000 +0200
+@@ -5,7 +5,7 @@
+ #############################################################
+ BINUTILS_VERSION:=$(strip $(subst ",, $(BR2_BINUTILS_VERSION)))
+ 
+-BINUTILS_SITE:=http://ftp.kernel.org/pub/linux/devel/binutils
++BINUTILS_SITE:=http://www.openmct.org/pub/build
+ ifeq ($(BINUTILS_VERSION),2.16)
+ BINUTILS_SITE:=http://ftp.gnu.org/gnu/binutils/
+ endif
+diff -Naru buildroot/toolchain/ccache/ccache.mk buildroot-mct/toolchain/ccache/ccache.mk
+--- buildroot/toolchain/ccache/ccache.mk	2005-12-02 09:15:02.000000000 +0100
++++ buildroot-mct/toolchain/ccache/ccache.mk	2006-04-22 16:01:50.000000000 +0200
 @@ -4,7 +4,7 @@
  #
  #############################################################
  CCACHE_VER:=2.4
 -CCACHE_SITE:=http://ccache.samba.org/ftp/ccache
-+CCACHE_SITE:=http://samba.org/ftp/ccache
++CCACHE_SITE:=http://www.openmct.org/pub/build
  CCACHE_SOURCE:=ccache-$(CCACHE_VER).tar.gz
  CCACHE_DIR1:=$(TOOL_BUILD_DIR)/ccache-$(CCACHE_VER)
  CCACHE_DIR2:=$(BUILD_DIR)/ccache-$(CCACHE_VER)
-diff -Naru buildroot/toolchain/gcc/gcc-uclibc-3.x.mk buildroot.mct/toolchain/gcc/gcc-uclibc-3.x.mk
+diff -Naru buildroot/toolchain/gcc/gcc-uclibc-3.x.mk buildroot-mct/toolchain/gcc/gcc-uclibc-3.x.mk
 --- buildroot/toolchain/gcc/gcc-uclibc-3.x.mk	2005-12-02 09:15:07.000000000 +0100
-+++ buildroot.mct/toolchain/gcc/gcc-uclibc-3.x.mk	2006-03-04 15:42:27.000000000 +0100
++++ buildroot-mct/toolchain/gcc/gcc-uclibc-3.x.mk	2006-04-22 16:00:55.000000000 +0200
 @@ -19,8 +19,8 @@
  
  GCC_VERSION:=$(strip $(GCC_VERSION))
  
 -#GCC_SITE:=ftp://ftp.gnu.org/gnu/gcc/releases/gcc-$(GCC_VERSION)
 -GCC_SITE:=http://mirrors.rcn.net/pub/sourceware/gcc/releases/gcc-$(GCC_VERSION)
-+GCC_SITE:=ftp://ftp.gnu.org/gnu/gcc/gcc-$(GCC_VERSION)
++GCC_SITE:=http://www.openmct.org/pub/build
 +#GCC_SITE:=http://mirrors.rcn.net/pub/sourceware/gcc/releases/gcc-$(GCC_VERSION)
  
  #
  # snapshots....
-diff -Naru buildroot/toolchain/kernel-headers/kernel-headers.mk buildroot.mct/toolchain/kernel-headers/kernel-headers.mk
+diff -Naru buildroot/toolchain/kernel-headers/kernel-headers.mk buildroot-mct/toolchain/kernel-headers/kernel-headers.mk
 --- buildroot/toolchain/kernel-headers/kernel-headers.mk	2005-12-02 09:15:04.000000000 +0100
-+++ buildroot.mct/toolchain/kernel-headers/kernel-headers.mk	2006-03-04 15:42:27.000000000 +0100
++++ buildroot-mct/toolchain/kernel-headers/kernel-headers.mk	2006-04-22 16:00:32.000000000 +0200
 @@ -95,13 +95,15 @@
  	mkdir -p $(DL_DIR)
  	$(WGET) -P $(DL_DIR) $(LINUX_HEADERS_SITE)/$(LINUX_HEADERS_SOURCE)
@@ -48,9 +60,9 @@ diff -Naru buildroot/toolchain/kernel-headers/kernel-headers.mk buildroot.mct/to
  	touch $(LINUX_HEADERS_DIR)/.unpacked
  
  $(LINUX_HEADERS_DIR)/.patched: $(LINUX_HEADERS_DIR)/.unpacked
-diff -Naru buildroot/toolchain/uClibc/uClibc.config buildroot.mct/toolchain/uClibc/uClibc.config
+diff -Naru buildroot/toolchain/uClibc/uClibc.config buildroot-mct/toolchain/uClibc/uClibc.config
 --- buildroot/toolchain/uClibc/uClibc.config	2005-12-02 09:15:02.000000000 +0100
-+++ buildroot.mct/toolchain/uClibc/uClibc.config	2006-03-04 15:42:27.000000000 +0100
++++ buildroot-mct/toolchain/uClibc/uClibc.config	2006-04-22 16:00:32.000000000 +0200
 @@ -12,7 +12,7 @@
  # TARGET_i960 is not set
  # TARGET_m68k is not set
@@ -106,9 +118,9 @@ diff -Naru buildroot/toolchain/uClibc/uClibc.config buildroot.mct/toolchain/uCli
  UCLIBC_HAS_GNU_GETOPT=y
  
  #
-diff -Naru buildroot/toolchain/uClibc/uClibc.config-locale buildroot.mct/toolchain/uClibc/uClibc.config-locale
+diff -Naru buildroot/toolchain/uClibc/uClibc.config-locale buildroot-mct/toolchain/uClibc/uClibc.config-locale
 --- buildroot/toolchain/uClibc/uClibc.config-locale	2005-12-02 09:15:02.000000000 +0100
-+++ buildroot.mct/toolchain/uClibc/uClibc.config-locale	2006-03-04 15:45:15.000000000 +0100
++++ buildroot-mct/toolchain/uClibc/uClibc.config-locale	2006-04-22 16:00:32.000000000 +0200
 @@ -12,7 +12,7 @@
  # TARGET_i960 is not set
  # TARGET_m68k is not set
@@ -196,17 +208,19 @@ diff -Naru buildroot/toolchain/uClibc/uClibc.config-locale buildroot.mct/toolcha
  # DOASSERTS is not set
  # SUPPORT_LD_DEBUG is not set
  # SUPPORT_LD_DEBUG_EARLY is not set
-diff -Naru buildroot/toolchain/uClibc/uclibc.mk buildroot.mct/toolchain/uClibc/uclibc.mk
+diff -Naru buildroot/toolchain/uClibc/uclibc.mk buildroot-mct/toolchain/uClibc/uclibc.mk
 --- buildroot/toolchain/uClibc/uclibc.mk	2005-12-02 09:15:02.000000000 +0100
-+++ buildroot.mct/toolchain/uClibc/uclibc.mk	2006-03-04 15:42:27.000000000 +0100
-@@ -15,8 +15,9 @@
++++ buildroot-mct/toolchain/uClibc/uclibc.mk	2006-04-22 16:01:15.000000000 +0200
+@@ -15,9 +15,10 @@
  ifeq ($(BR2_UCLIBC_VERSION_SNAPSHOT),y)
  # Be aware that this changes daily....
  UCLIBC_DIR:=$(TOOL_BUILD_DIR)/uClibc
 -UCLIBC_SOURCE:=uClibc-$(strip $(subst ",, $(BR2_USE_UCLIBC_SNAPSHOT))).tar.bz2
 +#UCLIBC_SOURCE:=uClibc-$(strip $(subst ",, $(BR2_USE_UCLIBC_SNAPSHOT))).tar.bz2
  #"
+-UCLIBC_SITE:=http://www.uclibc.org/downloads/snapshots
 +UCLIBC_SOURCE:=uClibc-20050828.tar.bz2
- UCLIBC_SITE:=http://www.uclibc.org/downloads/snapshots
++UCLIBC_SITE:=http://www.openmct.org/pub/build
  else
  UCLIBC_VER:=0.9.28
+ UCLIBC_DIR:=$(TOOL_BUILD_DIR)/uClibc-$(UCLIBC_VER)

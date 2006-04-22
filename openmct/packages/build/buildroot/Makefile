@@ -1,5 +1,5 @@
 # Buildroot
-DOWNLOAD=	http://buildroot.uclibc.org/downloads/buildroot-snapshot.tar.bz2
+DOWNLOAD=	http://www.openmct.org/pub/build/buildroot-20051202.tar.bz2
 
 MAKEARGS=	BUILD_DIR=$(OUTPUTDIR)
 
