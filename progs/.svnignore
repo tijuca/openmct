@@ -5,6 +5,8 @@ busybox-1.1.0
 coreutils-5.93
 nano-1.2.5
 mp3info-0.8.4
+portmap_4
 screen-4.0.2
+tcp_wrappers_7.6
 fcp
 proccgi

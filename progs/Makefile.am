@@ -5,7 +5,7 @@ VPATH = @srcdir@
 
 
 #busybox version
-bbver=1.1.0
+bbver=1.1.2
 #corutils version
 cuver=5.93
 #nano version
@@ -16,6 +16,10 @@ ncursesver=5.5
 sver=4.0.2
 #mp3info version
 mp3infover=0.8.4
+#tcp_wrappers version
+tcp_wver=7.6
+#wpasupplicant version
+wpaver=0.4.8
 
 ARCHIVDIR=@prefix@/archives
 PATCHDIR=../../patches
@@ -42,7 +46,7 @@ bin_PROGRAMS    = fcp proccgi
 fcp_SOURCES     = fcp.c
 proccgi_SOURCES = proccgi.c
 
-all: bbox coreutils nano mp3info
+all: bbox coreutils nano mp3info portmap
 
 bbox:
 	cd $(ARCHIVDIR); \
@@ -96,6 +100,48 @@ mp3info:
 	    $(BUILDENV) && \
 	cp mp3info $(prefix)/mct-fs/sbin
 
+tcp_wrappers:
+	cd $(ARCHIVDIR); \
+	test -f tcp_wrappers_$(tcp_wver).tar.gz || wget ftp://ftp.porcupine.org/pub/security/tcp_wrappers_$(tcp_wver).tar.gz
+	test -d tcp_wrappers_$(tcp_wver) || tar xzvf $(ARCHIVDIR)/tcp_wrappers_$(tcp_wver).tar.gz
+	if [ ! -f tcp_wrappers_$(tcp_wver)/.patched ]; then \
+	    cd tcp_wrappers_$(tcp_wver); \
+	    patch -p1 < $(PATCHDIR)/tcp_wrappers.patch; \
+	    touch .patched; \
+	fi;
+	cd tcp_wrappers_$(tcp_wver) && \
+	    $(BUILDENV) \
+	    $(MAKE) CC=mipsel-linux-gcc REAL_DAEMON_DIR=/tmp linux
+	    
+
+portmap: tcp_wrappers
+	cd $(ARCHIVDIR); \
+	test -f portmap_4.tar.gz || wget ftp://ftp.porcupine.org/pub/security/portmap_4.tar.gz
+	test -d portmap_4 || tar xzvf $(ARCHIVDIR)/portmap_4.tar.gz
+	if [ ! -f portmap_4/.patched ]; then \
+	    cd portmap_4; \
+	    patch -p1 < $(PATCHDIR)/portmap.patch; \
+	    touch .patched; \
+	fi;
+	cd portmap_4 && \
+	    $(BUILDENV) \
+	    $(MAKE) CC=mipsel-linux-gcc && \
+	    cp pmap_dump pmap_set portmap $(prefix)/mct-fs/sbin
+	
+
+
+#wpasupplicant:
+#	cd $(ARCHIVDIR); \
+#	test -f wpa_supplicant-$(wpaver).tar.gz || wget http://hostap.epitest.fi/releases/wpa_supplicant-$(wpaver).tar.gz
+#	test -d wpa_supplicant-$(wpaver) || tar xzvf $(ARCHIVDIR)/wpa_supplicant-$(wpaver).tar.gz
+#	if [ ! -f wpa_supplicant-$(wpaver)/.patched ]; then \
+#	    cd wpa_supplicant-$(wpaver); \
+#	    patch -p1 < $(PATCHDIR)/wpa.patch; \
+#	    touch .patched; \
+#	fi
+#	cd wpa_supplicant-$(wpaver) && \
+#	    $(MAKE) $(BUILDENV) CFLAGS+=-Os CPPFLAGS+=-I$(CCDIR)/include LIBS+=-L$(CCDIR)/lib
+#	    
 
 screen:
 	cd $(ARCHIVDIR); \
