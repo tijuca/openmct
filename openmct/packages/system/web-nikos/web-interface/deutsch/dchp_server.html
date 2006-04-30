@@ -1,0 +1,231 @@
+<html>
+<head>
+<meta http-equiv="Content-Language" content="de">
+<title>OpenMCT-RC4</title>
+<style type="text/css">
+.menutitle{
+cursor:pointer;
+margin-bottom: 5px;
+background-color:#2A2E34;
+color:#000000;
+width:140px;
+padding:2px;
+text-align:center;
+font-weight:bold;
+/*/*/border:1px solid #FFFFFF;/* */
+}
+
+.submenu{
+margin-bottom: 0.5em;
+}
+</style>
+
+<script type="text/javascript">
+
+var persistmenu="yes" //"yes" or "no". Make sure each SPAN content contains an incrementing ID starting at 1 (id="sub1", id="sub2", etc)
+var persisttype="sitewide" //enter "sitewide" for menu to persist across site, "local" for this page only
+
+if (document.getElementById){ 
+document.write('<style type="text/css">\n')
+document.write('.submenu{display: none;}\n')
+document.write('</style>\n')
+}
+
+function SwitchMenu(obj){
+if(document.getElementById){
+var el = document.getElementById(obj);
+var ar = document.getElementById("masterdiv").getElementsByTagName("span"); 
+if(el.style.display != "block"){ 
+for (var i=0; i<ar.length; i++){
+if (ar[i].className=="submenu") 
+ar[i].style.display = "none";
+}
+el.style.display = "block";
+}else{
+el.style.display = "none";
+}
+}
+}
+
+function get_cookie(Name) { 
+var search = Name + "="
+var returnvalue = "";
+if (document.cookie.length > 0) {
+offset = document.cookie.indexOf(search)
+if (offset != -1) { 
+offset += search.length
+end = document.cookie.indexOf(";", offset);
+if (end == -1) end = document.cookie.length;
+returnvalue=unescape(document.cookie.substring(offset, end))
+}
+}
+return returnvalue;
+}
+
+function onloadfunction(){
+if (persistmenu=="yes"){
+var cookiename=(persisttype=="sitewide")? "switchmenu" : window.location.pathname
+var cookievalue=get_cookie(cookiename)
+if (cookievalue!="")
+document.getElementById(cookievalue).style.display="block"
+}
+}
+
+function savemenustate(){
+var inc=1, blockid=""
+while (document.getElementById("sub"+inc)){
+if (document.getElementById("sub"+inc).style.display=="block"){
+blockid="sub"+inc
+break
+}
+inc++
+}
+var cookiename=(persisttype=="sitewide")? "switchmenu" : window.location.pathname
+var cookievalue=(persisttype=="sitewide")? blockid+";path=/" : blockid
+document.cookie=cookiename+"="+cookievalue
+}
+
+if (window.addEventListener)
+window.addEventListener("load", onloadfunction, false)
+else if (window.attachEvent)
+window.attachEvent("onload", onloadfunction)
+else if (document.getElementById)
+window.onload=onloadfunction
+
+if (persistmenu=="yes" && document.getElementById)
+window.onunload=savemenustate
+
+</script>
+<style fprolloverstyle>A:hover {color: #922718; font-family: Verdana; font-weight: bold}
+</style>
+
+
+</head>
+<body bgcolor="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" link="#FFFFFF" vlink="#FFFFFF" alink="#FFFFFF" text="#FFFFFF">
+<!-- ImageReady Slices (OpenMCT-RC4.psd) -->
+<center>
+<table id="Tabelle_01" width="780" height="800" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td rowspan="2" background="images/navi.png" width="165" height="800">
+			<font face="Verdana" size="1">
+
+&nbsp;</font><div id="masterdiv">
+
+<div class="menutitle" onclick="SwitchMenu('sub1')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Information</font></div>
+<font face="Verdana" size="1"><span class="submenu" id="sub1">
+<font color="#FFFFFF">- System</font><br>
+<font color="#FFFFFF">- Version</font><br>
+<font color="#FFFFFF">- Devices</font><br>
+<font color="#FFFFFF">- Network</font><br>
+<font color="#FFFFFF">- Log files</font><br>
+</span>
+
+</font><div class="menutitle" onclick="SwitchMenu('sub2')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Hardware</font></div>
+<font face="Verdana" size="1">
+<span class="submenu" id="sub2">
+<font color="#FFFFFF">- Save Configuration</font><br>
+<font color="#FFFFFF">- Restore Configuration</font><br>
+<font color="#FFFFFF">- Reset Configuration</font><br>
+<font color="#FFFFFF">- Date &amp; Time</font><br>
+<font color="#FFFFFF">- Harddrive</font><br>
+<font color="#FFFFFF">- Update Firmware</font><br>
+</span>
+
+</font><div class="menutitle" onclick="SwitchMenu('sub3')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Services</font></div>
+<font face="Verdana" size="1">
+<span class="submenu" id="sub3">
+<b>
+<font color="#FF0000">- DCHP Server</font></b><br>
+<font color="#FFFFFF">- Dynamic DNS</font><br>
+<font color="#FFFFFF">- HTTP Server</font><br>
+<font color="#FFFFFF">- FTP Server</font><br>
+<font color="#FFFFFF">- SSH Server</font><br>
+<font color="#FFFFFF">- Forwarding</font><br>
+</span>
+
+</font><div class="menutitle" onclick="SwitchMenu('sub4')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Security</font></div>
+<font face="Verdana">
+<span class="submenu" id="sub4">
+<font size="1">
+<font color="#FFFFFF">- User</font><br>
+<font color="#FFFFFF">- Groups</font><br>
+<font color="#FFFFFF">- Folders</font><br>
+<font color="#FFFFFF">- Administrator</font><br>
+</font>
+</span>
+
+</font><div class="menutitle" onclick="SwitchMenu('sub5')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Connections</font></div>
+<font face="Verdana">
+<span class="submenu" id="sub5">
+<font size="1">
+<font color="#FFFFFF">- LAN</font><br>
+<font color="#FFFFFF">- WAN</font><br>
+<font color="#FFFFFF">- WLAN</font><br>
+<font color="#FFFFFF">- VPN</font><br>
+</font>
+</span>
+
+</font><div class="menutitle" onclick="SwitchMenu('sub6')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Shutdown</font></div>
+<font face="Verdana">
+<span class="submenu" id="sub6">
+<font size="1">
+<font color="#FFFFFF">- Shutdown</font><br>
+<font color="#FFFFFF">- Reboot</font><br>
+</font>
+</span>
+
+</font><div class="menutitle" onclick="SwitchMenu('sub7')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Help</font></div>
+<font face="Verdana">
+<span class="submenu" id="sub7">
+<font size="1">
+<font color="#FFFFFF">- OpenMCT Website</font><br>
+<font color="#FFFFFF">- OpenMCT Forum</font><br>
+</font>
+</span>
+
+</font><div class="menutitle" onclick="SwitchMenu('sub8')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Logout</font></div>
+<font face="Verdana">
+<span class="submenu" id="sub8">
+
+</span>
+</div>
+</td>
+		<td background="images/logo.png" width="615" height="310">
+			&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="615" height="490" background="images/main.png">
+			<b><font face="Verdana" size="2">&nbsp;&nbsp; <font color="#FF0000">
+			DHCP Server</font></font></b><p><font face="Verdana" size="2"><b>&nbsp;&nbsp;
+			</b>start DHCP Server&nbsp; </font></p>
+			<p><font face="Verdana" size="2">&nbsp; Subnet mask:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</font><input type="text" name="T1" size="15"></p>
+			<p>&nbsp;&nbsp; Gateway:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input type="text" name="T4" size="15"></p>
+			<p>&nbsp;&nbsp; Domain name server:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input type="text" name="T5" size="15"></p>
+			<p>&nbsp;&nbsp; IP adress range:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input type="text" name="T6" size="15"> to&nbsp;
+			<input type="text" name="T7" size="15"></p>
+			<p>&nbsp;&nbsp; IP release time&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input type="text" name="T8" size="15"> hours</p>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input type="submit" value="Apply" name="B1"></p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</td>
+	</tr>
+</table>
+</center>
+<!-- End ImageReady Slices -->
+</body>
+</html>

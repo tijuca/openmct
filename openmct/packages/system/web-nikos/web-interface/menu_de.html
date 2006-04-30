@@ -1,0 +1,343 @@
+<html>
+<head>
+<style type="text/css">
+a.b:link, a.b:visited, a.b:hover, a.b:active
+{
+ text-align:center;
+ text-Decoration: none;
+}
+a.b:active
+{
+ color:ffffff;
+ background-color:#FF0000;
+}
+a.b:hover
+{
+ color:ffffff;
+ background-color:#3E434D;
+}
+</style>
+
+<style type="text/css">
+.menutitle{
+cursor:pointer;
+margin-bottom: 5px;
+background-color:#3E434D;
+color:#000000;
+width:140px;
+padding:2px;
+text-align:center;
+font-weight:bold;
+/*/*/border:1px solid #FFFFFF;/* */
+}
+
+.submenu{
+margin-bottom: 0.5em;
+}
+</style>
+
+<script type="text/javascript">
+
+var persistmenu="yes" //"yes" or "no". Make sure each SPAN content contains an incrementing ID starting at 1 (id="sub1", id="sub2", etc)
+var persisttype="sitewide" //enter "sitewide" for menu to persist across site, "local" for this page only
+
+if (document.getElementById){ 
+document.write('<style type="text/css">\n')
+document.write('.submenu{display: none;}\n')
+document.write('</style>\n')
+}
+
+function SwitchMenu(obj){
+if(document.getElementById){
+var el = document.getElementById(obj);
+var ar = document.getElementById("masterdiv").getElementsByTagName("span"); 
+if(el.style.display != "block"){ 
+for (var i=0; i<ar.length; i++){
+if (ar[i].className=="submenu") 
+ar[i].style.display = "none";
+}
+el.style.display = "block";
+}else{
+el.style.display = "none";
+}
+}
+}
+
+function get_cookie(Name) { 
+var search = Name + "="
+var returnvalue = "";
+if (document.cookie.length > 0) {
+offset = document.cookie.indexOf(search)
+if (offset != -1) { 
+offset += search.length
+end = document.cookie.indexOf(";", offset);
+if (end == -1) end = document.cookie.length;
+returnvalue=unescape(document.cookie.substring(offset, end))
+}
+}
+return returnvalue;
+}
+
+function onloadfunction(){
+if (persistmenu=="yes"){
+var cookiename=(persisttype=="sitewide")? "switchmenu" : window.location.pathname
+var cookievalue=get_cookie(cookiename)
+if (cookievalue!="")
+document.getElementById(cookievalue).style.display="block"
+}
+}
+
+function savemenustate(){
+var inc=1, blockid=""
+while (document.getElementById("sub"+inc)){
+if (document.getElementById("sub"+inc).style.display=="block"){
+blockid="sub"+inc
+break
+}
+inc++
+}
+var cookiename=(persisttype=="sitewide")? "switchmenu" : window.location.pathname
+var cookievalue=(persisttype=="sitewide")? blockid+";path=/" : blockid
+document.cookie=cookiename+"="+cookievalue
+}
+
+if (window.addEventListener)
+window.addEventListener("load", onloadfunction, false)
+else if (window.attachEvent)
+window.attachEvent("onload", onloadfunction)
+else if (document.getElementById)
+window.onload=onloadfunction
+
+if (persistmenu=="yes" && document.getElementById)
+window.onunload=savemenustate
+
+</script>
+<style fprolloverstyle>A:hover {color: #922718; font-family: Verdana; font-weight: bold}
+</style>
+<!-- #BeginEditable "doctitle" -->
+<!-- #EndEditable -->
+<base target="_self">
+</head>
+
+<body bgcolor="#000000" text="#FFFFFF" link="#FFFFFF" vlink="#FFFFFF" alink="#FFFFFF">
+
+<div id="masterdiv">
+
+<div class="menutitle" onclick="SwitchMenu('sub1')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Information</font></div>
+<span class="submenu" id="sub1">
+<font color="#FFFFFF"> 
+<font face="Verdana" size="1">
+<img border="0" src="images/system.png" width="16" height="15"> </font>
+<font face="Verdana" size="2">
+<a target="main" class="b" href="english/system.html">System</a></font></font><font face="Verdana" size="1"><br>
+</font>
+<font color="#FFFFFF" size="2" face="Verdana"> 
+<img border="0" src="images/info.png" width="16" height="16"> 
+<a class="b" target="main" href="english/version.html">Version</a></font><font face="Verdana" size="1"><br>
+</font>
+<font color="#FFFFFF" size="2" face="Verdana"> 
+<img border="0" src="images/devices.png" width="16" height="14"> 
+<a class="b" target="main" href="english/devices.html">Devices</a></font><font face="Verdana" size="1"><br>
+</font>
+<font color="#FFFFFF" size="2" face="Verdana"> 
+<img border="0" src="images/network.png" width="16" height="16"> 
+<a class="b" target="main" href="english/network.html">Network</a></font><font face="Verdana" size="1"><br>
+<font color="#FFFFFF"> 
+<img border="0" src="images/log.png" width="16" height="16"></font></font><font face="Verdana" size="2" color="#FFFFFF"> 
+<a class="b" target="main" href="english/log_files.html">Log files</a></font><font face="Verdana" size="1"><br>
+
+</font>
+</span>
+
+<div class="menutitle" onclick="SwitchMenu('sub2')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Hardware</font></div>
+<span class="submenu" id="sub2">
+<font color="#FFFFFF" face="Verdana" size="1"> 
+<img border="0" src="images/configuration.png" width="16" height="16"> </font>
+
+<font face="Verdana" size="2" color="#FFFFFF">
+<a class="b" target="main" href="english/configuration.html">Configuration</a></font><font face="Verdana" size="1"><br>
+<font color="#FFFFFF"> 
+<img border="0" src="images/date.png" width="16" height="14"> </font>
+
+</font>
+<font face="Verdana" size="2" color="#FFFFFF">
+<a class="b" target="main" href="english/date_time.html">Date &amp; Time</a></font><font face="Verdana" size="1"><br>
+<font color="#FFFFFF"> 
+<img border="0" src="images/harddrive.png" width="16" height="16"> </font>
+
+</font>
+<font face="Verdana" size="2" color="#FFFFFF">
+<a class="b" target="main" href="english/harddrive.html">Harddrive</a></font><font face="Verdana" size="1"><br>
+
+<img border="0" src="images/firmware.png" width="16" height="9"></font><font color="#FFFFFF" size="2" face="Verdana"> 
+<a class="b" target="main" href="english/update_firmware.html">Firmware</a></font><font face="Verdana" size="1"><br>
+
+&nbsp;</font></span><div class="menutitle" onclick="SwitchMenu('sub3')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Services</font></div>
+<font face="Verdana" size="1">
+<span class="submenu" id="sub3">
+<font color="#FFFFFF"> 
+<img border="0" src="images/dhcp.png" width="16" height="16"> </font>
+
+</font>
+<font face="Verdana" size="2" color="#FFFFFF">
+<a class="b" target="main" href="english/dchp_server.html">DCHP Server</a></font><font face="Verdana" size="1"><br>
+<font color="#FFFFFF"> 
+<img border="0" src="images/dyndns.png" width="16" height="16"> </font>
+
+</font>
+<font face="Verdana" size="2" color="#FFFFFF">
+<a class="b" target="main" href="english/dynamic_dns.html">Dynamic DNS</a></font><font face="Verdana" size="1"><br>
+
+</font>
+<font color="#FFFFFF" size="2" face="Verdana"> 
+<img border="0" src="images/http.png" width="16" height="16"> 
+<a class="b" target="main" href="english/http_server.html">HTTP Server</a></font><font face="Verdana" size="1"><br>
+
+</font>
+<font color="#FFFFFF" size="2" face="Verdana"> 
+<img border="0" src="images/ftp.png" width="16" height="16"> 
+<a class="b" target="main" href="english/ftp_server.html">FTP Server</a></font><font face="Verdana" size="1"><br>
+
+</font>
+<font face="Verdana" size="2" color="#FFFFFF">
+<img border="0" src="images/nfs.png" width="16" height="16"> 
+<a class="b" target="main" href="english/nfs_server.html">NFS Server</a></font><font face="Verdana" size="1"><br>
+
+</font>
+
+</font>
+<font color="#FFFFFF" size="2" face="Verdana"> 
+<img border="0" src="images/ssh.png" width="16" height="16"> 
+<a class="b" target="main" href="english/ssh_server.html">SSH Server</a></font><font face="Verdana" size="1"><br>
+</font>
+
+<font face="Verdana" size="2" color="#FFFFFF">
+<img border="0" src="images/samba.png" width="16" height="16"> 
+<a class="b" target="main" href="english/samba.html">Samba</a></font><font face="Verdana" size="1"><br>
+
+</font>
+
+<font face="Verdana" size="2" color="#FFFFFF">
+<img border="0" src="images/mediaserver.png" width="16" height="16"> 
+<a class="b" target="main" href="english/mediaserver.html">Media Server</a></font><font face="Verdana" size="1"><br>
+
+</font>
+
+<font color="#FFFFFF"><img border="0" src="images/firewall.png" width="16" height="16"> </font>
+
+</font>
+<font face="Verdana" size="2" color="#FFFFFF">
+<a class="b" target="main" href="english/forwarding.html">Forwarding</a></font><font face="Verdana" size="1"><br>
+
+
+
+
+</font>
+
+
+
+
+</span>
+
+<font face="Verdana" size="1">
+
+<div class="menutitle" onclick="SwitchMenu('sub4')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Security</font></div>
+<font face="Verdana">
+<span class="submenu" id="sub4">
+<font color="#FFFFFF"> 
+<font size="1">
+<img border="0" src="images/user.png" width="16" height="16">
+</font>
+<font size="2">
+<a class="b" target="main" href="english/user.html">User</a></font></font><font size="1"><br>
+<font color="#FFFFFF"> 
+<img border="0" src="images/usergroups.png" width="16" height="16"> </font>
+</font>
+<font size="2" color="#FFFFFF">
+<a class="b" target="main" href="english/groups.html">Groups</a></font><font size="1"><br>
+<font color="#FFFFFF"> 
+<img border="0" src="images/folder.png" width="16" height="13"> </font>
+</font>
+<font size="2" color="#FFFFFF">
+<a class="b" target="main" href="english/folders.html">Folders</a></font><font size="1"><br>
+<font color="#FFFFFF"> 
+<img border="0" src="images/admin.png" width="12" height="12"> </font>
+</font>
+<font size="2" color="#FFFFFF">
+<a class="b" target="main" href="english/administrator.html">Administrator</a></font><font size="1"><br>
+</font>
+</span>
+
+</font><div class="menutitle" onclick="SwitchMenu('sub5')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Connections</font></div>
+<font face="Verdana">
+<span class="submenu" id="sub5">
+<font color="#FFFFFF" size="2"> 
+<img border="0" src="images/lan.png" width="14" height="16"> 
+<a class="b" target="main" href="english/lan.html">LAN</a></font><font size="1"><br>
+<font color="#FFFFFF"> 
+<img border="0" src="images/wan.png" width="16" height="16"> </font>
+</font>
+<font size="2" color="#FFFFFF">
+<a class="b" target="main" href="english/wan.html">WAN</a></font><font size="1"><br>
+</font>
+<font color="#FFFFFF" size="2"> 
+<img border="0" src="images/wlan.png" width="16" height="14"> 
+<a class="b" target="main" href="english/wlan.html">WLAN</a></font><font size="1"><br>
+</font>
+<font color="#FFFFFF" size="2"> 
+<img border="0" src="images/vpn.png" width="16" height="9"> 
+<a class="b" target="main" href="english/vpn.html">VPN</a></font><font size="1"><br>
+</font>
+</span>
+
+</font><div class="menutitle" onclick="SwitchMenu('sub6')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Shutdown / Wake</font></div>
+<font face="Verdana">
+<span class="submenu" id="sub6">
+<font color="#FFFFFF"> 
+<font size="1">
+<img border="0" src="images/shutdown.png" width="16" height="16">
+</font>
+<font size="2">
+<a class="b" target="_blank" href="#.html">Shutdown</a></font></font><font size="1"><br>
+</font>
+<font color="#FFFFFF" size="2"> 
+<img border="0" src="images/reboot.png" width="16" height="16"> 
+<a class="b" target="_blank" href="#.html">Reboot</a></font><font size="1"><br>
+</font>
+<font color="#FFFFFF" size="2"> 
+<img border="0" src="images/wake.png" width="16" height="16"> 
+<a class="b" target="main" href="english/wake_on_lan.html">Wake on Lan</a></font><font size="1"><br>
+</font>
+</span>
+
+</font><div class="menutitle" onclick="SwitchMenu('sub7')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">Help</font></div>
+<font face="Verdana">
+<span class="submenu" id="sub7">
+<font color="#FFFFFF" size="2"> 
+<img border="0" src="images/openmct.png" width="16" height="16"> 
+<a class="b" target="_blank" href="http://www.openmct.org">OpenMCT Web</a></font><font size="1"><br>
+</font>
+<font color="#FFFFFF" size="2"> 
+<img border="0" src="images/forum.png" width="16" height="16"> 
+<a class="b" target="_blank" href="http://claxan.hangar18.org/forum">OpenMCT Forum</a></font><font size="1"><br>
+</font>
+</span>
+
+</font><div class="menutitle" onclick="SwitchMenu('sub8')" style="width: 140px; height: 15px">
+<font face="Verdana" size="1" color="#FFFFFF">
+<a target="_top" href="english/logout.htm">Logout</a></font></div>
+<font face="Verdana">
+<span class="submenu" id="sub8">
+
+</span>
+</div>
+
+</body>
+</html>
