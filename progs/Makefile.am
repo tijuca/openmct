@@ -16,8 +16,12 @@ ncursesver=5.5
 sver=4.0.2
 #mp3info version
 mp3infover=0.8.4
+#nfsutils version
+nfsutilsver=1.0.7
 #tcp_wrappers version
 tcp_wver=7.6
+#dropbear version
+dropver=0.48.1
 #wpasupplicant version
 wpaver=0.4.8
 
@@ -46,7 +50,8 @@ bin_PROGRAMS    = fcp proccgi
 fcp_SOURCES     = fcp.c
 proccgi_SOURCES = proccgi.c
 
-all: bbox coreutils nano mp3info portmap
+system: bbox coreutils nano mp3info
+network: portmap
 
 bbox:
 	cd $(ARCHIVDIR); \
@@ -114,6 +119,28 @@ tcp_wrappers:
 	    $(MAKE) CC=mipsel-linux-gcc REAL_DAEMON_DIR=/tmp linux
 	    
 
+nfsutils:
+	cd $(ARCHIVDIR); \
+	test -f nfs-utils-$(nfsutilsver).tar.gz || wget http://mesh.dl.sourceforge.net/sourceforge/nfs/nfs-utils-$(nfsutilsver).tar.gz
+	test -d nfs-utils-$(nfsutilsver) || tar xzvf $(ARCHIVDIR)/nfs-utils-$(nfsutilsver).tar.gz
+	if [ ! -f nfs-utils-$(nfsutilsver)/.patched ]; then \
+	    cd nfs-utils-$(nfsutilsver); \
+	    patch -p1 < $(PATCHDIR)/nfsutils.patch; \
+	    touch .patched; \
+	fi;
+	cd nfs-utils-$(nfsutilsver) && \
+	    $(BUILDENV) \
+	    ./configure \
+		--build=$(build) \
+	        --host=$(target) \
+		--prefix=$(prefix)/mct-fs/sbin \
+		--disable-gss \
+		--disable-nfsv4 &&\
+	    $(MAKE) CFLAGS+="-I$(CCDIR)/include/ -I./support/include/"
+	
+
+
+
 portmap: tcp_wrappers
 	cd $(ARCHIVDIR); \
 	test -f portmap_4.tar.gz || wget ftp://ftp.porcupine.org/pub/security/portmap_4.tar.gz
@@ -128,6 +155,37 @@ portmap: tcp_wrappers
 	    $(MAKE) CC=mipsel-linux-gcc && \
 	    cp pmap_dump pmap_set portmap $(prefix)/mct-fs/sbin
 	
+
+dropbear:
+	cd $(ARCHIVDIR); \
+	test -f dropbear-$(dropver).tar.gz || wget http://matt.ucc.asn.au/dropbear/releases/dropbear-$(dropver).tar.gz
+	test -d dropbear-$(dropver) || tar xzvf $(ARCHIVDIR)/dropbear-$(dropver).tar.gz
+	if [ ! -f dropbear-$(dropver)/.patched ]; then \
+	    cd dropbear-$(dropver); \
+	    patch -p1 < $(PATCHDIR)/dropbear.patch; \
+	    touch .patched; \
+	fi;
+	cd dropbear-$(dropver) && \
+	    $(BUILDENV) \
+	    ./configure \
+		--build=$(build) \
+	        --host=$(target) \
+		--prefix=$(prefix)/mct-fs/sbin \
+		--disable-zlib && \
+	    $(MAKE) PROGRAMS="dropbear dbclient scp dropbearkey dropbearconvert" \
+	    MULTI=1 \
+	    SCPPROGRESS=1 &&\
+	    cp dropbearmulti $(prefix)/mct-fs/sbin &&\
+	    cd $(prefix)/mct-fs/sbin && \
+	    for i in dropbear dropbearkey dropbearconvert; do \
+		ln -s dropbearmulti $$i ; \
+	    done && \
+	    cd $(prefix)/mct-fs/bin && \
+	    for i in dbclient scp ssh ; do \
+		ln -s ../sbin/dropbearmulti $$i ; \
+	    done
+
+
 
 
 #wpasupplicant:

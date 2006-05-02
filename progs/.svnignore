@@ -3,7 +3,9 @@ Makefile
 Makefile.in
 busybox-1.1.0
 coreutils-5.93
+dropbear-0.48.1
 nano-1.2.5
+nfs-utils-1.0.7
 mp3info-0.8.4
 portmap_4
 screen-4.0.2

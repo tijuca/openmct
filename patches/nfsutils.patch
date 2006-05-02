@@ -1,0 +1,11 @@
+diff -Naru nfs-utils-1.0.7/tools/rpcgen/Makefile nfs-utils-1.0.7-mct/tools/rpcgen/Makefile
+--- nfs-utils-1.0.7/tools/rpcgen/Makefile	2003-09-15 01:45:55.000000000 +0200
++++ nfs-utils-1.0.7-mct/tools/rpcgen/Makefile	2005-11-07 21:29:33.382119541 +0100
+@@ -46,6 +46,7 @@
+ 
+ include $(TOP)rules.mk
+ 
++CC	= gcc
+ 
+ all::	$(TOOL)
+ 	if [ ! -d $(TOP)bin ]; then \

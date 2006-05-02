@@ -6,7 +6,8 @@ VPATH=@srcdir@
 AUTOMAKE_OPTION = foreign
 # ncurses version
 ncursesver=5.5
-
+# gdbm version
+gdbmver=1.8.3
 
 # prefix is default $HOME/openmct-build, comes from configure.ac
 prefix=@prefix@
@@ -49,7 +50,11 @@ BUILDENV := \
 	PKG_CONFIG_PATH=$(targetprefix)/lib/pkgconfig
 
 
-all: prepare buildroot kernel ncurses basic-fs tools progs
+all: prepare buildroot kernel ncurses basic-fs \
+     libs \
+     tools \
+     system \
+     network
 
 prepare: directory
 # prepare linuxkernel
@@ -142,12 +147,38 @@ basic-fs:
 	ln -s $(CDK)/mct-fs/usr/vservers $(CDK)/mct-fs/vservers
 	touch $(DEPDIR)/$@
 
+#######################################
+#     libs
+#
+
+libs: gdbm
+
+gdbm:
+	if [ ! -f $(DEPDIR)/$@ ]; then \
+	    test -f $(ARCHIVDIR)/gdbm-$(gdbmver).tar.gz || wget ftp://ftp.gnu.org/gnu/gdbm/gdbm-$(gdbmver).tar.gz; \
+	    cd $(BUILDDIR); \
+	    test -d $(BUILDDIR)/gdbm-$(gdbmver) || tar xzvf $(ARCHIVDIR)/gdbm-$(gdbmver).tar.gz; \
+	    cd $(BUILDDIR)/gdbm-$(gdbmver) && \
+		$(BUILDENV) \
+		./configure \
+		    --prefix=$(prefix) \
+		    --host=$(target) \
+		    --prefix=$(CCDIR) && \
+	    $(MAKE) install BINOWN=$(USER) BINGRP=$(USER) && \
+	    touch $(DEPDIR)/$@; \
+	fi
+
+
 tools:
 	cd tools && \
 	    $(MAKE) all
 
-progs:
-	$(MAKE) -C progs/ all
+system:
+	$(MAKE) -C progs/ system
+
+network:
+	$(MAKE) -C progs/ network
+
 
 directory: download
 	test -d $(BUILDDIR) || mkdir $(BUILDDIR)
