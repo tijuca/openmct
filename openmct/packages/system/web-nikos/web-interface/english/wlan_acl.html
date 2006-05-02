@@ -1,15 +1,90 @@
 
 <head>
+<style>
+<!--
+a{text-decoration:none}
+//-->
+</style>
+<script type="text/javascript">
+
+function getposOffset(overlay, offsettype){
+var totaloffset=(offsettype=="left")? overlay.offsetLeft : overlay.offsetTop;
+var parentEl=overlay.offsetParent;
+while (parentEl!=null){
+totaloffset=(offsettype=="left")? totaloffset+parentEl.offsetLeft : totaloffset+parentEl.offsetTop;
+parentEl=parentEl.offsetParent;
+}
+return totaloffset;
+}
+
+function overlay(curobj, subobj){
+if (document.getElementById){
+var subobj=document.getElementById(subobj)
+subobj.style.left=getposOffset(curobj, "left")+"px"
+subobj.style.top=getposOffset(curobj, "top")+"px"
+subobj.style.display="block"
+return false
+}
+else
+return true
+}
+
+function overlayclose(subobj){
+document.getElementById(subobj).style.display="none"
+}
+
+</script>
 <base target="_self">
 </head>
 
 <body text="#FFFFFF" bgcolor="#000000" background="../images/main.png">
 
+
+
+
+<!--Sub content to overlay link when clicked on. Do not remove outermost <div id="subcontent"> tag below. -->
+<DIV id="subcontent" style="position:absolute; display:none; left:5px; top:455px">
+
+<div style="border: 4px solid #FFFFFF; background-color: black; width: 300px; padding: 8px">
+  <table border="0" width="275" height="1">
+	<tr>
+		<td height="1" width="242"><b>WLAN access list</b></td>
+		<td height="1" width="23">
+  <b><a href="#" onClick="overlayclose('subcontent'); return false">
+	<img border="0" src="../images/close_on.png" width="20" height="20"></a></b></td>
+	</tr>
+	</table>
+	<p><b>Access list policy:</b> You can choose how the hardware addresses
+  in the list should be handled. Whether the list should be ignored
+  (<i>open to every client</i>), whether the list members are the only ones
+  to gain access to the OpenMCT (<i>allow all in list</i>) or whether the list
+  members are the only ones to be rejected by the OpenMCT (<i>deny all in list</i>).<br>
+  <br>
+  <b>Access Control List:</b> Here you can enter a list of wireless
+  hardware addresses to which the access list policy applies.<br>
+  <br>
+
+
+</div>
+
+</DIV>
+
+
+
+
+
 <table border="0" width="514" id="table1">
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="490" colspan="4"><font color="#2C4ACE"><b>Connections - Wireless 
-		Access List</b></font></td>
+		Access List</b>
+<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b><img style="cursor: pointer;" src="../images/en.b_help.on.png" width="16" height="16" name="../images/en.b_help.png" id="helpButton" border="0" alt="" onClick="return overlay(this, 'subcontent')">
+
+
+
+
+
+</font></td>
 	</tr>
 	<tr>
 		<td width="14" height="22">&nbsp;</td>
