@@ -24,6 +24,8 @@ tcp_wver=7.6
 dropver=0.48.1
 #wpasupplicant version
 wpaver=0.4.8
+#smartmontools version
+smt_ver=5.33
 
 ARCHIVDIR=@prefix@/archives
 PATCHDIR=../../patches
@@ -138,6 +140,22 @@ nfsutils:
 		--disable-nfsv4 &&\
 	    $(MAKE) CFLAGS+="-I$(CCDIR)/include/ -I./support/include/"
 	
+
+smartd:
+	cd $(ARCHIVDIR); \
+	test -f smartmontools-$(smt_ver).tar.gz || wget http://mesh.dl.sourceforge.net/sourceforge/smartmontools/smartmontools-$(smt_ver).tar.gz
+	test -d smartmontools-$(smt_ver) || tar xzvf $(ARCHIVDIR)/smartmontools-$(smt_ver).tar.gz
+	cd smartmontools-$(smt_ver) && \
+	    $(BUILDENV) \
+	    ./configure \
+		--build=$(build) \
+	        --host=$(target) \
+		--prefix=$(prefix)/mct-fs \
+		--with-docdir=$(prefix)/tmp \
+		--with-mandir=$(prefix)/tmp && \
+	    $(MAKE) install
+	rm -rf $(prefix)/tmp
+
 
 
 
