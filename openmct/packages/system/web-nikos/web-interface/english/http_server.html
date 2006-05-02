@@ -5,9 +5,125 @@
 
 <body text="#FFFFFF" bgcolor="#000000" background="../images/main.png">
 
-<p align="center">&nbsp;</p>
-<p align="center">&nbsp;</p>
-<p align="center"><font face="Verdana" size="5">HTTP-Server</font></p>
+<table border="0" width="579" id="table1">
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="557" colspan="5"><font color="#2C4ACE"><b>Service - HTTP 
+		Server</b></font></td>
+	</tr>
+	<tr>
+		<td width="14" height="22">&nbsp;</td>
+		<td width="557" height="22" colspan="5">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">
+		<input type="checkbox" id="http_extern" name="http_extern" **HTTPEXTERN** value="checked" onclick=httpChanged()></td>
+		<td width="524" colspan="4">Open HTTP server to the outside through the 
+		WAN port.</td>
+	</tr>
+	<tr>
+		<td width="14" height="22">&nbsp;</td>
+		<td width="23" height="22">
+		&nbsp;</td>
+		<td width="524" height="22" colspan="4">(If enabled, it is recommended 
+		to also use SSL encryption.)</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="524" colspan="4">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">
+        <input type="checkbox" id="http_admin_extern" name="http_admin_extern" **HTTPADMINEXTERN** value="checked"></td>
+		<td width="524" colspan="4">Access for configuration pages from the 
+		outside.</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="524" colspan="4">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">
+        <input type="checkbox" id="http_ssl" name="http_ssl" **HTTPSSL** value="checked"></td>
+		<td width="524" colspan="4">Use SSL encryption (If enabled, device is 
+		reachable via</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="524" colspan="4">https://ip.address, otherwise via http://ip.address)</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="524" colspan="4">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="557" colspan="5">
+        <input class="button" type="submit" value="Apply"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="557" colspan="5">
+			&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="557" colspan="5">
+			<font color="#2C4ACE"><b>Configuration</b></font></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">
+			&nbsp;</td>
+		<td width="524" colspan="4">
+			&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" bgcolor="#2C4ACE">
+			&nbsp;</td>
+		<td width="115" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" bgcolor="#2C4ACE">
+			Name</td>
+		<td width="142" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" bgcolor="#2C4ACE">
+			URL</td>
+		<td width="59" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" bgcolor="#2C4ACE">
+			Port</td>
+		<td width="170" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" bgcolor="#2C4ACE">
+			Folder</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+			&nbsp;</td>
+		<td width="115" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+			&nbsp;</td>
+		<td width="142" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+			&nbsp;</td>
+		<td width="59" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+			&nbsp;</td>
+		<td width="170" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+			&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="557" colspan="5">
+			&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="557" colspan="5">
+<input class="button" name="newButton" type="submit" value="New">
+<input class="button" name="propButton" type="submit" value="Properties">
+<input class="button" name="delButton" type="submit" value="Delete"></td>
+	</tr>
+</table>
 
 
 

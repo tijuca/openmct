@@ -1,12 +1,349 @@
 
 <head>
 <base target="_self">
+<script type="text/javascript" src="../help.js"></script>
 </head>
+<body class="bodystyle" onLoad="toggleVis('help');togglePic('helpButton');" text="#FFFFFF" bgcolor="#000000" background="../images/main.png">
 
-<body text="#FFFFFF" bgcolor="#000000" background="../images/main.png">
 
-<p align="center">&nbsp;</p>
-<p align="center">&nbsp;</p>
-<p align="center"><font size="5" face="Verdana">Date &amp; Time</font></p>
+<table border="0" width="596" id="table1">
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="568" colspan="3"><font color="#2C4ACE"><b>Hardware - 
+		Date &amp; Time</b></font></td>
+	</tr>
+	<tr>
+		<td width="14" height="22">&nbsp;</td>
+		<td width="568" height="22" colspan="3">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="564" colspan="3">
+      Time Zone:&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14" height="22">&nbsp;</td>
+		<td width="564" height="22" colspan="3">
+      <select name="TIMEZONE">
+        <option value="GMT+12:00.1">(GMT-12:00) Eniwetok, Kwajalein</option>
+        <option value="GMT+11:00.2">(GMT-11:00) Midway Island, Samoa</option>
+        <option value="GMT+10:00.3">(GMT-10:00) Hawaii</option>
+        <option value="GMT+09:00.4">(GMT-09:00) Alaska</option>
+        <option value="GMT+08:00.5">(GMT-08:00) Pacific Time (US and Canada); Tijuana</option>
+        <option value="GMT+07:00.6">(GMT-07:00) Mountain Time (US and Canada)</option>
+        <option value="GMT+07:00.7">(GMT-07:00) Chihuahua, La Paz, Mazatlan</option>
+        <option value="GMT+07:00.8">(GMT-07:00) Arizona</option>
+        <option value="GMT+06:00.9">(GMT-06:00) Central Time (US and Canada)</option>
+        <option value="GMT+06:00.10">(GMT-06:00) Saskatchewan</option>
+        <option value="GMT+06:00.11">(GMT-06:00) Guadalajara, Mexico City, Monterrey</option>
+        <option value="GMT+06:00.12">(GMT-06:00) Central America</option>
+        <option value="GMT+05:00.13">(GMT-05:00) Eastern Time (US and Canada)</option>
+        <option value="GMT+05:00.14">(GMT-05:00) Indiana (East)</option>
+        <option value="GMT+05:00.15">(GMT-05:00) Bogota, Lima, Quito</option>
+        <option value="GMT+04:00.16">(GMT-04:00) Atlantic Time (Canada)</option>
+        <option value="GMT+04:00.17">(GMT-04:00) Caracas, La Paz</option>
+        <option value="GMT+04:00.18">(GMT-04:00) Santiago</option>
+        <option value="GMT+03:30.19">(GMT-03:30) Newfoundland and Labrador</option>
+        <option value="GMT+03:00.20">(GMT-03:00) Brasilia</option>
+        <option value="GMT+03:00.21">(GMT-03:00) Buenos Aires, Georgetown</option>
+        <option value="GMT+03:00.22">(GMT-03:00) Greenland</option>
+        <option value="GMT+02:00.23">(GMT-02:00) Mid-Atlantic</option>
+        <option value="GMT+01:00.24">(GMT-01:00) Azores</option>
+        <option value="GMT+01:00.25">(GMT-01:00) Cape Verde Islands</option>
+        <option value="GMT.26">(GMT) Greenwich Mean Time, Dublin, Edinburgh, Lisbon, London</option>
+        <option value="GMT.27">(GMT) Casablanca, Monrovia</option>
+        <option value="GMT-01:00.28">(GMT+01:00) Belgrade, Bratislava, Budapest, Ljubljana, Prague</option>
+        <option value="GMT-01:00.29">(GMT+01:00) Sarajevo, Skopje, Warsaw, Zagreb</option>
+        <option value="GMT-01:00.30">(GMT+01:00) Brussels, Copenhagen, Madrid, Paris</option>
+        <option value="GMT-01:00.31">(GMT+01:00) Amsterdam, Berlin, Bern, Rome, Stockholm, Vienna</option>
+        <option value="GMT-01:00.32">(GMT+01:00) West Central Africa</option>
+        <option value="GMT-02:00.33">(GMT+02:00) Bucharest</option>
+        <option value="GMT-02:00.34">(GMT+02:00) Cairo</option>
+        <option value="GMT-02:00.35">(GMT+02:00) Helsinki, Kyiv, Riga, Sofia, Tallinn, Vilnius</option>
+        <option value="GMT-02:00.36">(GMT+02:00) Athens, Istanbul, Minsk</option>
+        <option value="GMT-02:00.37">(GMT+02:00) Jerusalem</option>
+        <option value="GMT-02:00.38">(GMT+02:00) Harare, Pretoria</option>
+        <option value="GMT-03:00.39">(GMT+03:00) Moscow, St. Petersburg, Volgograd</option>
+        <option value="GMT-03:00.40">(GMT+03:00) Kuwait, Riyadh</option>
+        <option value="GMT-03:00.41">(GMT+03:00) Nairobi</option>
+        <option value="GMT-03:00.42">(GMT+03:00) Baghdad</option>
+        <option value="GMT-03:30.43">(GMT+03:30) Tehran</option>
+        <option value="GMT-04:00.44">(GMT+04:00) Abu Dhabi, Muscat</option>
+        <option value="GMT-04:00.45">(GMT+04:00) Baku, Tbilisi, Yerevan</option>
+        <option value="GMT-04:30.46">(GMT+04:30) Kabul</option>
+        <option value="GMT-05:00.47">(GMT+05:00) Ekaterinburg</option>
+        <option value="GMT-05:00.48">(GMT+05:00) Islamabad, Karachi, Tashkent</option>
+        <option value="GMT-05:30.49">(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi</option>
+        <option value="GMT-05:45.50">(GMT+05:45) Kathmandu</option>
+        <option value="GMT-06:00.51">(GMT+06:00) Astana, Dhaka</option>
+        <option value="GMT-06:00.52">(GMT+06:00) Sri Jayawardenepura</option>
+        <option value="GMT-06:00.53">(GMT+06:00) Almaty, Novosibirsk</option>
+        <option value="GMT-06:30.54">(GMT+06:30) Yangon (Rangoon)</option>
+        <option value="GMT-07:00.55">(GMT+07:00) Bangkok, Hanoi, Jakarta</option>
+        <option value="GMT-07:00.56">(GMT+07:00) Krasnoyarsk</option>
+        <option value="GMT-08:00.57">(GMT+08:00) Beijing, Chongqing, Hong Kong SAR, Urumqi</option>
+        <option value="GMT-08:00.58">(GMT+08:00) Kuala Lumpur, Singapore</option>
+        <option value="GMT-08:00.59">(GMT+08:00) Taipei</option>
+        <option value="GMT-08:00.60">(GMT+08:00) Perth</option>
+        <option value="GMT-08:00.61">(GMT+08:00) Irkutsk, Ulaan Bataar</option>
+        <option value="GMT-09:00.62">(GMT+09:00) Seoul</option>
+        <option value="GMT-09:00.63">(GMT+09:00) Osaka, Sapporo, Tokyo</option>
+        <option value="GMT-09:00.64">(GMT+09:00) Yakutsk</option>
+        <option value="GMT-09:30.65">(GMT+09:30) Darwin</option>
+        <option value="GMT-09:30.66">(GMT+09:30) Adelaide</option>
+        <option value="GMT-10:00.67">(GMT+10:00) Canberra, Melbourne, Sydney</option>
+        <option value="GMT-10:00.68">(GMT+10:00) Brisbane</option>
+        <option value="GMT-10:00.69">(GMT+10:00) Hobart</option>
+        <option value="GMT-10:00.70">(GMT+10:00) Vladivostok</option>
+        <option value="GMT-10:00.71">(GMT+10:00) Guam, Port Moresby</option>
+        <option value="GMT-11:00.72">(GMT+11:00) Magadan, Solomon Islands, New Caledonia</option>
+        <option value="GMT-12:00.73">(GMT+12:00) Fiji Islands, Kamchatka, Marshall Islands</option>
+        <option value="GMT-12:00.74">(GMT+12:00) Auckland, Wellington</option>
+      </select></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="564" colspan="3">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14" height="21">&nbsp;</td>
+		<td width="23" height="21"><input type="checkbox" id="TIME_DST" name="TIME_DST" **DST** value="checked"></td>
+		<td width="541" height="21" colspan="2">Use European summer time rule (daylight 
+		saving).</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">
+      &nbsp;</td>
+		<td width="541" colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">
+		<input type="radio" id="NTP_SERVER" value="V1" name="TIME" **USE_NTP_SERVER** onclick=setStateNTP()></td>
+		<td width="541" colspan="2"><label for="NTP_SERVER">Automatically synchonize with an Internet time server</label></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="122">Server:</td>
+		<td width="419">
+      <select name="NTP_SERVER_NAME" style="width:250px">
+        <option value="ntp.tuxfamily.net">ntp.tuxfamily.net</option>
+        <option value="time.nist.gov">time.nist.gov</option>
+        <option value="clock.isc.org">clock.isc.org</option>
+        <option value="clock.via.net">clock.via.net</option>
+        <option value="ntp-cup.external.hp.com">ntp-cup.external.hp.com</option>
+        <option value="timekeeper.isi.edu">timekeeper.isi.edu</option>
+        <option value="usno.pa-x.dec.com">usno.pa-x.dec.com</option>
+        <option value="ns.scruz.net">ns.scruz.net</option>
+        <option value="ntp.ucsd.edu">ntp.ucsd.edu</option>
+        <option value="ntp1.mainecoon.com">ntp1.mainecoon.com</option>
+        <option value="ntp2.mainecoon.com">ntp2.mainecoon.com</option>
+        <option value="navobs1.usnogps.navy.mil">navobs1.usnogps.navy.mil</option>
+        <option value="navobs2.usnogps.navy.mil">navobs2.usnogps.navy.mil</option>
+        <option value="utcnist.colorado.edu">utcnist.colorado.edu</option>
+        <option value="ntp2.usno.navy.mil">ntp2.usno.navy.mil</option>
+        <option value="tick.usno.navy.mil">tick.usno.navy.mil</option>
+        <option value="ntp1.delmarva.com">ntp1.delmarva.com</option>
+        <option value="timex.peachnet.edu">timex.peachnet.edu</option>
+        <option value="ntp-0.cso.uiuc.edu">ntp-0.cso.uiuc.edu</option>
+        <option value="ntp-1.cso.uiuc.edu">ntp-1.cso.uiuc.edu</option>
+        <option value="ntp-2.cso.uiuc.edu">ntp-2.cso.uiuc.edu</option>
+        <option value="ntp-2.mcs.anl.gov">ntp-2.mcs.anl.gov</option>
+        <option value="darkcity.cerias.purdue.edu">darkcity.cerias.purdue.edu</option>
+        <option value="gilbreth.ecn.purdue.edu">gilbreth.ecn.purdue.edu</option>
+        <option value="harbor.ecn.purdue.edu">harbor.ecn.purdue.edu</option>
+        <option value="molecule.ecn.purdue.edu">molecule.ecn.purdue.edu</option>
+        <option value="ntp1.kansas.net">ntp1.kansas.net</option>
+        <option value="ntp2.kansas.net">ntp2.kansas.net</option>
+        <option value="bitsy.mit.edu">bitsy.mit.edu</option>
+        <option value="bonehed.lcs.mit.edu">bonehed.lcs.mit.edu</option>
+        <option value="timeserver.cs.umb.edu">timeserver.cs.umb.edu</option>
+        <option value="ns.nts.umn.edu">ns.nts.umn.edu</option>
+        <option value="nss.nts.umn.edu">nss.nts.umn.edu</option>
+        <option value="navobs1.wustl.edu">navobs1.wustl.edu</option>
+        <option value="everest.cclabs.missouri.edu">everest.cclabs.missouri.edu</option>
+        <option value="terrapin.csc.ncsu.edu">terrapin.csc.ncsu.edu</option>
+        <option value="cuckoo.nevada.edu">cuckoo.nevada.edu</option>
+        <option value="ntp.ctr.columbia.edu">ntp.ctr.columbia.edu</option>
+        <option value="ntp0.cornell.edu">ntp0.cornell.edu</option>
+        <option value="sundial.columbia.edu">sundial.columbia.edu</option>
+        <option value="timex.cs.columbia.edu">timex.cs.columbia.edu</option>
+        <option value="otc1.psu.edu">otc1.psu.edu</option>
+        <option value="wwv.otc.psu.edu">wwv.otc.psu.edu</option>
+        <option value="fuzz.psc.edu">fuzz.psc.edu</option>
+        <option value="ntp-1.ece.cmu.edu">ntp-1.ece.cmu.edu</option>
+        <option value="ntp-2.ece.cmu.edu">ntp-2.ece.cmu.edu</option>
+        <option value="ntp.fnbhs.com">ntp.fnbhs.com</option>
+        <option value="ntp.tmc.edu">ntp.tmc.edu</option>
+        <option value="ntp5.tamu.edu">ntp5.tamu.edu</option>
+        <option value="ntp-2.vt.edu">ntp-2.vt.edu</option>
+        <option value="ntp.cmr.gov">ntp.cmr.gov</option>
+        <option value="clock.tricity.wsu.edu">clock.tricity.wsu.edu</option>
+        <option value="time.ultimeth.net">time.ultimeth.net</option>
+        <option value="ntp1.cs.wisc.edu">ntp1.cs.wisc.edu</option>
+        <option value="ntp2.cs.wisc.edu">ntp2.cs.wisc.edu</option>
+        <option value="ntp3.cs.wisc.edu">ntp3.cs.wisc.edu</option>
+        <option value="tick.nap.com.ar">tick.nap.com.ar</option>
+        <option value="time.sinectis.com.ar">time.sinectis.com.ar</option>
+        <option value="tock.nap.com.ar">tock.nap.com.ar</option>
+        <option value="ntp.cs.mu.OZ.AU">ntp.cs.mu.OZ.AU</option>
+        <option value="ntp.nml.csiro.au">ntp.nml.csiro.au</option>
+        <option value="augean.eleceng.adelaide.edu.au">augean.eleceng.adelaide.edu.au</option>
+        <option value="ntp.adelaide.edu.au">ntp.adelaide.edu.au</option>
+        <option value="ntp.saard.net">ntp.saard.net</option>
+        <option value="time.esec.com.au">time.esec.com.au</option>
+        <option value="time.chu.nrc.ca">time.chu.nrc.ca</option>
+        <option value="ntp1.cmc.ec.gc.ca">ntp1.cmc.ec.gc.ca</option>
+        <option value="ntp2.cmc.ec.gc.ca">ntp2.cmc.ec.gc.ca</option>
+        <option value="tick.utoronto.ca">tick.utoronto.ca</option>
+        <option value="timelord.uregina.ca">timelord.uregina.ca</option>
+        <option value="tock.utoronto.ca">tock.utoronto.ca</option>
+        <option value="bernina.ethz.ch">bernina.ethz.ch</option>
+        <option value="swisstime.ethz.ch">swisstime.ethz.ch</option>
+        <option value="ntp.dgf.uchile.cl">ntp.dgf.uchile.cl</option>
+        <option value="ntp1.fau.de">ntp1.fau.de</option>
+        <option value="ntp2.fau.de">ntp2.fau.de</option>
+        <option value="ntps1-0.cs.tu-berlin.de">ntps1-0.cs.tu-berlin.de</option>
+        <option value="ntps1-1.rz.Uni-Osnabrueck.DE">ntps1-1.rz.Uni-Osnabrueck.DE</option>
+        <option value="ntps1-1.uni-erlangen.de">ntps1-1.uni-erlangen.de</option>
+        <option value="ntps1-2.uni-erlangen.de">ntps1-2.uni-erlangen.de</option>
+        <option value="ptbtime1.ptb.de">ptbtime1.ptb.de</option>
+        <option value="ptbtime2.ptb.de">ptbtime2.ptb.de</option>
+        <option value="rustime01.rus.uni-stuttgart.de">rustime01.rus.uni-stuttgart.de</option>
+        <option value="clock.netcetera.dk">clock.netcetera.dk</option>
+        <option value="clock2.netcetera.dk">clock2.netcetera.dk</option>
+        <option value="slug.ctv.es">slug.ctv.es</option>
+        <option value="tick.keso.fi">tick.keso.fi</option>
+        <option value="ntp.obspm.fr">ntp.obspm.fr</option>
+        <option value="ntp.univ-lyon1.fr">ntp.univ-lyon1.fr</option>
+        <option value="ntp.via.ecp.fr">ntp.via.ecp.fr</option>
+        <option value="clock.cuhk.edu.hk">clock.cuhk.edu.hk</option>
+        <option value="time.kfki.hu">time.kfki.hu</option>
+        <option value="ntp.maths.tcd.ie">ntp.maths.tcd.ie</option>
+        <option value="tempo.cstv.to.cnr.it">tempo.cstv.to.cnr.it</option>
+        <option value="time.ien.it">time.ien.it</option>
+        <option value="ntps.net4u.it">ntps.net4u.it</option>
+        <option value="clock.nc.fukuoka-u.ac.jp">clock.nc.fukuoka-u.ac.jp</option>
+        <option value="clock.tl.fukuoka-u.ac.jp">clock.tl.fukuoka-u.ac.jp</option>
+        <option value="time.nuri.net">time.nuri.net</option>
+        <option value="ntp0.nl.net">ntp0.nl.net</option>
+        <option value="ntp1.nl.net">ntp1.nl.net</option>
+        <option value="ntp2.nl.net">ntp2.nl.net</option>
+        <option value="fartein.ifi.uio.no">fartein.ifi.uio.no</option>
+        <option value="time.alcanet.no">time.alcanet.no</option>
+        <option value="truechimer.waikato.ac.nz">truechimer.waikato.ac.nz</option>
+        <option value="vega.cbk.poznan.pl">vega.cbk.poznan.pl</option>
+        <option value="info.cyf-kr.edu.pl">info.cyf-kr.edu.pl</option>
+        <option value="ntp.landau.ac.ru">ntp.landau.ac.ru</option>
+        <option value="sign.chg.ru">sign.chg.ru</option>
+        <option value="time1.stupi.se">time1.stupi.se</option>
+        <option value="time2.stupi.se">time2.stupi.se</option>
+        <option value="ntp.lth.se">ntp.lth.se</option>
+        <option value="ntp.shim.org">ntp.shim.org</option>
+        <option value="biofiz.mf.uni-lj.si">biofiz.mf.uni-lj.si</option>
+        <option value="ntp1.arnes.si">ntp1.arnes.si</option>
+        <option value="ntp2.arnes.si">ntp2.arnes.si</option>
+        <option value="time.ijs.si">time.ijs.si</option>
+        <option value="ntp.cs.strath.ac.uk">ntp.cs.strath.ac.uk</option>
+        <option value="ntp0.uk.uu.net">ntp0.uk.uu.net</option>
+        <option value="ntp1.uk.uu.net">ntp1.uk.uu.net</option>
+        <option value="ntp2.uk.uu.net">ntp2.uk.uu.net</option>
+        <option value="ntp2a.mcc.ac.uk">ntp2a.mcc.ac.uk</option>
+        <option value="ntp2b.mcc.ac.uk">ntp2b.mcc.ac.uk</option>
+        <option value="ntp2c.mcc.ac.uk">ntp2c.mcc.ac.uk</option>
+        <option value="ntp2d.mcc.ac.uk">ntp2d.mcc.ac.uk</option>
+        <option value="ntp.linux.org.ve">ntp.linux.org.ve</option>
+        <option value="ntp.cs.unp.ac.za">ntp.cs.unp.ac.za</option>
+        <option value="ntp1.belbone.be">ntp1.belbone.be</option>
+        <option value="ntp2.belbone.be">ntp2.belbone.be</option>
+        <option value="ntp.certum.pl">ntp.certum.pl</option>
+        <option value="ntp1.sp.se">ntp1.sp.se</option>
+        <option value="ntp2.sp.se">ntp2.sp.se</option>
+        <option value="time.euro.apple.com">time.euro.apple.com</option>
+        <option value="time.datum.com">time.datum.com</option>
+        <option value="ntp0.ewetel.de">ntp0.ewetel.de</option>
+        <option value="ntp1.ewetel.de">ntp1.ewetel.de</option>
+        <option value="ntp0.freenet.de">ntp0.freenet.de</option>
+        <option value="ntp1.freenet.de">ntp1.freenet.de</option>
+        <option value="ntp.fujitsu.com">ntp.fujitsu.com</option>
+        <option value="time.windows.com">time.windows.com</option>
+        <option value="ntp1.t-online.de">ntp1.t-online.de</option>
+        <option value="ntps1-0.nacamar.net">ntps1-0.nacamar.net</option>
+      </select></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="122">Period:</td>
+		<td width="419">
+      <select name="NTP_PERIOD" style="width:250px">
+        <option value="1">Every hour</option>
+        <option value="2">Every day</option>
+        <option value="3">Every week</option>
+      </select></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="541" colspan="2">Last successful update:&nbsp; **NTP_LAST**</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="541" colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">
+		<input type="radio" id="MANUAL" value="V1" name="TIME1" **USE_MANUAL** onclick=setStateManual()></td>
+		<td width="541" colspan="2">
+      <label for="MANUAL">Set manually date and time</label></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="122">Date:</td>
+		<td width="419">
+            <input type=text name="DAY" value="**DAY**" style="width:34; height:22">
+            <select name="MONTH">
+              <option value=1>January</option>
+              <option value=2>February</option>
+              <option value=3>March</option>
+              <option value=4>April</option>
+              <option value=5>May</option>
+              <option value=6>June</option>
+              <option value=7>July</option>
+              <option value=8>August</option>
+              <option value=9>September</option>
+              <option value=10>October</option>
+              <option value=11>November</option>
+              <option value=12>December</option>
+            </select>
+            <input type=text name="YEAR" value="**YEAR**" style="width:56; height:22"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="122">Time:</td>
+		<td width="419"><input type=text name="RTIME" value="**TIME**" style="width:80px"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="568" colspan="3">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="568" colspan="3">
+			<input class="button" type=submit value="Apply"></td>
+	</tr>
+</table>
+
+
+
+
+
+
 
 

@@ -8,9 +8,104 @@
 
 </head>
 <body text="#FFFFFF" bgcolor="#000000" background="../images/main.png">
-<p align="center">&nbsp;</p>
-<p align="center">&nbsp;</p>
-<p align="center"><font size="5">DCHP</font><font size="5"> Server</font></p>
+<table border=0 id="table1" width="592">
+  <tr>
+    <td class="none" align="left" valign="top" height="28" width="14">
+      &nbsp;</td>
+    <td class="none" align="left" valign="top" height="28" colspan="5" width="568">
+      <font color="#2C4ACE"><b>Service - DCHP Server</b></font></td>
+  </tr>
+  <tr>
+    <td class="none" align="left" valign="top" height="28" width="14">
+      &nbsp;</td>
+    <td class="none" align="left" valign="top" height="28" colspan="5" width="568">
+      The DHCP server automatically configures clients</td>
+  </tr>
+  <tr>
+    <td class="none" align="left" valign="top" height="28" width="14">
+      &nbsp;</td>
+    <td class="none" align="left" valign="top" height="28" colspan="5" width="568">
+      (PCs and others) connected to the LAN ports of your OpenMCT.</td>
+  </tr>
+  <tr>
+    <td class="none" align="left" valign="top" height="28" width="14">
+      &nbsp;</td>
+    <td class="none" align="left" valign="top" height="28" width="20">
+      &nbsp;</td>
+    <td colspan="2" valign="top" class="forms">&nbsp;</td>
+    <td width="32">&nbsp;</td>
+    <td width="204">&nbsp;</td>
+  </tr>
+  <tr>
+    <td class="none" align="left" valign="top" height="28" width="14">
+      &nbsp;</td>
+    <td class="none" align="left" valign="top" height="28" width="20">
+      <input type="checkbox" id="dhcp_server" name="dhcp_server" **START** value="checked" onclick=setState()></td>
+    <td colspan="2" valign="top" class="forms">Start DHCP server</td>
+    <td width="32"></td>
+    <td width="204"></td>
+  </tr>
+  <tr>
+    <td class="none" width="14"></td>
+    <td class="none" width="20">&nbsp;</td>
+    <td class="forms" width="167">Subnet mask:&nbsp;</td>
+    <td class="none" width="129">
+      <input type="text" name="dhcp_subnetmask_ip" value="**NETMASK**" style="width:120px">
+    </td>
+    <td width="32"></td>
+    <td width="204"></td>
+  </tr>
+  <tr>
+    <td class="none" width="14"></td>
+    <td class="none" width="20">&nbsp;</td>
+    <td class="forms" width="167">Gateway:&nbsp;</td>
+    <td class="none" width="129">
+      <input type="text" name="dhcp_router_ip" value="**GATEWAY**" style="width:120px">
+    </td>
+    <td width="32"></td>
+    <td width="204"></td>
+  </tr>
+  <tr>
+    <td class="none" width="14"></td>
+    <td class="none" width="20">&nbsp;</td>
+    <td class="forms" width="167">DNS server:&nbsp;</td>
+    <td class="none" width="129">
+      <input type="text" name="dhcp_dns_ip" value="**DNS**" style="width:120px">
+    </td>
+    <td width="32"></td>
+    <td width="204"></td>
+  </tr>
+  <tr>
+    <td class="none" width="14"></td>
+    <td class="none" width="20">&nbsp;</td>
+    <td class="forms" width="167">IP address range:&nbsp;</td>
+    <td class="none" width="129">
+      <input type="text" name="dhcp_begin_ip" value="**IPBEGIN**" style="width:120px">
+    </td>
+    <td class="forms" width="32">&nbsp;to&nbsp;</td>
+    <td class="none" width="204">
+      <input type="text" name="dhcp_end_ip" value="**IPEND**" style="width:120px">
+    </td>
+  </tr>
+  <tr>
+    <td class="none" width="14"></td>
+    <td class="none" width="20">&nbsp;</td>
+    <td class="forms" width="167">IP release time:&nbsp;</td>
+    <td class="none" width="129">
+      <input type="text" name="dhcp_iprelease" value="**TIME**" style="width:120px">
+    </td>
+    <td class="forms" colspan=2>&nbsp;hours</td>
+  </tr>
+  <tr>
+    <td class="none" colspan=6>&nbsp;</td>
+  </tr>
+  <tr>
+    <td class="none" width="14">
+      &nbsp;</td>
+    <td class="none" colspan=5 width="568">
+      <input class="button" type="submit" value="Apply"></td>
+  </tr>
+</table>
 
 </body>
 </html>

@@ -5,8 +5,83 @@
 
 <body text="#FFFFFF" bgcolor="#000000" background="../images/main.png">
 
-<p align="center">&nbsp;</p>
-<p align="center">&nbsp;</p>
-<p align="center"><font size="5" face="Verdana">DynDNS</font></p>
+<table border="0" width="596" id="table1">
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="568" colspan="3"><font color="#2C4ACE"><b>Connections - Dynamic 
+		DNS</b></font></td>
+	</tr>
+	<tr>
+		<td width="14" height="22">&nbsp;</td>
+		<td width="205" height="22" colspan="2">&nbsp;</td>
+		<td height="22" width="363">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">
+		&nbsp;</td>
+		<td width="178">&nbsp;</td>
+		<td width="363">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14" height="22">&nbsp;</td>
+		<td width="23" height="22">
+		<input type="checkbox" id="ddns_client" name="ddns_client" **START** value="checked"></td>
+		<td width="541" height="22" colspan="2">run dynamic DNS client</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="178">&nbsp;</td>
+		<td width="363">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="178">Service:</td>
+		<td width="363">
+      <select name="ddns_service" style="width:200px">
+	<option value=dyndns_org>dyndns.org</option>
+	<option value=dtdns_com>dtdns.com</option>
+	<option value=noip_com>no-ip.com</option>
+      </select></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="178">Host:</td>
+		<td width="363"><input type="text" name="ddns_host" value="**HOST**" style="width:200px"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="178">Username:</td>
+		<td width="363"><input type="text" name="ddns_user" value="**USER**" style="width:200px"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="178">Password:</td>
+		<td width="363">
+		<input type="password" name="ddns_password" value="**PASSWORD**" style="width:200px"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="178">Retype password:</td>
+		<td width="363">
+		<input type="password" name="ddns_password0" value="**PASSWORD**" style="width:200px"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="568" colspan="3">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="568" colspan="3">
+			<input class="button" type=submit value="Apply"></td>
+	</tr>
+</table>
+
 
 

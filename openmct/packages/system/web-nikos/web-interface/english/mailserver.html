@@ -1,0 +1,137 @@
+
+<head>
+<base target="_self">
+</head>
+
+<body text="#FFFFFF" bgcolor="#000000" background="../images/main.png">
+
+<table border="0" width="596" id="table1">
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="568" colspan="5"><font color="#2C4ACE"><b>Services - Mail 
+		Server</b></font></td>
+	</tr>
+	<tr>
+		<td width="14" height="22">&nbsp;</td>
+		<td width="568" height="22" colspan="5">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">
+		<input type="checkbox" id="mail_server" name="mail_server" **MAILSTART** value="checked" onclick=mailChanged()></td>
+		<td width="541" colspan="4">Run Mail server</td>
+	</tr>
+	<tr>
+		<td width="14" height="22">&nbsp;</td>
+		<td width="23" height="22">
+		&nbsp;</td>
+		<td width="541" height="22" colspan="4">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23"><input type="checkbox" id="mail_imap_extern" name="mail_imap_extern" **IMAPEXTERN** value="checked"></td>
+		<td width="541" colspan="4">open IMAP and POP3 server for the outside</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="104">IMAP port:</td>
+		<td width="68"><input type="text" name="mail_imap_port" value="**IMAPPORT**" style="width:60px"></td>
+		<td width="106">IMAPS port:</td>
+		<td width="255"><input type="text" name="mail_imaps_port" value="**IMAPSPORT**" style="width:60px"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="104">POP3 port:</td>
+		<td width="68"><input type="text" name="mail_pop3_port" value="**POP3PORT**" style="width:60px"></td>
+		<td width="106">POP3S port:</td>
+		<td width="255"><input type="text" name="mail_pop3s_port" value="**POP3SPORT**" style="width:60px"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="541" colspan="4">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23"><input type="checkbox" id="mail_smtp_extern" name="mail_smtp_extern" **SMTPEXTERN** value="checked"></td>
+		<td width="541" colspan="4">open SMTP server for the outside</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="104">SMTP port:</td>
+		<td width="437" colspan="3"><input type="text" name="mail_smtp_port" value="**SMTPPORT**" style="width:60px"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="541" colspan="4">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="541" colspan="4">fetch intervall: <input type="text" name="mail_fetchsec" value="**FETCHMIN**" style="width:60px"> minutes</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="545" colspan="4"><input class="button" type="submit" name="appButton" value="Apply"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="568" colspan="5">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="568" colspan="5"><font color="#2C4ACE"><b>Fetchmail Account 
+		Configuration</b></font></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">
+			&nbsp;</td>
+		<td width="282" colspan="3">
+			&nbsp;</td>
+		<td width="255">
+			&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" bgcolor="#2C4ACE">
+			&nbsp;</td>
+		<td width="282" colspan="3" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" bgcolor="#2C4ACE">
+			Mail Account</td>
+		<td width="255" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" bgcolor="#2C4ACE">
+			User name</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+			&nbsp;</td>
+		<td width="282" colspan="3" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+			&nbsp;</td>
+		<td width="255" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+			&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">
+			&nbsp;</td>
+		<td width="282" colspan="3">
+			&nbsp;</td>
+		<td width="255">
+			&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="560" colspan="5">
+<input class="button" name=newButton type=submit value="New">
+<input class="button" name=propButton type=submit value="Properties">
+<input class="button" name=delButton  type=submit value="Delete"></td>
+	</tr>
+</table>
+
+
+

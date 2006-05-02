@@ -5,8 +5,135 @@
 
 <body text="#FFFFFF" bgcolor="#000000" background="../images/main.png">
 
-<p align="center">&nbsp;</p>
-<p align="center">&nbsp;</p>
-<p align="center"><font face="Verdana" size="5">W-LAN</font></p>
+<table border="0" width="596" id="table1">
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="568" colspan="4"><font color="#2C4ACE"><b>Service - WLAN</b></font></td>
+	</tr>
+	<tr>
+		<td width="14" height="22">&nbsp;</td>
+		<td width="229" height="22" colspan="3">&nbsp;</td>
+		<td height="22" width="339">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">
+		<input type="checkbox" id="wlan_start" name="wlan_start" **START** value="checked" onclick=setState()></td>
+		<td width="202" colspan="2"><label for="wlan_start">enable WLAN</label></td>
+		<td width="339">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14" height="22">&nbsp;</td>
+		<td width="23" height="22">
+		&nbsp;</td>
+		<td width="541" height="22" colspan="3">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="202" colspan="2">Network Name (ESSID)</td>
+		<td width="339"><input type="text" name="wlan_name" value="**NAME**" style="width:200px"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="202" colspan="2">IP addresse:&nbsp;</td>
+		<td width="339">
+        <b>**ADDR**</b>&nbsp;&nbsp;(same as on LAN port)</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="20">&nbsp;</td>
+		<td width="517" colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="20">
+		<input type="radio" id="wlan_open" name="wlan_encrypt" **NONE** value="V1" onclick=setState()></td>
+		<td width="517" colspan="2">without encryption (big security risk!)</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="20">
+		<input type="radio" id="wlan_wep" name="wlan_encrypt1" **WEP** value="V1" onclick=setState()></td>
+		<td width="517" colspan="2">enable WEP encryption</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="20">&nbsp;</td>
+		<td width="178">WEP hex key:</td>
+		<td width="339">
+		<input type="text" name="wlan_wepkey" value="**WEPKEY**" style="width:250px"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="20">
+		<input type="radio" id="wlan_wpa" name="wlan_encrypt2" **WPA** value="V1" onclick=setState()></td>
+		<td width="521" colspan="2">enable WPA encryption (recommended)</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="20">&nbsp;</td>
+		<td width="178">WPA-PSK key:</td>
+		<td width="339"><input type="text" name="wlan_wpakey" value="**WPAKEY**" style="width:250px"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="20">&nbsp;</td>
+		<td width="178">Encryption:</td>
+		<td width="339">
+          <select name="wlan_wpamode">
+            <option value="1">WPA (TKIP)</option>
+            <option value="2">WPA2 (CCMP)</option>
+            <option value="3">WPA and WPA2</option>
+          </select></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="564" colspan="4">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="564" colspan="4"><b><font color="#FF0000">Attention:</font></b></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="564" colspan="4">Changing these configurations must always</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="564" colspan="4">be done with a wired connection!</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="564" colspan="4">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="564" colspan="4"><b><font color="#FF0000">Attention:</font></b></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="564" colspan="4">Changing these configurations takes several 
+		seconds!</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="564" colspan="4">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="568" colspan="4">
+			<input class="button" type=submit value="Apply"></td>
+	</tr>
+</table>
+
 
 
