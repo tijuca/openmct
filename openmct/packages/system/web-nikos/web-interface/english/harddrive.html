@@ -6,124 +6,202 @@
 <body text="#FFFFFF" bgcolor="#000000" background="../images/main.png" style="background-attachment: fixed">
 
 
-<table border="0" width="596" id="table1">
+<table border="0" width="631" id="table1">
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="3"><font color="#2C4ACE"><b>Hardware - 
+		<td width="609" colspan="6"><font color="#2C4ACE"><b>Hardware - 
 		Harddrive</b></font></td>
 	</tr>
 	<tr>
 		<td width="14" height="22">&nbsp;</td>
-		<td width="568" height="22" colspan="3">&nbsp;</td>
+		<td width="609" height="22" colspan="6">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="564" colspan="3">
+		<td width="609" colspan="6">
+      Self-Monitoring Analysis and Reporting Technology Setting</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="609" colspan="6">
+      S.M.A.R.T.&nbsp;
+		<input type=radio class=radio id=smart_enable name=enable value=V1> 
+		Enable&nbsp;
+		<input type=radio class=radio id=smart_disable name=enable1 value=V1 checked> 
+		Disable&nbsp; <input class="button" type=submit value="Apply"></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="609" colspan="6">
+      &nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="167" colspan="2">
+      Turn off Harddisk</td>
+		<td width="437" colspan="4">
+      <select size=1 name=stimer onchange=javascript:request_command("APPLY1")>
+		<option value=0 >None</option>
+		<option value=60 >After 5 mins</option>
+		<option value=120 >After 10 mins</option>
+		<option value=240 >After 20 mins</option>
+		<option value=241 >After 30 mins</option>
+		<option value=242 >After 1 hour</option>
+		<option value=244 >After 2 hours</option>
+		<option value=246 >After 3 hours</option>
+		<option value=248 >After 4 hours</option>
+		<option value=250 >After 5 hours</option>
+		</select></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="609" colspan="6">
+      &nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="609" colspan="6">
+      Hardisk(s) Available</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="159" colspan="2" bgcolor="#2C4ACE" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+      Model Name</td>
+		<td width="127" bgcolor="#2C4ACE" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+      Available Size</td>
+		<td width="98" bgcolor="#2C4ACE" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+      Total Size</td>
+		<td width="100" bgcolor="#2C4ACE" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+      S.M.A.R.T</td>
+		<td width="71" bgcolor="#2C4ACE" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+      Status</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="159" colspan="2" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+      <font size="2">SAMSUNG HD300LD</font></td>
+		<td width="127" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+      <font size="2">281247 MB</font></td>
+		<td width="98" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+      <font size="2">281280 MB</font></td>
+		<td width="100" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+      <font size="2">Pass</font></td>
+		<td width="71" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+      <font size="2">Ready</font></td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="609" colspan="6">
+      &nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="609" colspan="6">
       Hard drive spin down</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="564" colspan="3">
+		<td width="609" colspan="6">
       &nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14" height="22">&nbsp;</td>
-		<td width="149" height="22" colspan="2">
+		<td width="167" height="22" colspan="2">
       Spin down after</td>
-		<td width="419" height="22">
+		<td width="437" height="22" colspan="4">
       <input type="text" name="hd_time" value="**TIME**" style="width:60px"> 
 		minutes (0 = never spin down)</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="564" colspan="3">&nbsp;</td>
+		<td width="609" colspan="6">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14" height="21">&nbsp;</td>
-		<td width="564" height="21" colspan="3"><input class="button" type=submit value="Apply"></td>
+		<td width="609" height="21" colspan="6"><input class="button" type=submit value="Apply"></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="564" colspan="3">
+		<td width="609" colspan="6">
 		&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="564" colspan="3">Hard drive format</td>
+		<td width="609" colspan="6">Hard drive format</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="122">&nbsp;</td>
-		<td width="419">
+		<td width="139">&nbsp;</td>
+		<td width="437" colspan="4">
       &nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23"><input type="checkbox" id="confirm" name="confirm" value="yes"></td>
-		<td width="541" colspan="2">I want to format my OpenMCT</td>
+		<td width="582" colspan="5">I want to format my OpenMCT</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="541" colspan="2">&nbsp;</td>
+		<td width="582" colspan="5">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="564" colspan="3">
+		<td width="609" colspan="6">
 		<b><font color="#FF0000"><span class="alert">Attention:</span></font></b></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="564" colspan="3">Pressing the button below will destroy all 
+		<td width="609" colspan="6">Pressing the button below will destroy all 
 		data on the harddrive!</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="564" colspan="3">Please make a backup of both your data and 
+		<td width="609" colspan="6">Please make a backup of both your data and 
 		configuration first!</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="3">&nbsp;</td>
+		<td width="609" colspan="6">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="3"><font color="#FF0000"><b><span class="alert">Attention:</span></b></font></td>
+		<td width="609" colspan="6"><font color="#FF0000"><b><span class="alert">Attention:</span></b></font></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="3">Please remove all USB Mass Storage devices 
+		<td width="609" colspan="6">Please remove all USB Mass Storage devices 
 		before you format!</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="3">
+		<td width="609" colspan="6">
 			&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="3">
+		<td width="609" colspan="6">
 			<font color="#FF0000"><b><span class="alert">Attention:</span></b></font></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="3">
+		<td width="609" colspan="6">
 			Prevent all device activity during formatting!</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="3">
+		<td width="609" colspan="6">
 			Wait untill the formatting is finished.</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="3">
+		<td width="609" colspan="6">
 			&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="3">
+		<td width="609" colspan="6">
 			<input class="button" type="submit" value="Format harddrive"></td>
 	</tr>
 </table>
