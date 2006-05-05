@@ -1,5 +1,39 @@
 
 <head>
+<style>
+<!--
+a{text-decoration:none}
+//-->
+</style>
+<script type="text/javascript">
+
+function getposOffset(overlay, offsettype){
+var totaloffset=(offsettype=="left")? overlay.offsetLeft : overlay.offsetTop;
+var parentEl=overlay.offsetParent;
+while (parentEl!=null){
+totaloffset=(offsettype=="left")? totaloffset+parentEl.offsetLeft : totaloffset+parentEl.offsetTop;
+parentEl=parentEl.offsetParent;
+}
+return totaloffset;
+}
+
+function overlay(curobj, subobj){
+if (document.getElementById){
+var subobj=document.getElementById(subobj)
+subobj.style.left=getposOffset(curobj, "left")+"px"
+subobj.style.top=getposOffset(curobj, "top")+"px"
+subobj.style.display="block"
+return false
+}
+else
+return true
+}
+
+function overlayclose(subobj){
+document.getElementById(subobj).style.display="none"
+}
+
+</script>
 <base target="_self">
 
 </head>
@@ -9,21 +43,26 @@
 <table border="0" width="596" id="table1">
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="3"><font color="#2C4ACE"><b>Hardware - 
+		<td width="257" colspan="3"><font color="#2C4ACE"><b>Hardware - 
 		Date &amp; Time</b></font></td>
+		<td width="311"><font color="#2C4ACE">
+		<img style="cursor: pointer;" src="../images/en.b_help.on.png" width="20" height="20" name="../images/en.b_help.png" id="helpButton" border="0" alt="" title="Help" onClick="return overlay(this, 'subcontent')"></font></td>
 	</tr>
 	<tr>
 		<td width="14" height="22">&nbsp;</td>
-		<td width="568" height="22" colspan="3">&nbsp;</td>
+		<td width="23" height="22">&nbsp;</td>
+		<td width="122" height="22">&nbsp;</td>
+		<td width="104" height="22">&nbsp;</td>
+		<td width="311" height="22">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="564" colspan="3">
+		<td width="564" colspan="4">
       Time Zone:&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14" height="22">&nbsp;</td>
-		<td width="564" height="22" colspan="3">
+		<td width="564" height="22" colspan="4">
       <select name="TIMEZONE">
         <option value="GMT+12:00.1">(GMT-12:00) Eniwetok, Kwajalein</option>
         <option value="GMT+11:00.2">(GMT-11:00) Midway Island, Samoa</option>
@@ -103,31 +142,31 @@
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="564" colspan="3">&nbsp;</td>
+		<td width="564" colspan="4">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14" height="21">&nbsp;</td>
 		<td width="23" height="21"><input type="checkbox" id="TIME_DST" name="TIME_DST" **DST** value="checked"></td>
-		<td width="541" height="21" colspan="2">Use European summer time rule (daylight 
+		<td width="541" height="21" colspan="3">Use European summer time rule (daylight 
 		saving).</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">
       &nbsp;</td>
-		<td width="541" colspan="2">&nbsp;</td>
+		<td width="541" colspan="3">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">
 		<input type="radio" id="NTP_SERVER" value="V1" name="TIME" **USE_NTP_SERVER** onclick=setStateNTP()></td>
-		<td width="541" colspan="2"><label for="NTP_SERVER">Automatically synchonize with an Internet time server</label></td>
+		<td width="541" colspan="3"><label for="NTP_SERVER">Automatically synchonize with an Internet time server</label></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
 		<td width="122">Server:</td>
-		<td width="419">
+		<td width="419" colspan="2">
       <select name="NTP_SERVER_NAME" style="width:250px">
         <option value="ntp.tuxfamily.net">ntp.tuxfamily.net</option>
         <option value="time.nist.gov">time.nist.gov</option>
@@ -277,7 +316,7 @@
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
 		<td width="122">Period:</td>
-		<td width="419">
+		<td width="419" colspan="2">
       <select name="NTP_PERIOD" style="width:250px">
         <option value="1">Every hour</option>
         <option value="2">Every day</option>
@@ -287,25 +326,25 @@
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="541" colspan="2">Last successful update:&nbsp; **NTP_LAST**</td>
+		<td width="541" colspan="3">Last successful update:&nbsp; **NTP_LAST**</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="541" colspan="2">&nbsp;</td>
+		<td width="541" colspan="3">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">
 		<input type="radio" id="MANUAL" value="V1" name="TIME1" **USE_MANUAL** onclick=setStateManual()></td>
-		<td width="541" colspan="2">
+		<td width="541" colspan="3">
       <label for="MANUAL">Set manually date and time</label></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
 		<td width="122">Date:</td>
-		<td width="419">
+		<td width="419" colspan="2">
             <input type=text name="DAY" value="**DAY**" style="width:34; height:22">
             <select name="MONTH">
               <option value=1>January</option>
@@ -327,18 +366,53 @@
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
 		<td width="122">Time:</td>
-		<td width="419"><input type=text name="RTIME" value="**TIME**" style="width:80px"></td>
+		<td width="419" colspan="2"><input type=text name="RTIME" value="**TIME**" style="width:80px"></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="3">&nbsp;</td>
+		<td width="568" colspan="4">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="3">
+		<td width="568" colspan="4">
 			<input class="button" type=submit value="Apply"></td>
 	</tr>
 </table>
+
+
+
+
+
+
+
+
+<DIV id="subcontent" style="position:absolute; display:none; left:-2px; top:467px">
+
+<div style="border: 4px solid #FFFFFF; background-color: black; width: 301px; padding: 8px; height:151px">
+  <table border="0" width="277" height="1" id="table2">
+	<tr>
+		<td height="1" width="246"><font color="#2C4ACE"><b>Date &amp; Time</b></font></td>
+		<td height="1" width="21">
+  <b><a href="#" title="Close" onClick="overlayclose('subcontent'); return false">
+	<img border="0" src="../images/close_on.png" width="20" height="20"></a></b></td>
+	</tr>
+	</table>
+	<p><font size="2">Please set the appropriate date and time and press apply. 
+                    <br><br><font color="#FFFF00"><b>The date format</b></font> is DD mm YYYY, eg. 28 january 2006
+                    <br><br><font color="#FFFF00"><b>The time format</b></font> is HH:MM in the 24 hours system, eg. 23:06
+	</font><br>
+  <br>
+
+
+</div>
+
+</DIV>
+
+
+
+
+
+
 
 
 

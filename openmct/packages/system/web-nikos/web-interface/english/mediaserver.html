@@ -1,20 +1,55 @@
 
 <head>
+<style>
+<!--
+a{text-decoration:none}
+//-->
+</style>
+<script type="text/javascript">
+
+function getposOffset(overlay, offsettype){
+var totaloffset=(offsettype=="left")? overlay.offsetLeft : overlay.offsetTop;
+var parentEl=overlay.offsetParent;
+while (parentEl!=null){
+totaloffset=(offsettype=="left")? totaloffset+parentEl.offsetLeft : totaloffset+parentEl.offsetTop;
+parentEl=parentEl.offsetParent;
+}
+return totaloffset;
+}
+
+function overlay(curobj, subobj){
+if (document.getElementById){
+var subobj=document.getElementById(subobj)
+subobj.style.left=getposOffset(curobj, "left")+"px"
+subobj.style.top=getposOffset(curobj, "top")+"px"
+subobj.style.display="block"
+return false
+}
+else
+return true
+}
+
+function overlayclose(subobj){
+document.getElementById(subobj).style.display="none"
+}
+
+</script>
 <base target="_self">
 </head>
 
 <body text="#FFFFFF" bgcolor="#000000" background="../images/main.png" style="background-attachment: fixed">
-
+<table border="0" width="58%" id="table3">
+	<tr>
+		<td width="13">&nbsp;</td>
+		<td width="285">
+      <font color="#2C4ACE"><b>Services - Media Server</b></font></td>
+		<td>
+      <font color="#2C4ACE">
+		<img style="cursor: pointer;" src="../images/en.b_help.on.png" width="20" height="20" name="../images/en.b_help.png" id="helpButton" border="0" alt="" title="Help" onClick="return overlay(this, 'subcontent')"></font></td>
+	</tr>
+</table>
+<br>
 <table border="0" width="530" id="table1">
-	<tr>
-		<td width="14">&nbsp;</td>
-		<td width="506" colspan="3"><font color="#2C4ACE"><b>Services - Media 
-		Server</b></font></td>
-	</tr>
-	<tr>
-		<td width="14" height="22">&nbsp;</td>
-		<td width="506" height="22" colspan="3">&nbsp;</td>
-	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">
@@ -82,6 +117,67 @@
 			<input class="button" type="submit" value="Apply"></td>
 	</tr>
 </table>
+
+
+
+<DIV id="subcontent" style="position:absolute; display:none; left:1px; top:382px">
+
+<div style="border: 4px solid #FFFFFF; background-color: black; width: 300px; padding: 8px">
+  <table border="0" width="275" height="1" id="table2">
+	<tr>
+		<td height="1" width="242"><font color="#2C4ACE"><b>Media Server</b></font></td>
+		<td height="1" width="23">
+  <b><a href="#" title="Close" onClick="overlayclose('subcontent'); return false">
+	<img border="0" src="../images/close_on.png" width="20" height="20"></a></b></td>
+	</tr>
+	</table>
+	<p><font size="2">This server is a media server based on the Universal Plug
+  and Play Protocol (UPnP).<br> 
+  <br>
+  	<font color="#FFFF00">
+  <b>Enable Media Server:</b></font> Switch on the media server.<br>
+  <br>
+  	<font color="#FFFF00">
+  <b>open media server for the outside:</b></font> If enabled the media server
+  can be accessed via the WAN port.<br>
+  <br>
+  	<font color="#FFFF00">
+  <b>Content folders:</b></font> User folders which are searched
+  for content, default is all user folders. Hold CTRL-C to
+  select multiple folders.<br>
+  <br>
+  	<font color="#FFFF00">
+  <b>Enable Internet Radio:</b></font> Enables Shoutcast Internet Radio<br>
+  <br>
+  	<font color="#FFFF00">
+  <b>Enable picture rescaling:</b></font> Enables the server to
+  rescale pictures. This needs a lot of power and time.<br>
+  <br>
+  	<font color="#FFFF00">
+  <b>Enable audio format resampling:</b></font> Enables resampling
+  of audio formats. This options needs a lot of power
+  and time.<br>
+  <br>
+  	<font color="#FFFF00">
+  <b>Language:</b></font> Select the userinterface langugage of the
+  advanced server pages.<br>
+  <br>
+  	<font color="#FFFF00">
+  <b>Scan for content:</b></font> Start a new scan in content folders.<br>
+  <br>
+  	<font color="#FFFF00">
+  <b>Advanced:</b></font> Switch to advanced configuration pages.</font><br>
+
+
+</div>
+
+</DIV>
+
+
+
+
+
+
 
 
 

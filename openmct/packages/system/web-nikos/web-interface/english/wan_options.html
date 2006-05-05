@@ -1,5 +1,40 @@
 
 <head>
+<style>
+<!--
+a{text-decoration:none}
+//-->
+</style>
+<script type="text/javascript">
+
+function getposOffset(overlay, offsettype){
+var totaloffset=(offsettype=="left")? overlay.offsetLeft : overlay.offsetTop;
+var parentEl=overlay.offsetParent;
+while (parentEl!=null){
+totaloffset=(offsettype=="left")? totaloffset+parentEl.offsetLeft : totaloffset+parentEl.offsetTop;
+parentEl=parentEl.offsetParent;
+}
+return totaloffset;
+}
+
+function overlay(curobj, subobj){
+if (document.getElementById){
+var subobj=document.getElementById(subobj)
+subobj.style.left=getposOffset(curobj, "left")+"px"
+subobj.style.top=getposOffset(curobj, "top")+"px"
+subobj.style.display="block"
+return false
+}
+else
+return true
+}
+
+function overlayclose(subobj){
+document.getElementById(subobj).style.display="none"
+}
+
+</script>
+
 <base target="_self">
 </head>
 
@@ -9,7 +44,8 @@
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="568" colspan="3"><font color="#2C4ACE"><b>Connections - WAN 
-		Options</b></font></td>
+		Options&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>
+		<img style="cursor: pointer;" src="../images/en.b_help.on.png" width="20" height="20" name="../images/en.b_help.png" id="helpButton" border="0" alt="" title="Help" onClick="return overlay(this, 'subcontent')"></font></td>
 	</tr>
 	<tr>
 		<td width="14" height="22">&nbsp;</td>
@@ -124,6 +160,56 @@
 			<input type="submit" value="Apply" name="B1"></td>
 	</tr>
 </table>
+
+
+
+<DIV id="subcontent" style="position:absolute; display:none; left:5px; top:455px">
+
+<div style="border: 4px solid #FFFFFF; background-color: black; width: 343px; padding: 8px; height:382px">
+  <table border="0" width="275" height="1" id="table2">
+	<tr>
+		<td height="1" width="242"><font color="#2C4ACE"><b>WAN options</b></font></td>
+		<td height="1" width="23">
+  <b><a href="#" title="Close" onClick="overlayclose('subcontent'); return false">
+	<img border="0" src="../images/close_on.png" width="20" height="20"></a></b></td>
+	</tr>
+	</table>
+	<p>
+  <b><font size="2" color="#FFFF00">MTU (for DSL only):</font></b><font size="2"> MTU settings (MTU = Maximum Transfer 
+  Unit) (In Bytes)(e.g. 1024) <b><br>
+  <br>
+  	<font color="#FFFF00">Answer ICMP packets:</font></b> This will allow answers to pings 
+  (ICMP echo requests) from the WAN port. It is good for
+  debugging but it can be a security hazard! <b><br>
+  <br>
+  	<font color="#FFFF00">Enable exposed host:</font></b> Enabling this will allow one PC on 
+  the LAN to act as if it bypasses the firewall completely and 
+  has a direct connection to the internet.<br>
+  <b><br>
+  	<font color="#FFFF00">IP address:</font></b> Exposed host IP address. (e.g. 192.168.1.1) 
+  <br>
+  <br>
+  	<font color="#FFFF00">
+  <b>Enable hardware address cloning:</b></font> This will enable you 
+  to set the MAC address of the WAN connection so it matches 
+  the address your ISP authenticates by. <br>
+  <br>
+  	<font color="#FFFF00">
+  <b>MAC address:</b></font> This is the MAC address your WAN port will 
+  be cloned to.(e.g. 00:05:DE:00:01:98) The original MAC address 
+  is on a sticker on the OpenMCT. </font>
+  <br>
+
+
+</div>
+
+</DIV>
+
+
+
+
+
+
 
 
 

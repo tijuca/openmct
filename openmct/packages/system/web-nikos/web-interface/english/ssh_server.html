@@ -1,21 +1,55 @@
 
 <head>
+<style>
+<!--
+a{text-decoration:none}
+//-->
+</style>
+<script type="text/javascript">
+
+function getposOffset(overlay, offsettype){
+var totaloffset=(offsettype=="left")? overlay.offsetLeft : overlay.offsetTop;
+var parentEl=overlay.offsetParent;
+while (parentEl!=null){
+totaloffset=(offsettype=="left")? totaloffset+parentEl.offsetLeft : totaloffset+parentEl.offsetTop;
+parentEl=parentEl.offsetParent;
+}
+return totaloffset;
+}
+
+function overlay(curobj, subobj){
+if (document.getElementById){
+var subobj=document.getElementById(subobj)
+subobj.style.left=getposOffset(curobj, "left")+"px"
+subobj.style.top=getposOffset(curobj, "top")+"px"
+subobj.style.display="block"
+return false
+}
+else
+return true
+}
+
+function overlayclose(subobj){
+document.getElementById(subobj).style.display="none"
+}
+
+</script>
 <base target="_self">
 </head>
 
 <body text="#FFFFFF" bgcolor="#000000" background="../images/main.png" style="background-attachment: fixed">
-
+<table border="0" width="58%" id="table3">
+	<tr>
+		<td width="13">&nbsp;</td>
+		<td width="268">
+      <font color="#2C4ACE"><b>Services - SSH Server</b></font></td>
+		<td>
+      <font color="#2C4ACE">
+		<img style="cursor: pointer;" src="../images/en.b_help.on.png" width="20" height="20" name="../images/en.b_help.png" id="helpButton" border="0" alt="" title="Help" onClick="return overlay(this, 'subcontent')"></font></td>
+	</tr>
+</table>
+<br>
 <table border="0" width="596" id="table1">
-	<tr>
-		<td width="14">&nbsp;</td>
-		<td width="568" colspan="3"><font color="#2C4ACE"><b>Services - SSH 
-		Server</b></font></td>
-	</tr>
-	<tr>
-		<td width="14" height="22">&nbsp;</td>
-		<td width="216" height="22" colspan="2">&nbsp;</td>
-		<td height="22" width="352">&nbsp;</td>
-	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23"><input type="checkbox" name="C2" value="ON"></td>
@@ -60,6 +94,45 @@
 			<input type="submit" value="Apply" name="B1"></td>
 	</tr>
 </table>
+
+
+
+<DIV id="subcontent" style="position:absolute; display:none; left:2px; top:307px">
+
+<div style="border: 4px solid #FFFFFF; background-color: black; width: 300px; padding: 8px">
+  <table border="0" width="275" height="1" id="table2">
+	<tr>
+		<td height="1" width="242"><font color="#2C4ACE"><b>SSH Server</b></font></td>
+		<td height="1" width="23">
+  <b><a href="#" title="Close" onClick="overlayclose('subcontent'); return false">
+	<img border="0" src="../images/close_on.png" width="20" height="20"></a></b></td>
+	</tr>
+	</table>
+	<p><font size="2">The SSH server is a secure terminal client. It can 
+                    be used to do advanced Configuration using the linux command 
+                    line. Please do not use it unless you need it. It is a security 
+                    risk! All users with an account will be able to access the 
+	OpenMCT. If you do not know what it is, leave it off. <br>
+                    <br>
+                    <font color="#FFFF00">
+                    <b>Run SSH server:</b></font> Start/stop the server<br>
+                      <br>
+                    <font color="#FFFF00">
+                    <b> Open SSH server to the outside:</b></font> This will allow 
+                    users to access the SSH server through the WAN port, ie from 
+                    the internet.</font><br>
+  <br>
+
+
+</div>
+
+</DIV>
+
+
+
+
+
+
 
 
 

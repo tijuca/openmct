@@ -1,5 +1,40 @@
 
 <head>
+<style>
+<!--
+a{text-decoration:none}
+//-->
+</style>
+<script type="text/javascript">
+
+function getposOffset(overlay, offsettype){
+var totaloffset=(offsettype=="left")? overlay.offsetLeft : overlay.offsetTop;
+var parentEl=overlay.offsetParent;
+while (parentEl!=null){
+totaloffset=(offsettype=="left")? totaloffset+parentEl.offsetLeft : totaloffset+parentEl.offsetTop;
+parentEl=parentEl.offsetParent;
+}
+return totaloffset;
+}
+
+function overlay(curobj, subobj){
+if (document.getElementById){
+var subobj=document.getElementById(subobj)
+subobj.style.left=getposOffset(curobj, "left")+"px"
+subobj.style.top=getposOffset(curobj, "top")+"px"
+subobj.style.display="block"
+return false
+}
+else
+return true
+}
+
+function overlayclose(subobj){
+document.getElementById(subobj).style.display="none"
+}
+
+</script>
+
 <base target="_self">
 </head>
 
@@ -8,7 +43,9 @@
 <table border="0" width="596" id="table1">
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="5"><font color="#2C4ACE"><b>Connections - VPN </b></font></td>
+		<td width="264" colspan="3"><font color="#2C4ACE"><b>Connections - VPN </b></font></td>
+		<td width="306" colspan="2"><font color="#2C4ACE">
+		<img style="cursor: pointer;" src="../images/en.b_help.on.png" width="20" height="20" name="../images/en.b_help.png" id="helpButton" border="0" alt="" title="Help" onClick="return overlay(this, 'subcontent')"></font></td>
 	</tr>
 	<tr>
 		<td width="14" height="22">&nbsp;</td>
@@ -83,6 +120,50 @@
 			<input class="button" name="statButton"  type="submit" value="Show status"></td>
 	</tr>
 </table>
+
+
+
+<DIV id="subcontent" style="position:absolute; display:none; left:3px; top:306px">
+
+<div style="border: 4px solid #FFFFFF; background-color: black; width: 300px; padding: 8px">
+  <table border="0" width="275" height="1" id="table2">
+	<tr>
+		<td height="1" width="242"><font color="#2C4ACE"><b>VPN connections</b></font></td>
+		<td height="1" width="23">
+  <b><a href="#" title="Close" onClick="overlayclose('subcontent'); return false">
+	<img border="0" src="../images/close_on.png" width="20" height="20"></a></b></td>
+	</tr>
+	</table>
+	<p><font size="2">The server uses IPsec tunnels to create VPN connections. The listed
+  connections are shown with Name, Status, Action,
+  Remote Host and Remote Net.<br>
+  <br>
+  	<font color="#FFFF00">
+  <b>Add:</b></font> If you want to add a permanent new connection, please 
+  press Add Connection.<br>
+  <br>
+  	<font color="#FFFF00">
+  <b>properties:</b></font> If you want to see and edit the properties of an existing 
+  connection, select the connection and press Properties.<br>
+  <br>
+  	<font color="#FFFF00">
+  <b>Delete:</b></font> If you want to delete a connection, select the connection and press Delete Connection.<br>
+  <br>
+  	<font color="#FFFF00">
+  <b>Show status:</b></font> If you wish to see the status of all the connections, 
+  press Show status of all connections. </font><br>
+  <br>
+
+
+</div>
+
+</DIV>
+
+
+
+
+
+
 
 
 

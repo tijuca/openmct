@@ -1,5 +1,40 @@
 
 <head>
+<style>
+<!--
+a{text-decoration:none}
+//-->
+</style>
+<script type="text/javascript">
+
+function getposOffset(overlay, offsettype){
+var totaloffset=(offsettype=="left")? overlay.offsetLeft : overlay.offsetTop;
+var parentEl=overlay.offsetParent;
+while (parentEl!=null){
+totaloffset=(offsettype=="left")? totaloffset+parentEl.offsetLeft : totaloffset+parentEl.offsetTop;
+parentEl=parentEl.offsetParent;
+}
+return totaloffset;
+}
+
+function overlay(curobj, subobj){
+if (document.getElementById){
+var subobj=document.getElementById(subobj)
+subobj.style.left=getposOffset(curobj, "left")+"px"
+subobj.style.top=getposOffset(curobj, "top")+"px"
+subobj.style.display="block"
+return false
+}
+else
+return true
+}
+
+function overlayclose(subobj){
+document.getElementById(subobj).style.display="none"
+}
+
+</script>
+
 <base target="_self">
 </head>
 
@@ -8,13 +43,16 @@
 <table border="0" width="439" id="table1">
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="416" colspan="5"><font color="#2C4ACE"><b>Administration - 
-		Groups</b></font></td>
+		<td width="252" colspan="4"><font color="#2C4ACE"><b>Administration - 
+		Groups&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b></font></td>
+		<td width="160"><font color="#2C4ACE">
+		<img style="cursor: pointer;" src="../images/en.b_help.on.png" width="20" height="20" name="../images/en.b_help.png" id="helpButton" border="0" alt="" title="Help" onClick="return overlay(this, 'subcontent')"></font></td>
 	</tr>
 	<tr>
 		<td width="14" height="10"></td>
 		<td width="178" height="10" colspan="2"></td>
-		<td height="10" width="236" colspan="3"></td>
+		<td height="10" width="73" colspan="2"></td>
+		<td height="10" width="160"></td>
 	</tr>
 	<tr>
 		<td width="14" height="20">&nbsp;</td>
@@ -74,6 +112,43 @@
 			<input type="submit" value="Delete" name="B3"></td>
 	</tr>
 	</table>
+
+
+
+<DIV id="subcontent" style="position:absolute; display:none; left:3px; top:268px">
+
+<div style="border: 4px solid #FFFFFF; background-color: black; width: 300px; padding: 8px">
+  <table border="0" width="275" height="1" id="table2">
+	<tr>
+		<td height="1" width="242"><font color="#2C4ACE"><b>Groups</b></font></td>
+		<td height="1" width="23">
+  <b><a href="#" title="Close" onClick="overlayclose('subcontent'); return false">
+	<img border="0" src="../images/close_on.png" width="20" height="20"></a></b></td>
+	</tr>
+	</table>
+	<p><font size="2">A group is a tool to quickly give access to a folder to multiple users. 
+                    Add the users to a group and give the group access rights to one or more folders. <br><br>
+                    <font color="#FFFF00">
+                    <b>New:</b></font> Pressing the New button gives you a dialogue to add a 
+                      new group.<br>
+                      <br>
+                    <font color="#FFFF00">
+                    <b>Properties:</b></font> Selecting a group and pressing the Properties button will 
+                      allow you to edit the group settings and add or remove users.<br>
+                      <br>
+                    <font color="#FFFF00">
+                    <b>Delete:</b></font> Selecting a group and pressing the Delete button will 
+                      delete the group, but all users will be left intact. Access rights given to the group will be revoked! Users 
+                      will not be able to access folders or files they are not 
+                      authorized to via an other group or on a personal basis!</font><br>
+  <br>
+
+
+</div>
+
+</DIV>
+
+
 
 
 

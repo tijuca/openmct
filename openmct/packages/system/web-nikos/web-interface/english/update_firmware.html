@@ -1,5 +1,39 @@
 
 <head>
+<style>
+<!--
+a{text-decoration:none}
+//-->
+</style>
+<script type="text/javascript">
+
+function getposOffset(overlay, offsettype){
+var totaloffset=(offsettype=="left")? overlay.offsetLeft : overlay.offsetTop;
+var parentEl=overlay.offsetParent;
+while (parentEl!=null){
+totaloffset=(offsettype=="left")? totaloffset+parentEl.offsetLeft : totaloffset+parentEl.offsetTop;
+parentEl=parentEl.offsetParent;
+}
+return totaloffset;
+}
+
+function overlay(curobj, subobj){
+if (document.getElementById){
+var subobj=document.getElementById(subobj)
+subobj.style.left=getposOffset(curobj, "left")+"px"
+subobj.style.top=getposOffset(curobj, "top")+"px"
+subobj.style.display="block"
+return false
+}
+else
+return true
+}
+
+function overlayclose(subobj){
+document.getElementById(subobj).style.display="none"
+}
+
+</script>
 <base target="_self">
 </head>
 <body text="#FFFFFF" bgcolor="#000000" background="../images/main.png" style="background-attachment: fixed">
@@ -8,94 +42,156 @@
 <table border="0" width="672" id="table1">
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="648" colspan="2"><font color="#2C4ACE"><b>Hardware - 
+		<td width="290" colspan="2"><font color="#2C4ACE"><b>Configuration - 
 		Firmware Update</b></font></td>
+		<td width="354"><font color="#2C4ACE">
+		<img style="cursor: pointer;" src="../images/en.b_help.on.png" width="20" height="20" name="../images/en.b_help.png" id="helpButton" border="0" alt="" title="Help" onClick="return overlay(this, 'subcontent')"></font></td>
 	</tr>
 	<tr>
 		<td width="14" height="22">&nbsp;</td>
-		<td width="648" height="22" colspan="2">&nbsp;</td>
+		<td width="23" height="22">&nbsp;</td>
+		<td width="263" height="22">&nbsp;</td>
+		<td width="354" height="22">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">
       &nbsp;</td>
-		<td width="621">Current firmware version:&nbsp;&nbsp; <b>
+		<td width="621" colspan="2">Current firmware version:&nbsp;&nbsp; <b>
 		<font color="#2C4ACE">RC4</font></b></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="621">New firmware file:</td>
+		<td width="621" colspan="2">New firmware file:</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">
       &nbsp;</td>
-		<td width="621">
+		<td width="621" colspan="2">
       <input type="file" name="file" maxlength="500000" size=40></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="621">&nbsp;</td>
+		<td width="621" colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="621"><font color="#FF0000"><b>Attention: </b></font>During 
+		<td width="621" colspan="2"><font color="#FF0000"><b>Attention: </b></font>During 
 		the updating process, the power must not be</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="621">interrupted! After the update, the OpenMCT will 
+		<td width="621" colspan="2">interrupted! After the update, the OpenMCT will 
 		automatically reboot.</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="621">
+		<td width="621" colspan="2">
       When the OpenMCT is rebooted, the update is complette.</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="621">
+		<td width="621" colspan="2">
       &nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="621">
+		<td width="621" colspan="2">
       <font color="#FF0000"><b>Attention: </b></font>Updating the firmware could 
 		change some configuration!</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="621">Please save your current configuration first!</td>
+		<td width="621" colspan="2">Please save your current configuration first!</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="621">&nbsp;</td>
+		<td width="621" colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="621"><font color="#FF0000"><b>Attention: </b></font>It is 
+		<td width="621" colspan="2"><font color="#FF0000"><b>Attention: </b></font>It is 
 		recommended you backup the date on your OpenMCT first!</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="648" colspan="2">&nbsp;</td>
+		<td width="648" colspan="3">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="648" colspan="2">
+		<td width="648" colspan="3">
 			<input class="button" type="submit" value="Update firmware"></td>
 	</tr>
 </table>
+
+
+
+
+
+
+
+
+<DIV id="subcontent" style="position:absolute; display:none; left:-7px; top:421px">
+
+<div style="border: 4px solid #FFFFFF; background-color: black; width: 293px; padding: 8px; height:350px">
+  <table border="0" width="274" height="1" id="table2">
+	<tr>
+		<td height="1" width="241"><font color="#2C4ACE"><b>Firmware update</b></font></td>
+		<td height="1" width="23">
+  <b><a href="#" title="Close" onClick="overlayclose('subcontent'); return false">
+	<img border="0" src="../images/close_on.png" width="20" height="20"></a></b></td>
+	</tr>
+	</table>
+	<font size="2">New firmware usually fixes bugs and adds additional features 
+  to your OpenMCT. Check on
+	<a target="_blank" class="textlink" href="http://www.openmct.org">
+	<font color="#FFFF00"><u>http://www.openmct.org</u></font></a>&nbsp; 
+  if new firmware updates are available for the OpenMCT Storage Gateway. </font>
+  <p><font size="2">OpenMCT will release new and updated firmware on a regular 
+  basis. It is also possible to obtain the source code and 
+  create your own firmware.<br>
+  <br>
+
+  </font>
+
+  <p style="color:#9E0039;"><font color="#FF0000"><b><font size="2">Attention:</font></b></font><font size="2"><font color="#FF0000">
+	</font><font color="#FFFF00">Changing the source 
+  code of the firmware is at your own risk! </font></font> </p>
+
+  <p><font size="2">Download the firmware file and click on &quot;Browse&quot; 
+  to select the file. Click on &quot;Update firmware&quot; 
+  to start the update.<br>
+  </font>
+  </p>
+  <p style="color:#9E0039;"><font color="#FF0000"><b><font size="2">Attention:</font></b></font><font size="2"><font color="#FF0000">
+	</font><font color="#FFFF00">Backup your data and configuration first!
+	</font></font><br>
+  <br>
+
+
+	</p>
+
+
+</div>
+
+</DIV>
+
+
+
+
+
+
 
 
 

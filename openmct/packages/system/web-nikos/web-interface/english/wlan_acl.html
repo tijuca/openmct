@@ -43,25 +43,26 @@ document.getElementById(subobj).style.display="none"
 
 
 <!--Sub content to overlay link when clicked on. Do not remove outermost <div id="subcontent"> tag below. -->
-<DIV id="subcontent" style="position:absolute; display:none; left:5px; top:455px">
+<DIV id="subcontent" style="position:absolute; display:none; left:-4px; top:347px">
 
 <div style="border: 4px solid #FFFFFF; background-color: black; width: 300px; padding: 8px">
   <table border="0" width="275" height="1">
 	<tr>
-		<td height="1" width="242"><b>WLAN access list</b></td>
+		<td height="1" width="242"><font color="#2C4ACE"><b>WLAN access list</b></font></td>
 		<td height="1" width="23">
-  <b><a href="#" onClick="overlayclose('subcontent'); return false">
+  <b><a href="#" title="Close" onClick="overlayclose('subcontent'); return false">
 	<img border="0" src="../images/close_on.png" width="20" height="20"></a></b></td>
 	</tr>
 	</table>
-	<p><b>Access list policy:</b> You can choose how the hardware addresses
+	<p><b><font size="2" color="#FFFF00">Access list policy:</font></b><font size="2"> You can choose how the hardware addresses
   in the list should be handled. Whether the list should be ignored
   (<i>open to every client</i>), whether the list members are the only ones
   to gain access to the OpenMCT (<i>allow all in list</i>) or whether the list
   members are the only ones to be rejected by the OpenMCT (<i>deny all in list</i>).<br>
   <br>
-  <b>Access Control List:</b> Here you can enter a list of wireless
-  hardware addresses to which the access list policy applies.<br>
+  	<font color="#FFFF00">
+  <b>Access Control List:</b></font> Here you can enter a list of wireless
+  hardware addresses to which the access list policy applies.</font><br>
   <br>
 
 
@@ -79,7 +80,7 @@ document.getElementById(subobj).style.display="none"
 		<td width="302" colspan="3"><font color="#2C4ACE"><b>Connections - Wireless 
 		Access List</b></font></td>
 		<td width="186"><font color="#2C4ACE"><b>&nbsp;&nbsp; </b>
-		<img style="cursor: pointer;" src="../images/en.b_help.on.png" width="20" height="20" name="../images/en.b_help.png" id="helpButton" border="0" alt="" onClick="return overlay(this, 'subcontent')"></font></td>
+		<img style="cursor: pointer;" src="../images/en.b_help.on.png" width="20" height="20" name="../images/en.b_help.png" id="helpButton" border="0" alt="" title="Help" onClick="return overlay(this, 'subcontent')"></font></td>
 	</tr>
 	<tr>
 		<td width="14" height="22">&nbsp;</td>

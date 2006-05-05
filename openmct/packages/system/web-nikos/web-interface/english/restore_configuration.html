@@ -1,7 +1,40 @@
 
 <head>
+<style>
+<!--
+a{text-decoration:none}
+//-->
+</style>
+<script type="text/javascript">
+
+function getposOffset(overlay, offsettype){
+var totaloffset=(offsettype=="left")? overlay.offsetLeft : overlay.offsetTop;
+var parentEl=overlay.offsetParent;
+while (parentEl!=null){
+totaloffset=(offsettype=="left")? totaloffset+parentEl.offsetLeft : totaloffset+parentEl.offsetTop;
+parentEl=parentEl.offsetParent;
+}
+return totaloffset;
+}
+
+function overlay(curobj, subobj){
+if (document.getElementById){
+var subobj=document.getElementById(subobj)
+subobj.style.left=getposOffset(curobj, "left")+"px"
+subobj.style.top=getposOffset(curobj, "top")+"px"
+subobj.style.display="block"
+return false
+}
+else
+return true
+}
+
+function overlayclose(subobj){
+document.getElementById(subobj).style.display="none"
+}
+
+</script>
 <base target="_self">
->
 </head>
 <body text="#FFFFFF" bgcolor="#000000" background="../images/main.png" style="background-attachment: fixed">
 
@@ -9,88 +42,150 @@
 <table border="0" width="596" id="table1">
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="2"><font color="#2C4ACE"><b>Configuration - 
-		Restore Configuration</b></font></td>
+		<td width="277" colspan="2"><font color="#2C4ACE"><b>Configuration - 
+		Restore Config.&nbsp; </b></font></td>
+		<td width="291"><font color="#2C4ACE">
+		<img style="cursor: pointer;" src="../images/en.b_help.on.png" width="20" height="20" name="../images/en.b_help.png" id="helpButton" border="0" alt="" title="Help" onClick="return overlay(this, 'subcontent')"></font></td>
 	</tr>
 	<tr>
 		<td width="14" height="22">&nbsp;</td>
-		<td width="568" height="22" colspan="2">&nbsp;</td>
+		<td width="23" height="22">&nbsp;</td>
+		<td width="250" height="22">&nbsp;</td>
+		<td width="291" height="22">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">
       <input type=checkbox id="deluser" name="deluser" value="yes"></td>
-		<td width="541">Remove all users that are not listed in the new </td>
+		<td width="541" colspan="2">Remove all users that are not listed in the new </td>
 	</tr>
 	<tr>
 		<td width="14" height="22">&nbsp;</td>
 		<td width="23" height="22">
 		&nbsp;</td>
-		<td width="541" height="22">configuration file. <font color="#FF0000">This also removes all their data!</font></td>
+		<td width="541" height="22" colspan="2">configuration file. <font color="#FF0000">This also removes all their data!</font></td>
 	</tr>
 	<tr>
 		<td width="14" height="21">&nbsp;</td>
 		<td width="23" height="21">&nbsp;</td>
-		<td width="541" height="21">&nbsp;</td>
+		<td width="541" height="21" colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">
       <input type=checkbox id="delfolder" name="delfolder" value="yes"></td>
-		<td width="541">Remove all folders that are not listed in the new </td>
+		<td width="541" colspan="2">Remove all folders that are not listed in the new </td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="541">configuration file. <font color="#FF0000">This also removes all data within!</font></td>
+		<td width="541" colspan="2">configuration file. <font color="#FF0000">This also removes all data within!</font></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="541">&nbsp;</td>
+		<td width="541" colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="541">New configuration file:</td>
+		<td width="541" colspan="2">New configuration file:</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="541">
+		<td width="541" colspan="2">
       <input type="file" name="file" maxlength="500000" size=40></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="541">&nbsp;</td>
+		<td width="541" colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="541"><font color="#FF0000"><b>Attention: </b></font>Restoring the configuration will delete the</td>
+		<td width="541" colspan="2"><font color="#FF0000"><b>Attention: </b></font>Restoring the configuration will delete the</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="545">current 
+		<td width="545" colspan="2">current 
 		settings! Please save your current configuration first!</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="545">The Administrator password will not be changed.</td>
+		<td width="545" colspan="2">The Administrator password will not be changed.</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="2">&nbsp;</td>
+		<td width="568" colspan="3">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="2">
+		<td width="568" colspan="3">
 			<input class="button" type="submit" value="Restore "></td>
 	</tr>
 </table>
+
+
+
+
+
+
+
+
+<DIV id="subcontent" style="position:absolute; display:none; left:1px; top:441px">
+
+<div style="border: 4px solid #FFFFFF; background-color: black; width: 300px; padding: 8px; height:400px">
+  <table border="0" width="275" height="1" id="table2">
+	<tr>
+		<td height="1" width="242"><font color="#2C4ACE"><b>Restore 
+		configuration</b></font></td>
+		<td height="1" width="23">
+  <b><a href="#" title="Close" onClick="overlayclose('subcontent'); return false">
+	<img border="0" src="../images/close_on.png" width="20" height="20"></a></b></td>
+	</tr>
+	</table>
+	<p><font size="2">This menu lets you restore a previously saved configuration 
+                    file. Use the browse button to select a previous backup of your 
+                    configuration file. Then press the Restore button to start 
+                    the restore. Do not switch off the OpenMCT during the restore. 
+                    This can lead to a corrupt configuration file and the need to reset your entire 
+	OpenMCT!<br>
+                    <br>
+                    You can select the button to delete all users that were created 
+                    after the configuration file was backed up. All data in the 
+                    users home directories will be deleted as well! If you do not select 
+                    this button, the user data and logins will be
+                    maintained. <br>
+                  
+                    </font></p>
+                  
+                    <p style="color:#9E0039;"><font color="#FF0000"><b>Attention:</b><font size="2"> </font>
+					</font><font size="2" color="#FFFF00"> Please be aware that this removes any changes done 
+                    to the configuration after the backup was done!</font><font size="2" color="#FFFFFF"> <br>
+                    <br>
+                    </font><font color="#FF0000"> 
+                    <b>Attention:</b></font><font size="2" color="#FFFFFF"> </font>
+					<font size="2" color="#FFFF00"> Restoring the configuration will delete the current 
+                    settings! Please save the current configuration first! The 
+                    administrator password will not be changed.</font><br>
+
+
+	</p>
+
+
+</div>
+
+</DIV>
+
+
+
+
+
+
 
 
 

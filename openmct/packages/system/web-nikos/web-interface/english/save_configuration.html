@@ -1,5 +1,40 @@
 
 <head>
+<style>
+<!--
+a{text-decoration:none}
+//-->
+</style>
+<script type="text/javascript">
+
+function getposOffset(overlay, offsettype){
+var totaloffset=(offsettype=="left")? overlay.offsetLeft : overlay.offsetTop;
+var parentEl=overlay.offsetParent;
+while (parentEl!=null){
+totaloffset=(offsettype=="left")? totaloffset+parentEl.offsetLeft : totaloffset+parentEl.offsetTop;
+parentEl=parentEl.offsetParent;
+}
+return totaloffset;
+}
+
+function overlay(curobj, subobj){
+if (document.getElementById){
+var subobj=document.getElementById(subobj)
+subobj.style.left=getposOffset(curobj, "left")+"px"
+subobj.style.top=getposOffset(curobj, "top")+"px"
+subobj.style.display="block"
+return false
+}
+else
+return true
+}
+
+function overlayclose(subobj){
+document.getElementById(subobj).style.display="none"
+}
+
+</script>
+
 <base target="_self">
 </head>
 
@@ -8,29 +43,62 @@
 <table border="0" width="596" id="table1">
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568"><font color="#2C4ACE"><b>Configuration - Save 
+		<td width="308"><font color="#2C4ACE"><b>Configuration - Save 
 		Configuration</b></font></td>
+		<td width="260"><font color="#2C4ACE">
+		<img style="cursor: pointer;" src="../images/en.b_help.on.png" width="20" height="20" name="../images/en.b_help.png" id="helpButton" border="0" alt="" title="Help" onClick="return overlay(this, 'subcontent')"></font></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="564">
+		<td width="564" colspan="2">
 		&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14" height="22">&nbsp;</td>
-		<td width="564" height="22">
+		<td width="564" height="22" colspan="2">
 		Save current configuration file on your computer.</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="564">&nbsp;</td>
+		<td width="564" colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="564">
+		<td width="564" colspan="2">
 			<input type="submit" value="Save Configuration" name="B1"></td>
 	</tr>
 </table>
+
+
+
+<DIV id="subcontent" style="position:absolute; display:none; left:-1px; top:177px">
+
+<div style="border: 4px solid #FFFFFF; background-color: black; width: 285px; padding: 8px; height:181px">
+  <table border="0" width="263" height="1" id="table2">
+	<tr>
+		<td height="1" width="233"><font color="#2C4ACE"><b>Save Configuration</b></font></td>
+		<td height="1" width="20">
+  <b><a href="#" title="Close" onClick="overlayclose('subcontent'); return false">
+	<img border="0" src="../images/close_on.png" width="20" height="20"></a></b></td>
+	</tr>
+	</table>
+	<p><font size="2">In this menu you can save the current configuration file on your computer.</b><br>
+                    <br>
+                    After pressing the button, you will be asked where you want 
+                    to backup the configuration file. Please select a location 
+                    and press save. </font>
+  <br>
+
+
+</div>
+
+</DIV>
+
+
+
+
+
+
 
 
 

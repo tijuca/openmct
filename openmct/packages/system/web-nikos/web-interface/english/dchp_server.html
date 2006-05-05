@@ -1,40 +1,71 @@
 <html>
 <head>
-<meta http-equiv="Content-Language" content="de">
-<title>OpenMCT-RC4</title>
+<style>
+<!--
+a{text-decoration:none}
+//-->
+</style>
+<script type="text/javascript">
 
+function getposOffset(overlay, offsettype){
+var totaloffset=(offsettype=="left")? overlay.offsetLeft : overlay.offsetTop;
+var parentEl=overlay.offsetParent;
+while (parentEl!=null){
+totaloffset=(offsettype=="left")? totaloffset+parentEl.offsetLeft : totaloffset+parentEl.offsetTop;
+parentEl=parentEl.offsetParent;
+}
+return totaloffset;
+}
 
+function overlay(curobj, subobj){
+if (document.getElementById){
+var subobj=document.getElementById(subobj)
+subobj.style.left=getposOffset(curobj, "left")+"px"
+subobj.style.top=getposOffset(curobj, "top")+"px"
+subobj.style.display="block"
+return false
+}
+else
+return true
+}
 
+function overlayclose(subobj){
+document.getElementById(subobj).style.display="none"
+}
+
+</script>
+<base target="_self">
 
 </head>
 <body text="#FFFFFF" bgcolor="#000000" background="../images/main.png" style="background-attachment: fixed">
+<table border="0" width="59%" id="table3">
+	<tr>
+		<td width="13">&nbsp;</td>
+		<td width="268">
+      <font color="#2C4ACE"><b>Services - DCHP Server</b></font></td>
+		<td>
+      <font color="#2C4ACE">
+		<img style="cursor: pointer;" src="../images/en.b_help.on.png" width="20" height="20" name="../images/en.b_help.png" id="helpButton" border="0" alt="" title="Help" onClick="return overlay(this, 'subcontent')"></font></td>
+	</tr>
+</table>
 <table border=0 id="table1" width="592">
   <tr>
-    <td class="none" align="left" valign="top" height="28" width="14">
+    <td class="none" align="left" valign="top" height="20" width="14">
       &nbsp;</td>
-    <td class="none" align="left" valign="top" height="28" colspan="5" width="568">
-      <font color="#2C4ACE"><b>Service - DCHP Server</b></font></td>
+    <td class="none" align="left" valign="top" height="20" width="556" colspan="5">
+      &nbsp;</td>
   </tr>
   <tr>
-    <td class="none" align="left" valign="top" height="28" width="14">
+    <td class="none" align="left" valign="top" height="25" width="14">
       &nbsp;</td>
-    <td class="none" align="left" valign="top" height="28" colspan="5" width="568">
+    <td class="none" align="left" valign="top" height="25" colspan="5" width="568">
       The DHCP server automatically configures clients</td>
   </tr>
   <tr>
-    <td class="none" align="left" valign="top" height="28" width="14">
+    <td class="none" align="left" valign="top" height="39" width="14">
       &nbsp;</td>
-    <td class="none" align="left" valign="top" height="28" colspan="5" width="568">
+    <td class="none" align="left" valign="top" height="39" colspan="5" width="568">
       (PCs and others) connected to the LAN ports of your OpenMCT.</td>
-  </tr>
-  <tr>
-    <td class="none" align="left" valign="top" height="28" width="14">
-      &nbsp;</td>
-    <td class="none" align="left" valign="top" height="28" width="20">
-      &nbsp;</td>
-    <td colspan="2" valign="top" class="forms">&nbsp;</td>
-    <td width="32">&nbsp;</td>
-    <td width="204">&nbsp;</td>
   </tr>
   <tr>
     <td class="none" align="left" valign="top" height="28" width="14">
@@ -42,56 +73,56 @@
     <td class="none" align="left" valign="top" height="28" width="20">
       <input type="checkbox" id="dhcp_server" name="dhcp_server" **START** value="checked" onclick=setState()></td>
     <td colspan="2" valign="top" class="forms">Start DHCP server</td>
-    <td width="32"></td>
-    <td width="204"></td>
+    <td width="34"></td>
+    <td width="227"></td>
   </tr>
   <tr>
     <td class="none" width="14"></td>
     <td class="none" width="20">&nbsp;</td>
-    <td class="forms" width="167">Subnet mask:&nbsp;</td>
-    <td class="none" width="129">
+    <td class="forms" width="151">Subnet mask:&nbsp;</td>
+    <td class="none" width="120">
       <input type="text" name="dhcp_subnetmask_ip" value="**NETMASK**" style="width:120px">
     </td>
-    <td width="32"></td>
-    <td width="204"></td>
+    <td width="34"></td>
+    <td width="227"></td>
   </tr>
   <tr>
     <td class="none" width="14"></td>
     <td class="none" width="20">&nbsp;</td>
-    <td class="forms" width="167">Gateway:&nbsp;</td>
-    <td class="none" width="129">
+    <td class="forms" width="151">Gateway:&nbsp;</td>
+    <td class="none" width="120">
       <input type="text" name="dhcp_router_ip" value="**GATEWAY**" style="width:120px">
     </td>
-    <td width="32"></td>
-    <td width="204"></td>
+    <td width="34"></td>
+    <td width="227"></td>
   </tr>
   <tr>
     <td class="none" width="14"></td>
     <td class="none" width="20">&nbsp;</td>
-    <td class="forms" width="167">DNS server:&nbsp;</td>
-    <td class="none" width="129">
+    <td class="forms" width="151">DNS server:&nbsp;</td>
+    <td class="none" width="120">
       <input type="text" name="dhcp_dns_ip" value="**DNS**" style="width:120px">
     </td>
-    <td width="32"></td>
-    <td width="204"></td>
+    <td width="34"></td>
+    <td width="227"></td>
   </tr>
   <tr>
     <td class="none" width="14"></td>
     <td class="none" width="20">&nbsp;</td>
-    <td class="forms" width="167">IP address range:&nbsp;</td>
-    <td class="none" width="129">
+    <td class="forms" width="151">IP address range:&nbsp;</td>
+    <td class="none" width="120">
       <input type="text" name="dhcp_begin_ip" value="**IPBEGIN**" style="width:120px">
     </td>
-    <td class="forms" width="32">&nbsp;to&nbsp;</td>
-    <td class="none" width="204">
+    <td class="forms" width="34">&nbsp;to&nbsp;</td>
+    <td class="none" width="227">
       <input type="text" name="dhcp_end_ip" value="**IPEND**" style="width:120px">
     </td>
   </tr>
   <tr>
     <td class="none" width="14"></td>
     <td class="none" width="20">&nbsp;</td>
-    <td class="forms" width="167">IP release time:&nbsp;</td>
-    <td class="none" width="129">
+    <td class="forms" width="151">IP release time:&nbsp;</td>
+    <td class="none" width="120">
       <input type="text" name="dhcp_iprelease" value="**TIME**" style="width:120px">
     </td>
     <td class="forms" colspan=2>&nbsp;hours</td>
@@ -106,6 +137,60 @@
       <input class="button" type="submit" value="Apply"></td>
   </tr>
 </table>
+
+<DIV id="subcontent" style="position:absolute; display:none; left:-1px; top:388px">
+
+<div style="border: 4px solid #FFFFFF; background-color: black; width: 300px; padding: 8px">
+  <table border="0" width="275" height="1" id="table2">
+	<tr>
+		<td height="1" width="242"><font color="#2C4ACE"><b>DCHP Server</b></font></td>
+		<td height="1" width="23">
+  <b><a href="#" title="Close" onClick="overlayclose('subcontent'); return false">
+	<img border="0" src="../images/close_on.png" width="20" height="20"></a></b></td>
+	</tr>
+	</table>
+	<p><font size="2">The DHCP server is responsible for giving dynamic IP addresses 
+                      to the computers connected to the LAN ports of your 
+	OpenMCT. If this is switched on, the OpenMCT will give all the information 
+                      your computers need to function automatically. For more 
+                      information, please read the "Network and Router Basics" chapter in the manual.<br>
+                      <br>
+                      <font color="#FFFF00">
+                      <b>Start DHCP server:</b></font> Check this if you want to run 
+                      the DHCP server. <br>
+                      <br>
+                      <font color="#FFFF00">
+                      <b> Subnet mask:</b></font> The subnet mask in use for the DHCP 
+                      server. (e.g. 255.255.255.0)<br>
+                      <br>
+                      <font color="#FFFF00">
+                      <b>Gateway:</b></font> The IP address of the gateway the DHCP clients 
+                      should be automatically forwarded to if they want to reach 
+                      external sites. This address should usually be the OpenMCT itself, unless a different gateway is running. (e.g. 192.168.1.1)<br>
+                      <br>
+                      <font color="#FFFF00">
+                      <b>Domain name server:</b></font> The IP address of the DNS server 
+                      the clients should query. This should be the OpenMCT IP address 
+                      or an other DNS system. (e.g. 192.168.1.1)<br>
+                      <br>
+                      <font color="#FFFF00">
+                      <b>IP address range:</b></font> The range of IP addresses the DHCP 
+                      server can use. (e.g. 192.168.1.10 to 192.168.1.200)<br>
+                      <br>
+                      <font color="#FFFF00">
+                      <b>IP release time:</b></font> The time between refreshing IP addresses 
+                      given to DHCP clients. After a refresh, the IP address of a client PC can 
+                      change! </font><br>
+  <br>
+
+
+</div>
+
+</DIV>
+
+
+
+
 
 </body>
 </html>

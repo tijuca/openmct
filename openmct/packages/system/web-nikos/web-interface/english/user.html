@@ -1,5 +1,39 @@
 
 <head>
+<style>
+<!--
+a{text-decoration:none}
+//-->
+</style>
+<script type="text/javascript">
+
+function getposOffset(overlay, offsettype){
+var totaloffset=(offsettype=="left")? overlay.offsetLeft : overlay.offsetTop;
+var parentEl=overlay.offsetParent;
+while (parentEl!=null){
+totaloffset=(offsettype=="left")? totaloffset+parentEl.offsetLeft : totaloffset+parentEl.offsetTop;
+parentEl=parentEl.offsetParent;
+}
+return totaloffset;
+}
+
+function overlay(curobj, subobj){
+if (document.getElementById){
+var subobj=document.getElementById(subobj)
+subobj.style.left=getposOffset(curobj, "left")+"px"
+subobj.style.top=getposOffset(curobj, "top")+"px"
+subobj.style.display="block"
+return false
+}
+else
+return true
+}
+
+function overlayclose(subobj){
+document.getElementById(subobj).style.display="none"
+}
+
+</script>
 <base target="_self">
 </head>
 
@@ -8,13 +42,17 @@
 <table border="0" width="545" id="table1">
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="521" colspan="4"><font color="#2C4ACE"><b>Administration - 
+		<td width="190" colspan="2"><font color="#2C4ACE"><b>Administration - 
 		User</b></font></td>
+		<td width="86">&nbsp;</td>
+		<td width="79"><font color="#2C4ACE">
+		<img style="cursor: pointer;" src="../images/en.b_help.on.png" width="20" height="20" name="../images/en.b_help.png" id="helpButton" border="0" alt="" title="Help" onClick="return overlay(this, 'subcontent')"></font></td>
+		<td width="154">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14" height="22">&nbsp;</td>
 		<td width="183" height="22" colspan="2">&nbsp;</td>
-		<td height="22" width="334" colspan="2">&nbsp;</td>
+		<td height="22" width="334" colspan="3">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
@@ -22,9 +60,9 @@
 		<img border="0" src="../images/build.png" width="22" height="22"></td>
 		<td width="158" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" bgcolor="#2C4ACE">
 		<b>User name</b></td>
-		<td width="162" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" bgcolor="#2C4ACE">
+		<td width="157" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" bgcolor="#2C4ACE" colspan="2">
 		<b>Allowed quota</b></td>
-		<td width="168" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" bgcolor="#2C4ACE">
+		<td width="146" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" bgcolor="#2C4ACE">
 		<b>Used space</b></td>
 	</tr>
 	<tr>
@@ -33,9 +71,9 @@
 		<input type="radio" value="V1" name="R1"></td>
 		<td width="158" height="22" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
 		nikos</td>
-		<td width="162" height="22" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+		<td width="157" height="22" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" colspan="2">
 		unlimited</td>
-		<td width="168" height="22" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+		<td width="146" height="22" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
 		900 MB</td>
 	</tr>
 	<tr>
@@ -44,9 +82,9 @@
 		<input type="radio" value="V1" name="R2"></td>
 		<td width="158" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
 		andi</td>
-		<td width="162" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+		<td width="157" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" colspan="2">
 		unlimited</td>
-		<td width="168" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+		<td width="146" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
 		900 MB</td>
 	</tr>
 	<tr>
@@ -55,9 +93,9 @@
 		<input type="radio" value="V1" name="R3"></td>
 		<td width="158" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
 		carsten</td>
-		<td width="162" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+		<td width="157" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" colspan="2">
 		unlimited</td>
-		<td width="168" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+		<td width="146" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
 		900 MB</td>
 	</tr>
 	<tr>
@@ -66,47 +104,47 @@
 		<input type="radio" value="V1" name="R4"></td>
 		<td width="158" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
 			wusam</td>
-		<td width="162" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+		<td width="157" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF" colspan="2">
 			unlimited</td>
-		<td width="168" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
+		<td width="146" style="border-style: solid; border-width: 1px; padding-left: 4px; padding-right: 4px" bordercolor="#FFFFFF">
 			900 MB</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="521" colspan="4">
+		<td width="521" colspan="5">
 			&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="521" colspan="4">
+		<td width="521" colspan="5">
 			&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="521" colspan="4">
+		<td width="521" colspan="5">
 			<input type="submit" value="New" name="B1">
 			<input type="submit" value="Properties" name="B2">
 			<input type="submit" value="Delete" name="B3"></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="521" colspan="4">
+		<td width="521" colspan="5">
 			&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="521" colspan="4">
+		<td width="521" colspan="5">
 			<font color="#FF0000"><b>Attention:</b></font> Deleting users also 
 			deletes all their data!</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="521" colspan="4">
+		<td width="521" colspan="5">
 			&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="521" colspan="4">
+		<td width="521" colspan="5">
 			<input type="checkbox" name="C2" value="ON"> Yes, I want to delete 
 			the user <b>and</b> all its data.</td>
 	</tr>
@@ -114,7 +152,44 @@
 
 
 
+<DIV id="subcontent" style="position:absolute; display:none; left:5px; top:455px">
+
+<div style="border: 4px solid #FFFFFF; background-color: black; width: 300px; padding: 8px">
+  <table border="0" width="275" height="1" id="table2">
+	<tr>
+		<td height="1" width="242"><font color="#2C4ACE"><b>User</b></font></td>
+		<td height="1" width="23">
+  <b><a href="#" title="Close" onClick="overlayclose('subcontent'); return false">
+	<img border="0" src="../images/close_on.png" width="20" height="20"></a></b></td>
+	</tr>
+	</table>
+	<p>
+                    <b><font size="2" color="#FFFF00">New:</font></b><font size="2"> Pressing the New button gives you a dialogue to 
+                    add new users.
+                    <br>
+                    <br>
+                    <font color="#FFFF00">
+                    <b>Properties:</b></font> Selecting a user and pressing the Properties button will 
+                    allow you to edit the user settings. (e.g. password)
+                    <br>
+                    <br>
+                    <font color="#FFFF00">
+                    <b>Delete:</b></font> Selecting a user and pressing the Delete button will 
+                    delete the user. This will also delete the user folder by 
+                    the same name, but not any other folders created were the 
+                    user might have saved data.</font><br>
+
+
+</div>
+
+</DIV>
+
+
+
+
+
 <p>&nbsp;</p>
+
 
 
 
