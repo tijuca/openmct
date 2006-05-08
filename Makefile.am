@@ -6,6 +6,8 @@ VPATH=@srcdir@
 AUTOMAKE_OPTION = foreign
 # ncurses version
 ncursesver=5.5
+# curl version
+curlver=7.15.1
 # gdbm version
 gdbmver=1.8.3
 
@@ -151,10 +153,29 @@ basic-fs:
 #     libs
 #
 
-libs: gdbm
+libs: curl gdbm
+
+curl:
+	if [ ! -f $(DEPDIR)/$@ ]; then \
+	    cd $(ARCHIVDIR); \
+	    test -f $(ARCHIVDIR)/curl-$(curlver).tar.bz2 || wget http://curl.haxx.se/download/curl-$(curlver).tar.bz2; \
+	    cd $(BUILDDIR); \
+	    test -d $(BUILDDIR)/curl-$(curlver) || tar xjvf $(ARCHIVDIR)/curl-$(curlver).tar.bz2; \
+	    cd $(BUILDDIR)/curl-$(curlver) && \
+		$(BUILDENV) \
+		./configure \
+		    --prefix=$(prefix) \
+		    --host=$(target) \
+		    --enable-shared \
+		    --with-random=/dev/urandom \
+		    --prefix=$(CCDIR) && \
+	    $(MAKE) install && \
+	    touch $(DEPDIR)/$@; \
+	fi
 
 gdbm:
 	if [ ! -f $(DEPDIR)/$@ ]; then \
+	    cd $(ARCHIVDIR); \
 	    test -f $(ARCHIVDIR)/gdbm-$(gdbmver).tar.gz || wget ftp://ftp.gnu.org/gnu/gdbm/gdbm-$(gdbmver).tar.gz; \
 	    cd $(BUILDDIR); \
 	    test -d $(BUILDDIR)/gdbm-$(gdbmver) || tar xzvf $(ARCHIVDIR)/gdbm-$(gdbmver).tar.gz; \
@@ -168,6 +189,11 @@ gdbm:
 	    touch $(DEPDIR)/$@; \
 	fi
 
+
+
+#######################################
+#     tools
+#
 
 tools:
 	cd tools && \

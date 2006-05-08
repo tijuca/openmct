@@ -29,7 +29,6 @@ smt_ver=5.33
 
 ARCHIVDIR=@prefix@/archives
 PATCHDIR=../../patches
-#STRIP=$$HOME/openmct-build/cdk/mipsel-linux/bin/mipsel-linux-sstrip
 CCDIR=@prefix@/cdk/@target@
 
 AM_CFLAGS = $(CFLAGS)
@@ -52,8 +51,8 @@ bin_PROGRAMS    = fcp proccgi
 fcp_SOURCES     = fcp.c
 proccgi_SOURCES = proccgi.c
 
-system: bbox coreutils nano mp3info
-network: portmap
+system: bbox coreutils nano mp3info smartd
+network: portmap tcp_wrappers
 
 bbox:
 	cd $(ARCHIVDIR); \
