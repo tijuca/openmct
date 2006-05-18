@@ -39,105 +39,77 @@ document.getElementById(subobj).style.display="none"
 </head>
 
 <body text="#FFFFFF" bgcolor="#000000" background="../images/main.png" style="background-attachment: fixed">
-<table border="0" width="58%" id="table2">
+<table border="0" width="48%" id="table3">
 	<tr>
 		<td width="13">&nbsp;</td>
 		<td width="268">
-      <font color="#2C4ACE"><b>Services - File Server</b></font></td>
+      <font color="#2C4ACE"><b>Service - Print Server</b></font></td>
 		<td>
       <font color="#2C4ACE">
 		<img style="cursor: pointer;" src="../images/en.b_help.on.png" width="20" height="20" name="../images/en.b_help.png" id="helpButton" border="0" alt="" title="Help" onClick="return overlay(this, 'subcontent')"></font></td>
 	</tr>
 </table>
+<br>
 <table border="0" width="596" id="table1">
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="2"><font color="#2C4ACE"><b>(CIFS/SMB)</b></font></td>
-	</tr>
-	<tr>
-		<td width="14">&nbsp;</td>
-		<td width="564" colspan="2">To make your data avaible through the WAN 
-		port to the outside</td>
-	</tr>
-	<tr>
-		<td width="14">&nbsp;</td>
-		<td width="564" colspan="2">using Windows file sharing (CIFS/SMB), turn 
-		this option on.</td>
-	</tr>
-	<tr>
-		<td width="14">&nbsp;</td>
-		<td width="564" colspan="2">&nbsp;</td>
-	</tr>
-	<tr>
-		<td width="14">&nbsp;</td>
-		<td width="564" colspan="2">This is a security risk, since users from 
-		the internet can also</td>
-	</tr>
-	<tr>
-		<td width="14">&nbsp;</td>
-		<td width="564" colspan="2">see your files.</td>
-	</tr>
-	<tr>
-		<td width="14">&nbsp;</td>
-		<td width="564" colspan="2">&nbsp;</td>
-	</tr>
-	<tr>
-		<td width="14">&nbsp;</td>
-		<td width="564" colspan="2">Make sure you have an additional firewall (your 
-		existing router</td>
-	</tr>
-	<tr>
-		<td width="14">&nbsp;</td>
-		<td width="564" colspan="2">for instance) blocking this traffic between 
-		you and the internet!</td>
+		<td width="23"><input type="checkbox" name="C2" value="ON" checked></td>
+		<td width="541" colspan="2">Run Print Server</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="541">&nbsp;</td>
+		<td width="149">&nbsp;</td>
+		<td width="392">
+		&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
 		<td width="23">&nbsp;</td>
-		<td width="541">&nbsp;</td>
+		<td width="149">Printer name:</td>
+		<td width="392">
+		<input type="text" name="tcp_port0" size="18"
+                      maxlength="8" class="formulartext"></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="23"><input type="checkbox" name="C3" value="ON"></td>
-		<td width="541">Open Windows File Sharing (CIFS/SMB) on the WAN port</td>
+		<td width="23">&nbsp;</td>
+		<td width="149">Make and model:</td>
+		<td width="392">
+		<input type="text" name="tcp_port1" size="18"
+                      maxlength="8" class="formulartext"></td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="568" colspan="2">&nbsp;</td>
+		<td width="23">&nbsp;</td>
+		<td width="149">&nbsp;</td>
+		<td width="392">&nbsp;</td>
 	</tr>
 	<tr>
 		<td width="14">&nbsp;</td>
-		<td width="564" colspan="2">
+		<td width="564" colspan="3">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="14">&nbsp;</td>
+		<td width="564" colspan="3">
 			<input type="submit" value="Apply" name="B1"></td>
 	</tr>
 </table>
 
 
 
-<DIV id="subcontent" style="position:absolute; display:none; left:1px; top:475px">
+<DIV id="subcontent" style="position:absolute; display:none; left:3px; top:374px">
 
 <div style="border: 4px solid #FFFFFF; background-color: black; width: 300px; padding: 8px">
-  <table border="0" width="275" height="1" id="table3">
+  <table border="0" width="275" height="1" id="table2">
 	<tr>
-		<td height="1" width="242"><font color="#2C4ACE"><b>File Server (CIFS/SMB)</b></font></td>
+		<td height="1" width="242"><font color="#2C4ACE"><b>Print Server</b></font></td>
 		<td height="1" width="23">
   <b><a href="#" title="Close" onClick="overlayclose('subcontent'); return false">
 	<img border="0" src="../images/close_on.png" width="20" height="20"></a></b></td>
 	</tr>
 	</table>
-	<p><font size="2">This will allow you to use Windows file sharing (CIFS/SMB) 
-through the WAN port. If you allow this, please be aware 
-anyone on the network you attach the WAN port of your OpenMCT to (ie the internet) 
-will be able to use your OpenMCT via Windows file sharing. 
-Make sure you only do this if you connect to an existing router and
-that router blocks Windows file sharing traffic from the internet. Most
-routers will block this type of traffic automatically.</font><br>
-  <br>
+	<p>Coming Soon<br>
 
 
 </div>
