@@ -1,0 +1,21 @@
+BODY {
+	SCROLLBAR-FACE-COLOR: #3E434D; SCROLLBAR-HIGHLIGHT-COLOR: #000000; SCROLLBAR-SHADOW-COLOR: #FFFFFF; SCROLLBAR-ARROW-COLOR: #FFFFFF; SCROLLBAR-BASE-COLOR: #FFFFFF; font-familiy: arial; scrollbar-3d-light-color: #FFFFFF; scrollbar-dark-shadow-color: #FFFFFF
+}
+A {
+	COLOR: black; TEXT-DECORATION: none; fonz: ; line-heigt: 30pt
+}
+A:visited {
+	COLOR: white
+}
+A:active {
+	COLOR: white
+}
+A:link {
+	COLOR: white
+}
+a_vlink {
+	COLOR: white
+}
+A:hover {
+	BACKGROUND: none transparent scroll repeat 0% 0%; COLOR: orange; LETTER-SPACING: 1pt
+}
