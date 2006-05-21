@@ -25,6 +25,22 @@ echo -n "Starting Network ..."
 /sbin/ifup -a
 echo ""
 
+# checking for directorys on HD, else no login via FTP or use of Samba, NFS is possibile
+# we create the directory with '-p' option on mkdir, so every directory ahead the named directory is builded automaticly
+
+DIRECTORY="/usr/var /usr/var/empty /usr/var/log/samba /usr/var/run/samba /usr/var/lib/samba /usr/var/lib/nfs"
+echo "looking up for $DIRECTORY"
+for i in $DIRECTORY; do
+    test -d $$i || mkdir -p $$i;
+done
+
+# ok, and now checking for some files needed for NFS
+FILES="/usr/var/lib/nfs/rmtab /usr/var/lib/nfs/etab /usr/var/lib/nfs/xtab"
+for i in $FILES; do
+    test -d $$i || touch $$i;
+done
+echo ""
+
 # Telnetd for Remote Access
 if [ "$START_TELNETD" == "yes" ]; then
    echo -n "Starting telnet daemon ... "
