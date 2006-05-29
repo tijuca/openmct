@@ -22,6 +22,7 @@ echo -n "Setting Hostname ... "
 echo ""
 
 echo -n "Starting Network ..."
+/sbin/ifdown -a
 /sbin/ifup -a
 echo ""
 
