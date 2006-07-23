@@ -1,37 +1,25 @@
-diff -Naru buildroot/toolchain/binutils/binutils.mk buildroot-mct/toolchain/binutils/binutils.mk
---- buildroot/toolchain/binutils/binutils.mk	2005-12-02 09:15:03.000000000 +0100
-+++ buildroot-mct/toolchain/binutils/binutils.mk	2006-04-22 16:01:31.000000000 +0200
-@@ -5,7 +5,7 @@
- #############################################################
- BINUTILS_VERSION:=$(strip $(subst ",, $(BR2_BINUTILS_VERSION)))
- 
--BINUTILS_SITE:=http://ftp.kernel.org/pub/linux/devel/binutils
-+BINUTILS_SITE:=http://www.openmct.org/pub/build
- ifeq ($(BINUTILS_VERSION),2.16)
- BINUTILS_SITE:=http://ftp.gnu.org/gnu/binutils/
- endif
 diff -Naru buildroot/toolchain/ccache/ccache.mk buildroot-mct/toolchain/ccache/ccache.mk
---- buildroot/toolchain/ccache/ccache.mk	2005-12-02 09:15:02.000000000 +0100
-+++ buildroot-mct/toolchain/ccache/ccache.mk	2006-04-22 16:01:50.000000000 +0200
+--- buildroot/toolchain/ccache/ccache.mk        2005-12-02 09:15:02.000000000 +0100
++++ buildroot-mct/toolchain/ccache/ccache.mk    2006-04-22 16:01:50.000000000 +0200
 @@ -4,7 +4,7 @@
  #
  #############################################################
  CCACHE_VER:=2.4
 -CCACHE_SITE:=http://ccache.samba.org/ftp/ccache
-+CCACHE_SITE:=http://www.openmct.org/pub/build
++CCACHE_SITE:=http://samba.org/ftp/ccache
  CCACHE_SOURCE:=ccache-$(CCACHE_VER).tar.gz
  CCACHE_DIR1:=$(TOOL_BUILD_DIR)/ccache-$(CCACHE_VER)
  CCACHE_DIR2:=$(BUILD_DIR)/ccache-$(CCACHE_VER)
 diff -Naru buildroot/toolchain/gcc/gcc-uclibc-3.x.mk buildroot-mct/toolchain/gcc/gcc-uclibc-3.x.mk
---- buildroot/toolchain/gcc/gcc-uclibc-3.x.mk	2005-12-02 09:15:07.000000000 +0100
-+++ buildroot-mct/toolchain/gcc/gcc-uclibc-3.x.mk	2006-04-22 16:00:55.000000000 +0200
+--- buildroot/toolchain/gcc/gcc-uclibc-3.x.mk   2005-12-02 09:15:07.000000000 +0100
++++ buildroot-mct/toolchain/gcc/gcc-uclibc-3.x.mk       2006-04-22 16:00:55.000000000 +0200
 @@ -19,8 +19,8 @@
  
  GCC_VERSION:=$(strip $(GCC_VERSION))
  
 -#GCC_SITE:=ftp://ftp.gnu.org/gnu/gcc/releases/gcc-$(GCC_VERSION)
 -GCC_SITE:=http://mirrors.rcn.net/pub/sourceware/gcc/releases/gcc-$(GCC_VERSION)
-+GCC_SITE:=http://www.openmct.org/pub/build
++GCC_SITE:=http://gcc.fyxm.net/releases/gcc-3.3.6
 +#GCC_SITE:=http://mirrors.rcn.net/pub/sourceware/gcc/releases/gcc-$(GCC_VERSION)
  
  #
@@ -220,7 +208,7 @@ diff -Naru buildroot/toolchain/uClibc/uclibc.mk buildroot-mct/toolchain/uClibc/u
  #"
 -UCLIBC_SITE:=http://www.uclibc.org/downloads/snapshots
 +UCLIBC_SOURCE:=uClibc-20050828.tar.bz2
-+UCLIBC_SITE:=http://www.openmct.org/pub/build
++UCLIBC_SITE:=http://claxan.hangar18.org/misc/openmct
  else
  UCLIBC_VER:=0.9.28
  UCLIBC_DIR:=$(TOOL_BUILD_DIR)/uClibc-$(UCLIBC_VER)
