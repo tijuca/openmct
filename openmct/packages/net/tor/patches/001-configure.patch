@@ -1,0 +1,314 @@
+diff -Naru tor-0.1.1.23/configure tor-0.1.1.23-mct/configure
+--- tor-0.1.1.23/configure	2006-07-30 06:40:51.000000000 +0200
++++ tor-0.1.1.23-mct/configure	2006-08-27 16:21:08.000000000 +0200
+@@ -3547,83 +3547,6 @@
+   fi
+ fi
+ 
+-echo "$as_me:$LINENO: checking whether we need extra options to link libevent" >&5
+-echo $ECHO_N "checking whether we need extra options to link libevent... $ECHO_C" >&6
+-if test "${ac_cv_libevent_linker_option+set}" = set; then
+-  echo $ECHO_N "(cached) $ECHO_C" >&6
+-else
+-
+-    saved_LDFLAGS="$LDFLAGS"
+-    le_runs=no
+-    linked_with=nothing
+-    for le_extra in "" "-Wl,-R$le_libdir" "-R$le_libdir" ; do
+-      LDFLAGS="$le_extra $saved_LDFLAGS"
+-      if test "$cross_compiling" = yes; then
+-  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+-See \`config.log' for more details." >&5
+-echo "$as_me: error: cannot run test program while cross compiling
+-See \`config.log' for more details." >&2;}
+-   { (exit 1); exit 1; }; }
+-else
+-  cat >conftest.$ac_ext <<_ACEOF
+-/* confdefs.h.  */
+-_ACEOF
+-cat confdefs.h >>conftest.$ac_ext
+-cat >>conftest.$ac_ext <<_ACEOF
+-/* end confdefs.h.  */
+-void *event_init(void);
+-                int main(int c, char **v) {
+-                   event_init(); return 0;
+-                }
+-_ACEOF
+-rm -f conftest$ac_exeext
+-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+-  (eval $ac_link) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+-  (eval $ac_try) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); }; }; then
+-  libevent_runs=yes
+-else
+-  echo "$as_me: program exited with status $ac_status" >&5
+-echo "$as_me: failed program was:" >&5
+-sed 's/^/| /' conftest.$ac_ext >&5
+-
+-( exit $ac_status )
+-libevent_runs=no
+-fi
+-rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+-fi
+-      if test $libevent_runs = yes ; then
+-        if test -z "$le_extra" ; then
+-          ac_cv_libevent_linker_option='(none)'
+-        else
+-          ac_cv_libevent_linker_option=$le_extra
+-        fi
+-        le_runs=yes
+-        break
+-      fi
+-    done
+-    if test $le_runs = no ; then
+-      { { echo "$as_me:$LINENO: error: Found linkable libevent in $ac_cv_libevent_dir, but it doesn't run, even with -R.  Maybe specify another using --with-libevent-dir?" >&5
+-echo "$as_me: error: Found linkable libevent in $ac_cv_libevent_dir, but it doesn't run, even with -R.  Maybe specify another using --with-libevent-dir?" >&2;}
+-   { (exit 1); exit 1; }; }
+-    fi
+-    LDFLAGS="$saved_LDFLAGS"
+-
+-fi
+-echo "$as_me:$LINENO: result: $ac_cv_libevent_linker_option" >&5
+-echo "${ECHO_T}$ac_cv_libevent_linker_option" >&6
+-
+-if test $ac_cv_libevent_linker_option != '(none)' ; then
+-   LDFLAGS="$ac_cv_libevent_linker_option $LDFLAGS"
+-fi
+-
+-
+ echo "$as_me:$LINENO: checking for OpenSSL directory" >&5
+ echo $ECHO_N "checking for OpenSSL directory... $ECHO_C" >&6
+ if test "${ac_cv_openssl_dir+set}" = set; then
+@@ -3738,147 +3661,6 @@
+   fi
+ fi
+ 
+-echo "$as_me:$LINENO: checking whether we need extra options to link OpenSSL" >&5
+-echo $ECHO_N "checking whether we need extra options to link OpenSSL... $ECHO_C" >&6
+-if test "${ac_cv_openssl_linker_option+set}" = set; then
+-  echo $ECHO_N "(cached) $ECHO_C" >&6
+-else
+-
+-    saved_LDFLAGS="$LDFLAGS"
+-    ssl_runs=no
+-    linked_with=nothing
+-    for ssl_extra in "" "-Wl,-R$ssl_libdir" "-R$ssl_libdir" ; do
+-      LDFLAGS="$ssl_extra $saved_LDFLAGS"
+-      if test "$cross_compiling" = yes; then
+-  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+-See \`config.log' for more details." >&5
+-echo "$as_me: error: cannot run test program while cross compiling
+-See \`config.log' for more details." >&2;}
+-   { (exit 1); exit 1; }; }
+-else
+-  cat >conftest.$ac_ext <<_ACEOF
+-/* confdefs.h.  */
+-_ACEOF
+-cat confdefs.h >>conftest.$ac_ext
+-cat >>conftest.$ac_ext <<_ACEOF
+-/* end confdefs.h.  */
+-
+-#include <string.h>
+-#include <openssl/rand.h>
+-int main(void)
+-{
+-        char a[2048];
+-        memset(a, 0, sizeof(a));
+-        RAND_add(a, sizeof(a), sizeof(a));
+-        return(RAND_status() <= 0);
+-}
+-
+-_ACEOF
+-rm -f conftest$ac_exeext
+-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+-  (eval $ac_link) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+-  (eval $ac_try) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); }; }; then
+-  openssl_runs=yes
+-else
+-  echo "$as_me: program exited with status $ac_status" >&5
+-echo "$as_me: failed program was:" >&5
+-sed 's/^/| /' conftest.$ac_ext >&5
+-
+-( exit $ac_status )
+-openssl_runs=no
+-fi
+-rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+-fi
+-      if test $openssl_runs = yes ; then
+-        if test "$linked_with" = nothing; then
+-           linked_with="$ssl_extra"
+-        fi
+-        if test "$cross_compiling" = yes; then
+-  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+-See \`config.log' for more details." >&5
+-echo "$as_me: error: cannot run test program while cross compiling
+-See \`config.log' for more details." >&2;}
+-   { (exit 1); exit 1; }; }
+-else
+-  cat >conftest.$ac_ext <<_ACEOF
+-/* confdefs.h.  */
+-_ACEOF
+-cat confdefs.h >>conftest.$ac_ext
+-cat >>conftest.$ac_ext <<_ACEOF
+-/* end confdefs.h.  */
+-
+-#include <openssl/opensslv.h>
+-#include <openssl/crypto.h>
+-int main(void) {
+-return (OPENSSL_VERSION_NUMBER == SSLeay()) == 0;
+-}
+-_ACEOF
+-rm -f conftest$ac_exeext
+-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+-  (eval $ac_link) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+-  (eval $ac_try) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); }; }; then
+-  right_version=yes
+-else
+-  echo "$as_me: program exited with status $ac_status" >&5
+-echo "$as_me: failed program was:" >&5
+-sed 's/^/| /' conftest.$ac_ext >&5
+-
+-( exit $ac_status )
+-right_version=no
+-fi
+-rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+-fi
+-        if test "$right_version" = yes; then
+-          if test -z "$ssl_extra" ; then
+-            ac_cv_openssl_linker_option='(none)'
+-          else
+-            ac_cv_openssl_linker_option=$ssl_extra
+-          fi
+-          ssl_runs=yes
+-          break
+-        fi
+-     fi
+-    done
+-    if test $ssl_runs = no ; then
+-      if test "$linked_with" = 'nothing' ; then
+-        { { echo "$as_me:$LINENO: error: Found linkable OpenSSL in $ac_cv_openssl_dir, but it doesn't run, even with -R.  Maybe specify another using --with-ssl-dir?" >&5
+-echo "$as_me: error: Found linkable OpenSSL in $ac_cv_openssl_dir, but it doesn't run, even with -R.  Maybe specify another using --with-ssl-dir?" >&2;}
+-   { (exit 1); exit 1; }; }
+-      else
+-        if test -z "$linked_with" ; then
+-            ac_cv_openssl_linker_option='(none)'
+-        else
+-            ac_cv_openssl_linker_option=$linked_with
+-        fi
+-        { echo "$as_me:$LINENO: WARNING: I managed to make OpenSSL link and run, but I couldn't make it link against the same version I found header files for." >&5
+-echo "$as_me: WARNING: I managed to make OpenSSL link and run, but I couldn't make it link against the same version I found header files for." >&2;}
+-      fi
+-    fi
+-    LDFLAGS="$saved_LDFLAGS"
+-
+-fi
+-echo "$as_me:$LINENO: result: $ac_cv_openssl_linker_option" >&5
+-echo "${ECHO_T}$ac_cv_openssl_linker_option" >&6
+-
+-if test "$ac_cv_openssl_linker_option" != '(none)' ; then
+-   LDFLAGS="$ac_cv_openssl_linker_option $LDFLAGS"
+-fi
+-
+-
+ # Check whether --enable-largefile or --disable-largefile was given.
+ if test "${enable_largefile+set}" = set; then
+   enableval="$enable_largefile"
+@@ -13338,63 +13120,6 @@
+ _ACEOF
+ 
+ 
+-echo "$as_me:$LINENO: checking whether time_t is signed" >&5
+-echo $ECHO_N "checking whether time_t is signed... $ECHO_C" >&6
+-if test "${tor_cv_time_t_signed+set}" = set; then
+-  echo $ECHO_N "(cached) $ECHO_C" >&6
+-else
+-
+-if test "$cross_compiling" = yes; then
+-  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+-See \`config.log' for more details." >&5
+-echo "$as_me: error: cannot run test program while cross compiling
+-See \`config.log' for more details." >&2;}
+-   { (exit 1); exit 1; }; }
+-else
+-  cat >conftest.$ac_ext <<_ACEOF
+-/* confdefs.h.  */
+-_ACEOF
+-cat confdefs.h >>conftest.$ac_ext
+-cat >>conftest.$ac_ext <<_ACEOF
+-/* end confdefs.h.  */
+-
+-int main(int c, char**v) { if (((time_t)-1)<0) return 1; else return 0; }
+-_ACEOF
+-rm -f conftest$ac_exeext
+-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+-  (eval $ac_link) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+-  (eval $ac_try) 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); }; }; then
+-  tor_cv_time_t_signed=no
+-else
+-  echo "$as_me: program exited with status $ac_status" >&5
+-echo "$as_me: failed program was:" >&5
+-sed 's/^/| /' conftest.$ac_ext >&5
+-
+-( exit $ac_status )
+-tor_cv_time_t_signed=yes
+-fi
+-rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+-fi
+-
+-fi
+-echo "$as_me:$LINENO: result: $tor_cv_time_t_signed" >&5
+-echo "${ECHO_T}$tor_cv_time_t_signed" >&6
+-
+-if test $tor_cv_time_t_signed = yes; then
+-
+-cat >>confdefs.h <<\_ACEOF
+-#define TIME_T_IS_SIGNED 1
+-_ACEOF
+-
+-fi
+-
+ echo "$as_me:$LINENO: checking for socklen_t" >&5
+ echo $ECHO_N "checking for socklen_t... $ECHO_C" >&6
+ if test "${ac_cv_type_socklen_t+set}" = set; then
+diff -Naru tor-0.1.1.23/src/common/compat.h tor-0.1.1.23-mct/src/common/compat.h
+--- tor-0.1.1.23/src/common/compat.h	2006-07-25 05:52:47.000000000 +0200
++++ tor-0.1.1.23-mct/src/common/compat.h	2006-08-27 16:22:37.000000000 +0200
+@@ -31,9 +31,9 @@
+ #endif
+ #include <stdarg.h>
+ 
+-#ifndef NULL_REP_IS_ZERO_BYTES
++/*#ifndef NULL_REP_IS_ZERO_BYTES
+ #error "It seems your platform does not represent NULL as zero. We can't cope."
+-#endif
++#endif*/
+ 
+ /* ===== Compiler compatibility */
+ 
