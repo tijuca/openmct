@@ -7069,7 +7069,7 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/s3511a.c linux-2.4.32-mct/ar
 +
 +	to_tm(time, &tm);
 +
-+	year = tm.tm_year;
++	year = tm.tm_year % 100;
 +	month = tm.tm_mon + 1;
 +	mday = tm.tm_mday;
 +	wday = tm.tm_wday;
@@ -9171,7 +9171,7 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/s3511a.c linux-2.4.32-mct/arc
 +
 +	to_tm(time, &tm);
 +
-+	year = tm.tm_year;
++	year = tm.tm_year % 100;
 +	month = tm.tm_mon + 1;
 +	mday = tm.tm_mday;
 +	wday = tm.tm_wday;
