@@ -1,5 +1,5 @@
 # Samba 3.x
-DOWNLOAD=	http://www.samba.org/samba/ftp/stable/samba-3.0.22.tar.gz
+DOWNLOAD=	http://www.samba.org/samba/ftp/stable/samba-3.0.23c.tar.gz
 
 SRCDIRSUFFIX=	/source
 
@@ -20,10 +20,11 @@ CONFIGUREARGS=	--host=$(TARGET) \
                 --with-readline \
                 --with-libsmbclient \
                 --with-winbind \
-                --with-shared-modules=idmap_rid,idmap_ad \
+                --with-shared-modules=idmap_rid \
                 --with-msdfs \
                 --with-automount \
-                --with-tdbsam
+                --with-tdbsam \
+		--without-ldap
 
 INSTALL=	$(CP) $(SRCDIR)/source/bin/{smbd,nmbd,smbpasswd} $(NEWROOTDIR)/sbin && \
 		$(STRIP) $(NEWROOTDIR)/sbin/{smbd,nmbd,smbpasswd}
