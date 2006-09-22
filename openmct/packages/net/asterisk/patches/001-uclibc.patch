@@ -1,0 +1,27 @@
+diff -Naru asterisk-1.2.12.1/dns.c asterisk-1.2.12.1-mct/dns.c
+--- asterisk-1.2.12.1/dns.c	2005-11-29 19:24:39.000000000 +0100
++++ asterisk-1.2.12.1-mct/dns.c	2006-09-22 14:13:29.000000000 +0200
+@@ -173,7 +173,7 @@
+ 	return 0;
+ }
+ 
+-#if defined(res_ninit)
++#if defined(__res_ninit)
+ #define HAS_RES_NINIT
+ #else
+ AST_MUTEX_DEFINE_STATIC(res_lock);
+diff -Naru asterisk-1.2.12.1/include/asterisk/compat.h asterisk-1.2.12.1-mct/include/asterisk/compat.h
+--- asterisk-1.2.12.1/include/asterisk/compat.h	2005-11-29 19:24:39.000000000 +0100
++++ asterisk-1.2.12.1-mct/include/asterisk/compat.h	2006-09-22 14:21:58.000000000 +0200
+@@ -74,9 +74,9 @@
+ #define HAVE_VASPRINTF
+ #define HAVE_STRTOQ
+ 
+-#ifdef _BSD_SOURCE
++/*#ifdef _BSD_SOURCE
+ #define HAVE_GETLOADAVG
+-#endif
++#endif*/
+ 
+ #ifdef __linux__
+ #define HAVE_STRCASESTR
