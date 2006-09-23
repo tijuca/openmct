@@ -1,38 +1,40 @@
 diff -Naru samba-3.0.23c/source/configure samba-3.0.23c-mct/source/configure
 --- samba-3.0.23c/source/configure	2006-08-31 20:57:32.000000000 +0200
-+++ samba-3.0.23c-mct/source/configure	2006-09-20 23:21:00.000000000 +0200
-@@ -14438,7 +14438,7 @@
++++ samba-3.0.23c-mct/source/configure	2006-09-23 13:56:17.000000000 +0200
+@@ -5180,7 +5180,7 @@
+ rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
  fi
- echo "$as_me:$LINENO: result: $samba_cv_have_setresuid" >&5
- echo "${ECHO_T}$samba_cv_have_setresuid" >&6
--if test x"$samba_cv_have_setresuid" = x"yes"; then
-+if test x"$samba_cv_have_setresuid" = x"yes" || test x"$samba_cv_have_setresuid" = x"cross"; then
+ 	CPPFLAGS="$old_CPPFLAGS"
+-	if test x$LINUX_LFS_SUPPORT = xyes ; then
++	if test x$LINUX_LFS_SUPPORT = xyes || test x$LINUX_LFS_SUPPORT = xcross; then
+ 		CPPFLAGS="-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE $CPPFLAGS"
  
  cat >>confdefs.h <<\_ACEOF
- #define HAVE_SETRESUID 1
-@@ -14492,7 +14492,7 @@
- fi
- echo "$as_me:$LINENO: result: $samba_cv_have_setresgid" >&5
- echo "${ECHO_T}$samba_cv_have_setresgid" >&6
--if test x"$samba_cv_have_setresgid" = x"yes"; then
-+if test x"$samba_cv_have_setresgid" = x"yes" || test x"$samba_cv_have_setresgid" = x"cross"; then
- 
- cat >>confdefs.h <<\_ACEOF
- #define HAVE_SETRESGID 1
-@@ -21195,11 +21195,7 @@
+@@ -21194,13 +21194,7 @@
+ case "$host_os" in
      *linux*)
         # glibc <= 2.3.2 has a broken getgrouplist
-        if test "$cross_compiling" = yes; then
+-       if test "$cross_compiling" = yes; then
 -  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
 -See \`config.log' for more details." >&5
 -echo "$as_me: error: cannot run test program while cross compiling
 -See \`config.log' for more details." >&2;}
 -   { (exit 1); exit 1; }; }
-+          linux_getgrouplist_ok=no
- else
+-else
++       if test "$cross_compiling" = no; then
    cat >conftest.$ac_ext <<_ACEOF
  /* confdefs.h.  */
-@@ -27818,7 +27814,7 @@
+ _ACEOF
+@@ -26693,7 +26687,7 @@
+ fi
+ echo "$as_me:$LINENO: result: $samba_cv_have_longlong" >&5
+ echo "${ECHO_T}$samba_cv_have_longlong" >&6
+-if test x"$samba_cv_have_longlong" = x"yes"; then
++if test x"$samba_cv_have_longlong" = x"yes" || test x"$samba_cv_have_longlong" = x"cross"; then
+ 
+ cat >>confdefs.h <<\_ACEOF
+ #define HAVE_LONGLONG 1
+@@ -27818,7 +27812,7 @@
  fi
  echo "$as_me:$LINENO: result: $samba_cv_HAVE_GETTIMEOFDAY_TZ" >&5
  echo "${ECHO_T}$samba_cv_HAVE_GETTIMEOFDAY_TZ" >&6
@@ -41,3 +43,21 @@ diff -Naru samba-3.0.23c/source/configure samba-3.0.23c-mct/source/configure
  
  cat >>confdefs.h <<\_ACEOF
  #define HAVE_GETTIMEOFDAY_TZ 1
+@@ -33192,7 +33186,7 @@
+ fi
+ echo "$as_me:$LINENO: result: $samba_cv_HAVE_IFACE_IFCONF" >&5
+ echo "${ECHO_T}$samba_cv_HAVE_IFACE_IFCONF" >&6
+-if test x"$samba_cv_HAVE_IFACE_IFCONF" = x"yes"; then
++if test x"$samba_cv_HAVE_IFACE_IFCONF" = x"yes" || test x"$samba_cv_HAVE_IFACE_IFCONF" = x"cross"; then
+     iface=yes;
+ cat >>confdefs.h <<\_ACEOF
+ #define HAVE_IFACE_IFCONF 1
+@@ -33421,7 +33415,7 @@
+ fi
+ echo "$as_me:$LINENO: result: $samba_cv_USE_SETEUID" >&5
+ echo "${ECHO_T}$samba_cv_USE_SETEUID" >&6
+-if test x"$samba_cv_USE_SETEUID" = x"yes"; then
++if test x"$samba_cv_USE_SETEUID" = x"yes" || test x"$samba_cv_USE_SETEUID" = x"cross"; then
+     seteuid=yes;
+ cat >>confdefs.h <<\_ACEOF
+ #define USE_SETEUID 1
