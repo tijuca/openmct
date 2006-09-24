@@ -1,6 +1,6 @@
 diff -Naru samba-3.0.23c/source/configure samba-3.0.23c-mct/source/configure
 --- samba-3.0.23c/source/configure	2006-08-31 20:57:32.000000000 +0200
-+++ samba-3.0.23c-mct/source/configure	2006-09-23 13:56:17.000000000 +0200
++++ samba-3.0.23c-mct/source/configure	2006-09-24 14:35:01.000000000 +0200
 @@ -5180,7 +5180,7 @@
  rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
  fi
@@ -34,6 +34,15 @@ diff -Naru samba-3.0.23c/source/configure samba-3.0.23c-mct/source/configure
  
  cat >>confdefs.h <<\_ACEOF
  #define HAVE_LONGLONG 1
+@@ -27001,7 +26995,7 @@
+ fi
+ echo "$as_me:$LINENO: result: $samba_cv_HAVE_OFF64_T" >&5
+ echo "${ECHO_T}$samba_cv_HAVE_OFF64_T" >&6
+-if test x"$samba_cv_HAVE_OFF64_T" = x"yes"; then
++if test x"$samba_cv_HAVE_OFF64_T" = x"yes" || test x"$samba_cv_HAVE_OFF64_T" = x"cross"; then
+ 
+ cat >>confdefs.h <<\_ACEOF
+ #define HAVE_OFF64_T 1
 @@ -27818,7 +27812,7 @@
  fi
  echo "$as_me:$LINENO: result: $samba_cv_HAVE_GETTIMEOFDAY_TZ" >&5
