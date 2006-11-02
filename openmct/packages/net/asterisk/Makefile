@@ -1,7 +1,9 @@
 # Asterisk
 DOWNLOAD=	http://ftp.digium.com/pub/asterisk/releases/asterisk-1.2.12.1.tar.gz
 
-MAKEARGS=	CROSS_COMPILE=$(OPENMCT_CROSS_BASE)/bin/$(TARGET)-uclibc- OPTIMIZE="-Os -Dlinux" CROSS_ARCH=Linux
+MAKEARGS=	CROSS_COMPILE_TARGET=$(OPENMCT_CROSS_BASE) \
+		CROSS_COMPILE=$(OPENMCT_CROSS_BASE)/bin/$(TARGET)-uclibc- \
+		OPTIMIZE="-Os -Dlinux" CROSS_ARCH=Linux
 
 INSTALL=	
 
