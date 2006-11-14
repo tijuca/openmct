@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <malloc.h>
+#include <sys/resource.h>
 #include "includes/argument.h"
 #include "includes/modules.h"
 #include "includes/template.h"
@@ -31,6 +32,7 @@
 
 void owi_header(char *title) {
    printf("Content-Type: text/html\n\n");
+   fflush(stdout);
         
    printf("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"" 
           "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
@@ -60,11 +62,18 @@ int main(int argc, char **argv) {
    int i;
    char *p = strrchr(argv[0], '/');
    char *module = NULL;
+   struct rlimit rlimit;
+
+   getrlimit(RLIMIT_CORE, &rlimit);
+
+   rlimit.rlim_max = 20000;
+
+   setrlimit(RLIMIT_CORE, &rlimit);
 
    if (p) {
       module = p + 1;
    } else {
-      module = p;
+      module = argv[0];
    }
 
    owi_request();
@@ -74,6 +83,8 @@ int main(int argc, char **argv) {
          return modules[i].main(argc, argv);
       }
    }
+
+   printf("Content-Type: text/html\n\nModule nicht gefunden\n");
 
    return 0;
 }

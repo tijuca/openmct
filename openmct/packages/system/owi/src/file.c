@@ -32,45 +32,92 @@
 char **file_line= NULL;
 int file_line_counter = 0;
 
-/* \fn file_read(filename)
+/* \fn file_open(filename)
  * Read file into memory (char**) 
  * \param[in] filename file that will be read into memory 
  * \return Amount of lines that have been read
  */
-int file_read(char *filename) {
+int file_open(char *filename) {
    /* File handle */
    FILE *fp = NULL;
+   /* Line counter - set -1 on default for error */
+   int line_counter = -1;
+   /* Real filename */
+   char *real_filename = (char*)malloc(strlen(filename) + strlen(FILE_BASE) + 1);
+
+   /* Malloc ok? */
+   if (real_filename) {
+      /* Write real filename into variable */
+      sprintf(real_filename, "%s%s", FILE_BASE, filename);
+      /* Try to open file */
+      fp = fopen(real_filename, "r");
+      /* Successful? */
+      if (fp) {
+         /* Read data */
+         line_counter = file_read(fp);
+         /* Close file */
+         fclose(fp);
+      }
+      /* Free memory for filename */
+      free(real_filename);
+   }
+   /* Return amount of lines */
+   return line_counter;
+}
+
+/* \fn proc_read(char *command)
+ * Execute program and parses output
+ * \param[in] command command that will be executed
+ * \return Amount of lines that have been read
+ */
+int proc_open(char *command) {
+   /* File handle */
+   FILE *fp = NULL;
+   /* Line counter */
+   int line_counter;
+
+   /* Try to execute */
+   fp = popen(command, "r");
+   /* Successful? */
+   if (fp) {
+      /* Read data */
+      line_counter = file_read(fp);
+      /* Close file */
+      pclose(fp);
+   } else {
+      /* Set error */
+      line_counter = -1;
+   }
+
+   /* Return amount of lines */
+   return line_counter;
+}
+
+/* \fn file_read(fp)
+ * \param[in] fp file pointer
+ */
+int file_read(FILE *fp) {
    /* Each line from file */
    char line[FILE_MAXLINE];
    /* Line counter */
    int line_counter = 0;
 
-   /* Try to open file */
-   fp = fopen(filename, "r");
-   /* Successful? */
-   if (fp) {
-      while (fgets(line, sizeof(line), fp)) {
-         /* Strip \n from line */
-         line[strlen(line) - 1] = 0;
-         /* Reallocate array */
-         file_line = (char**)realloc(file_line,
-                                                    sizeof(char *) *
-                                                    (line_counter + 1));
-         file_line[line_counter] = (char*)malloc(strlen(line) + 1);
-         /* Add to data */
-         strcpy(file_line[line_counter], line);
-         /* Increase line counter */
-         line_counter++;
-      }
-      file_line_counter = line_counter;
-      /* Close file */
-      fclose(fp);
-   } else {
-      /* Print error message on stderr */
-      fprintf(stderr, "[*] can't open file (%s)\n", filename);
+   /* Loop through file */
+   while (fgets(line, sizeof(line), fp)) {
+      /* Strip \n from line */
+      line[strlen(line) - 1] = 0;
+      /* Reallocate array */
+      file_line = (char**)realloc(file_line,
+                                  sizeof(char *) * (line_counter + 1));
+      file_line[line_counter] = (char*)malloc(strlen(line) + 1);
+      /* Add to data */
+      strcpy(file_line[line_counter], line);
+      /* Increase line counter */
+      line_counter++;
    }
+   file_line_counter = line_counter;
 
-   /* Return amount of lines */
+   /* Return bytes */
    return line_counter;
 }
 
@@ -109,15 +156,24 @@ void file_print(FILE *fp) {
 void file_save(char *filename) {
    /* File handle */
    FILE *fp = NULL;
+   /* Real filename */
+   char *real_filename = (char*)malloc(strlen(filename) + strlen(FILE_BASE) + 1);
 
-   /* Try to open file for writing */
-   fp = fopen(filename, "w");
-   /* Successful? */
-   if (fp) {
-      /* Print data to file */
-      file_print(fp);
-      /* Close file */
-      fclose(fp);
+   /* Malloc ok? */
+   if (real_filename) {
+      /* Write real filename into variable */
+      sprintf(real_filename, "%s%s", FILE_BASE, filename);
+      /* Try to open file for writing */
+      fp = fopen(real_filename, "w");
+      /* Successful? */
+      if (fp) {
+         /* Print data to file */
+         file_print(fp);
+         /* Close file */
+         fclose(fp);
+      }
+      /* Free filename */
+      free(real_filename);
    }
 }
 
@@ -231,110 +287,4 @@ void file_line_action(int mode, int line_index, char *format, ...) {
  */
 int file_get_pad(char *string, char *match) {
    return (strstr(string, match) - string) + strlen(match);
-}
-
-void passwd_del(char *username) {
-   /* Index counter */
-   int i;
-
-   /* Loop through passwd entries */
-   for (i = 0; i < file_line_counter; i++) {
-      /* Get passwd entry */
-      char **passwd = argument_parse(file_line_get(i), ":");
-      /* Username matches? */
-      if (!strcasecmp(username, passwd[0])) {
-         /* Delete username */
-         file_line_action(FILE_LINE_DEL, i, NULL);
-      }
-      /* Free passwd entry */
-      argument_free(passwd);
-   }
-}
-
-void nfs_update(char *mountpoint, char *options) {
-   /* Index counter */
-   int i;
-
-   /* Loop through passwd entries */
-   for (i = 0; i < file_line_counter; i++) {
-      /* Get nfs entry */
-      char **nfs = argument_parse(file_line_get(i), "    ");
-      /* Matches? */
-      if (!strcasecmp(nfs[0], mountpoint)) {
-         file_line_action(FILE_LINE_SET, i,
-                          "%s %s", nfs[0], options);
-      }
-      /* Free nfs entry */
-      argument_free(nfs);
-   }
-}
-
-void nfs_del(char *mountpoint) {
-   /* Index counter */
-   int i;
-
-   /* Loop through passwd entries */
-   for (i = 0; i < file_line_counter; i++) {
-      /* Get nfs entry */
-      char **nfs = argument_parse(file_line_get(i), "    ");
-      /* Matches? */
-      if (!strcasecmp(nfs[0], mountpoint)) {
-         file_line_action(FILE_LINE_DEL, i, NULL);
-      }
-   }
-}
-
-void interfaces_update(char *interface, char *ip, char *netmask, char *broadcast, char *gateway) {
-   /* Index counter */
-   int i;
-   /* Correct section? */
-   int section = 0;
-
-   /* Loop through passwd entries */
-   for (i = 0; i < file_line_counter; i++) {
-      /* Get nfs entry */
-      char **line = argument_parse(file_line_get(i), "   ");
-
-      /* At least two parameter found? */
-      if (line && line[0] && line[1]) {
-         /* New interface start? */
-         if (!strcasecmp(line[0], "auto")) {
-            /* Interfaces matches? */
-            if (!strcasecmp(line[1], interface)) {
-               /* We are in the correct section */
-               section = 1;
-            } else {
-               /* We are not in the correct section */
-               section = 0;
-            }
-         /* Else correct section? */
-         } else if (section) {
-            /* Prefix padding for variable settings */
-            int prefix = 0;
-
-            if (!strcasecmp(line[0], "address")) {
-               /* get padding for address options */
-               prefix = file_get_pad(file_line_get(i), "address");
-               /* Set new ip address */
-               file_line_action(FILE_LINE_SET, i,
-                                "%*s %s %s", prefix, "address", ip, prefix);
-            } else if (!strcasecmp(line[0], "netmask")) {
-               /* get padding for address options */
-               prefix = file_get_pad(file_line_get(i), "netmask");
-               /* Set new netmask address */
-               file_line_action(FILE_LINE_SET, i,
-                                "%*s %s %s", prefix, "netmask", netmask, prefix);
-            } else if (!strcasecmp(line[0], "gateway")) {
-               /* get padding for address options */
-               prefix = file_get_pad(file_line_get(i), "gateway");
-               /* Set new gateway address */
-               file_line_action(FILE_LINE_SET, i,
-                                "%*s %s %s", prefix, "gateway", gateway, prefix);
-            }
-         }
-      }
-
-      /* Free line */
-      argument_free(line);
-   }
 }

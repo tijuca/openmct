@@ -44,7 +44,7 @@ int group_main(int argc, char **argv) {
    owi_header("Group Management");
  
    /* Read file into memory */
-   if (file_read(GROUP_FILE) != -1) {
+   if (file_open(GROUP_FILE) != -1) {
       /* Command NULL or empty? */
       if (!command || !strcmp(command, "")) {
          /* Just print user list */
@@ -84,7 +84,9 @@ void group_list() {
    printf("<h1>%s</h1>\n", variable_get("andi"));
    
    /* print table headline */
-   printf("<table cellpadding=\"0\" cellspacing=\"0\">\n"
+   printf("<div class=\"dataGridHeader\">\n"
+          "<div class=\"dataGridContent\">\n"
+          "<table class=\"%s\">\n"
           "<thead>\n"
           "<tr>\n"
           "<td></td>\n"
@@ -94,6 +96,7 @@ void group_list() {
           "<td></td>\n"
           "</tr>\n"
           "<tbody>", 
+          CONTENT_TABLE_CLASS,
           GROUP_TABLE_DESCRIPTION,
           GROUP_TABLE_GID,
           GROUP_TABLE_MEMBERS);

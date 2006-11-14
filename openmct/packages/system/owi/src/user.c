@@ -45,7 +45,7 @@ int user_main(int argc, char **argv) {
    owi_header("User Management");
 
    /* Read file into memory */
-   if (file_read(USER_FILE) != -1) {
+   if (file_open(USER_FILE) != -1) {
       /* Command NULL or empty? */
       if (!command || !strcmp(command, "")) {
          /* Just print user list */
@@ -55,8 +55,7 @@ int user_main(int argc, char **argv) {
          /* Show user detail */
          user_detail(variable_get("id"));
       } else if (!strcasecmp(command, "update")) {
-         user_update(variable_get("id"), variable_get("password"), variable_get("gecos"),
-                     variable_get("directory"), variable_get("shell"));
+         user_update(variable_get("id"));
       }
       /* Free file */
       file_free(USER_FILE);
@@ -115,12 +114,12 @@ void user_list() {
       /* Parse passwd entry */
       char **passwd = argument_parse(file_line_get(i), ":");
       /* Search string specified? */
-      if ( (!search || !strcmp(search, "") ||
+      if (!search || !strcmp(search, "") ||
           (search && 
            (!strcasecmp(passwd[0], search) ||
             !strcasecmp(passwd[3], search) ||
             !strcasecmp(passwd[4], search) ||
-            !strcasecmp(passwd[5], search)))) && atoi(passwd[2]) > 99) {
+            !strcasecmp(passwd[5], search)))) {
       /* Print entry */
       printf("<tr onmouseover=\"this.className='%s';\""
                   " onmouseout=\"this.className='%s';\">\n"
@@ -182,15 +181,11 @@ void user_detail(char *username) {
                 "</tr>\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
-                "<td><input type=\"user_password\" /></td>\n"
+                "<td><input type=\"password\" /></td>\n"
                 "</tr>\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
-                "<td><input type=\"user_password_check\" /></td>\n"
-                "</tr>\n"
-                "<tr>\n"
-                "<td>%s</td>\n"
-                "<td>%s</td>\n"
+                "<td><input type=\"password_check\" /></td>\n"
                 "</tr>\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
@@ -198,15 +193,19 @@ void user_detail(char *username) {
                 "</tr>\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
-                "<td><input type=\"text\" name=\"user_gecos\" value=\"%s\" /></td>\n"
+                "<td>%s</td>\n"
                 "</tr>\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
-                "<td><input type=\"text\" name=\"user_directory\" value=\"%s\" /></td>\n"
+                "<td><input type=\"text\" name=\"gecos\" value=\"%s\" /></td>\n"
                 "</tr>\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
-                "<td><input type=\"text\" name=\"user_shell\" value=\"%s\" /></td>\n"
+                "<td><input type=\"text\" name=\"directory\" value=\"%s\" /></td>\n"
+                "</tr>\n"
+                "<tr>\n"
+                "<td>%s</td>\n"
+                "<td><input type=\"text\" name=\"shell\" value=\"%s\" /></td>\n"
                 "</tr>\n"
                 "<tr>\n"
                 "<td colspan=\"2\">\n"
@@ -249,15 +248,11 @@ void user_detail(char *username) {
    }
 }
 
-/* \fn user_update(username, password, gecos, directory, loginshell)
+/* \fn user_update(username)
  * Update an entry in password file
  * \param[in] username username that will be updated
- * \param[in] password new password in cleartext (will be crypted)
- * \param[in] gecos new gecos field
- * \param[in] directory new home directory
- * \param[in] shell new shell
  */
-void user_update(char *username, char *password, char *gecos, char *directory, char *shell) {
+void user_update(char *username) {
    /* Index counter */
    unsigned int i;
 
@@ -271,12 +266,12 @@ void user_update(char *username, char *password, char *gecos, char *directory, c
          file_line_action(FILE_LINE_SET, i,
                           "%s:%s:%s:%s:%s:%s:%s",
                           username,
-                          crypt(password, "OM"),
+                          crypt(variable_get("password"), "OM"),
                           passwd[2],
                           passwd[3],
-                          gecos,
-                          directory,
-                          shell);
+                          variable_get("gecos"),
+                          variable_get("directory"),
+                          variable_get("shell"));
       }
       /* Free passwd entry */
       argument_free(passwd);
@@ -284,17 +279,16 @@ void user_update(char *username, char *password, char *gecos, char *directory, c
    
    /* Save result in user file */
    file_save(USER_FILE);
+
+   /* Display user */
+   user_detail(username);
 }
 
 /* \fn user_update(username, password, gecos, directory, loginshell)
  * Update an entry in password file
  * \param[in] username username that will be updated
- * \param[in] password new password in cleartext (will be crypted)
- * \param[in] gecos new gecos field
- * \param[in] directory new home directory
- * \param[in] shell new shell
  */
-void user_add(char *username, char *password, char *gecos, char *directory, char *shell) {
+void user_add(char *username) {
    /* Index counter */
    int i;
    /* Max uid */
@@ -318,12 +312,12 @@ void user_add(char *username, char *password, char *gecos, char *directory, char
    file_line_action(FILE_LINE_ADD, i,
                     "%s:%s:%d:%d:%s:%s:%s",
                     username,
-                    crypt(password, "OM"),
+                    crypt(variable_get("password"), "OM"),
                     max_uid,
                     max_uid,
-                    gecos,
-                    directory,
-                    shell);
+                    variable_get("gecos"),
+                    variable_get("directory"),
+                    variable_get("shell"));
 
    /* Save result in user file */
    file_save(USER_FILE);
