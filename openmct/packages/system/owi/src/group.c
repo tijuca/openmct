@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <grp.h>
 #include <unistd.h>
 #include "includes/argument.h"
 #include "includes/language.h"
@@ -29,6 +28,7 @@
 #include "includes/variable.h"
 #include "includes/owi.h"
 #include "includes/group.h"
+#include "includes/file.h"
 
 /* \fn group_main(argc, argv)
  * Show all groups from system
@@ -42,17 +42,26 @@ int group_main(int argc, char **argv) {
    
    /* Print header information */
    owi_header("Group Management");
-   
-   /* Command NULL or empty? */
-   if (!command || !strcmp(command, "")) {
-      /* Just print user list */
-      group_list();
-   /* show user detail */
-   } else if (!strcasecmp(command, "detail")) {
-      /* Show user detail */
-      group_detail(variable_get("id"));
-   } else if (!strcasecmp(command, "update")) {
-      group_update(variable_get("id"));
+ 
+   /* Read file into memory */
+   if (file_read(GROUP_FILE) != -1) {
+      /* Command NULL or empty? */
+      if (!command || !strcmp(command, "")) {
+         /* Just print user list */
+         group_list();
+      /* show user detail */
+      } else if (!strcasecmp(command, "detail")) {
+         /* Show user detail */
+         group_detail(variable_get("id"));
+      } else if (!strcasecmp(command, "update")) {
+         group_update(variable_get("id"), variable_get("members"));
+      }
+      /* Free file */
+      file_free(GROUP_FILE);
+   } else {
+      /* Print error message */
+      owi_headline(1, GROUP_HEADLINE);
+      owi_headline(2, GROUP_FILE_FAILED);
    }
 
    /* Print footer information */
@@ -66,8 +75,8 @@ int group_main(int argc, char **argv) {
  * Show all users from system
  */
 void group_list() {
-   /* variable for handling user entry in /etc/passwd */
-   struct group *group;
+   /* Index counter */
+   int i = 0;	
 
    /* print headline */
    owi_headline(1, GROUP_HEADLINE);
@@ -88,26 +97,31 @@ void group_list() {
           GROUP_TABLE_DESCRIPTION,
           GROUP_TABLE_GID,
           GROUP_TABLE_MEMBERS);
-   /* Loop through all user entries in /etc/passwd */
-   while ( (group = getgrent()) != NULL) {
+   /* Loop through all user entries in group file */
+   while ( i < file_line_counter) {
+      char **group = argument_parse(file_line_get(i), ":");
       /* Print entry */
       printf("<tr onmouseover=\"this.style.backgroundColor='%s';\""
                   " onmouseout=\"this.style.backgroundColor='%s';\">\n"
              "<td><input type=\"checkbox\" name=\"group_%s\" value=\"checked\" /></td>\n"
              "<td>%s</td>\n"
-             "<td>%d</td>\n"
+             "<td>%s</td>\n"
              "<td>%s</td>\n"
              "<td><a href=\"%s?command=detail&id=%s\" />%s</td>\n"
              "</tr>\n",
              CONTENT_TABLE_CLASS_MOUSEOVER,
              CONTENT_TABLE_CLASS_MOUSEOUT,
-             group->gr_name,
-             group->gr_name,
-             group->gr_gid,
-             "",
+             group[0],
+             group[0],
+             group[2],
+             group[3],
              getenv("SCRIPT_NAME"),
-             group->gr_name,
+             group[0],
              GROUP_BUTTON_MODIFY);
+      /* Increase index counter */
+      i++;
+      /* Free group entry */
+      argument_free(group);
    }
    /* Print table footer */
    printf("</tbody>\n"
@@ -118,23 +132,23 @@ void group_list() {
           "</tfoot>\n"
           "</table>\n",
           GROUP_BUTTON_DELETE);
-   /* closes /etc/passwd */
-   endgrent();
 }
 
 /* \fn group_detail(groupname)
  * Show one group account
  */
 void group_detail(char *groupname) {
-   /* variable for handling user entry in /etc/passwd */
-   struct group *group;
-   /* User found? */
+   /* Index counter */
+   int i = 0;	
+   /* Group found? */
    int group_found = 0;
 
    /* Loop through passwd database */
-   while ( (group = getgrent()) != NULL) {
+   while ( i < file_line_counter) {
+      /* Get group entry */	   
+      char **group = argument_parse(file_line_get(i), ":");
       /* Match found? */
-      if (!strcmp(group->gr_name, groupname)) {
+      if (!strcmp(group[0], groupname)) {
          printf("<form action=\"%s\" method=\"POST\">\n"
                 "<input type=\"hidden\" name=\"command\" value=\"update\">\n"
                 "<input type=\"hidden\" name=\"id\" value=\"%s\">\n"
@@ -153,7 +167,7 @@ void group_detail(char *groupname) {
                 "</tr>\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
-                "<td>%d</td>\n"
+                "<td>%s</td>\n"
                 "</tr>\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
@@ -166,63 +180,61 @@ void group_detail(char *groupname) {
                 "</form>\n"
                 ,
                 getenv("SCRIPT_NAME"),
-                group->gr_name,
+                group[0],
                 GROUP_TABLE_DESCRIPTION,
-                group->gr_name,
+                group[0],
                 GROUP_TABLE_NEW_PASSWORD,
                 GROUP_TABLE_NEW_PASSWORD_CHECK,
                 GROUP_TABLE_GID,
-                group->gr_gid,
+                group[2],
                 GROUP_TABLE_MEMBERS,
-                "");
+                group[3]);
 
 
          /* Set user found to one */
          group_found = 1;
       }
+      /* Increase index counter */
+      i++;
+      /* Free group entry */
+      argument_free(group);
    }
-   /* closes /etc/passwd */
-   endgrent();
 
    /* No user found? */
    if (!group_found) {
       /* Print information screen */
-      owi_headline(2, "User not found");
+      owi_headline(2, "Group not found");
    }
 }
 
-/* \fn group_update(groupname)
- * Update a group
+/* \fn group_update(groupname, members)
+ * Update an entry in password file
  * \param[in] groupname group that will be updated
+ * \param[in] members comma seperated list of usernames
  */
-void group_update(char *groupname) {
-   /* Variable for handling group entry in /etc/group */
-   struct group *group;
-   /* File handling for writing password records */
-   /* FILE *fp = fopen("/tmp/.group.tmp", "w"); */
-   /* User found? */
-   int group_found = 0;
+void group_update(char *groupname, char *members) {
+   /* Index counter */
+   unsigned int i;
 
-   /* Loop through passwd database */
-   while ( (group = getgrent()) != NULL) {
-      /* Match found? */
-      if (!strcmp(group->gr_name, groupname)) {
-         group_found = 1;
+   /* Loop through passwd entries */
+   for (i = 0; i < file_line_counter; i++) {
+      /* Get passwd entry */
+      char **group = argument_parse(file_line_get(i), ":");
+      /* Passwd entry found? */
+      if (!strcasecmp(groupname, group[0])) {
+         /* Set new passwd line in memory */
+         file_line_action(FILE_LINE_SET, i,
+                          "%s:%s:%s:%s",
+                          group[0],
+                          group[1],
+                          group[2],
+                          members);
       }
-      /* putgrent(group, fp); */
+      /* Free passwd entry */
+      argument_free(group);
    }
- 
-   /* closes /etc/passwd */
-   endgrent();
 
-   /* No user found? */
-   if (!group_found) {
-      /* Print information screen */
-      owi_headline(2, "User not found");
-   } else {
-      unlink("/etc/group");
-      rename("/tmp/.group.tmp", "/etc/group");
-      /* Display user */	   
-      group_detail(groupname);
-   }
+   /* Save result in user file */
+   file_save(GROUP_FILE);
 }
+

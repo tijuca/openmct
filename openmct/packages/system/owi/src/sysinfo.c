@@ -31,6 +31,7 @@
 #include <sys/ioctl.h>
 #include <net/if_arp.h>
 #include <arpa/inet.h>
+#include <sys/sysinfo.h>
 #include "includes/argument.h"
 #include "includes/language.h"
 #include "includes/template.h"
@@ -79,7 +80,7 @@ void sysinfo_list() {
 
    sysinfo_network();
 
-   printf("</td></tr>\n",
+   printf("</td></tr>\n"
           "</table>\n");
 }
 
@@ -114,11 +115,14 @@ void sysinfo_general() {
              CONTENT_TABLE_CLASS,
              CONTENT_TABLE_CLASS_MOUSEOVER,
              CONTENT_TABLE_CLASS_MOUSEOUT,
-             si.loads[0], si.loads[1], si.loads[2],
-             si.totalram / 1024 / 1024 , si.freeram / 1024 / 1024, si.sharedram / 1024 / 1024,
-             si.bufferram,
-             si.totalswap / 1024 / 1024, si.freeswap / 1024 / 1024,
-             si.procs);
+             (unsigned int)si.loads[0], (unsigned int)si.loads[1],
+	     (unsigned int)si.loads[2], (unsigned int)(si.totalram / 1024 / 1024),
+             (unsigned int)(si.freeram / 1024 / 1024),
+             (unsigned int)(si.sharedram / 1024 / 1024),
+             (unsigned int)si.bufferram,
+             (unsigned int)(si.totalswap / 1024 / 1024),
+             (unsigned int)(si.freeswap / 1024 / 1024),
+             (unsigned int)si.procs);
    }
 }
 
@@ -175,7 +179,7 @@ void sysinfo_network() {
    /* Device information */
    char device[1024], line[1024];
    /* Trafic information */
-   long in, out;
+   int in, out;
 
    /* Try to open network information file */
    fp = fopen("/proc/net/dev", "r");

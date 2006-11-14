@@ -21,14 +21,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <pwd.h>
 #include <unistd.h>
+#include <crypt.h>
 #include "includes/argument.h"
 #include "includes/language.h"
 #include "includes/template.h"
 #include "includes/variable.h"
 #include "includes/owi.h"
 #include "includes/user.h"
+#include "includes/file.h"
 
 /* \fn user_main(argc, argv)
  * Show all users from system
@@ -39,20 +40,30 @@
 int user_main(int argc, char **argv) {
    /* Get command for this module */        
    char *command = variable_get("command");
-   
+ 
    /* Print header information */
    owi_header("User Management");
-   
-   /* Command NULL or empty? */
-   if (!command || !strcmp(command, "")) {
-      /* Just print user list */
-      user_list();
-   /* show user detail */
-   } else if (!strcasecmp(command, "detail")) {
-      /* Show user detail */
-      user_detail(variable_get("id"));
-   } else if (!strcasecmp(command, "update")) {
-      user_update(variable_get("id"));
+
+   /* Read file into memory */
+   if (file_read(USER_FILE) != -1) {
+      /* Command NULL or empty? */
+      if (!command || !strcmp(command, "")) {
+         /* Just print user list */
+         user_list();
+      /* show user detail */
+      } else if (!strcasecmp(command, "detail")) {
+         /* Show user detail */
+         user_detail(variable_get("id"));
+      } else if (!strcasecmp(command, "update")) {
+         user_update(variable_get("id"), variable_get("password"), variable_get("gecos"),
+                     variable_get("directory"), variable_get("shell"));
+      }
+      /* Free file */
+      file_free(USER_FILE);
+   } else {
+      /* Print error message */
+      owi_headline(1, USER_HEADLINE);
+      owi_headline(2, USER_FILE_FAILED);
    }
 
    /* Print footer information */
@@ -66,43 +77,27 @@ int user_main(int argc, char **argv) {
  * Show all users from system
  */
 void user_list() {
-   /* variable for handling user entry in /etc/passwd */
-   struct passwd *user;
    /* Get command for this module */        
    char *search = variable_get("search");
-   /* counter for users */
-   int user_count = 0;
+   /* Index counter */
+   int i = 0;
 
-   /* Loop through all user entries in /etc/passwd */
-   while ( (user = getpwent()) != NULL) {
-      user_count++;
-   }
-   /* Set pointer to start */
-   setpwent();
-   
    owi_image("images/user.png", USER_HEADLINE, USER_HEADLINE);
    owi_headline(1, USER_HEADLINE);
    owi_headline(2, USER_DESCRIPTION);
 
-   printf("<table>\n"
-          "<tr>\n"
-          "<td>Seiten (%d):\n"
-          "</td>\n"
-          "<td align=\"right\"><input type=\"text\" name=\"search=\" /></td>\n"
-          "</tr>\n"
-          "</table>\n", 0);
-
-   
    /* print table headline */
-   printf("<table class=\"%s\">\n"
+   printf("<div class=\"dataGridHeader\">\n"
+          "<div class=\"dataGridContent\">\n"
+          "<table class=\"%s\">\n"
           "<thead>\n"
           "<tr>\n"
           "<td width=\"30\">&nbsp;</td>\n"
           "<td width=\"60\">%s</td>\n"
-          "<td width=\"60\">%s</td>\n"
-          "<td width=\"60\">%s</td>\n"
+          "<td width=\"90\">%s</td>\n"
           "<td width=\"120\">%s</td>\n"
-          "<td width=\"100\">%s</td>\n"
+          "<td width=\"150\">%s</td>\n"
+          "<td width=\"120\">%s</td>\n"
           "<td width=\"80\">%s</td>\n"
           "<td></td>\n"
           "</tr>\n"
@@ -115,43 +110,50 @@ void user_list() {
           USER_TABLE_DIRECTORY,
           USER_TABLE_SHELL);
 
-   /* Loop through all user entries in /etc/passwd */
-   while ( (user = getpwent()) != NULL) {
-      if (!search || !strcmp(search, "") ||
+   /* Loop through all user entries in passwd file */
+   while ( i < file_line_counter) {
+      /* Parse passwd entry */
+      char **passwd = argument_parse(file_line_get(i), ":");
+      /* Search string specified? */
+      if ( (!search || !strcmp(search, "") ||
           (search && 
-           (!strcasecmp(user->pw_name, search) ||
-            !strcasecmp(user->pw_gecos, search) ||
-            !strcasecmp(user->pw_dir, search) ||
-            !strcasecmp(user->pw_shell, search)))) {
+           (!strcasecmp(passwd[0], search) ||
+            !strcasecmp(passwd[3], search) ||
+            !strcasecmp(passwd[4], search) ||
+            !strcasecmp(passwd[5], search)))) && atoi(passwd[2]) > 99) {
       /* Print entry */
       printf("<tr onmouseover=\"this.className='%s';\""
                   " onmouseout=\"this.className='%s';\">\n"
              "<td width=\"30\"><input type=\"checkbox\" name=\"user_%s\" value=\"checked\" /></td>\n"
              "<td width=\"60\"><a href=\"%s?command=detail&amp;id=%s\" />%s</td>\n"
-             "<td width=\"60\">%d</td>\n"
-             "<td width=\"60\">%d</td>\n"
+             "<td width=\"90\">%s</td>\n"
              "<td width=\"120\">%s</td>\n"
-             "<td width=\"100\">%s</td>\n"
+             "<td width=\"150\">%s</td>\n"
+             "<td width=\"120\">%s</td>\n"
              "<td width=\"80\">%s</td>\n"
              "</tr>\n",
              CONTENT_TABLE_CLASS_MOUSEOVER,
              CONTENT_TABLE_CLASS_MOUSEOUT,
-             user->pw_name,
+             passwd[0],
              getenv("SCRIPT_NAME"),
-             user->pw_name,
-             user->pw_name,
-             user->pw_uid,
-             user->pw_gid,
-             user->pw_gecos,
-             user->pw_dir,
-             user->pw_shell);
-      }   
+             passwd[0],
+             passwd[0],
+             passwd[2],
+             passwd[3],
+             passwd[4],
+             passwd[5],
+             passwd[6]);
+      }
+      /* Increase counter */
+      i++;
+      /* Free passwd entry */
+      argument_free(passwd);
    }
    /* Print table footer */
    printf("</tbody>\n"
-          "</table>\n");
-   /* closes /etc/passwd */
-   endpwent();
+          "</table>\n"
+          "</div>\n"
+          "</div>\n");
 }
 
 /* \fn user_detail(username)
@@ -159,15 +161,17 @@ void user_list() {
  * \param[in] username user that will be displayed
  */
 void user_detail(char *username) {
-   /* variable for handling user entry in /etc/passwd */
-   struct passwd *user;
    /* User found? */
    int user_found = 0;
+   /* Index counter */
+   int i = 0;
 
-   /* Loop through passwd database */
-   while ( (user = getpwent()) != NULL) {
+   /* Loop through all user entries in /etc/passwd */
+   while ( i < file_line_counter) {
+      /* Parse passwd entry */
+      char **passwd = argument_parse(file_line_get(i), ":");
       /* Match found? */
-      if (!strcmp(user->pw_name, username)) {
+      if (!strcmp(passwd[0], username)) {
          printf("<form action=\"%s\" method=\"POST\">\n"
                 "<input type=\"hidden\" name=\"command\" value=\"update\">\n"
                 "<input type=\"hidden\" name=\"id\" value=\"%s\">\n"
@@ -186,11 +190,11 @@ void user_detail(char *username) {
                 "</tr>\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
-                "<td>%d</td>\n"
+                "<td>%s</td>\n"
                 "</tr>\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
-                "<td>%d</td>\n"
+                "<td>%s</td>\n"
                 "</tr>\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
@@ -212,29 +216,31 @@ void user_detail(char *username) {
                 "</form>\n"
                 ,
                 getenv("SCRIPT_NAME"),
-                user->pw_name,
+                passwd[0],
                 USER_TABLE_DESCRIPTION,
-                user->pw_name,
+                passwd[0],
                 USER_TABLE_NEW_PASSWORD,
                 USER_TABLE_NEW_PASSWORD_CHECK,
                 USER_TABLE_UID,
-                user->pw_uid,
+                passwd[2],
                 USER_TABLE_GID,
-                user->pw_gid,
+                passwd[3],
                 USER_TABLE_GECOS,
-                user->pw_gecos,
+                passwd[4],
                 USER_TABLE_DIRECTORY,
-                user->pw_dir,
+                passwd[5],
                 USER_TABLE_SHELL,
-                user->pw_shell);
+                passwd[6]);
 
 
          /* Set user found to one */
          user_found = 1;
       }
+      /* Increase index counter */
+      i++;
+      /* Free passwd entry */
+      argument_free(passwd);
    }
-   /* closes /etc/passwd */
-   endpwent();
 
    /* No user found? */
    if (!user_found) {
@@ -243,39 +249,82 @@ void user_detail(char *username) {
    }
 }
 
-/* \fn user_update(username)
- * Update an user
- * \param[in] username user that will be updated
+/* \fn user_update(username, password, gecos, directory, loginshell)
+ * Update an entry in password file
+ * \param[in] username username that will be updated
+ * \param[in] password new password in cleartext (will be crypted)
+ * \param[in] gecos new gecos field
+ * \param[in] directory new home directory
+ * \param[in] shell new shell
  */
-void user_update(char *username) {
-   /* Variable for handling user entry in /etc/passwd */
-   struct passwd *user;
-   /* File handling for writing password records */
-   FILE *fp = fopen("/tmp/.passwd.tmp", "w");
-   /* User found? */
-   int user_found = 0;
+void user_update(char *username, char *password, char *gecos, char *directory, char *shell) {
+   /* Index counter */
+   unsigned int i;
 
-   /* Loop through passwd database */
-   while ( (user = getpwent()) != NULL) {
-      /* Match found? */
-      if (!strcmp(user->pw_name, username)) {
-         user->pw_shell = variable_get("user_shell");
-         user_found = 1;
+   /* Loop through passwd entries */
+   for (i = 0; i < file_line_counter; i++) {
+      /* Get passwd entry */
+      char **passwd = argument_parse(file_line_get(i), ":");
+      /* Passwd entry found? */
+      if (!strcasecmp(username, passwd[0])) {
+         /* Set new passwd line in memory */
+         file_line_action(FILE_LINE_SET, i,
+                          "%s:%s:%s:%s:%s:%s:%s",
+                          username,
+                          crypt(password, "OM"),
+                          passwd[2],
+                          passwd[3],
+                          gecos,
+                          directory,
+                          shell);
       }
-      putpwent(user, fp);
+      /* Free passwd entry */
+      argument_free(passwd);
    }
- 
-   /* closes /etc/passwd */
-   endpwent();
+   
+   /* Save result in user file */
+   file_save(USER_FILE);
+}
 
-   /* No user found? */
-   if (!user_found) {
-      /* Print information screen */
-      owi_headline(2, "User not found");
-   } else {
-      unlink("/etc/passwd");
-      rename("/tmp/.passwd.tmp", "/etc/passwd");
-      /* Display user */	   
-      user_detail(username);
+/* \fn user_update(username, password, gecos, directory, loginshell)
+ * Update an entry in password file
+ * \param[in] username username that will be updated
+ * \param[in] password new password in cleartext (will be crypted)
+ * \param[in] gecos new gecos field
+ * \param[in] directory new home directory
+ * \param[in] shell new shell
+ */
+void user_add(char *username, char *password, char *gecos, char *directory, char *shell) {
+   /* Index counter */
+   int i;
+   /* Max uid */
+   unsigned int max_uid = 0;
+
+   /* Loop through passwd entries */
+   for (i = 0; i < file_line_counter; i++) {
+      /* Get passwd entry */
+      char **passwd = argument_parse(file_line_get(i), ":");
+      /* Current uid greater than max uid? */
+      if (atoi(passwd[2]) > max_uid) {
+         /* Set max uid */
+         max_uid = atoi(passwd[2]);
+      }
+      /* Free passwd entry */
+      argument_free(passwd);
    }
+   /* Increase max uid */
+   max_uid++;
+   /* Add new passwd line in memory */
+   file_line_action(FILE_LINE_ADD, i,
+                    "%s:%s:%d:%d:%s:%s:%s",
+                    username,
+                    crypt(password, "OM"),
+                    max_uid,
+                    max_uid,
+                    gecos,
+                    directory,
+                    shell);
+
+   /* Save result in user file */
+   file_save(USER_FILE);
 }

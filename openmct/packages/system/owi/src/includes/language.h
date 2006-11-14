@@ -18,6 +18,8 @@
 
 #define  USER_DESCRIPTION                    "Die nachfolgende Liste f&uuml;hrt Ihre Accounts an - samt Informationen &uuml;ber Loginshell Homeverzeichnis etc..."
 
+#define  USER_FILE_FAILED                    "Benutzerdatenbank konnte nicht ge&ouml;ffnet werden"
+
 /* group */
 
 #define  GROUP_TABLE_DESCRIPTION             "Gruppe"
@@ -30,6 +32,8 @@
 #define  GROUP_BUTTON_MODIFY                 "Bearbeiten"
 
 #define  GROUP_HEADLINE                      "Gruppenverwaltung"
+
+#define  GROUP_FILE_FAILED                   "Gruppendatenbank konnte nicht ge&ouml;ffnet werden"
 
 /* sysinfo */
 #define  SYSINFO_HEADLINE                    "Systeminformation"
