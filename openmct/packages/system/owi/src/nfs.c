@@ -42,7 +42,7 @@ int nfs_main(int argc, char **argv) {
    char *command = variable_get("command");
  
    /* Print header information */
-   owi_header("Network File System");
+   owi_header(NFS_HEADLINE);
 
    /* Read file into memory */
    if (file_open(NFS_FILE) != -1) {
@@ -81,25 +81,30 @@ void nfs_list() {
    /* Index counter */
    int i = 0;
 
-   owi_image("images/nfs.png", NFS_HEADLINE, NFS_HEADLINE);
+   /* Print external table for design */
+   printf("<table width=\"%d\">\n"
+          "<tr>\n"
+          "<td>\n",
+          CONTENT_WIDTH);
+
    owi_headline(1, NFS_HEADLINE);
-   owi_headline(2, NFS_DESCRIPTION);
+   printf("<br />%s<br /><br />", NFS_DESCRIPTION);
 
    /* print table headline */
    printf("<div class=\"dataGridHeader\">\n"
           "<div class=\"dataGridContent\">\n"
-          "<table class=\"%s\">\n"
+          "<table class=\"%s\" width=\"100%%\">\n"
           "<thead>\n"
           "<tr>\n"
-          "<td width=\"30\">&nbsp;</td>\n"
-          "<td width=\"120\">%s</td>\n"
-          "<td width=\"500\">%s</td>\n"
-          "<td></td>\n"
+          "<td>%s</td>\n"
+          "<td>%s</td>\n"
+          "<td>%s</td>\n"
           "</tr>\n"
           "<tbody>",
           CONTENT_TABLE_CLASS,
           NFS_TABLE_DESCRIPTION,
-          NFS_TABLE_OPTIONS);
+          NFS_TABLE_OPTIONS,
+	  NFS_TABLE_ACTION);
 
    /* Loop through all nfs entries in nfs file */
    while ( i < file_line_counter) {
@@ -116,17 +121,23 @@ void nfs_list() {
       /* Print entry */
       printf("<tr onmouseover=\"this.className='%s';\""
                   " onmouseout=\"this.className='%s';\">\n"
-             "<td width=\"30\"><input type=\"checkbox\" name=\"nfs_%s\" value=\"checked\" /></td>\n"
-             "<td width=\"120\"><a href=\"%s?command=detail&amp;id=%s\" />%s</td>\n"
-             "<td width=\"500\">%s</td>\n"
+             "<td>%s</td>\n"
+             "<td>%s</td>\n"
+	     "<td>\n"
+	     "<input type=\"button\" onClick=\"location='%s?command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
+             "<input type=\"button\" onClick=\"location='%s?command=delete&amp;id=%s'\" value=\"%s\" />"
+             "</td>\n"
              "</tr>\n",
              CONTENT_TABLE_CLASS_MOUSEOVER,
              CONTENT_TABLE_CLASS_MOUSEOUT,
              nfs[0],
-             getenv("SCRIPT_NAME"),
-             nfs[0],
-             nfs[0],
-             nfs[1]);
+             nfs[1],
+	     getenv("SCRIPT_NAME"),
+	     nfs[0],
+	     NFS_BUTTON_MODIFY,
+	     getenv("SCRIPT_NAME"),
+	     nfs[0],
+	     NFS_BUTTON_DELETE);
       }
       /* Increase counter */
       i++;
@@ -138,6 +149,11 @@ void nfs_list() {
           "</table>\n"
           "</div>\n"
           "</div>\n");
+
+   /* Close external table */
+   printf("</td>\n"
+          "</tr>\n"
+          "</table>\n");
 }
 
 /* \fn nfs_detail(nfsname)

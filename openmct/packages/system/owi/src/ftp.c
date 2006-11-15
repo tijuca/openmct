@@ -96,10 +96,15 @@ void ftp_list() {
    /* Index counter */
    int j = 0;
 
+   /* Print external table for design */
+   printf("<table width=\"%d\">\n"
+          "<tr>\n"
+          "<td>\n",
+          CONTENT_WIDTH);
+
    /* Print headline information */
-   owi_image("images/ftp.png", FTP_HEADLINE, FTP_HEADLINE);
    owi_headline(1, FTP_HEADLINE);
-   owi_headline(2, FTP_DESCRIPTION);
+   printf("<br />%s<br /><br />\n", FTP_DESCRIPTION);
 
    /* Loop through config file */
    for (i = 0;  i < file_line_counter; i++) {
@@ -117,8 +122,9 @@ void ftp_list() {
    /* Print table head */
    printf("<form action=\"%s\" method=\"post\">\n"
           "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
-          "<table cellpadding=\"0\" cellspacing=\"10\">\n",
-	  getenv("SCRIPT_NAME"));
+          "<table class=\"%s\" width=\"100%%\">\n",
+	  getenv("SCRIPT_NAME"),
+          CONTENT_TABLE_CLASS);
 
    /* Loop through all availbe config variables */
    for (i = 0; ftp_ini[i].variable != NULL; i++) {
@@ -153,8 +159,9 @@ void ftp_list() {
    /* Print Submit button */
    printf("<tr>\n"
           "<td></td>\n"
-	  "<td align=\"right\"><input type=\"submit\" value=\"Save\" /></td>\n"
-	  "</tr>\n");
+	  "<td align=\"right\"><input type=\"submit\" value=\"%s\" /></td>\n"
+	  "</tr>\n",
+	  FTP_BUTTON_UPDATE);
 
    /* Print table footer */
    printf("</table>\n"

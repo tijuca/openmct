@@ -41,8 +41,26 @@ int shell_main(int argc, char **argv) {
    /* Index counter */
    int i;
 
-   /* Print footer information */
    owi_header(SHELL_HEADLINE);
+
+   /* Print external table for design */
+   printf("<table width=\"%d\">\n"
+          "<tr>\n"
+          "<td>\n",
+          CONTENT_WIDTH);
+
+   /* Print headline information */
+   owi_headline(1, SHELL_HEADLINE);
+   printf("<br />%s<br /><br />\n", SHELL_DESCRIPTION);
+
+   /* Print table head */
+   printf("<form action=\"%s\" method=\"post\">\n"
+          "<input type=\"hidden\" name=\"command\" value=\"execute\" />\n"
+          "<table class=\"%s\" width=\"100%%\">\n"
+	  "<tr>\n"
+	  "<td>\n",
+          getenv("SCRIPT_NAME"),
+          CONTENT_TABLE_CLASS);
 
    /* No directory set? */
    if (!strcasecmp(variable_get("directory"), "")) {
@@ -53,12 +71,12 @@ int shell_main(int argc, char **argv) {
    /* Change to directory before execting command */
    chdir(variable_get("directory"));
 
+   printf("<textarea rows=24 cols=80 background=#000000>\n");
    /* Command NULL or empty? */
    if (!strcasecmp(variable_get("command"), "execute")) {
       char **cmd_argv = argument_parse(variable_get("value"), " 	");
       char curdir[1024];
 
-      printf("<textarea rows=24 cols=80 background=#000000>\n");
       printf("%s # %s\n", variable_get("directory"), variable_get("value"));
 
       if (!strcasecmp(cmd_argv[0], "cd")) {
@@ -76,24 +94,26 @@ int shell_main(int argc, char **argv) {
       /* Set new directory */
       variable_set("directory", curdir);
       printf("%s # ", variable_get("directory"));
-      printf("</textarea>\n");
    }
+   printf("</textarea>\n");
 
-   printf("<form action=\"%s\" method=\"post\">\n"
-          "<input type=\"hidden\" name=\"command\" value=\"execute\">\n"
-          "<input type=\"hidden\" name=\"directory\" value=\"%s\">\n"
-          "<table cellpadding=\"0\" cellspacing=\"10\">\n"
-          "<tr>\n"
-          "<td>%s</td>\n"
-          "<td><input type=\"text\" name=\"value\" /></td>\n"
-          "<td><input type=\"submit\" value=\"%s\" /></td>\n"
+   printf("</td>\n"
           "</tr>\n"
+	  "<tr>\n"
+	  "<tr>\n"
+	  "<td>\n"
+	  "<input type=\"hidden\" name=\"directory\" value=\"%s\" />\n"
+	  "%s # <input type=\"text\" name=\"value\" size=\"100\"/>\n"
+	  "</td>\n"
+	  "</tr>\n"
 	  "</table>\n"
 	  "</form>\n",
-          getenv("SCRIPT_NAME"),
 	  variable_get("directory"),
-	  SHELL_TABLE_COMMAND,
-	  SHELL_TABLE_SUBMIT);
+	  variable_get("directory"));
+
+   printf("<script type=\"text/javascript\">\n"
+	  "document.forms[0].value.focus();\n"
+	  "</script>\n");
 
    /* Print footer information */
    owi_footer();
