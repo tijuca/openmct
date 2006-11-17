@@ -1,5 +1,7 @@
-#define  CONTENT_WIDTH                       700
 #define  CONTENT_TABLE_CLASS                 "content_table"
+#define  CONTENT_TABLE_LIST_CLASS            "content_table_list"
+#define  CONTENT_TABLE_BOX_CLASS             "content_table_box"
 #define  CONTENT_TABLE_CLASS_MOUSEOVER       "content_table_mouseover"
 #define  CONTENT_TABLE_CLASS_MOUSEOUT        "content_table_mouseout"
-#define  CONTENT_TABLE_MAX_ENTRIES_PER_PAGE  15
+#define  CONTENT_DATAGRID_HEADER             "dataGridHeader"
+#define  CONTENT_DATAGRID_CONTENT            "dataGridContent"

@@ -18,7 +18,7 @@
 #define  USER_FILE_FAILED                    "Benutzerdatenbank konnte nicht ge&ouml;ffnet werden"
 #define  USER_NOT_FOUND                      "Kennung konnte nicht gefunden werden"
 
-#define  USER_BUTTON_NEW                     "Neu"
+#define  USER_BUTTON_NEW                     "Neue Kennung"
 #define  USER_BUTTON_DELETE                  "Entfernen"
 #define  USER_BUTTON_MODIFY                  "Bearbeiten"
 #define  USER_BUTTON_UPDATE                  "Speichern"
@@ -31,7 +31,9 @@
 #define  GROUP_TABLE_NEW_PASSWORD_CHECK      "Neues Passwort (Best&auml;tigung)"
 #define  GROUP_TABLE_GID                     "Gruppen ID"
 #define  GROUP_TABLE_MEMBERS                 "Mitglieder"
+#define  GROUP_TABLE_ACTION                  "Aktion"
 #define  GROUP_BUTTON_DELETE                 "Entfernen"
+#define  GROUP_BUTTON_NEW                    "Neue Gruppe"
 #define  GROUP_BUTTON_MODIFY                 "Bearbeiten"
 #define  GROUP_HEADLINE                      "Gruppenverwaltung"
 #define  GROUP_FILE_FAILED                   "Gruppendatenbank konnte nicht ge&ouml;ffnet werden"

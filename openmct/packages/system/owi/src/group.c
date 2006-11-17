@@ -78,28 +78,45 @@ void group_list() {
    /* Index counter */
    int i = 0;	
 
-   /* print headline */
-   owi_headline(1, GROUP_HEADLINE);
-
-   printf("<h1>%s</h1>\n", variable_get("andi"));
-   
-   /* print table headline */
-   printf("<div class=\"dataGridHeader\">\n"
-          "<div class=\"dataGridContent\">\n"
+   /* Start form / external table / scroll area / internal table*/
+   printf("<form action=\"%s\" method=\"post\">\n"
+          "<input type=\"hidden\" name=\"command\" value=\"\" />\n"
+          "<table class=\"%s\">\n"
+          "<tr>\n"
+          "<td>\n"
+          "<h1>%s</h1>\n"
+          "<br />%s<br /><br />\n"
+          "<table width=\"100%%\">\n"
+          "<tr>\n"
+          "<td align=\"right\">"
+          "<input type=\"text\" name=\"search\" value=\"%s\" />&nbsp;"
+          "<input type=\"submit\" value=\"Suchen\" /></td>\n"
+          "</tr>\n"
+          "</table>\n"
+          "<div class=\"%s\">\n"
+          "<div class=\"%s\">\n"
           "<table class=\"%s\">\n"
           "<thead>\n"
           "<tr>\n"
-          "<td></td>\n"
-          "<td>%s</td>\n"
-          "<td>%s</td>\n"
-          "<td>%s</td>\n"
-          "<td></td>\n"
+          "<th width=\"80\">%s</th>\n"
+          "<th width=\"260\">%s</th>\n"
+          "<th width=\"260\">%s</th>\n"
+          "<th width=\"260\">%s</th>\n"
           "</tr>\n"
-          "<tbody>", 
+          "</thead>\n"
+          "<tbody>",
+          getenv("SCRIPT_NAME"),
           CONTENT_TABLE_CLASS,
+          USER_HEADLINE,
+          USER_DESCRIPTION,
+          variable_get("search"),
+          CONTENT_DATAGRID_HEADER,
+          CONTENT_DATAGRID_CONTENT,
+          CONTENT_TABLE_LIST_CLASS,
           GROUP_TABLE_DESCRIPTION,
           GROUP_TABLE_GID,
-          GROUP_TABLE_MEMBERS);
+          GROUP_TABLE_MEMBERS,
+          GROUP_TABLE_ACTION);
    /* Loop through all user entries in group file */
    while ( i < file_line_counter) {
       char **group = argument_parse(file_line_get(i), ":");
@@ -126,15 +143,24 @@ void group_list() {
       /* Free group entry */
       argument_free(group);
    }
-   /* Print table footer */
+   /* Print table footer / close internal table / close scroll / print footer / ... */
    printf("</tbody>\n"
-          "<tfoot>\n"
+          "</table>\n"
+          "</div>\n"
+          "</div>\n"
+          "<table width=\"100%%\">\n"
           "<tr>\n"
-          "<td colspan=\"8\" align=\"right\"><input class=\"button\""
-          " type=\"button\" onClick=\"delete\" value=\"%s\" /></td>\n"
-          "</tfoot>\n"
-          "</table>\n",
-          GROUP_BUTTON_DELETE);
+          "<td colspan=\"7\" align=\"right\">\n"
+          "<input type=\"button\" onClick=\"location='%s?command=new'\" value=\"%s\" />"
+          "</td>\n"
+          "</tr>\n"
+          "</table>\n"
+          "</td>\n"
+          "</tr>\n"
+          "</table>\n"
+          "</form>\n",
+          getenv("SCRIPT_NAME"),
+          GROUP_BUTTON_NEW);
 }
 
 /* \fn group_detail(groupname)

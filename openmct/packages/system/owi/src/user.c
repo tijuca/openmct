@@ -86,57 +86,45 @@ void user_list() {
    char *search = variable_get("search");
    /* Index counter */
    int i = 0;
-   /* Pages */
-   int pages = (file_line_counter / CONTENT_TABLE_MAX_ENTRIES_PER_PAGE) + 1;
    /* Match counter */
    int j = 0;
 
-   /* Start form */
+   /* Start form / external table / scroll area / internal table*/
    printf("<form action=\"%s\" method=\"post\">\n"
-          "<input type=\"hidden\" name=\"command\" value=\"\" />\n",
-          getenv("SCRIPT_NAME"));
-
-   /* Print external table for design */
-   printf("<table width=\"%d\">\n"
+          "<input type=\"hidden\" name=\"command\" value=\"\" />\n"
+          "<table class=\"%s\">\n"
           "<tr>\n"
-	  "<td>\n",
-	  CONTENT_WIDTH);
-
-   /* Print headline */
-   owi_headline(1, USER_HEADLINE);
-   /* Print description */
-   printf("<br />%s<br /><br />\n", USER_DESCRIPTION);
-
-   printf("<table width=\"100%%\">\n"
+	  "<td>\n"
+	  "<h1>%s</h1>\n"
+          "<br />%s<br /><br />\n"
+          "<table width=\"100%%\">\n"
           "<tr>\n"
-	  "<td>Seiten (%d): ", pages);
-   /* Loop through pages */
-   for (i = 0; i < pages; i++) {
-      printf("<a href=\"%s?page=%d\">%d</a>\n", getenv("SCRIPT_NAME"), i + 1, i + 1);
-   }
-	  
-   printf("</td>\n"
 	  "<td align=\"right\">"
 	  "<input type=\"text\" name=\"search\" value=\"%s\" />&nbsp;"
 	  "<input type=\"submit\" value=\"Suchen\" /></td>\n"
 	  "</tr>\n"
-	  "</table>\n",
-	  variable_get("search"));
-
-   /* print table headline */
-   printf("<table class=\"%s\" width=\"100%%\">\n"
+	  "</table>\n"
+          "<div class=\"%s\">\n"
+          "<div class=\"%s\">\n"
+          "<table class=\"%s\">\n"
           "<thead>\n"
           "<tr>\n"
-          "<td>%s</td>\n"
-          "<td>%s</td>\n"
-          "<td>%s</td>\n"
-          "<td>%s</td>\n"
-          "<td>%s</td>\n"
-          "<td></td>\n"
+          "<th width=\"80\">%s</th>\n"
+          "<th width=\"160\">%s</th>\n"
+          "<th width=\"160\">%s</th>\n"
+          "<th width=\"160\">%s</th>\n"
+          "<th width=\"160\">%s</th>\n"
           "</tr>\n"
 	  "</thead>\n"
           "<tbody>",
-          CONTENT_TABLE_CLASS,
+          getenv("SCRIPT_NAME"),
+	  CONTENT_TABLE_CLASS,
+	  USER_HEADLINE,
+	  USER_DESCRIPTION,
+	  variable_get("search"),
+	  CONTENT_DATAGRID_HEADER,
+	  CONTENT_DATAGRID_CONTENT,
+	  CONTENT_TABLE_LIST_CLASS,
           USER_TABLE_DESCRIPTION,
           USER_TABLE_GECOS,
           USER_TABLE_DIRECTORY,
@@ -146,7 +134,7 @@ void user_list() {
    /* Start at first password entry */
    i = 0;
    /* Loop through all user entries in passwd file */
-   while ( i < file_line_counter && j < CONTENT_TABLE_MAX_ENTRIES_PER_PAGE) {
+   while ( i < file_line_counter) {
       /* Parse passwd entry */
       char **passwd = argument_parse(file_line_get(i), ":");
       /* Search string specified? */
@@ -159,11 +147,11 @@ void user_list() {
          /* Print entry */
          printf("<tr onmouseover=\"this.className='%s';\""
                 " onmouseout=\"this.className='%s';\">\n"
-                "<td>%s</td>\n"
-                "<td>%s</td>\n"
-                "<td>%s</td>\n"
-                "<td>%s</td>\n"
-                "<td>"
+                "<td width=\"80\">%s</td>\n"
+                "<td width=\"160\">%s</td>\n"
+                "<td width=\"160\">%s</td>\n"
+                "<td width=\"160\">%s</td>\n"
+                "<td width=\"160\">"
 		"<input type=\"button\" onClick=\"location='%s?command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
 		"<input type=\"button\" onClick=\"location='%s?command=delete&amp;id=%s'\" value=\"%s\" />"
 		"</td>\n"
@@ -188,23 +176,24 @@ void user_list() {
       /* Free passwd entry */
       argument_free(passwd);
    }
-   /* Print table footer */
+   /* Print table footer / close internal table / close scroll / print footer / ... */
    printf("</tbody>\n"
-          "<tfoot>\n"
+          "</table>\n"
+          "</div>\n"
+	  "</div>\n"
+          "<table width=\"100%%\">\n"
 	  "<tr>\n"
 	  "<td colspan=\"7\" align=\"right\">\n"
 	  "<input type=\"button\" onClick=\"location='%s?command=new'\" value=\"%s\" />"
 	  "</td>\n"
 	  "</tr>\n"
-	  "</table>\n",
-	  getenv("SCRIPT_NAME"),
-	  USER_BUTTON_NEW);
-
-   /* Close external table */
-   printf("</td>\n"
+	  "</table>\n"
+          "</td>\n"
           "</tr>\n"
 	  "</table>\n"
-          "</form>\n");
+          "</form>\n",
+	  getenv("SCRIPT_NAME"),
+	  USER_BUTTON_NEW);
 }
 
 /* \fn user_detail(username)
@@ -218,16 +207,14 @@ void user_detail(char *username) {
    int i = 0;
 
    /* Print external table for design */
-   printf("<table width=\"%d\">\n"
+   printf("<table class=\"%s\">\n"
           "<tr>\n"
-          "<td>\n",
-          CONTENT_WIDTH);
-
-   /* Print headline */
-   owi_headline(1, USER_HEADLINE);
-   /* Print description */
-   printf("<br />%s<br /><br />\n", USER_DETAIL);
-
+          "<td>\n"
+	  "<h1>%s</h1>\n"
+	  "<br />%s<br /><br />\n",
+          CONTENT_TABLE_CLASS,
+	  USER_HEADLINE,
+	  USER_DETAIL);
 
    /* Loop through all user entries in /etc/passwd */
    while ( i < file_line_counter) {
@@ -236,11 +223,11 @@ void user_detail(char *username) {
       /* Match found? */
       if (!strcmp(passwd[0], username)) {
          printf("<form action=\"%s\" method=\"post\">\n"
-                "<input type=\"hidden\" name=\"command\" value=\"update\">\n"
-                "<input type=\"hidden\" name=\"id\" value=\"%s\">\n"
+                "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
+                "<input type=\"hidden\" name=\"id\" value=\"%s\" />\n"
                 "<table class=\"%s\" width=\"100%%\">\n"
                 "<tr>\n"
-                "<td>%s</td>\n"
+                "<td width=\"250\">%s</td>\n"
                 "<td>%s</td>\n"
                 "</tr>\n"
                 "<tr>\n"
@@ -271,16 +258,18 @@ void user_detail(char *username) {
                 "<td>%s</td>\n"
                 "<td><input type=\"text\" name=\"shell\" value=\"%s\" /></td>\n"
                 "</tr>\n"
+                "</table>\n"
+                "<table width=\"100%%\">\n"
                 "<tr>\n"
                 "<td colspan=\"2\" align=\"right\">\n"
-                "<input type=\"submit\" value=\"%s\">\n"
+                "<input type=\"submit\" value=\"%s\" />\n"
                 "</td>\n"
                 "</table>\n"
                 "</form>\n"
                 ,
                 getenv("SCRIPT_NAME"),
                 passwd[0],
-		CONTENT_TABLE_CLASS,
+		CONTENT_TABLE_BOX_CLASS,
                 USER_TABLE_DESCRIPTION,
                 passwd[0],
                 USER_TABLE_NEW_PASSWORD,
@@ -429,24 +418,17 @@ void user_delete(char *username) {
  * Show the add screen for adding a user 
  */
 void user_new() {
-
    /* Print external table for design */
-   printf("<table width=\"%d\">\n"
+   printf("<table class=\"%s\">\n"
           "<tr>\n"
-          "<td>\n",
-          CONTENT_WIDTH);
-
-   /* Print headline */
-   owi_headline(1, USER_HEADLINE);
-   /* Print description */
-   printf("<br />%s<br /><br />\n", USER_NEW);
-
-   /* Display new user screen */
-   printf("<form action=\"%s\" method=\"post\">\n"
-          "<input type=\"hidden\" name=\"command\" value=\"add\">\n"
+          "<td>\n"
+	  "<h1>%s</h1>"
+	  "<br />%s<br /><br />\n"
+          "<form action=\"%s\" method=\"post\">\n"
+          "<input type=\"hidden\" name=\"command\" value=\"add\" />\n"
           "<table class=\"%s\" width=\"100%%\">\n"
           "<tr>\n"
-          "<td>%s</td>\n"
+          "<td width=\"250\">%s</td>\n"
           "<td><input type=\"text\" name=\"id\" /></td>\n"
           "</tr>\n"
           "<tr>\n"
@@ -469,15 +451,22 @@ void user_new() {
           "<td>%s</td>\n"
           "<td><input type=\"text\" name=\"shell\" /></td>\n"
           "</tr>\n"
+          "</table>\n"
+          "<table width=\"100%%\">\n"
           "<tr>\n"
           "<td colspan=\"2\" align=\"right\">\n"
-          "<input type=\"submit\" value=\"%s\">\n"
+          "<input type=\"submit\" value=\"%s\" />\n"
           "</td>\n"
           "</table>\n"
           "</form>\n"
-          ,
-          getenv("SCRIPT_NAME"),
+          "</td>\n"
+          "</tr>\n"
+          "</table>\n",
           CONTENT_TABLE_CLASS,
+	  USER_HEADLINE,
+	  USER_NEW,
+          getenv("SCRIPT_NAME"),
+          CONTENT_TABLE_BOX_CLASS,
           USER_TABLE_DESCRIPTION,
           USER_TABLE_NEW_PASSWORD,
           USER_TABLE_NEW_PASSWORD_CHECK,
@@ -485,9 +474,4 @@ void user_new() {
           USER_TABLE_DIRECTORY,
           USER_TABLE_SHELL,
           USER_BUTTON_ADD);
-
-   /* Close external table */
-   printf("</td>\n"
-          "</tr>\n"
-	  "</table>\n");
 }
