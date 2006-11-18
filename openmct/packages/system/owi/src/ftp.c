@@ -97,14 +97,19 @@ void ftp_list() {
    int j = 0;
 
    /* Print external table for design */
-   printf("<table width=\"%d\">\n"
+   printf("<table class=\"%s\">\n"
           "<tr>\n"
-          "<td>\n",
-          CONTENT_WIDTH);
-
-   /* Print headline information */
-   owi_headline(1, FTP_HEADLINE);
-   printf("<br />%s<br /><br />\n", FTP_DESCRIPTION);
+          "<td>\n"
+          "<h1>%s</h1>\n"
+          "<br />%s<br /><br />\n"
+          "<form action=\"%s\" method=\"post\">\n"
+          "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
+          "<table class=\"%s\" width=\"100%%\">\n",
+          CONTENT_TABLE_CLASS,
+          FTP_HEADLINE,
+          FTP_DETAIL,
+          getenv("SCRIPT_NAME"),
+          CONTENT_TABLE_BOX_CLASS);
 
    /* Loop through config file */
    for (i = 0;  i < file_line_counter; i++) {
@@ -119,17 +124,10 @@ void ftp_list() {
       }
    }
 
-   /* Print table head */
-   printf("<form action=\"%s\" method=\"post\">\n"
-          "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
-          "<table class=\"%s\" width=\"100%%\">\n",
-	  getenv("SCRIPT_NAME"),
-          CONTENT_TABLE_CLASS);
-
    /* Loop through all availbe config variables */
    for (i = 0; ftp_ini[i].variable != NULL; i++) {
       printf("<tr>\n"
-             "<td>%s</td>\n"
+             "<td width=\"250\">%s</td>\n"
 	     "<td>", ftp_ini[i].description);
       /* valid set? */
       if (ftp_ini[i].valid) {
@@ -157,15 +155,14 @@ void ftp_list() {
    }
 
    /* Print Submit button */
-   printf("<tr>\n"
-          "<td></td>\n"
-	  "<td align=\"right\"><input type=\"submit\" value=\"%s\" /></td>\n"
-	  "</tr>\n",
-	  FTP_BUTTON_UPDATE);
-
-   /* Print table footer */
    printf("</table>\n"
-          "</form>\n");
+          "<table width=\"100%%\">\n"
+	  "<tr>\n"
+	  "<td align=\"right\"><input type=\"submit\" value=\"%s\" /></td>\n"
+	  "</tr>\n"
+          "</table>\n"
+          "</form>\n",
+	  FTP_BUTTON_UPDATE);
 
    /* Listen directive found? */	  
    if (ini_listen) {

@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <crypt.h>
 #include "includes/argument.h"
 #include "includes/language.h"
 #include "includes/template.h"
@@ -55,6 +56,12 @@ int group_main(int argc, char **argv) {
          group_detail(variable_get("id"));
       } else if (!strcasecmp(command, "update")) {
          group_update(variable_get("id"), variable_get("members"));
+      } else if (!strcasecmp(command, "new")) {
+         group_new(variable_get("id"));
+      } else if (!strcasecmp(command, "add")) {
+         group_add(variable_get("id"));
+      } else if (!strcasecmp(command, "delete")) {
+         group_delete(variable_get("id"));
       }
       /* Free file */
       file_free(GROUP_FILE);
@@ -77,6 +84,8 @@ int group_main(int argc, char **argv) {
 void group_list() {
    /* Index counter */
    int i = 0;	
+   /* Search string */
+   char *search = variable_get("search");
 
    /* Start form / external table / scroll area / internal table*/
    printf("<form action=\"%s\" method=\"post\">\n"
@@ -99,16 +108,16 @@ void group_list() {
           "<thead>\n"
           "<tr>\n"
           "<th width=\"80\">%s</th>\n"
-          "<th width=\"260\">%s</th>\n"
-          "<th width=\"260\">%s</th>\n"
+          "<th width=\"80\">%s</th>\n"
+          "<th width=\"340\">%s</th>\n"
           "<th width=\"260\">%s</th>\n"
           "</tr>\n"
           "</thead>\n"
           "<tbody>",
           getenv("SCRIPT_NAME"),
           CONTENT_TABLE_CLASS,
-          USER_HEADLINE,
-          USER_DESCRIPTION,
+          GROUP_HEADLINE,
+          GROUP_DESCRIPTION,
           variable_get("search"),
           CONTENT_DATAGRID_HEADER,
           CONTENT_DATAGRID_CONTENT,
@@ -120,24 +129,31 @@ void group_list() {
    /* Loop through all user entries in group file */
    while ( i < file_line_counter) {
       char **group = argument_parse(file_line_get(i), ":");
-      /* Print entry */
-      printf("<tr onmouseover=\"this.style.backgroundColor='%s';\""
-                  " onmouseout=\"this.style.backgroundColor='%s';\">\n"
-             "<td><input type=\"checkbox\" name=\"group_%s\" value=\"checked\" /></td>\n"
-             "<td>%s</td>\n"
-             "<td>%s</td>\n"
-             "<td>%s</td>\n"
-             "<td><a href=\"%s?command=detail&id=%s\" />%s</td>\n"
-             "</tr>\n",
-             CONTENT_TABLE_CLASS_MOUSEOVER,
-             CONTENT_TABLE_CLASS_MOUSEOUT,
-             group[0],
-             group[0],
-             group[2],
-             group[3],
-             getenv("SCRIPT_NAME"),
-             group[0],
-             GROUP_BUTTON_MODIFY);
+      /* Search string specified? */
+      if (!search || !strcmp(search, "") ||
+          (search &&
+           (!strcasecmp(group[0], search) ||
+            !strcasecmp(group[2], search)))) {
+         /* Print entry */
+         printf("<tr onmouseover=\"this.style.backgroundColor='%s';\""
+                     " onmouseout=\"this.style.backgroundColor='%s';\">\n"
+                "<td width=\"80\">%s</td>\n"
+                "<td width=\"80\">%s</td>\n"
+                "<td width=\"340\">%s</td>\n"
+                "<td width=\"260\"><input type=\"button\" onClick=\"location='%s?command=detail&id=%s'\" value=\"%s\" />&nbsp;<input type=\"button\" onClick=\"location='%s?command=delete&id=%s'\" value=\"%s\" /></td>\n"
+                "</tr>\n",
+                CONTENT_TABLE_CLASS_MOUSEOVER,
+                CONTENT_TABLE_CLASS_MOUSEOUT,
+                group[0],
+                group[2],
+                group[3],
+                getenv("SCRIPT_NAME"),
+                group[0],
+                GROUP_BUTTON_MODIFY,
+		getenv("SCRIPT_NAME"),
+		group[0],
+                GROUP_BUTTON_DELETE);
+      }
       /* Increase index counter */
       i++;
       /* Free group entry */
@@ -267,3 +283,124 @@ void group_update(char *groupname, char *members) {
    file_save(GROUP_FILE);
 }
 
+/* \fn group_delete(username)
+ * Delete an entry from group file
+ * \param[in] groupname group that will be deleted
+ */
+void group_delete(char *groupname) {
+   /* Index counter */
+   unsigned int i;
+
+   /* Loop through passwd entries */
+   for (i = 0; i < file_line_counter; i++) {
+      /* Get group entry */
+      char **group = argument_parse(file_line_get(i), ":");
+      /* Passwd entry found? */
+      if (!strcasecmp(groupname, group[0])) {
+         /* Delete group line in memory */
+         file_line_action(FILE_LINE_DEL, i, NULL);
+      }
+      /* Free group entry */
+      argument_free(group);
+   }
+
+   /* Save result in user file */
+   file_save(GROUP_FILE);
+
+   /* Display user */
+   group_list();
+}
+
+/* \fn group_add(groupname)
+ * Execute a new group now
+ * \param[in] groupname groupname that will be updated
+ */
+void group_add(char *groupname) {
+   /* Index counter */
+   int i;
+   /* Max uid */
+   unsigned int max_uid = 0;
+
+   /* Loop through passwd entries */
+   for (i = 0; i < file_line_counter; i++) {
+      /* Get passwd entry */
+      char **passwd = argument_parse(file_line_get(i), ":");
+      /* Current uid greater than max uid? */
+      if (atoi(passwd[2]) > max_uid) {
+         /* Set max uid */
+         max_uid = atoi(passwd[2]);
+      }
+      /* Free passwd entry */
+      argument_free(passwd);
+   }
+   /* Increase max uid */
+   max_uid++;
+   /* Add new passwd line in memory */
+   file_line_action(FILE_LINE_ADD, i,
+                    "%s:%s:%d:%d:%s:%s:%s",
+                    groupname,
+                    crypt(variable_get("password"), "OM"),
+                    max_uid,
+                    max_uid,
+                    variable_get("gecos"),
+                    variable_get("directory"),
+                    variable_get("shell"));
+
+   /* Save result in group file */
+   file_save(GROUP_FILE);
+
+   /* Show all groups */
+   group_list();
+}
+
+/* \fn group_new()
+ * Show the add screen for adding a group
+ */
+void group_new() {
+   /* Print external table for design */
+   printf("<table class=\"%s\">\n"
+          "<tr>\n"
+          "<td>\n"
+	  "<h1>%s</h1>"
+	  "<br />%s<br /><br />\n"
+          "<form action=\"%s\" method=\"post\">\n"
+          "<input type=\"hidden\" name=\"command\" value=\"add\" />\n"
+          "<table class=\"%s\" width=\"100%%\">\n"
+          "<tr>\n"
+          "<td width=\"250\">%s</td>\n"
+          "<td><input type=\"text\" name=\"id\" /></td>\n"
+          "</tr>\n"
+          "<tr>\n"
+          "<td>%s</td>\n"
+          "<td><input type=\"password\" /></td>\n"
+          "</tr>\n"
+          "<tr>\n"
+          "<td>%s</td>\n"
+          "<td><input type=\"password_check\" /></td>\n"
+          "</tr>\n"
+          "<tr>\n"
+          "<td>%s</td>\n"
+          "<td><input type=\"text\" name=\"members\" /></td>\n"
+          "</tr>\n"
+          "</table>\n"
+          "<table width=\"100%%\">\n"
+          "<tr>\n"
+          "<td colspan=\"2\" align=\"right\">\n"
+          "<input type=\"submit\" value=\"%s\" />\n"
+          "</td>\n"
+          "</table>\n"
+          "</form>\n"
+          "</td>\n"
+          "</tr>\n"
+          "</table>\n",
+          CONTENT_TABLE_CLASS,
+	  GROUP_HEADLINE,
+	  GROUP_NEW,
+          getenv("SCRIPT_NAME"),
+          CONTENT_TABLE_BOX_CLASS,
+          GROUP_TABLE_DESCRIPTION,
+          GROUP_TABLE_NEW_PASSWORD,
+          GROUP_TABLE_NEW_PASSWORD_CHECK,
+          GROUP_TABLE_MEMBERS,
+          GROUP_BUTTON_ADD);
+}

@@ -5,7 +5,7 @@ body {
    color: #666666;
 }
 
-select {
+input {
    color: #ff7c11;
    background-color: #ffffff;
    border: 1px solid #ff7c11;
@@ -13,7 +13,7 @@ select {
    font-size: 10px;
 }
 
-input {
+input button {
    color: #ff7c11;
    background-color: #ffffff;
    border: 1px solid #ff7c11;
@@ -48,24 +48,23 @@ h2 {
 }
 
 .content_table {
-   border: 1px;
-   border-spacing: 0px;
-   background-color: lightgray;
-   border: 1px solid #666666;
+   width: 696px;
 }
 
-.content_table td {
-   padding: 3px;
-}
-
-.content_table thead {
-   font-weight:bold;
+.content_table_list {
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
    font-size: 10px;
+   border-spacing: 0px;
+   border-margin: 0px;
+   background-color: #cccccc;
 }
 
-.content_table tbody {
-   padding: 0px;
-   font-size: 9px;
+.content_table_box {
+   font-family: Tahoma, Arial, Helvetica, sans-serif;
+   font-size: 10px;
+   padding: 5px;
+   background-color: #cccccc;
+   border: 1px solid #666666;
 }
 
 .content_table_mouseover {
@@ -73,5 +72,37 @@ h2 {
 }
 
 .content_table_mouseout {
-   background-color: lightgray;
+   background-color: #cccccc;
 }
+
+
+.dataGridHeader {
+   position: relative;
+   padding-top: 24px;
+   border-left: 1px solid #666666;
+   width: 700px;
+   border-right: 1px solid #666666;
+   border-top: 1px solid #999999;
+   background-color: #cccccc;
+}
+
+.dataGridContent {
+   overflow: auto;
+   width: 700px;
+   height: 300px;
+   border-bottom: 1px solid #666666;
+}
+
+.dataGridHeader thead tr {
+   width: 700px;
+   position: absolute;
+   top: 0;
+   left: 0;
+   text-align: left;
+}
+.dataGridHeader table thead tr th, .dataGridHeader table tbody tr td {
+   text-align: left;
+   height: 0;
+   padding: 5px;
+}
+

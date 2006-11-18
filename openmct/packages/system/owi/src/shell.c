@@ -44,10 +44,10 @@ int shell_main(int argc, char **argv) {
    owi_header(SHELL_HEADLINE);
 
    /* Print external table for design */
-   printf("<table width=\"%d\">\n"
+   printf("<table width=\"%s\">\n"
           "<tr>\n"
           "<td>\n",
-          CONTENT_WIDTH);
+          CONTENT_TABLE_CLASS);
 
    /* Print headline information */
    owi_headline(1, SHELL_HEADLINE);
@@ -71,7 +71,7 @@ int shell_main(int argc, char **argv) {
    /* Change to directory before execting command */
    chdir(variable_get("directory"));
 
-   printf("<textarea rows=24 cols=80 background=#000000>\n");
+   printf("<textarea rows=20 cols=90 background=#000000>\n");
    /* Command NULL or empty? */
    if (!strcasecmp(variable_get("command"), "execute")) {
       char **cmd_argv = argument_parse(variable_get("value"), " 	");

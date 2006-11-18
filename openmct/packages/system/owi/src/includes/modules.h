@@ -5,6 +5,7 @@
 #include "nfs.h"
 #include "ftp.h"
 #include "shell.h"
+#include "interface.h"
 
 struct modules_t {
    char *name;
@@ -16,5 +17,6 @@ struct modules_t {
    { "nfs.cgi", nfs_main },
    { "ftp.cgi", ftp_main },
    { "shell.cgi", shell_main },
+   { "interface.cgi", interface_main },
    { NULL, NULL }
 };

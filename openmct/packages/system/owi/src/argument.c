@@ -169,13 +169,58 @@ char **argument_parse(char *value, char *seperator) {
  * \param[in] argument dynamic array of char pointers
  */
 void argument_free(char **argument) {
-   /* variable for loop */
+   /* Variable for loop */
    int i;
-   /* loop through all arguments */
-   for (i = 0; argument[i] == NULL; i++) {
-      /* free element */
+
+   /* Loop through all arguments */
+   for (i = 0; argument[i] != NULL; i++) {
+      /* Free element */
       free(argument[i]);
+      /* Set to NULL */
+      argument[i] = NULL;
    }
    /* free dynamic array */
    free(argument);
+   /* Set pointer to NULL */
+   *argument = NULL;
+}
+
+/* \fn argument_get(argument, index, seperator)
+ * Get one string containng all arguments separated with seperator
+ * \param[in] argument argument data
+ * \param[in] index start at this index
+ * \param[in] seperator use this string as seperator 
+ * \return pointer to string
+ */
+char *argument_get(char **argument, int index, char *seperator) {
+   /* Option data (from 1st argument until n-th argument) */
+   char *string;
+   /* Define whole string len for all options */
+   int string_length = 0;
+   /* Index counter */
+   int  i = 0;
+
+   /* Loop through all argument values */
+   for (i = index; argument[i] != NULL; i++) {
+      /* Calculate whole length */
+      string_length += strlen(argument[i]) + strlen(seperator);
+   }
+
+   /* Allocate memory for options */
+   string = (char*)malloc(string_length + 1);
+   /* Everything ok? */
+   if (string) {
+      /* Clear buffer */
+      memset(string, string_length + 1, 0);
+      /* Loop through all argument values */
+      for (i = index; argument[i] != NULL; i++) {
+         /* Append data to string */
+         strcat(string, argument[i]);
+         /* Append seperator to string */
+         strcat(string, seperator);
+      }
+   } 
+   
+   /* Return result */
+   return string;
 }

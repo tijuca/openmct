@@ -7,11 +7,11 @@ CP=cp
 BINARY=owi.cgi
 LDFLAGS=-lcrypt
 
-OBJECTS=ftp.o misc.o variable.o argument.o user.o group.o sysinfo.o file.o nfs.o shell.o owi.o
+OBJECTS=ftp.o misc.o variable.o interface.o argument.o user.o group.o sysinfo.o file.o nfs.o shell.o owi.o
 
 all:	$(OBJECTS)
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $(BINARY) $(OBJECTS)
-	$(STRIP) $(BINARY)
+	$(STRIP) -s $(BINARY)
 	$(CP) $(BINARY) ../www
 
 %.o:	%.c
