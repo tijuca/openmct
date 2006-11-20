@@ -208,7 +208,7 @@ diff -Naru buildroot/toolchain/uClibc/uclibc.mk buildroot-mct/toolchain/uClibc/u
  #"
 -UCLIBC_SITE:=http://www.uclibc.org/downloads/snapshots
 +UCLIBC_SOURCE:=uClibc-20050828.tar.bz2
-+UCLIBC_SITE:=http://claxan.hangar18.org/misc/openmct
++UCLIBC_SITE:=http://www.openmct.org/pub/build
  else
  UCLIBC_VER:=0.9.28
  UCLIBC_DIR:=$(TOOL_BUILD_DIR)/uClibc-$(UCLIBC_VER)

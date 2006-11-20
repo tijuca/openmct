@@ -39,7 +39,6 @@ OUTPUTDIR=$(OPENMCT_DEVEL_PREFIX)/output
 TARGETDIR=$(OUTPUTDIR)/$(TARGET)
 ROOTDIR=$(OUTPUTDIR)/root
 NEWROOTDIR=$(OUTPUTDIR)/newroot
-ETCDIR=$(OPENMCT_DEVEL_PREFIX)/etc
 NEWETCDIR=$(OUTPUTDIR)/newetc
 SCRIPTDIR=$(OPENMCT_DEVEL_PREFIX)/scripts
 SRCDIR=src
@@ -66,9 +65,8 @@ INSTALLED=.installed
 VMLINUXBIN=vmlinux.bin
 KERNEL=$(VMLINUXBIN).gz
 ROOT=root.bin
+ETC=etc.bin
 MCT_MODIFY=mct_modify
-PROCCGI=proccgi
-FCP=fcp
 
 # Options
 ROOTOPTS=-l -q
@@ -211,7 +209,8 @@ do-install:	$(SRCDIR)
 
 # default do-uninstall target
 do-uninstall:
-	$(UNINSTALL)
+	@$(ECHO) -e "\033[1;33mUNINSTALL \033[1;32m$(FILENAME)\033[0m"
+	@$(UNINSTALL)
 
 do-clean:
 	@if [ -d $(SRCDIR) ]; then \
