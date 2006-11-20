@@ -59,6 +59,8 @@ int interface_main(int argc, char **argv) {
       if (!command || !strcmp(command, "")) {
          /* Just print user list */
          interface_list();
+      } else if (!strcasecmp(command, "detail")) {
+         interface_detail(variable_get("id"));
       }
       /* Free file */
       file_free(INTERFACE_FILE);
@@ -144,7 +146,14 @@ void interface_list() {
       /* Auto line? (= interface start) */
       if ( (interface && interface[0] && !strcasecmp(interface[0], "auto")) ||
            i == file_line_counter) {
-         if (strcmp(current_interface, "")) {
+         if (strcmp(current_interface, "") && 
+	    ((!search || !strcmp(search, "") ||
+	     (search &&
+	      (strstr(current_interface, search) ||
+	       (interface_ini[0].current && strstr(interface_ini[0].current[1], search)) ||
+	       (interface_ini[1].current && strstr(interface_ini[1].current[1], search)))
+	     )
+	    ))) {
             /* Print network interface */
             printf("<tr onmouseover=\"this.className='%s';\""
                 " onmouseout=\"this.className='%s';\">\n"
@@ -232,4 +241,146 @@ void interface_list() {
           "</form>\n",
 	  getenv("SCRIPT_NAME"),
 	  INTERFACE_BUTTON_NEW);
+}
+
+/* \fn interface_detail(interfacename)
+ * Show one interface
+ * \param[in] interfacename interface that will be displayed
+ */
+void interface_detail(char *interfacename) {
+   /* User found? */
+   int interface_found = 0;
+   /* Index counter */
+   int i = 0;
+   /* Old interface */
+   char current_interface[1024] = "";
+   /* Index counter */
+   int j = 0;
+
+   /* Print external table for design */
+   printf("<table class=\"%s\">\n"
+          "<tr>\n"
+          "<td>\n"
+	  "<h1>%s</h1>\n"
+	  "<br />%s<br /><br />\n",
+          CONTENT_TABLE_CLASS,
+	  INTERFACE_HEADLINE,
+	  INTERFACE_DETAIL);
+
+   /* Start at first password entry */
+   i = 0;
+   /* Loop through all user entries in passwd file */
+   while (i <= file_line_counter) {
+      /* Parse interface entry */
+      char **interface = NULL;
+      /* Pseudo line not reached? */
+      if (i < file_line_counter) {
+         /* Get and parse line */
+         interface = argument_parse(file_line_get(i), ARGUMENT_SEPERATOR_STANDARD);
+      }
+      /* Auto line? (= interface start) */
+      if ( (interface && interface[0] && !strcasecmp(interface[0], "auto")) ||
+           i == file_line_counter) {
+         if (!strcmp(current_interface, interfacename)) {
+            /* Print network interface */
+            printf("<form action=\"%s\" method=\"post\">\n"
+                   "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
+                   "<input type=\"hidden\" name=\"id\" value=\"%s\" />\n"
+                   "<table class=\"%s\" width=\"100%%\">\n"
+                   "<tr>\n"
+                   "<td width=\"250\">%s</td>\n"
+                   "<td>%s</td>\n"
+                   "</tr>\n"
+                   "<tr>\n"
+                   "<tr>\n"
+                   "<td>%s</td>\n"
+                   "<td><input type=\"text\" name=\"ipadress\" value=\"%s\" /></td>\n"
+                   "</tr>\n"
+                   "<tr>\n"
+                   "<td>%s</td>\n"
+                   "<td><input type=\"text\" name=\"ipadress\" value=\"%s\" /></td>\n"
+                   "</tr>\n"
+                   "<tr>\n"
+                   "<td>%s</td>\n"
+                   "<td><input type=\"text\" name=\"ipadress\" value=\"%s\" /></td>\n"
+                   "</tr>\n"
+                   "</table>\n"
+                   "<table width=\"100%%\">\n"
+                   "<tr>\n"
+                   "<td colspan=\"2\" align=\"right\">\n"
+                   "<input type=\"submit\" value=\"%s\" />\n"
+                   "</td>\n"
+                   "</table>\n"
+                   "</form>\n"
+                   ,
+                   getenv("SCRIPT_NAME"),
+                   current_interface,
+                   CONTENT_TABLE_BOX_CLASS,
+                   INTERFACE_TABLE_DESCRIPTION,
+                   current_interface,
+                   INTERFACE_TABLE_IPADDRESS,
+                   interface_ini[0].current ? interface_ini[0].current[1] : "",
+                   INTERFACE_TABLE_NETMASK,
+                   interface_ini[1].current ? interface_ini[1].current[1] : "",
+                   INTERFACE_TABLE_GATEWAY,
+                   interface_ini[2].current ? interface_ini[2].current[1] : "",
+                   INTERFACE_BUTTON_UPDATE);
+            /* Set interface found to one */
+            interface_found = 1;
+         }
+         /* Clear current interface */
+         memset(current_interface, sizeof(current_interface), 0);
+         if (interface) {
+            /* Copy current_interface from first argument from "auto" line */
+            strncpy(current_interface, interface[1], sizeof(current_interface));
+         }
+         /* Loop through all ini settings */
+         for (j = 0; interface_ini[j].variable != NULL; j++) {
+            /* Argument set for this line */
+            if (interface_ini[j].current) {
+               /* Free argument */
+               argument_free(interface_ini[j].current);
+               /* And set argument pointer to zero */
+               interface_ini[j].current = NULL;
+            }
+         }
+         /* Not last section in file? */
+         if (interface) {
+            /* Free interface entry */
+            argument_free(interface);
+         }
+      } else {
+         /* For lookup */
+         int interface_ini_found = 0;
+         /* Parse through all available commands */
+         for (j = 0; interface_ini[j].variable != NULL; j++) {
+            /* Argument command matches? */
+            if (interface && interface[0] &&
+                !strcasecmp(interface[0], interface_ini[j].variable)) {
+               /* Set pointer */
+               interface_ini[j].current = interface;
+               /* Set found to true */
+               interface_ini_found = 1;
+            }
+         }
+         /* Free interface information? */
+         if (!interface_ini_found && interface) {
+            /* Free argument */
+            argument_free(interface);
+         }
+      }
+      /* Increase counter */
+      i++;
+   }
+
+   /* No interface found? */
+   if (!interface_found) {
+      /* Print information screen */
+      owi_headline(2, INTERFACE_NOT_FOUND);
+   }
+
+   /* Close external table */
+   printf("</td>\n"
+          "</tr>\n"
+	  "</table>\n");
 }

@@ -129,18 +129,19 @@ void nfs_list() {
    while ( i < file_line_counter) {
       /* Parse nfs entry */
       char **nfs = argument_parse(file_line_get(i), ARGUMENT_SEPERATOR_STANDARD);
-      /* Search string specified? */
-      if ((!search || !strcmp(search, "") ||
-          (search && 
-           (!strcasecmp(nfs[0], search) ||
-            !strcasecmp(nfs[3], search) ||
-            !strcasecmp(nfs[4], search) ||
-            !strcasecmp(nfs[5], search)))) &&
-	    (nfs[0][0] != '#')) {
-	 /* Get options data for this share */
-	 char *options = argument_get(nfs, 1, ARGUMENT_SEPERATOR_STANDARD);
-	 /* Everything ok? */
-	 if (options) {
+      /* Get options data for this share */
+      char *options = NULL;
+      /* Valid line? */
+      if (nfs[0] && nfs[1] && nfs[0][0] != '#') {
+         options = argument_get(nfs, 1, ARGUMENT_SEPERATOR_STANDARD);
+      }
+      /* Everything ok? */
+      if (options) {
+         /* Search string specified? */
+         if ((!search || !strcmp(search, "") ||
+             (search && 
+              (strstr(nfs[0], search) ||
+               strstr(options, search))))) {
             /* Print entry */
             printf("<tr onmouseover=\"this.className='%s';\""
                      " onmouseout=\"this.className='%s';\">\n"
@@ -161,10 +162,12 @@ void nfs_list() {
   	           getenv("SCRIPT_NAME"),
 	           nfs[0],
   	           NFS_BUTTON_DELETE);
-            /* Free options */
-	    free(options);
 	 }
       }
+      if (options) {
+         /* Free options */
+         free(options);
+      }	 
       /* Increase counter */
       i++;
       /* Free nfs entry */

@@ -132,8 +132,8 @@ void group_list() {
       /* Search string specified? */
       if (!search || !strcmp(search, "") ||
           (search &&
-           (!strcasecmp(group[0], search) ||
-            !strcasecmp(group[2], search)))) {
+           (strstr(group[0], search) ||
+            strstr(group[2], search)))) {
          /* Print entry */
          printf("<tr onmouseover=\"this.style.backgroundColor='%s';\""
                      " onmouseout=\"this.style.backgroundColor='%s';\">\n"
@@ -188,6 +188,16 @@ void group_detail(char *groupname) {
    /* Group found? */
    int group_found = 0;
 
+   /* Print external table for design */
+   printf("<table class=\"%s\">\n"
+          "<tr>\n"
+          "<td>\n"
+          "<h1>%s</h1>\n"
+          "<br />%s<br /><br />\n",
+          CONTENT_TABLE_CLASS,
+          GROUP_HEADLINE,
+          GROUP_DETAIL);
+
    /* Loop through passwd database */
    while ( i < file_line_counter) {
       /* Get group entry */	   
@@ -197,7 +207,7 @@ void group_detail(char *groupname) {
          printf("<form action=\"%s\" method=\"POST\">\n"
                 "<input type=\"hidden\" name=\"command\" value=\"update\">\n"
                 "<input type=\"hidden\" name=\"id\" value=\"%s\">\n"
-                "<table cellpadding=\"0\" cellspacing=\"10\">\n"
+                "<table class=\"%s\" width=\"100%%\">\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
                 "<td>%s</td>\n"
@@ -216,16 +226,20 @@ void group_detail(char *groupname) {
                 "</tr>\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
-                "<td>%s</td>\n"
+                "<td><input type=\"text\" name=\"members\" value=\"%s\" /></td>\n"
+                "</tr>\n"
+                "</table>\n"
+                "<table width=\"100%%\">\n"
                 "<tr>\n"
-                "<td colspan=\"2\">\n"
-                "<input type=\"submit\" value=\"Update\">\n"
+                "<td colspan=\"2\" align=\"right\">\n"
+                "<input type=\"submit\" value=\"%s\" />\n"
                 "</td>\n"
                 "</table>\n"
                 "</form>\n"
                 ,
                 getenv("SCRIPT_NAME"),
                 group[0],
+		CONTENT_TABLE_BOX_CLASS,
                 GROUP_TABLE_DESCRIPTION,
                 group[0],
                 GROUP_TABLE_NEW_PASSWORD,
@@ -233,7 +247,8 @@ void group_detail(char *groupname) {
                 GROUP_TABLE_GID,
                 group[2],
                 GROUP_TABLE_MEMBERS,
-                group[3]);
+                group[3],
+		GROUP_BUTTON_UPDATE);
 
 
          /* Set user found to one */
@@ -250,6 +265,11 @@ void group_detail(char *groupname) {
       /* Print information screen */
       owi_headline(2, "Group not found");
    }
+
+   /* Close external table */
+   printf("</td>\n"
+          "</tr>\n"
+          "</table>\n");
 }
 
 /* \fn group_update(groupname, members)
@@ -281,6 +301,9 @@ void group_update(char *groupname, char *members) {
 
    /* Save result in user file */
    file_save(GROUP_FILE);
+
+   /* Display group */
+   group_detail(groupname);
 }
 
 /* \fn group_delete(username)

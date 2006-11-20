@@ -140,10 +140,10 @@ void user_list() {
       /* Search string specified? */
       if (!search || !strcmp(search, "") ||
           (search && 
-           (!strcasecmp(passwd[0], search) ||
-            !strcasecmp(passwd[3], search) ||
-            !strcasecmp(passwd[4], search) ||
-            !strcasecmp(passwd[5], search)))) {
+           (strstr(passwd[0], search) ||
+            strstr(passwd[3], search) ||
+            strstr(passwd[4], search) ||
+            strstr(passwd[5], search)))) {
          /* Print entry */
          printf("<tr onmouseover=\"this.className='%s';\""
                 " onmouseout=\"this.className='%s';\">\n"

@@ -194,7 +194,7 @@ void argument_free(char **argument) {
  */
 char *argument_get(char **argument, int index, char *seperator) {
    /* Option data (from 1st argument until n-th argument) */
-   char *string;
+   char *string = NULL;
    /* Define whole string len for all options */
    int string_length = 0;
    /* Index counter */
