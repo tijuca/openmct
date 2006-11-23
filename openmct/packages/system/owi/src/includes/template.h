@@ -5,3 +5,11 @@
 #define  CONTENT_TABLE_CLASS_MOUSEOUT        "content_table_mouseout"
 #define  CONTENT_DATAGRID_HEADER             "dataGridHeader"
 #define  CONTENT_DATAGRID_CONTENT            "dataGridContent"
+
+#define  USER_NAV_CLASS                      "user"
+#define  GROUP_NAV_CLASS                     "group"
+#define  SYSINFO_NAV_CLASS                   "system"
+#define  NFS_NAV_CLASS                       "nfs"
+#define  FTP_NAV_CLASS                       "ftp"
+#define  INTERFACE_NAV_CLASS                 "interface"
+#define  SHELL_NAV_CLASS                     "shell"

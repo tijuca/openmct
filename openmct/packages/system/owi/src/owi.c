@@ -31,22 +31,46 @@
 #include "includes/owi.h"
 
 void owi_header(char *title) {
+   /* Loop counter */
+   int i = 0;
+
    printf("Content-Type: text/html\n\n");
    fflush(stdout);
-        
-   printf("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"" 
-          "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
-          "<html xmlns=\"http://www.w3.org/1999/xhtml\">"
+ 
+   printf("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
+          "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
           "<head>\n"
-          "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />\n"
           "<title>%s</title>\n"
           "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/openmct.css\" />\n"
+          "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" />\n"
           "</head>\n"
-          "<body>\n", title);
+          "<body>\n"
+          "<div id=\"navigation-outer\">Navigation</div>\n"
+          "<div id=\"navigation-inner\">\n"
+          "<ul id=\"navigation\">\n", title);
+   for (i = 0; modules[i].name != NULL; i++) {
+      printf("<li class=\"navigation %s\"><a href=\"%s\">%s</a></li>\n",
+             modules[i].style,
+	     modules[i].name,
+	     modules[i].description);
+   }
+   printf("</ul>\n"
+          "</div>\n"
+          /*"<div id=\"toolbar\">\n"
+          "<a href=\"user.cgi?command=new\">Neu</a>\n"
+          "<a href=\"user.cgi?command=csv\">CSV</a>\n"
+          "</div>\n"*/
+          "<div id=\"taskbar\">\n"
+          "<a class=\"button-internet\" target=\"_blank\" href=\"http://www.openmct.org\">OpenMCT Homepage</a>\n"
+          "<a class=\"button-community\" target=\"_blank\" href=\"http://claxan.hangar18.org/forum\">OpenMCT Forum</a>\n"
+          "<a class=\"button-contact\" href=\"mailto:dev@openmct.org\">OpenMCT Kontakt</a>\n"
+          "</div>\n"
+          "<div id=\"content\">\n");
 }
 
 void owi_footer() {
-   printf("</body>\n"
+   printf("</div>\n"
+          "</body>\n"
           "</html>\n");
 }
 

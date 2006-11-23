@@ -3,7 +3,7 @@
 #define  FILE_LINE_DEL     2
 #define  FILE_LINE_ADD     3
 
-#define  FILE_BASE         "/var/www/owi/examples"
+#define  FILE_BASE         "../examples"
 
 int file_open(char *filename);
 int proc_open(char *filename);

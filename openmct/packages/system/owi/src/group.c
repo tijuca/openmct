@@ -102,9 +102,7 @@ void group_list() {
           "<input type=\"submit\" value=\"Suchen\" /></td>\n"
           "</tr>\n"
           "</table>\n"
-          "<div class=\"%s\">\n"
-          "<div class=\"%s\">\n"
-          "<table class=\"%s\">\n"
+          "<table id=\"%s\" cellpadding=\"0\" cellspacing=\"0\">\n"
           "<thead>\n"
           "<tr>\n"
           "<th width=\"80\">%s</th>\n"
@@ -119,8 +117,6 @@ void group_list() {
           GROUP_HEADLINE,
           GROUP_DESCRIPTION,
           variable_get("search"),
-          CONTENT_DATAGRID_HEADER,
-          CONTENT_DATAGRID_CONTENT,
           CONTENT_TABLE_LIST_CLASS,
           GROUP_TABLE_DESCRIPTION,
           GROUP_TABLE_GID,
@@ -162,8 +158,6 @@ void group_list() {
    /* Print table footer / close internal table / close scroll / print footer / ... */
    printf("</tbody>\n"
           "</table>\n"
-          "</div>\n"
-          "</div>\n"
           "<table width=\"100%%\">\n"
           "<tr>\n"
           "<td colspan=\"7\" align=\"right\">\n"
