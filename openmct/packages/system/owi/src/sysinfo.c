@@ -95,14 +95,16 @@ void sysinfo_general() {
    if (!sysinfo(&si)) {
       owi_headline(1, SYSINFO_HEADLINE);
       owi_headline(2, SYSINFO_DESCRIPTION);
-      printf("<table class=\"%s\" border=\"1\" align=\"center\">\n"
+      printf("<table class=\"%s\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n"
+             "<thead>\n"
              "<tr>\n"
-             "<td>Load (1 / 5 / 15 minute load avarage)</td>\n"
-             "<td>Memory (All / Free / Shared)</td>\n"
-             "<td>Speicher in Puffern:</td>\n"
-             "<td>Swap (All / Free):</td>\n"
-             "<td>Tasks</td>\n"
+             "<th>Load (1 / 5 / 15 minute load avarage)</th>\n"
+             "<th>Memory (All / Free / Shared)</th>\n"
+             "<th>Speicher in Puffern:</t>\n"
+             "<th>Swap (All / Free):</th>\n"
+             "<th>Tasks</th>\n"
              "</tr>\n"
+             "</thead>\n"
              "<tr onmouseover=\"this.className='%s';\""
              " onmouseout=\"this.className='%s';\">\n"
              "<td>%u / %u / %u</td>\n"
@@ -112,7 +114,7 @@ void sysinfo_general() {
              "<td>%d</td>\n"
              "</tr>\n"
              "</table>\n",
-             CONTENT_TABLE_CLASS,
+             CONTENT_TABLE_BOX_CLASS,
              CONTENT_TABLE_CLASS_MOUSEOVER,
              CONTENT_TABLE_CLASS_MOUSEOUT,
              (unsigned int)si.loads[0], (unsigned int)si.loads[1],
@@ -141,13 +143,15 @@ void sysinfo_filesystems() {
    if (fp) {
       owi_headline(1, SYSINFO_FILESYSTEMS);
       owi_headline(2, SYSINFO_FILESYSTEMS_DESCRIPTION);
-      printf("<table class=\"%s\" border=\"1\" align=\"center\">\n"
+      printf("<table class=\"%s\" cellpadding=\"0\" cellspacing=\"0\" align=\"left\">\n"
+             "<thead>\n"
              "<tr>\n"
-             "<td>Ger&auml;t</td>\n"
-             "<td>Eingeh&auml;ngt auf</td>\n"
-             "<td>Dateisystem</td>\n"
-             "</tr>\n",
-             CONTENT_TABLE_CLASS);
+             "<th>Ger&auml;t</th>\n"
+             "<th>Eingeh&auml;ngt auf</th>\n"
+             "<th>Dateisystem</th>\n"
+             "</tr>\n"
+             "</thead>\n",
+             CONTENT_TABLE_BOX_CLASS);
       /* Read until file end reached */
       while (fscanf(fp, "%s %s %s", device, mountpoint, fs) == 3) {
          if (strcasecmp(fs, "0")) {
@@ -187,14 +191,15 @@ void sysinfo_network() {
    if (fp) {
       owi_headline(1, SYSINFO_NETWORK_DEVICES);
       owi_headline(2, SYSINFO_NETWORK_DEVICES_DESCRIPTION);
-      printf("<table class=\"%s\" border=\"1\" align=\"center\">\n"
+      printf("<table class=\"%s\" cellpadding=\"0\" cellspacing=\"0\" align=\"left\">\n"
+             "<thead>\n"
              "<tr>\n"
-             "<td>Interface</td>\n"
-             "<td>IP Adresse</td>\n"
-             "<td>In</td>\n"
-             "<td>Out</td>\n"
-             "</tr>\n",
-             CONTENT_TABLE_CLASS);
+             "<th>Interface</th>\n"
+             "<th>In</th>\n"
+             "<th>Out</th>\n"
+             "</tr>\n"
+             "</thead>\n",
+             CONTENT_TABLE_BOX_CLASS);
       /* Skip first line */
       fgets(line, sizeof(line) - 1, fp);
       /* Read while not end of file */

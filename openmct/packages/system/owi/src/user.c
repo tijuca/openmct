@@ -86,13 +86,11 @@ void user_list() {
    char *search = variable_get("search");
    /* Index counter */
    int i = 0;
-   /* Match counter */
-   int j = 0;
 
    /* Start form / external table / scroll area / internal table*/
    printf("<form action=\"%s\" method=\"post\">\n"
           "<input type=\"hidden\" name=\"command\" value=\"\" />\n"
-          "<table id=\"%s\">\n"
+          "<table class=\"%s\">\n"
           "<tr>\n"
 	  "<td>\n"
 	  "<h1>%s</h1>\n"
@@ -104,7 +102,7 @@ void user_list() {
 	  "<input type=\"submit\" value=\"Suchen\" /></td>\n"
 	  "</tr>\n"
 	  "</table>\n"
-          "<table id=\"%s\" cellpadding=\"0\" cellspacing=\"0\">\n"
+          "<table class=\"%s\" cellpadding=\"0\" cellspacing=\"0\">\n"
           "<thead>\n"
           "<tr>\n"
           "<th width=\"80\">%s</th>\n"
@@ -136,10 +134,10 @@ void user_list() {
       /* Search string specified? */
       if (!search || !strcmp(search, "") ||
           (search && 
-           (strstr(passwd[0], search) ||
-            strstr(passwd[3], search) ||
-            strstr(passwd[4], search) ||
-            strstr(passwd[5], search)))) {
+           (strstr(argument_get_part(passwd, 0), search) ||
+            strstr(argument_get_part(passwd, 3), search) ||
+            strstr(argument_get_part(passwd, 4), search) ||
+            strstr(argument_get_part(passwd, 5), search)))) {
          /* Print entry */
          printf("<tr onmouseover=\"this.className='%s';\""
                 " onmouseout=\"this.className='%s';\">\n"
@@ -154,18 +152,16 @@ void user_list() {
                 "</tr>\n",
                 CONTENT_TABLE_CLASS_MOUSEOVER,
                 CONTENT_TABLE_CLASS_MOUSEOUT,
-                passwd[0],
-                passwd[4] ? passwd[4] : "",
-                passwd[5] ? passwd[5] : "",
-                passwd[6] ? passwd[6] : "",
+                argument_get_part(passwd, 0),
+                argument_get_part(passwd, 4),
+                argument_get_part(passwd, 5),
+                argument_get_part(passwd, 6),
                 getenv("SCRIPT_NAME"),
-                passwd[0],
+                argument_get_part(passwd, 0),
 		USER_BUTTON_MODIFY,
 		getenv("SCRIPT_NAME"),
-		passwd[0],
+		argument_get_part(passwd, 0),
 		USER_BUTTON_DELETE);
-         /* Increase match counter */
-	 j++;
       }
       /* Increase counter */
       i++;
@@ -215,7 +211,7 @@ void user_detail(char *username) {
       /* Parse passwd entry */
       char **passwd = argument_parse(file_line_get(i), ":");
       /* Match found? */
-      if (!strcmp(passwd[0], username)) {
+      if (!strcmp(argument_get_part(passwd, 0), username)) {
          printf("<form action=\"%s\" method=\"post\">\n"
                 "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
                 "<input type=\"hidden\" name=\"id\" value=\"%s\" />\n"
@@ -227,10 +223,6 @@ void user_detail(char *username) {
                 "<tr>\n"
                 "<td>%s</td>\n"
                 "<td><input type=\"password\" /></td>\n"
-                "</tr>\n"
-                "<tr>\n"
-                "<td>%s</td>\n"
-                "<td><input type=\"password_check\" /></td>\n"
                 "</tr>\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
@@ -262,22 +254,21 @@ void user_detail(char *username) {
                 "</form>\n"
                 ,
                 getenv("SCRIPT_NAME"),
-                passwd[0],
+                argument_get_part(passwd, 0),
 		CONTENT_TABLE_BOX_CLASS,
                 USER_TABLE_DESCRIPTION,
-                passwd[0],
+                argument_get_part(passwd, 0),
                 USER_TABLE_NEW_PASSWORD,
-                USER_TABLE_NEW_PASSWORD_CHECK,
                 USER_TABLE_UID,
-                passwd[2],
+                argument_get_part(passwd, 2),
                 USER_TABLE_GID,
-                passwd[3],
+                argument_get_part(passwd, 3),
                 USER_TABLE_GECOS,
-                passwd[4],
+                argument_get_part(passwd, 4),
                 USER_TABLE_DIRECTORY,
-                passwd[5],
+                argument_get_part(passwd, 5),
                 USER_TABLE_SHELL,
-                passwd[6],
+                argument_get_part(passwd, 6),
 		USER_BUTTON_UPDATE);
 
 
@@ -315,17 +306,17 @@ void user_update(char *username) {
       /* Get passwd entry */
       char **passwd = argument_parse(file_line_get(i), ":");
       /* Passwd entry found? */
-      if (!strcasecmp(username, passwd[0])) {
+      if (!strcasecmp(username, argument_get_part(passwd, 0))) {
          /* Set new passwd line in memory */
          file_line_action(FILE_LINE_SET, i,
                           "%s:%s:%s:%s:%s:%s:%s",
                           username,
                           crypt(variable_get("password"), "OM"),
-                          passwd[2],
-                          passwd[3],
-                          variable_get("gecos"),
-                          variable_get("directory"),
-                          variable_get("shell"));
+                          argument_get_part(passwd, 2),
+                          argument_get_part(passwd, 3),
+                          variable_ltrim(variable_filter(variable_get("gecos"), ":")),
+                          variable_ltrim(variable_filter(variable_get("directory"), ":")),
+                          variable_ltrim(variable_filter(variable_get("shell"), ":")));
       }
       /* Free passwd entry */
       argument_free(passwd);
@@ -346,38 +337,52 @@ void user_add(char *username) {
    /* Index counter */
    int i;
    /* Max uid */
-   unsigned int max_uid = 0;
+   unsigned int start_uid = 1000;
+   /* User already found? */
+   int found = 0;
 
    /* Loop through passwd entries */
    for (i = 0; i < file_line_counter; i++) {
       /* Get passwd entry */
       char **passwd = argument_parse(file_line_get(i), ":");
-      /* Current uid greater than max uid? */
-      if (atoi(passwd[2]) > max_uid) {
-         /* Set max uid */
-         max_uid = atoi(passwd[2]);
+      /* Current uid start uid found? */
+      if (atoi(argument_get_part(passwd, 2)) == start_uid) {
+         /* Increase start uid */
+         start_uid++;
+	 /* And scan again */
+	 i = 0;
       }
+      /* New user already in user database */
+      if (!strcasecmp(argument_get_part(passwd, 0), 
+          variable_ltrim(variable_filter(username, ":")))) {
+         /* Set found to true */
+         found = 1;
+      } 
       /* Free passwd entry */
       argument_free(passwd);
+      /* Found? */
+      if (found) {
+         break;
+      }
    }
-   /* Increase max uid */
-   max_uid++;
-   /* Add new passwd line in memory */
-   file_line_action(FILE_LINE_ADD, i,
-                    "%s:%s:%d:%d:%s:%s:%s",
-                    username,
-                    crypt(variable_get("password"), "OM"),
-                    max_uid,
-                    max_uid,
-                    variable_get("gecos"),
-                    variable_get("directory"),
-                    variable_get("shell"));
+   /* User not found? */
+   if (!found) {
+      /* Add new passwd line in memory */
+      file_line_action(FILE_LINE_ADD, i,
+                       "%s:%s:%d:%d:%s:%s:%s",
+                       variable_ltrim(variable_filter(username, ":")),
+                       crypt(variable_get("password"), "OM"),
+                       start_uid,
+                       start_uid,
+                       variable_ltrim(variable_filter(variable_get("gecos"), ":")),
+                       variable_ltrim(variable_filter(variable_get("directory"), ":")),
+                       variable_ltrim(variable_filter(variable_get("shell"), ":")));
+      /* Save result in user file */
+      file_save(USER_FILE);
+   }
 
-   /* Save result in user file */
-   file_save(USER_FILE);
-
-   /* Show all users */
-   user_list();
+   /* Display new user*/
+   user_detail(username);
 }
 
 /* \fn user_delete(username)
@@ -393,7 +398,7 @@ void user_delete(char *username) {
       /* Get passwd entry */
       char **passwd = argument_parse(file_line_get(i), ":");
       /* Passwd entry found? */
-      if (!strcasecmp(username, passwd[0])) {
+      if (!strcasecmp(username, argument_get_part(passwd, 0))) {
          /* Set new passwd line in memory */
          file_line_action(FILE_LINE_DEL, i, NULL);
       }
@@ -431,10 +436,6 @@ void user_new() {
           "</tr>\n"
           "<tr>\n"
           "<td>%s</td>\n"
-          "<td><input type=\"password_check\" /></td>\n"
-          "</tr>\n"
-          "<tr>\n"
-          "<td>%s</td>\n"
           "<td><input type=\"text\" name=\"gecos\" /></td>\n"
           "</tr>\n"
           "<tr>\n"
@@ -463,7 +464,6 @@ void user_new() {
           CONTENT_TABLE_BOX_CLASS,
           USER_TABLE_DESCRIPTION,
           USER_TABLE_NEW_PASSWORD,
-          USER_TABLE_NEW_PASSWORD_CHECK,
           USER_TABLE_GECOS,
           USER_TABLE_DIRECTORY,
           USER_TABLE_SHELL,

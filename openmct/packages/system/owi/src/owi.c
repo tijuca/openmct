@@ -131,11 +131,13 @@ void owi_request() {
    char *equal = NULL;
    /* Pointer for handling variable set */
    char *p, *o;
+   /* Parameter that are passed via CGI */
+   char **parameter = NULL;
 
    /* GET request? */
    if (request_method && !strcasecmp(request_method, "GET")) {
-      /* Parse arguments */
-      argument = argument_parse(getenv("QUERY_STRING"), ARGUMENT_SEPERATOR_CGI);
+      /* Parse parameters */
+      parameter = argument_parse(getenv("QUERY_STRING"), ARGUMENT_SEPERATOR_CGI);
    /* POST request and content_length set? */
    } else if (request_method && !strcasecmp(request_method, "POST") && content_length) {
       /* convert string to integer */
@@ -148,8 +150,8 @@ void owi_request() {
          memset(post, 0, length + 1);
          /* Read post data */
          if (read(0, post, length)) {
-            /* Parse arguments */
-            argument = argument_parse(post, ARGUMENT_SEPERATOR_CGI);
+            /* Parse parameters */
+            parameter = argument_parse(post, ARGUMENT_SEPERATOR_CGI);
          }
          /* Free post data */
          free(post);
@@ -157,11 +159,11 @@ void owi_request() {
     }
 
     /* HTTP parameter found? */
-    if (argument) {
-       /* Loop through arguments */
-       for (i = 0; argument[i] != NULL; i++) {
+    if (parameter) {
+       /* Loop through parameters */
+       for (i = 0; parameter[i] != NULL; i++) {
           /* Get position of = sign */
-          equal = strchr(argument[i], '=');
+          equal = strchr(parameter[i], '=');
           /* Found? */
           if (equal) {
              /* Set to 0 so string will terminate here */
@@ -190,12 +192,12 @@ void owi_request() {
              /* Terminate string */
              *o = 0;
              /* define variable name */
-             variable_set(argument[i], equal + 1);
+             variable_set(parameter[i], equal + 1);
           }
           /* Set equal sign */
           *equal = '=';
        }
-       /* Free arguments via HTTP */
-       free(argument);
+       /* Free parameters via HTTP */
+       free(parameter);
     }
 }

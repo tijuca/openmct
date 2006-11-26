@@ -4,7 +4,6 @@
 
 #define  USER_TABLE_DESCRIPTION              "Kennung"
 #define  USER_TABLE_NEW_PASSWORD             "Neues Passwort"
-#define  USER_TABLE_NEW_PASSWORD_CHECK       "Neues Passwort (Best&auml;tigung)"
 #define  USER_TABLE_UID                      "User ID"
 #define  USER_TABLE_GID                      "Gruppen ID"
 #define  USER_TABLE_GECOS                    "Bemerkung"
@@ -28,7 +27,6 @@
 
 #define  GROUP_TABLE_DESCRIPTION             "Gruppe"
 #define  GROUP_TABLE_NEW_PASSWORD            "Neues Passwort"
-#define  GROUP_TABLE_NEW_PASSWORD_CHECK      "Neues Passwort (Best&auml;tigung)"
 #define  GROUP_TABLE_GID                     "Gruppen ID"
 #define  GROUP_TABLE_MEMBERS                 "Mitglieder"
 #define  GROUP_TABLE_ACTION                  "Aktion"

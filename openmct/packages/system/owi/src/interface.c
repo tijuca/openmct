@@ -105,7 +105,7 @@ void interface_list() {
 	  "<input type=\"submit\" value=\"Suchen\" /></td>\n"
 	  "</tr>\n"
 	  "</table>\n"
-          "<table id=\"%s\" cellpadding=\"0\" cellspacing=\"0\">\n"
+          "<table class=\"%s\" cellpadding=\"0\" cellspacing=\"0\">\n"
           "<thead>\n"
           "<tr>\n"
           "<th width=\"80\">%s</th>\n"

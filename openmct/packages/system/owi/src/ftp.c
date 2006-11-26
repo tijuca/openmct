@@ -104,7 +104,12 @@ void ftp_list() {
           "<br />%s<br /><br />\n"
           "<form action=\"%s\" method=\"post\">\n"
           "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
-          "<table class=\"%s\" width=\"100%%\">\n",
+          "<table class=\"%s\" width=\"100%%\" cellspacing=\"0\" cellpading=\"0\">\n"
+	  "<thead>\n"
+	  "<tr>\n"
+	  "<th colspan=\"2\">FTP Konfiguration</th>\n"
+	  "</tr>\n"
+	  "</thead>\n",
           CONTENT_TABLE_CLASS,
           FTP_HEADLINE,
           FTP_DETAIL,
@@ -118,7 +123,7 @@ void ftp_list() {
 
       /* Parse through all available commands */
       for (j = 0; ftp_ini[j].variable != NULL; j++) { 
-         if (ini && ini[0] && !strcasecmp(ini[0], ftp_ini[j].variable)) {
+         if (!strcasecmp(argument_get_part(ini, 0), ftp_ini[j].variable)) {
             ftp_ini[j].current = ini;
 	 }
       }
@@ -188,7 +193,7 @@ void ftp_update() {
       /* Parse through all available commands */
       for (j = 0; ftp_ini[j].variable != NULL; j++) {
          /* Entry found? */
-         if (ini && ini[0] && !strcasecmp(ini[0], ftp_ini[j].variable)) {
+         if (!strcasecmp(argument_get_part(ini, 0), ftp_ini[j].variable)) {
             /* Write new config line */
             file_line_action(FILE_LINE_SET, i,
 	                     "%*s=%s",

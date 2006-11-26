@@ -102,7 +102,7 @@ void nfs_list() {
           "<input type=\"submit\" value=\"Suchen\" /></td>\n"
           "</tr>\n"
           "</table>\n"
-          "<table id=\"%s\" cellpadding=\"0\" cellspacing=\"0\">\n"
+          "<table class=\"%s\" cellpadding=\"0\" cellspacing=\"0\">\n"
           "<thead>\n"
           "<tr>\n"
           "<th width=\"80\">%s</th>\n"
@@ -128,7 +128,7 @@ void nfs_list() {
       /* Get options data for this share */
       char *options = NULL;
       /* Valid line? */
-      if (nfs[0] && nfs[1] && nfs[0][0] != '#') {
+      if (argument_get_part(nfs, 0)[0] != '#') {
          options = argument_get(nfs, 1, ARGUMENT_SEPERATOR_STANDARD);
       }
       /* Everything ok? */
@@ -136,7 +136,7 @@ void nfs_list() {
          /* Search string specified? */
          if ((!search || !strcmp(search, "") ||
              (search && 
-              (strstr(nfs[0], search) ||
+              (strstr(argument_get_part(nfs, 0), search) ||
                strstr(options, search))))) {
             /* Print entry */
             printf("<tr onmouseover=\"this.className='%s';\""
@@ -150,13 +150,13 @@ void nfs_list() {
                    "</tr>\n",
                    CONTENT_TABLE_CLASS_MOUSEOVER,
                    CONTENT_TABLE_CLASS_MOUSEOUT,
-                   nfs[0],
+                   argument_get_part(nfs, 0),
                    options,
 	           getenv("SCRIPT_NAME"),
-  	           nfs[0],
+                   argument_get_part(nfs, 0),
 	           NFS_BUTTON_MODIFY,
   	           getenv("SCRIPT_NAME"),
-	           nfs[0],
+                   argument_get_part(nfs, 0),
   	           NFS_BUTTON_DELETE);
 	 }
       }
@@ -212,7 +212,7 @@ void nfs_detail(char *nfsname) {
       /* Parse nfs entry */
       char **nfs = argument_parse(file_line_get(i), ARGUMENT_SEPERATOR_STANDARD);
       /* Match found? */
-      if (!strcmp(nfs[0], nfsname)) {
+      if (!strcmp(argument_get_part(nfs, 0), nfsname)) {
          /* Get options data for this share */
          char *options = argument_get(nfs, 1, ARGUMENT_SEPERATOR_STANDARD);
          /* Everything ok? */
@@ -240,10 +240,10 @@ void nfs_detail(char *nfsname) {
                    "</form>\n"
                    ,
                    getenv("SCRIPT_NAME"),
-                   nfs[0],
+                   argument_get_part(nfs, 0),
    	   	   CONTENT_TABLE_BOX_CLASS,
                    NFS_TABLE_DESCRIPTION,
-                   nfs[0],
+                   argument_get_part(nfs, 0),
                    NFS_TABLE_OPTIONS,
                    options,
 		   NFS_BUTTON_UPDATE);
@@ -286,11 +286,11 @@ void nfs_update(char *nfsname) {
       /* Get nfs entry */
       char **nfs = argument_parse(file_line_get(i), ARGUMENT_SEPERATOR_STANDARD);
       /* Passwd entry found? */
-      if (!strcasecmp(nfsname, nfs[0])) {
+      if (!strcasecmp(nfsname, argument_get_part(nfs, 0))) {
          /* Set new nfs line in memory */
          file_line_action(FILE_LINE_SET, i,
                           "%s %s",
-                          nfs[0],
+                          argument_get_part(nfs, 0),
                           options);
       }
       /* Free nfs entry */
@@ -338,7 +338,7 @@ void nfs_delete(char *nfsname) {
       /* Get nfs entry */
       char **nfs = argument_parse(file_line_get(i), ARGUMENT_SEPERATOR_STANDARD);
       /* Passwd entry found? */
-      if (!strcasecmp(nfsname, nfs[0])) {
+      if (!strcasecmp(nfsname, argument_get_part(nfs, 0))) {
          /* Set new nfs line in memory */
          file_line_action(FILE_LINE_DEL, i, NULL);
       }

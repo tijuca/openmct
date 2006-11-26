@@ -24,8 +24,6 @@
 #include <string.h>
 #include "includes/argument.h"
 
-char **argument = NULL;
-
 /* \fn argument_parse_seperator(value, seperator)
  * Split a string into pieces seperated with one or more characters
  * \param[in] value string that will be parsed
@@ -43,7 +41,7 @@ char **argument_parse(char *value, char *seperator) {
    int start_index = 0;
    /* stop index for argument */
    int stop_index = 0;
-   /* argument counter */
+   /* Argument counter */
    int argument_count = 0;
    /* argument data */
    char **argument = NULL;
@@ -198,7 +196,7 @@ char *argument_get(char **argument, int index, char *seperator) {
    /* Define whole string len for all options */
    int string_length = 0;
    /* Index counter */
-   int  i = 0;
+   int i = 0;
 
    /* Loop through all argument values */
    for (i = index; argument[i] != NULL; i++) {
@@ -223,4 +221,21 @@ char *argument_get(char **argument, int index, char *seperator) {
    
    /* Return result */
    return string;
+}
+
+/* \fn argument_get_part(argument, index)
+ * \param[in] argument Argument data
+ * \param[in] index get this index
+ */
+char *argument_get_part(char **argument, int index) {
+   /* Index counter */
+   int i;
+
+   for (i = 0; argument[i] != NULL; i++) {
+      if (index == i) {
+         break;
+      }
+   }
+
+   return argument[i] ? argument[i] : "";
 }

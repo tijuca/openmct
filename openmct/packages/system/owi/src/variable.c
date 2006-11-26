@@ -166,3 +166,41 @@ void variable_free() {
       variable = NULL;
    }
 }
+
+/* \fn variable_filter(variable, filter)
+ * \param[in] variable Variable value
+ * \param[in] filter Value filter
+ */
+char *variable_filter(char *variable, char *filter) {
+   /* Index counter */
+   int i;
+   /* Variable set? */
+   if (variable) {
+      /* Filter value from variable */
+      for (i = 0; i < strlen(variable); i++) {
+          /* Unwanted character found? */
+          if (strchr(filter, variable[i])) {
+	     /* "Filter" it */
+	     strcpy(variable + i, variable + i + 1);
+	  }
+      }
+   }
+   /* Return original pointer */
+   return variable;
+}
+
+/* \fn variable_ltrm(variable, filter)
+ * \param[in] variable Variable vale
+ */
+char *variable_ltrim(char *variable) {
+   /* Variable set? */
+   if (variable) {
+      /* While leading spacing or tabs */
+      while(*variable == ' ' || *variable == '\t') {
+         /* Skip first character */
+         strcpy(variable, variable + 1);
+      }
+   }
+   /* Return original pointer */
+   return variable;
+}

@@ -7,5 +7,4 @@ enum ARGUMENT_STATE { ARGUMENT_PRE, ARGUMENT_DATA, ARGUMENT_ADD, ARGUMENT_END, A
 char **argument_parse(char *value, char *seperator);
 void argument_free(char **argument);
 char *argument_get(char **argument, int index, char *seperator);
-
-extern char **argument;
+char *argument_get_part(char **argument, int index);
