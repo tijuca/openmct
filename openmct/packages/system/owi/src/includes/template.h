@@ -13,3 +13,6 @@
 #define  FTP_NAV_CLASS                       "ftp"
 #define  INTERFACE_NAV_CLASS                 "interface"
 #define  SHELL_NAV_CLASS                     "shell"
+
+#define  CONTENT_LINK_AQUA_CLASS             "aqua_button_link"
+#define  CONTENT_BUTTON_AQUA_CLASS           "aqua_button"

@@ -98,18 +98,20 @@ void user_list() {
           "<table width=\"100%%\">\n"
           "<tr>\n"
 	  "<td align=\"right\">"
-	  "<input type=\"text\" name=\"search\" value=\"%s\" />&nbsp;"
-	  "<input type=\"submit\" value=\"Suchen\" /></td>\n"
+          "<div class=\"searchbar\">\n"
+          "<input class=\"searchbox\" type=\"text\" name=\"search\" value=\"%s\" /><a href=\"#\" onclick=\"javascript:document.forms[0].reset()\" class=\"searchreset\" title=\"L&ouml;schen\"><img src=\"images/reset.gif\" id=\"searchreset\" border=\"0\" alt=\"\" /></a>\n"
+          "</div>\n"
+	  "</td>\n"
 	  "</tr>\n"
 	  "</table>\n"
           "<table class=\"%s\" cellpadding=\"0\" cellspacing=\"0\">\n"
           "<thead>\n"
           "<tr>\n"
-          "<th width=\"80\">%s</th>\n"
-          "<th width=\"160\">%s</th>\n"
-          "<th width=\"160\">%s</th>\n"
-          "<th width=\"160\">%s</th>\n"
-          "<th width=\"160\">%s</th>\n"
+          "<th>%s</th>\n"
+          "<th>%s</th>\n"
+          "<th>%s</th>\n"
+          "<th>%s</th>\n"
+          "<th>%s</th>\n"
           "</tr>\n"
 	  "</thead>\n"
           "<tbody>",
@@ -174,7 +176,7 @@ void user_list() {
           "<table width=\"100%%\">\n"
 	  "<tr>\n"
 	  "<td colspan=\"7\" align=\"right\">\n"
-	  "<input type=\"button\" onClick=\"location='%s?command=new'\" value=\"%s\" />"
+	  "<a class=\"%s\" href=\"#\" onClick=\"location='%s?command=new'\"><div class=\"%s\">%s</div></a>\n"
 	  "</td>\n"
 	  "</tr>\n"
 	  "</table>\n"
@@ -182,7 +184,9 @@ void user_list() {
           "</tr>\n"
 	  "</table>\n"
           "</form>\n",
+	  CONTENT_LINK_AQUA_CLASS,
 	  getenv("SCRIPT_NAME"),
+	  CONTENT_BUTTON_AQUA_CLASS,
 	  USER_BUTTON_NEW);
 }
 
@@ -248,8 +252,9 @@ void user_detail(char *username) {
                 "<table width=\"100%%\">\n"
                 "<tr>\n"
                 "<td colspan=\"2\" align=\"right\">\n"
-                "<input type=\"submit\" value=\"%s\" />\n"
+                "<a href=\"#\" onClick=\"javascript:document.forms[0].submit()\" class=\"%s\"><div class=\"%s\">%s</div></a>\n"
                 "</td>\n"
+	        "</tr>\n"
                 "</table>\n"
                 "</form>\n"
                 ,
@@ -269,6 +274,8 @@ void user_detail(char *username) {
                 argument_get_part(passwd, 5),
                 USER_TABLE_SHELL,
                 argument_get_part(passwd, 6),
+		CONTENT_LINK_AQUA_CLASS,
+		CONTENT_BUTTON_AQUA_CLASS,
 		USER_BUTTON_UPDATE);
 
 
@@ -450,8 +457,9 @@ void user_new() {
           "<table width=\"100%%\">\n"
           "<tr>\n"
           "<td colspan=\"2\" align=\"right\">\n"
-          "<input type=\"submit\" value=\"%s\" />\n"
+          "<a href=\"#\" onClick=\"javascript:document.forms[0].submit()\" class=\"%s\"><div class=\"%s\">%s</div></a>\n"
           "</td>\n"
+	  "</tr>\n"
           "</table>\n"
           "</form>\n"
           "</td>\n"
@@ -467,5 +475,7 @@ void user_new() {
           USER_TABLE_GECOS,
           USER_TABLE_DIRECTORY,
           USER_TABLE_SHELL,
+          CONTENT_LINK_AQUA_CLASS,
+          CONTENT_BUTTON_AQUA_CLASS,
           USER_BUTTON_ADD);
 }

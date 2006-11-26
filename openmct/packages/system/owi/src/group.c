@@ -98,8 +98,10 @@ void group_list() {
           "<table width=\"100%%\">\n"
           "<tr>\n"
           "<td align=\"right\">"
-          "<input type=\"text\" name=\"search\" value=\"%s\" />&nbsp;"
-          "<input type=\"submit\" value=\"Suchen\" /></td>\n"
+          "<div class=\"searchbar\">\n"
+          "<input class=\"searchbox\" type=\"text\" name=\"search\" value=\"%s\" /><a href=\"#\" onclick=\"javascript:document.forms[0].reset()\" class=\"searchreset\" title=\"L&ouml;schen\"><img src=\"images/reset.gif\" id=\"searchreset\" border=\"0\" alt=\"\" /></a>\n"
+          "</div>\n"
+          "</td>\n"
           "</tr>\n"
           "</table>\n"
           "<table class=\"%s\" cellpadding=\"0\" cellspacing=\"0\">\n"
@@ -161,7 +163,7 @@ void group_list() {
           "<table width=\"100%%\">\n"
           "<tr>\n"
           "<td colspan=\"7\" align=\"right\">\n"
-          "<input type=\"button\" onClick=\"location='%s?command=new'\" value=\"%s\" />"
+	  "<a class=\"%s\" href=\"#\" onClick=\"location='%s?command=new'\"><div class=\"%s\">%s</div></a>\n"
           "</td>\n"
           "</tr>\n"
           "</table>\n"
@@ -169,7 +171,9 @@ void group_list() {
           "</tr>\n"
           "</table>\n"
           "</form>\n",
+	  CONTENT_LINK_AQUA_CLASS,
           getenv("SCRIPT_NAME"),
+	  CONTENT_BUTTON_AQUA_CLASS,
           GROUP_BUTTON_NEW);
 }
 
@@ -201,7 +205,7 @@ void group_detail(char *groupname) {
          printf("<form action=\"%s\" method=\"POST\">\n"
                 "<input type=\"hidden\" name=\"command\" value=\"update\">\n"
                 "<input type=\"hidden\" name=\"id\" value=\"%s\">\n"
-                "<table class=\"%s\" width=\"100%%\">\n"
+                "<table class=\"%s\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\">\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
                 "<td>%s</td>\n"
@@ -222,7 +226,7 @@ void group_detail(char *groupname) {
                 "<table width=\"100%%\">\n"
                 "<tr>\n"
                 "<td colspan=\"2\" align=\"right\">\n"
-                "<input type=\"submit\" value=\"%s\" />\n"
+	        "<a class=\"%s\" href=\"#\" onClick=\"javascript:document.forms[0].submit()\"><div class=\"%s\">%s</div></a>\n"
                 "</td>\n"
                 "</table>\n"
                 "</form>\n"
@@ -237,6 +241,8 @@ void group_detail(char *groupname) {
                 argument_get_part(group, 2),
                 GROUP_TABLE_MEMBERS,
                 argument_get_part(group, 3),
+		CONTENT_LINK_AQUA_CLASS,
+		CONTENT_BUTTON_AQUA_CLASS,
 		GROUP_BUTTON_UPDATE);
 
 
@@ -388,7 +394,7 @@ void group_new() {
 	  "<br />%s<br /><br />\n"
           "<form action=\"%s\" method=\"post\">\n"
           "<input type=\"hidden\" name=\"command\" value=\"add\" />\n"
-          "<table class=\"%s\" width=\"100%%\">\n"
+          "<table class=\"%s\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\">\n"
           "<tr>\n"
           "<td width=\"250\">%s</td>\n"
           "<td><input type=\"text\" name=\"id\" /></td>\n"
@@ -405,7 +411,7 @@ void group_new() {
           "<table width=\"100%%\">\n"
           "<tr>\n"
           "<td colspan=\"2\" align=\"right\">\n"
-          "<input type=\"submit\" value=\"%s\" />\n"
+	  "<a class=\"%s\" href=\"#\" onClick=\"javascript:document.forms[0].submit()\"><div class=\"%s\">%s</div></a>\n"
           "</td>\n"
           "</table>\n"
           "</form>\n"
@@ -420,5 +426,7 @@ void group_new() {
           GROUP_TABLE_DESCRIPTION,
           GROUP_TABLE_NEW_PASSWORD,
           GROUP_TABLE_MEMBERS,
+          CONTENT_LINK_AQUA_CLASS,
+          CONTENT_BUTTON_AQUA_CLASS,
           GROUP_BUTTON_ADD);
 }

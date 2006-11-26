@@ -56,6 +56,8 @@ int nfs_main(int argc, char **argv) {
          nfs_detail(variable_get("id"));
       } else if (!strcasecmp(command, "update")) {
          nfs_update(variable_get("id"));
+	 /* Reloade NFS configuration */
+         proc_open("exportfs -rfa");
       } else if (!strcasecmp(command, "delete")) {
          nfs_delete(variable_get("id"));
       } else if (!strcasecmp(command, "new")) {
