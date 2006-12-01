@@ -23,11 +23,11 @@ IMAGEPACKAGES=	packages/base/busybox \
 		packages/net/ntp \
 		packages/net/tcpwrapper \
 		packages/net/portmap \
+		packages/net/samba \
 		packages/net/vsftpd \
 		packages/system/debootstrap \
 		packages/system/fcp \
 		packages/system/ethtool \
-		packages/system/mii-diag \
 		packages/system/smartd \
 		packages/system/vserver \
 		packages/system/vserverdebiantools

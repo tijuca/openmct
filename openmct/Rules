@@ -18,7 +18,7 @@ MAKE=/usr/bin/make
 TOUCH=/usr/bin/touch
 LN=/bin/ln
 MKDIR=/bin/mkdir
-MKFSJFFS2=/usr/bin/mkfs.jffs2
+MKFSJFFS2=/usr/sbin/mkfs.jffs2
 MKSQUASHFS=/usr/sbin/mksquashfs
 MAKE=/usr/bin/make
 GCC=/usr/bin/gcc
@@ -69,7 +69,7 @@ ETC=etc.bin
 MCT_MODIFY=mct_modify
 
 # Options
-ROOTOPTS=-l -q
+ROOTOPTS=-le -all-root
 
 # Scripts
 PATCHSOURCE=$(SCRIPTDIR)/patch-source.sh
