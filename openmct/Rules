@@ -80,8 +80,7 @@ REMOVESVN=$(SCRIPTDIR)/remove-svn.sh
 CLEANUPROOT=$(SCRIPTDIR)/cleanup-root.sh
 
 # tar options
-#TAROPT=--strip-path=1
-TAROPT=--strip-components=1
+TAROPT=--strip-path=1
 
 ifndef CONFIGUREENV
 # default configure enviornment arguments
