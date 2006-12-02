@@ -1,6 +1,5 @@
 # Linux Kernel
-#DOWNLOAD=	http://www.de.kernel.org/pub/linux/kernel/v2.4/linux-2.4.32.tar.bz2
-DOWNLOAD=	http://www.fi.kernel.org/pub/linux/kernel/v2.4/linux-2.4.32.tar.bz2
+DOWNLOAD=	http://www.de.kernel.org/pub/linux/kernel/v2.4/linux-2.4.32.tar.bz2
 
 MAKEARGS=	CROSS_COMPILE=$(OPENMCT_CROSS_COMPILE) vmlinux
 

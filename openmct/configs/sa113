@@ -21,9 +21,12 @@ ETH1IPADDR=172.16.0.254
 IMAGEPACKAGES=	packages/base/busybox \
 		packages/net/dropbear \
 		packages/net/nfsutils \
-		packages/net/ntp \
+		packages/net/iptables \
 		packages/net/tcpwrapper \
 		packages/net/portmap \
+		packages/net/ppp \
+		packages/net/pppoe \
+		packages/net/pptp \
 		packages/net/vsftpd \
 		packages/system/debootstrap \
 		packages/system/fcp \

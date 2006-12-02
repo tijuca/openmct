@@ -20,14 +20,13 @@ ETH0DEFAULTGW=192.168.1.1
 IMAGEPACKAGES=	packages/base/busybox \
 		packages/net/dropbear \
 		packages/net/nfsutils \
-		packages/net/ntp \
 		packages/net/tcpwrapper \
 		packages/net/portmap \
+		packages/net/samba2 \
 		packages/net/vsftpd \
 		packages/system/debootstrap \
 		packages/system/fcp \
 		packages/system/ethtool \
-		packages/system/mii-diag \
-		packages/system/smartd \
+		packages/system/owi \
 		packages/system/vserver \
 		packages/system/vserverdebiantools

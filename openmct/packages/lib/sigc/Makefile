@@ -7,7 +7,7 @@ INSTALL=	$(CP) $(SRCDIR)/sigc++/.libs/libsigc-2.0.so.0.0.0 $(NEWROOTDIR)/lib && 
 		$(STRIP) $(NEWROOTDIR)/lib/libsigc-2.0.so.0.0.0 && \
 		$(LN) -sf libsigc-2.0.so.0.0.0 $(NEWROOTDIR)/lib/libsigc-2.0.so.0 && \
 		$(LN) -sf libsigc-2.0.so.0.0.0 $(NEWROOTDIR)/lib/libsigc-2.0.so && \
-		$(CP) $(SRCDIR)/sigc++config.h $(OUTPUTDIR)/$(TARGET)/include/sigc++-2.0 && \
-		cd $(SRCDIR) && make install && cd .. 
+		cd $(SRCDIR) && make install && cd .. && \
+		$(CP) $(SRCDIR)/sigc++config.h $(OUTPUTDIR)/$(TARGET)/include/sigc++-2.0
 
 include		$(OPENMCT_DEVEL_PREFIX)Rules

@@ -18,16 +18,31 @@ IMAGEHOSTNAME=nas200
 ETH0IPADDR=192.168.1.254
 ETH0DEFAULTGW=192.168.1.1
 IMAGEPACKAGES=	packages/base/busybox \
+		packages/lib/openssl \
+		packages/lib/ncurses \
+		packages/lib/curl \
+		packages/lib/sigc \
+		packages/lib/torrent \
+		packages/base/htop \
+		packages/base/nano \
+		packages/base/screen \
 		packages/net/dropbear \
 		packages/net/nfsutils \
-		packages/net/ntp \
+		packages/net/nzbget \
 		packages/net/tcpwrapper \
 		packages/net/portmap \
-		packages/net/samba \
+		packages/net/openvpn \
+		packages/net/rtorrent \
+		packages/net/samba2 \
 		packages/net/vsftpd \
+		packages/system/chpax \
 		packages/system/debootstrap \
-		packages/system/fcp \
 		packages/system/ethtool \
+		packages/system/fcp \
+		packages/system/gradm \
+		packages/system/lsof \
+		packages/system/owi \
+		packages/system/parted \
 		packages/system/smartd \
 		packages/system/vserver \
 		packages/system/vserverdebiantools
