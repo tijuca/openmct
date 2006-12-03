@@ -1,0 +1,15 @@
+diff -Naru squashfs2.2-r2/squashfs-tools/Makefile squashfs2.2-r2-mct/squashfs-tools/Makefile
+--- squashfs2.2-r2/squashfs-tools/Makefile	2005-09-01 01:21:14.000000000 +0200
++++ squashfs2.2-r2-mct/squashfs-tools/Makefile	2006-12-03 14:28:00.000000000 +0100
+@@ -1,9 +1,10 @@
+ INCLUDEDIR = .
++LZMAPATH = ../../../lzma/src/C/7zip/Compress/LZMA_Lib/
+ 
+ CFLAGS := -I$(INCLUDEDIR) -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -g
+ 
+ mksquashfs: mksquashfs.o read_fs.o sort.o
+-	$(CC) mksquashfs.o read_fs.o sort.o -lz -o $@
++	$(CXX) mksquashfs.o read_fs.o sort.o -L$(LZMAPATH) -llzma -o $@
+ 
+ mksquashfs.o: mksquashfs.c mksquashfs.h
+ 

@@ -85,6 +85,9 @@ packages/system/linux/$(SRCDIR)/$(CONFIG):
 		$(MAKE) -C packages/system/linux/src dep ; \
 	fi
 
+squashfs:
+	@$(MAKE) -C packages/build/squashfs
+
 $(OUTPUTDIR):
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(OUTPUTDIR)\033[0m"
 	@$(MKDIR) $(OUTPUTDIR)
@@ -148,7 +151,7 @@ endif
 	@$(ECHO) "" >> $(NEWCONFDIR)/etc/network/interfaces 
 endif
 
-$(OUTPUTDIR)/$(ROOT):
+$(OUTPUTDIR)/$(ROOT):	squashfs
 	@$(ECHO) -e "\033[1;33mREMOVE .svn FROM $(NEWROOTDIR)" 
 	@$(REMOVESVN) $(NEWROOTDIR)
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"
