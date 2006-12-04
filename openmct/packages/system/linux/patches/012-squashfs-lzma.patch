@@ -1,0 +1,92 @@
+diff -Naru linux-2.4.32/fs/squashfs/inode.c linux-2.4.32-mct/fs/squashfs/inode.c
+--- linux-2.4.32/fs/squashfs/inode.c	2006-12-04 11:43:37.000000000 +0100
++++ linux-2.4.32-mct/fs/squashfs/inode.c	2006-12-04 11:52:01.000000000 +0100
+@@ -21,7 +21,9 @@
+  * inode.c
+  */
+ 
++#ifndef CONFIG_SQUASHFS_LZMA
+ #define SQUASHFS_1_0_COMPATIBILITY
++#endif
+ 
+ #include <linux/types.h>
+ #include <linux/squashfs_fs.h>
+@@ -35,7 +37,11 @@
+ #include <asm/uaccess.h>
+ #include <linux/wait.h>
+ #include <asm/semaphore.h>
++#ifdef CONFIG_SQUASHFS_LZMA
++#include <linux/Lzma.h>
++#else
+ #include <linux/zlib.h>
++#endif
+ #include <linux/blkdev.h>
+ #include <linux/vmalloc.h>
+ 
+@@ -77,7 +83,11 @@
+ 
+ DECLARE_MUTEX(read_data_mutex);
+ 
++#ifdef CONFIG_SQUASHFS_LZMA
++static CLzmaDecoderState state;
++#else
+ static z_stream stream;
++#endif
+ 
+ static DECLARE_FSTYPE_DEV(squashfs_fs_type, "squashfs", squashfs_read_super);
+ 
+@@ -252,6 +262,15 @@
+ 	if(compressed) {
+ 		int zlib_err;
+ 
++#ifdef CONFIG_SQUASHFS_LZMA
++		SizeT InProcessed;
++		if((zlib_err = LzmaDecode(&state,
++					  c_buffer, c_byte, &InProcessed,
++					  buffer, msBlk->read_size, &bytes)) != LZMA_RESULT_OK) {
++			ERROR("lzma_fs returned unexpected result 0x%x\n", zlib_err);	
++			bytes = 0;
++		}
++#else
+ 		stream.next_in = c_buffer;
+ 		stream.avail_in = c_byte;
+ 		stream.next_out = buffer;
+@@ -263,6 +282,7 @@
+ 			bytes = 0;
+ 		} else
+ 			bytes = stream.total_out;
++#endif			
+ 		up(&read_data_mutex);
+ 	}
+ 
+@@ -1671,8 +1691,17 @@
+ 
+ 	printk(KERN_INFO "Squashfs 2.2-r2 (released 2005/09/08) (C) 2002-2005 Phillip Lougher\n");
+ 
++#ifdef CONFIG_SQUASHFS_LZMA
++	LzmaDecode_Probs(&state,
++	           CONFIG_SQUASHFS_LZMA_LC,
++		   CONFIG_SQUASHFS_LZMA_LP,
++		   CONFIG_SQUASHFS_LZMA_PB);
++	if (!(state.Probs)) {
++		ERROR("Failed to allocate lzma probs\n");
++#else
+ 	if(!(stream.workspace = (char *) vmalloc(zlib_inflate_workspacesize()))) {
+ 		ERROR("Failed to allocate zlib workspace\n");
++#endif
+ 		return -ENOMEM;
+ 	}
+ 	return register_filesystem(&squashfs_fs_type);
+@@ -1681,7 +1710,12 @@
+ 
+ static void __exit exit_squashfs_fs(void)
+ {
++#ifdef CONFIG_SQUASHFS_LZMA
++	LzmaDecode_Probs_Free(&state);
++#else
+ 	vfree(stream.workspace);
++
++#endif
+ 	unregister_filesystem(&squashfs_fs_type);
+ }
+ 
