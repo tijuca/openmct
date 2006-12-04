@@ -1,0 +1,153 @@
+#!/bin/sh
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+
+# Recovery Mode ;)
+if [ ! -f /etc/rc.conf ]; then
+   /sbin/telnetd
+   exit 
+fi
+
+. /etc/rc.conf
+
+echo -n "Mounting Data ... "
+/bin/mount -a
+echo ""
+
+echo -n "Added /usr/lib directory ... "
+/sbin/ldconfig /usr/lib
+echo ""
+
+echo -n "Setting Hostname ... "
+/bin/hostname `cat /etc/hostname`
+echo ""
+
+echo -n "Starting Network ..."
+/sbin/ifdown -a
+/sbin/ifup -a
+echo ""
+
+# checking for directorys on HD, else no login via FTP or use of Samba, NFS is possibile
+# we create the directory with '-p' option on mkdir, so every directory ahead the named directory is builded automaticly
+
+DIRECTORY="/usr/var /usr/var/empty /usr/var/log/samba /usr/var/run/samba /usr/var/lib/samba /usr/var/lib/nfs"
+echo "looking up for $DIRECTORY"
+for i in $DIRECTORY; do
+    test -d $$i || mkdir -p $$i;
+done
+
+# ok, and now checking for some files needed for NFS
+FILES="/usr/var/lib/nfs/rmtab /usr/var/lib/nfs/etab /usr/var/lib/nfs/xtab"
+for i in $FILES; do
+    test -d $$i || touch $$i;
+done
+echo ""
+
+# Telnetd for Remote Access
+if [ "$START_TELNETD" == "yes" ]; then
+   echo -n "Starting telnet daemon ... "
+   /sbin/telnetd
+   echo ""
+fi
+
+# IDE Options
+if [ "$START_HDPARM" == "yes" ]; then
+   echo -n "Enable IDE settings ... "
+   /sbin/hdparm $OPTIONS_HDPARM
+   echo ""
+fi
+
+# SWAP Partitition
+if [ "$START_SWAP" == "yes" ]; then
+   echo -n "Enable SWAP partition ... "
+   /sbin/swapon $OPTIONS_SWAP
+fi
+
+# NTPDate Client
+if [ "$START_NTPDATE" == "yes" ]; then
+   echo -n "Running ntp client ... "
+   /sbin/ntpdate $OPTIONS_NTPDATE
+fi
+
+# Syslog Daemon
+if [ "$START_SYSLOGD" == "yes" ]; then
+   echo -n "Starting Syslog daemon ... "
+   [ ! -d /var/log ] && mkdir -p /var/log
+   /sbin/syslogd
+fi
+
+# LED Display
+if [ "$START_LEDS" == "yes" ]; then
+   echo -n "Starting Led display ... "
+   echo $OPTIONS_LEDS_HB > /proc/mct/led/hb
+   echo $OPTIONS_LEDS_IN > /proc/mct/led/in
+   echo $OPTIONS_LEDS_OUT > /proc/mct/led/out
+fi
+
+# SSH Daemon (Dropbear)
+if [ "$START_SSHD" == "yes" ]; then
+   if [ ! -d /etc/dropbear ]; then
+      mkdir /etc/dropbear
+   fi
+   if [ ! -f /etc/dropbear/dropbear_dss_host_key ]; then
+      /sbin/dropbearkey -f /etc/dropbear/dropbear_dss_host_key -t dss
+   fi
+   echo -n "Starting SSH daemon ... "
+   /sbin/dropbear
+   echo ""
+fi
+
+# Portmap (RPC)
+if [ "$START_PORTMAP" == "yes" ]; then
+   echo -n "Starting Portmap daemon ... "
+   /sbin/portmap
+   echo ""
+fi
+
+# FTP Daemon (VSFTPD)
+if [ "$START_FTPD" == "yes" ]; then
+   echo -n "Starting FTP daemon ... "
+   /sbin/vsftpd &
+   echo ""
+fi
+
+# Harddisk Monitoring (SMARTD)
+if [ "$START_SMARTD" == "yes" ]; then
+   echo -n "Starting S.M.A.R.T. daemon ... "
+   /sbin/smartd
+   echo ""
+fi
+
+# Network File System Daemons (NFS)
+if [ "$START_NFS" == "yes" ]; then
+   echo -n "Starting NFS daemons ..."
+   [ ! -d /var/lib/nfs ] && mkdir -p /var/lib/nfs
+   [ ! -d /var/run     ] && mkdir -p /var/run
+   [ ! -f /var/lib/nfs/etab ] && touch /var/lib/nfs/etab
+   [ ! -f /var/lib/nfs/rmtab ] && touch /var/lib/nfs/rmtab
+   /sbin/rpc.mountd
+   /sbin/rpc.nfsd
+   /sbin/rpc.rquotad
+   echo ""
+fi
+
+# Virtual Servers
+if [ "$START_VSERVERS" == "yes" ]; then
+   echo -n "Starting Vservers ... "
+   [ ! -d /usr/vservers ] && mkdir /usr/vservers
+   echo ""
+fi
+
+# Crond
+if [ "$START_CROND" == "yes" ]; then
+   echo -n "Starting Crond ... "
+   /sbin/crond
+   echo ""
+fi
+
+# Samba
+if [ "$START_SAMBA" == "yes" ]; then
+   echo -n "Starting Samba ... "
+   /sbin/nmbd -D
+   /sbin/smbd -D
+   echo ""
+fi

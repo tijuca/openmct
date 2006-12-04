@@ -1,4 +1,4 @@
 proc    /proc           proc    defaults         0 0
 tmpfs   /tmp            ramfs   defaults         0 0
-/dev/mtd/4	/conf	jffs2	defaults	0 0
+/dev/mtdblock/3	/conf	jffs2	defaults	0 0
 /dev/discs/disc0/part1  /usr    ext3    defaults 0 0
