@@ -5,29 +5,13 @@ Prequisies:
 -----------
 
  A compiler for the hostsystem is needed. 
- A crosscompiler will be build.
-
 
 To configure OpenMCT edit Rules:
 --------------------------------
 
- Modify IMAGEPRODCODE in the section 'Image Information' for
- your needs:
+ make config MCT=[target mct product]
 
-  Claxan SA 110 ............ = 0x04
-  Claxan SA 113 ............ = 0x04
-  Claxan NAS 110 ........... = 0x05
-  Intellinet SOHO SERVER ... = 0x04
-  Intellinet SOHO NAS ...... = 0x05
-  IOGEAR BOSS .............. = 0x06
-  Tritton TRI-ASA1120/200 .. = 0x04
-  Tritton TRI-ASA2120/200 .. = 0x04
-  Tritton TRI-NAS080/120/200 = 0x05
-
-
-To build OpenMCT use:
----------------------
+Simply type make config to get a list of all availbe product types.
+After configure just type make to build the Image:
 
  make
-
- You dont need to be root to do the 'make'.
