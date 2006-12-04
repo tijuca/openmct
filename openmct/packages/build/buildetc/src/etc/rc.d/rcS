@@ -1,14 +1,6 @@
 #!/bin/sh
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin
 
-# Recovery Mode ;)
-if [ ! -f /etc/rc.conf ]; then
-   /sbin/telnetd
-   exit 
-fi
-
-. /etc/rc.conf
-
 echo -n "Mounting Data ... "
 /bin/mount -a
 echo ""
@@ -16,6 +8,8 @@ echo ""
 echo -n "Added /usr/lib directory ... "
 /sbin/ldconfig /usr/lib
 echo ""
+
+. /etc/rc.conf
 
 echo -n "Setting Hostname ... "
 /bin/hostname `cat /etc/hostname`
