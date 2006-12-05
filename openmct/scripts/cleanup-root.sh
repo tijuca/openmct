@@ -7,7 +7,6 @@ if [ "$1" != "" ]; then
 	rm -rf $1/usr
 	rm -rf $1/var
 	rm -rf $1/etc
-	rm -f $1/lib/libstdc++*
 	mkdir $1/conf
 	mkdir $1/usr
 	mkdir $1/usr/home

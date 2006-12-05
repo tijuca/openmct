@@ -9,6 +9,10 @@ echo -n "Added /usr/lib directory ... "
 ldconfig -C /conf/etc/ld.so.cache -f /conf/etc/ld.so.conf -X /usr/lib
 echo ""
 
+/bin/sh /etc/rc.conf
+if [ $? -ne 0 ]; then
+   /bin/cp /etc/default/rc.conf /etc/rc.conf
+fi
 . /etc/rc.conf
 
 echo -n "Setting Hostname ... "
@@ -151,6 +155,7 @@ fi
 
 # Starting user defined startup commands
 if [ -x /conf/etc/rc.d/rcS.local ]; then
-   echo -n "Starting rcS.local"
+   echo -n "Starting rcS.local ... "
    /bin/sh /etc/rc.d/rcS.local
+   echo ""
 fi
