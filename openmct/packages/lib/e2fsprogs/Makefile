@@ -5,8 +5,8 @@ CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-elf-shli
 
 INSTALL=	$(CP) $(SRCDIR)/lib/libuuid.so.1.2 $(NEWROOTDIR)/lib && \
 		$(STRIP) $(NEWROOTDIR)/lib/libuuid.so.1.2 && \
-		$(LN) -sf $(NEWROOTDIR)/lib/libuuid.so.1.2 $(NEWROOTDIR)/lib/libuuid.so.1 && \
-		$(LN) -sf $(NEWROOTDIR)/lib/libuuid.so.1.2 $(NEWROOTDIR)/lib/libuuid.so && \
+		$(LN) -sf libuuid.so.1.2 $(NEWROOTDIR)/lib/libuuid.so.1 && \
+		$(LN) -sf libuuid.so.1.2 $(NEWROOTDIR)/lib/libuuid.so && \
 		cd $(SRCDIR) && make install-libs && cd ..
 
 include		$(OPENMCT_DEVEL_PREFIX)Rules

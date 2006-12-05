@@ -45,7 +45,6 @@ INSTALLDIR=usr
 
 # Binaries
 STRIP=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-sstrip
-MKSQUASHFS=$(OUTPUTDIR)/mksquashfs
 
 # Cross Compiler Environment
 OPENMCT_CROSS_BUILD=y
@@ -67,6 +66,7 @@ KERNEL=$(VMLINUXBIN).gz
 ROOT=root.bin
 ETC=etc.bin
 MCT_MODIFY=mct_modify
+MKSQUASHFS=mksquashfs
 
 # Options
 ROOTOPTS=-le -all-root

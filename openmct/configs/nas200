@@ -31,6 +31,7 @@ IMAGEPACKAGES=	packages/base/busybox \
 		packages/net/nfsutils \
 		packages/net/nzbget \
 		packages/net/tcpwrapper \
+		packages/net/mt-daapd \
 		packages/net/portmap \
 		packages/net/openvpn \
 		packages/net/rtorrent \

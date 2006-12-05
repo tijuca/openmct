@@ -40,6 +40,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <sys/reboot.h>
 
 #ifndef __MTD_USER_H__
 #define __MTD_USER_H__
@@ -197,6 +198,7 @@ typedef int bool;
 #define FLAG_HELP		0x02
 #define FLAG_FILENAME	0x04
 #define FLAG_DEVICE		0x08
+#define FLAG_DONTREBOOT 0x10
 
 /* error levels */
 #define LOG_NORMAL	1
@@ -220,13 +222,14 @@ static void showusage (const char *progname,bool error)
 			   "\n"
 			   "Flash Copy - Written by Abraham van der Merwe <abraham@2d3d.co.za>\n"
 			   "\n"
-			   "usage: %s [ -v | --verbose ] <filename> <device>\n"
+			   "usage: %s [ -v | --verbose ] [ -d | --dont-reboot] <filename> <device>\n"
 			   "       %s -h | --help\n"
 			   "\n"
-			   "   -h | --help      Show this help message\n"
-			   "   -v | --verbose   Show progress reports\n"
-			   "   <filename>       File which you want to copy to flash\n"
-			   "   <device>         Flash device to write to (e.g. /dev/mtd0, /dev/mtd1, etc.)\n"
+			   "   -h | --help        Show this help message\n"
+			   "   -v | --verbose     Show progress reports\n"
+			   "   -d | --dont-reboot Don't reboot after flash process\n"
+			   "   <filename>         File which you want to copy to flash\n"
+			   "   <device>           Flash device to write to (e.g. /dev/mtd0, /dev/mtd1, etc.)\n"
 			   "\n",
 			   progname,progname);
 
@@ -313,6 +316,7 @@ int main (int argc,char *argv[])
    	static const struct option long_options[] = {
    		{"help", no_argument, 0, 'h'},
    		{"verbose", no_argument, 0, 'v'},
+   		{"dont-reboot", no_argument, 0, 'd'},
    		{0, 0, 0, 0},
    	};
 
@@ -330,6 +334,10 @@ int main (int argc,char *argv[])
    	case 'v':
 		flags |= FLAG_VERBOSE;
 		DEBUG("Got FLAG_VERBOSE\n");
+		break;
+        case 'd':
+		flags |= FLAG_DONTREBOOT;
+		DEBUG("Got FLAG_DONTREBOOT\n");
 		break;
 	default:
 		DEBUG("Unknown parameter: %s\n",argv[option_index]);
@@ -511,6 +519,12 @@ int main (int argc,char *argv[])
 				 KB (filestat.st_size));
    DEBUG("Verified %d / %luk bytes\n",written,filestat.st_size);
 
-   exit (EXIT_SUCCESS);
+   if (flags & FLAG_DONTREBOOT) {
+   	exit (EXIT_SUCCESS);
+   } else {
+	log_printf (LOG_NORMAL, "Reboot now\n");
+	sync();
+	reboot(RB_AUTOBOOT);
+   }
 }
 

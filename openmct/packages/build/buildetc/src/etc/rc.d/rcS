@@ -6,7 +6,7 @@ echo -n "Mounting Data ... "
 echo ""
 
 echo -n "Added /usr/lib directory ... "
-/sbin/ldconfig /usr/lib
+ldconfig -C /conf/etc/ld.so.cache -f /conf/etc/ld.so.conf -X /usr/lib
 echo ""
 
 . /etc/rc.conf
@@ -16,8 +16,11 @@ echo -n "Setting Hostname ... "
 echo ""
 
 echo -n "Starting Network ..."
-/sbin/ifdown -a
 /sbin/ifup -a
+if [ $? -ne 0 ]; then
+   /bin/cp /etc/default/interfaces /etc/network/interfaces
+   /sbin/ifup -a
+fi
 echo ""
 
 # checking for directorys on HD, else no login via FTP or use of Samba, NFS is possibile
@@ -26,13 +29,13 @@ echo ""
 DIRECTORY="/usr/var /usr/var/empty /usr/var/log/samba /usr/var/run/samba /usr/var/lib/samba /usr/var/lib/nfs"
 echo "looking up for $DIRECTORY"
 for i in $DIRECTORY; do
-    test -d $$i || mkdir -p $$i;
+    test -d $i || mkdir -p $i;
 done
 
 # ok, and now checking for some files needed for NFS
 FILES="/usr/var/lib/nfs/rmtab /usr/var/lib/nfs/etab /usr/var/lib/nfs/xtab"
 for i in $FILES; do
-    test -d $$i || touch $$i;
+    test -d $i || touch $i;
 done
 echo ""
 
@@ -144,4 +147,10 @@ if [ "$START_SAMBA" == "yes" ]; then
    /sbin/nmbd -D
    /sbin/smbd -D
    echo ""
+fi
+
+# Starting user defined startup commands
+if [ -x /conf/etc/rc.d/rcS.local ]; then
+   echo -n "Starting rcS.local"
+   /bin/sh /etc/rc.d/rcS.local
 fi

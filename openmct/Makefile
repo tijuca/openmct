@@ -85,8 +85,6 @@ packages/system/linux/$(SRCDIR)/$(CONFIG):
 		$(MAKE) -C packages/system/linux/src dep ; \
 	fi
 
-squashfs:
-	@$(MAKE) -C packages/build/squashfs
 
 $(OUTPUTDIR):
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(OUTPUTDIR)\033[0m"
@@ -99,6 +97,10 @@ $(OUTPUTDIR)/$(KERNEL):	packages/system/linux/$(SRCDIR)/$(CONFIG) $(NEWROOTDIR) 
 $(OUTPUTDIR)/$(MCT_MODIFY): packages/build/mct_modify/src/mct_modify.c
 	@$(MAKE) -C packages/build/mct_modify OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-clean
 	@$(MAKE) -C packages/build/mct_modify OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-all
+
+$(OUTPUTDIR)/$(MKSQUASHFS):
+	@$(MAKE) -C packages/build/squashfs OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-clean
+	@$(MAKE) -C packages/build/squashfs OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-all
 
 $(NEWROOTDIR):
 ifdef OPENMCT_CROSS_BUILD
@@ -150,27 +152,22 @@ ifdef ETH1DEFAULTGW
 endif
 	@$(ECHO) "" >> $(NEWCONFDIR)/etc/network/interfaces 
 endif
+	@$(CP) $(NEWCONFDIR)/etc/network/interfaces $(NEWROOTDIR)/etc/default/interfaces
 
-$(OUTPUTDIR)/$(ROOT):	root	squashfs
-
-root:
+$(OUTPUTDIR)/$(ROOT):
 	@$(ECHO) -e "\033[1;33mREMOVE .svn FROM $(NEWROOTDIR)" 
 	@$(REMOVESVN) $(NEWROOTDIR)
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"
-	$(MKSQUASHFS) $(NEWROOTDIR) $(OUTPUTDIR)/$(ROOT) $(ROOTOPTS)
+	$(OUTPUTDIR)/$(MKSQUASHFS) $(NEWROOTDIR) $(OUTPUTDIR)/$(ROOT) $(ROOTOPTS)
 
-$(OUTPUTDIR)/$(ETC):	etc
-
-etc:
+$(OUTPUTDIR)/$(ETC):	
 	@$(ECHO) -e "\033[1;33mREMOVE .svn FROM $(NEWCONFDIR)" 
 	@$(REMOVESVN) $(NEWCONFDIR)
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ETC)\033[0m"
 	@$(MKFSJFFS2) -d $(NEWCONFDIR) -o $(OUTPUTDIR)/$(ETC) $(ETCOPTS)
 
 
-$(IMAGEFILENAME):	$(OUTPUTDIR)/$(MCT_MODIFY) $(OUTPUTDIR)/$(KERNEL) pkg $(OUTPUTDIR)/$(ROOT) $(OUTPUTDIR)/$(ETC) pack
-
-pack:
+$(IMAGEFILENAME):	$(OUTPUTDIR)/$(MCT_MODIFY) $(OUTPUTDIR)/$(MKSQUASHFS) $(OUTPUTDIR)/$(KERNEL) pkg $(OUTPUTDIR)/$(ROOT) $(OUTPUTDIR)/$(ETC)
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(IMAGEFILENAME)\033[0m"
 	@$(OUTPUTDIR)/$(MCT_MODIFY) -w -i $(IMAGEFILENAME) -m $(IMAGEMODE) -p $(IMAGEPRODCODE) \
 		-v $(IMAGEVERSION) -n $(IMAGESUBVERSION) -k $(OUTPUTDIR)/$(KERNEL) \

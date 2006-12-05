@@ -33,12 +33,14 @@ IMAGEPACKAGES=	packages/base/busybox \
 		packages/net/iptables \
 		packages/net/nzbget \
 		packages/net/tcpwrapper \
+		packages/net/mt-daapd \
 		packages/net/ppp \
 		packages/net/pppoe \
 		packages/net/pptp \
 		packages/net/pptpd \
 		packages/net/portmap \
 		packages/net/openvpn \
+		packages/net/oidentd \
 		packages/net/rtorrent \
 		packages/net/samba2 \
 		packages/net/vsftpd \
