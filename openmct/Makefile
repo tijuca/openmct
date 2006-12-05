@@ -76,7 +76,7 @@ pkgdistclean:
 
 packages/system/linux/$(SRCDIR)/$(CONFIG):
 	@$(MAKE) -C packages/system/linux OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ $(SRCDIR)
-	@$(CP) packages/system/linux/configs/$(IMAGEKERNELCONFIG) packages/system/linux/configs/config
+	@$(CP) packages/system/linux/configs/$(IMAGETARGET) packages/system/linux/configs/config
 	@$(MAKE) -C packages/system/linux OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ $(SRCDIR)/$(CONFIG)
 	@if [ ! -s $(OUTPUTDIR)/linux ]; then \
 		$(LN) -s $(ACTDIR)/packages/system/linux/$(SRCDIR) $(OUTPUTDIR)/linux ; \
@@ -115,7 +115,7 @@ $(NEWCONFDIR):
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/$(IMAGERELEASEFILENAME)\033[0m"
 	@$(ECHO) "OpenMCT $(IMAGEVERSION) $(IMAGESUBVERSION) $(IMAGEPRODCODE)" > $(NEWROOTDIR)/etc/$(IMAGERELEASEFILENAME)
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hostname\033[0m"
-	@$(ECHO) $(IMAGEHOSTNAME) > $(NEWCONFDIR)/etc/hostname
+	@$(ECHO) $(IMAGETARGET) > $(NEWCONFDIR)/etc/hostname
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/issue\033[0m"
 	@$(ECHO) "Welcome on OpenMCT $(IMAGEVERSION) - Kernel \r (\t)" > $(NEWCONFDIR)/etc/issue
 ifdef ETH0IPADDR 
@@ -133,7 +133,7 @@ ifdef ETH0DEFAULTGW
 endif
 	@$(ECHO) "" >> $(NEWCONFDIR)/etc/network/interfaces 
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hosts\033[0m"
-	@$(ECHO) $(ETH0IPADDR) $(IMAGEHOSTNAME) > $(NEWCONFDIR)/etc/hosts
+	@$(ECHO) $(ETH0IPADDR) $(IMAGETARGET) > $(NEWCONFDIR)/etc/hosts
 endif
 ifdef ETH1IPADDR 
 	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth1\033[0m"
