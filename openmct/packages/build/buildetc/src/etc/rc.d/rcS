@@ -27,6 +27,17 @@ if [ $? -ne 0 ]; then
 fi
 echo ""
 
+# Web Server?
+if [ "$START_NTPDATE" == "yes" ]; then
+   echo -n "Starting Web Server ..."
+   if [ -d /usr/www ]; then
+      /sbin/httpd -h /usr/www
+   else
+      /sbin/httpd -h /www
+   fi
+   echo ""
+fi
+
 # checking for directorys on HD, else no login via FTP or use of Samba, NFS is possibile
 # we create the directory with '-p' option on mkdir, so every directory ahead the named directory is builded automaticly
 
