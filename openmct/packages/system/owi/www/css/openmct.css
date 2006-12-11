@@ -154,7 +154,7 @@ h2 {
 
 #navigation li {
    font-size: 11px;
-   background: url(images/icons/folder-closed.png) no-repeat;
+   background: url(../images/icons/folder-closed.png) no-repeat;
    background-position: 10px 1px;
    border-bottom: 1px solid #EBEBEB;
 }

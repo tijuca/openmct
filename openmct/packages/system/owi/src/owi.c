@@ -41,7 +41,7 @@ void owi_header(char *title) {
           "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
           "<head>\n"
           "<title>%s</title>\n"
-          "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/openmct.css\" />\n"
+          "<link rel=\"stylesheet\" type=\"text/css\" href=\"../css/openmct.css\" />\n"
           "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" />\n"
           "</head>\n"
           "<body>\n"
