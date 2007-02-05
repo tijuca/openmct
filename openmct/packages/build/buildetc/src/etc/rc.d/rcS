@@ -146,6 +146,14 @@ fi
 if [ "$START_VSERVERS" == "yes" ]; then
    echo -n "Starting Vservers ... "
    [ ! -d /usr/vservers ] && mkdir /usr/vservers
+   for i in /etc/vservers/*.conf ; do
+      . $i
+      if [ $ONBOOT="yes" ] ; then
+         /sbin/vserver $S_HOSTNAME start
+      fi
+      ONBOOT=
+      S_HOSTNAME=
+   done
    echo ""
 fi
 
