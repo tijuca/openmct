@@ -1,5 +1,5 @@
 # PPPOE
-DOWNLOAD=	http://www.roaringpenguin.com/penguin/pppoe/rp-pppoe-3.7.tar.gz
+DOWNLOAD=	http://www.roaringpenguin.com/penguin/pppoe/rp-pppoe-3.8.tar.gz
 
 SRCDIRSUFFIX=	/src
 

@@ -1,5 +1,5 @@
 # IPTables (Firewalling)
-DOWNLOAD=	http://www.netfilter.org/projects/iptables/files/iptables-1.3.3.tar.bz2
+DOWNLOAD=	http://www.netfilter.org/projects/iptables/files/iptables-1.3.7.tar.bz2
 
 MAKEENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc LD=$(OPENMCT_CROSS_COMPILE)ld
 

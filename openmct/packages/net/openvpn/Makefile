@@ -1,5 +1,5 @@
 # OpenVPN
-DOWNLOAD=	http://openvpn.net/release/openvpn-2.0.7.tar.gz
+DOWNLOAD=	http://openvpn.net/release/openvpn-2.0.9.tar.gz
 
 CONFIGUREARGS=	--prefix=$(PREFIX) --host=$(TARGET) --disable-lzo
 

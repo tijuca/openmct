@@ -1,5 +1,5 @@
 # RSync
-DOWNLOAD=	http://rsync.samba.org/ftp/rsync/rsync-2.6.7.tar.gz
+DOWNLOAD=	http://rsync.samba.org/ftp/rsync/rsync-2.6.9.tar.gz
 
 INSTALL=	$(CP) $(SRCDIR)/rsync $(NEWROOTDIR)/sbin && \
 		$(STRIP) $(NEWROOTDIR)/sbin/rsync

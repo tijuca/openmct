@@ -1,5 +1,5 @@
 # rTorrent
-DOWNLOAD=	http://libtorrent.rakshasa.no/downloads/rtorrent-0.6.4.tar.gz
+DOWNLOAD=	http://libtorrent.rakshasa.no/downloads/rtorrent-0.7.2.tar.gz
 
 #DEPENDSON=	packages/lib/curl \
 #		packages/lib/sigc \

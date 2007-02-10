@@ -1,5 +1,5 @@
 # PPP
-DOWNLOAD=	ftp://ftp.samba.org/pub/ppp/ppp-2.4.3.tar.gz
+DOWNLOAD=	ftp://ftp.samba.org/pub/ppp/ppp-2.4.4.tar.gz
 
 MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc COPTS=-Os FILTER=
 

@@ -1,5 +1,5 @@
 # ProFTPD
-DOWNLOAD=	ftp://ftp.proftpd.org/distrib/source/proftpd-1.2.10.tar.bz2
+DOWNLOAD=	ftp://ftp.proftpd.org/distrib/source/proftpd-1.3.0a.tar.bz2
 
 CONFIGUREARGS=	--prefix=$(PREFIX) --host=$(TARGET) --disable-cap
 

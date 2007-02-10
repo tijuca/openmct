@@ -31,7 +31,6 @@ IMAGEPACKAGES=	packages/base/busybox \
 		packages/system/debootstrap \
 		packages/system/fcp \
 		packages/system/ethtool \
-		packages/system/mii-diag \
 		packages/system/smartd \
 		packages/system/vserver \
 		packages/system/vserverdebiantools

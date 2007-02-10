@@ -1,5 +1,5 @@
 # lighttpd
-DOWNLOAD=	http://www.lighttpd.net/download/lighttpd-1.4.11.tar.gz	
+DOWNLOAD=	http://www.lighttpd.net/download/lighttpd-1.4.13.tar.gz	
 
 MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc CCOPT="-Os"
 

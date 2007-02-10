@@ -1,5 +1,5 @@
 # unrar
-DOWNLOAD=	http://www.rarlab.com/rar/unrarsrc-3.6.8.tar.gz
+DOWNLOAD=	http://files5.rarlab.com/rar/unrarsrc-3.7.3.tar.gz
 
 MAKEARGS=	-f makefile.unix CXX=$(OPENMCT_CROSS_COMPILE)g++ CXXFLAGS="-Os" STRIP=$(OPENMCT_CROSS_COMPILE)sstrip
 
