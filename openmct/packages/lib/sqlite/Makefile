@@ -1,5 +1,5 @@
 # sqlite
-DOWNLOAD=	http://www.sqlite.org/sqlite-3.3.8.tar.gz
+DOWNLOAD=	http://www.sqlite.org/sqlite-3.3.12.tar.gz
 
 DEPENDSON=	packages/lib/readline
 

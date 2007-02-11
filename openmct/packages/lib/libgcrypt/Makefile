@@ -1,5 +1,5 @@
 # libgcrypt
-DOWNLOAD=	ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.2.2.tar.bz2
+DOWNLOAD=	ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.2.4.tar.bz2
 
 DEPENDSON=	packages/lib/libgpg-error
 

@@ -1,5 +1,5 @@
 # libxml2
-DOWNLOAD=	ftp://xmlsoft.org/libxml2/libxml2-2.6.26.tar.gz
+DOWNLOAD=	ftp://xmlsoft.org/libxml2/libxml2-2.6.27.tar.gz
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET)
 

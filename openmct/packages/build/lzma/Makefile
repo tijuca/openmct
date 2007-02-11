@@ -1,5 +1,5 @@
 # LZMA
-DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/sevenzip/lzma443.tar.bz2
+DOWNLOAD=	http://www.openmct.org/pub/build/lzma443.tar.bz2
 
 EXTRACT=	$(TAR) -C $(SRCDIR) $(TARMODE) $(FILENAME)
 

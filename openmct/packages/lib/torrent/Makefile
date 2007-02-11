@@ -1,5 +1,5 @@
 # torrent
-DOWNLOAD=	http://libtorrent.rakshasa.no/downloads/libtorrent-0.10.4.tar.gz
+DOWNLOAD=	http://libtorrent.rakshasa.no/downloads/libtorrent-0.11.2.tar.gz
 
 CONFIGUREENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc \
 		CXX=$(OPENMCT_CROSS_COMPILE)g++ \

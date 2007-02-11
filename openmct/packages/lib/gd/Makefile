@@ -1,5 +1,5 @@
 # GD
-DOWNLOAD=	http://www.boutell.com/gd/http/gd-2.0.33.tar.gz
+DOWNLOAD=	http://www.libgd.org/releases/gd-2.0.34.tar.bz2
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET)
 

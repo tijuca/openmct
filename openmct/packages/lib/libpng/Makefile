@@ -1,5 +1,5 @@
 # libpng
-DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/libpng/libpng-1.2.10.tar.bz2	
+DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/libpng/libpng-1.2.16.tar.bz2	
 
 DEPENDSON=	packages/lib/zlib
 

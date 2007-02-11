@@ -1,14 +1,6 @@
-diff -Naru linux-2.4.32/include/linux/Lzma.h linux-2.4.32-mct/include/linux/Lzma.h
---- linux-2.4.32/include/linux/Lzma.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/linux/Lzma.h	2006-12-04 11:18:48.000000000 +0100
-@@ -0,0 +1,4 @@
-+
-+#include <linux/LzmaDecode.h>
-+#include <linux/LzmaTypes.h>
-+#include <linux/LzmaInflate.h>
-diff -Naru linux-2.4.32/include/linux/LzmaDecode.h linux-2.4.32-mct/include/linux/LzmaDecode.h
---- linux-2.4.32/include/linux/LzmaDecode.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/linux/LzmaDecode.h	2006-12-04 10:55:35.000000000 +0100
+diff -Naru linux-2.4.34.1/include/linux/LzmaDecode.h linux-2.4.34.1-lzma/include/linux/LzmaDecode.h
+--- linux-2.4.34.1/include/linux/LzmaDecode.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.34.1-lzma/include/linux/LzmaDecode.h	2007-02-11 13:40:26.000000000 +0100
 @@ -0,0 +1,113 @@
 +/* 
 +  LzmaDecode.h
@@ -123,15 +115,25 @@ diff -Naru linux-2.4.32/include/linux/LzmaDecode.h linux-2.4.32-mct/include/linu
 +    unsigned char *outStream, SizeT outSize, SizeT *outSizeProcessed);
 +
 +#endif
-diff -Naru linux-2.4.32/include/linux/LzmaInflate.h linux-2.4.32-mct/include/linux/LzmaInflate.h
---- linux-2.4.32/include/linux/LzmaInflate.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/linux/LzmaInflate.h	2006-12-04 11:17:51.000000000 +0100
+diff -Naru linux-2.4.34.1/include/linux/Lzma.h linux-2.4.34.1-lzma/include/linux/Lzma.h
+--- linux-2.4.34.1/include/linux/Lzma.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.34.1-lzma/include/linux/Lzma.h	2007-02-11 13:41:46.000000000 +0100
+@@ -0,0 +1,6 @@
++#include <linux/LzmaDecode.h>
++#include <linux/LzmaTypes.h>
++#include <linux/LzmaInflate.h>
++
++int LzmaDecode_Probs(CLzmaDecoderState *state, int lc, int lp, int pb);
++int LzmaDecode_Probs_Free(CLzmaDecoderState *state);
+diff -Naru linux-2.4.34.1/include/linux/LzmaInflate.h linux-2.4.34.1-lzma/include/linux/LzmaInflate.h
+--- linux-2.4.34.1/include/linux/LzmaInflate.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.34.1-lzma/include/linux/LzmaInflate.h	2007-02-11 13:40:26.000000000 +0100
 @@ -0,0 +1,2 @@
 +int LzmaDecode_Probs(CLzmaDecoderState *state, int lc, int lp, int pb);
 +int LzmaDecode_Probs_Free(CLzmaDecoderState *state);
-diff -Naru linux-2.4.32/include/linux/LzmaTypes.h linux-2.4.32-mct/include/linux/LzmaTypes.h
---- linux-2.4.32/include/linux/LzmaTypes.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/linux/LzmaTypes.h	2006-12-04 10:28:14.000000000 +0100
+diff -Naru linux-2.4.34.1/include/linux/LzmaTypes.h linux-2.4.34.1-lzma/include/linux/LzmaTypes.h
+--- linux-2.4.34.1/include/linux/LzmaTypes.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.34.1-lzma/include/linux/LzmaTypes.h	2007-02-11 13:40:26.000000000 +0100
 @@ -0,0 +1,45 @@
 +/* 
 +LzmaTypes.h 
@@ -178,9 +180,9 @@ diff -Naru linux-2.4.32/include/linux/LzmaTypes.h linux-2.4.32-mct/include/linux
 +#endif
 +
 +#endif
-diff -Naru linux-2.4.32/lib/Config.in linux-2.4.32-mct/lib/Config.in
---- linux-2.4.32/lib/Config.in	2006-12-04 11:43:37.000000000 +0100
-+++ linux-2.4.32-mct/lib/Config.in	2006-12-04 11:45:07.000000000 +0100
+diff -Naru linux-2.4.34.1/lib/Config.in linux-2.4.34.1-lzma/lib/Config.in
+--- linux-2.4.34.1/lib/Config.in	2007-02-11 13:42:20.000000000 +0100
++++ linux-2.4.34.1-lzma/lib/Config.in	2007-02-11 13:40:26.000000000 +0100
 @@ -10,7 +10,6 @@
  # Do we need the compression support?
  #
@@ -206,22 +208,9 @@ diff -Naru linux-2.4.32/lib/Config.in linux-2.4.32-mct/lib/Config.in
  if [ "$CONFIG_EXPERIMENTAL" = "y" -a \
       "$CONFIG_HOTPLUG" = "y" ]; then
     tristate 'Hotplug firmware loading support (EXPERIMENTAL)' CONFIG_FW_LOADER
-diff -Naru linux-2.4.32/lib/Makefile linux-2.4.32-mct/lib/Makefile
---- linux-2.4.32/lib/Makefile	2004-04-14 15:05:40.000000000 +0200
-+++ linux-2.4.32-mct/lib/Makefile	2006-12-04 11:45:10.000000000 +0100
-@@ -27,6 +27,9 @@
- subdir-$(CONFIG_ZLIB_INFLATE) += zlib_inflate
- subdir-$(CONFIG_ZLIB_DEFLATE) += zlib_deflate
- 
-+# LZMA Support
-+subdir-$(CONFIG_LZMA_INFLATE) += lzma_inflate
-+
- include $(TOPDIR)/drivers/net/Makefile.lib
- include $(TOPDIR)/drivers/usb/Makefile.lib
- include $(TOPDIR)/drivers/bluetooth/Makefile.lib
-diff -Naru linux-2.4.32/lib/lzma_inflate/LzmaDecode.c linux-2.4.32-mct/lib/lzma_inflate/LzmaDecode.c
---- linux-2.4.32/lib/lzma_inflate/LzmaDecode.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/lib/lzma_inflate/LzmaDecode.c	2006-12-04 10:55:09.000000000 +0100
+diff -Naru linux-2.4.34.1/lib/lzma_inflate/LzmaDecode.c linux-2.4.34.1-lzma/lib/lzma_inflate/LzmaDecode.c
+--- linux-2.4.34.1/lib/lzma_inflate/LzmaDecode.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.34.1-lzma/lib/lzma_inflate/LzmaDecode.c	2007-02-11 13:40:26.000000000 +0100
 @@ -0,0 +1,584 @@
 +/*
 +  LzmaDecode.c
@@ -807,9 +796,9 @@ diff -Naru linux-2.4.32/lib/lzma_inflate/LzmaDecode.c linux-2.4.32-mct/lib/lzma_
 +  *outSizeProcessed = nowPos;
 +  return LZMA_RESULT_OK;
 +}
-diff -Naru linux-2.4.32/lib/lzma_inflate/LzmaInflate.c linux-2.4.32-mct/lib/lzma_inflate/LzmaInflate.c
---- linux-2.4.32/lib/lzma_inflate/LzmaInflate.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/lib/lzma_inflate/LzmaInflate.c	2006-12-04 11:47:16.000000000 +0100
+diff -Naru linux-2.4.34.1/lib/lzma_inflate/LzmaInflate.c linux-2.4.34.1-lzma/lib/lzma_inflate/LzmaInflate.c
+--- linux-2.4.34.1/lib/lzma_inflate/LzmaInflate.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.34.1-lzma/lib/lzma_inflate/LzmaInflate.c	2007-02-11 13:40:26.000000000 +0100
 @@ -0,0 +1,21 @@
 +/* LzmaInflate.c -- lzma interface to inflate modules
 + */
@@ -832,10 +821,10 @@ diff -Naru linux-2.4.32/lib/lzma_inflate/LzmaInflate.c linux-2.4.32-mct/lib/lzma
 +		vfree(state->Probs);
 +	}
 +}
-diff -Naru linux-2.4.32/lib/lzma_inflate/LzmaSyms.c linux-2.4.32-mct/lib/lzma_inflate/LzmaSyms.c
---- linux-2.4.32/lib/lzma_inflate/LzmaSyms.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/lib/lzma_inflate/LzmaSyms.c	2006-12-04 11:47:35.000000000 +0100
-@@ -0,0 +1,15 @@
+diff -Naru linux-2.4.34.1/lib/lzma_inflate/LzmaSyms.c linux-2.4.34.1-lzma/lib/lzma_inflate/LzmaSyms.c
+--- linux-2.4.34.1/lib/lzma_inflate/LzmaSyms.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.34.1-lzma/lib/lzma_inflate/LzmaSyms.c	2007-02-11 13:41:06.000000000 +0100
+@@ -0,0 +1,16 @@
 +/*
 + * linux/lib/lzma_inflate/LzmaSyms.c
 + *
@@ -845,15 +834,16 @@ diff -Naru linux-2.4.32/lib/lzma_inflate/LzmaSyms.c linux-2.4.32-mct/lib/lzma_in
 +
 +#include <linux/module.h>
 +#include <linux/init.h>
++#include <linux/Lzma.h>
 +
 +EXPORT_SYMBOL(LzmaDecode_Probs);
 +EXPORT_SYMBOL(LzmaDecode_Probs_Free);
 +EXPORT_SYMBOL(LzmaDecode);
 +MODULE_LICENSE("GPL");
 +
-diff -Naru linux-2.4.32/lib/lzma_inflate/Makefile linux-2.4.32-mct/lib/lzma_inflate/Makefile
---- linux-2.4.32/lib/lzma_inflate/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/lib/lzma_inflate/Makefile	2006-12-04 10:49:57.000000000 +0100
+diff -Naru linux-2.4.34.1/lib/lzma_inflate/Makefile linux-2.4.34.1-lzma/lib/lzma_inflate/Makefile
+--- linux-2.4.34.1/lib/lzma_inflate/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.34.1-lzma/lib/lzma_inflate/Makefile	2007-02-11 13:40:26.000000000 +0100
 @@ -0,0 +1,10 @@
 +O_TARGET    := lzma_inflate.o
 +
@@ -865,3 +855,16 @@ diff -Naru linux-2.4.32/lib/lzma_inflate/Makefile linux-2.4.32-mct/lib/lzma_infl
 +EXTRA_CFLAGS += -I $(TOPDIR)/lib/lzma_inflate
 +
 +include $(TOPDIR)/Rules.make
+diff -Naru linux-2.4.34.1/lib/Makefile linux-2.4.34.1-lzma/lib/Makefile
+--- linux-2.4.34.1/lib/Makefile	2007-02-03 20:43:51.000000000 +0100
++++ linux-2.4.34.1-lzma/lib/Makefile	2007-02-11 13:40:26.000000000 +0100
+@@ -27,6 +27,9 @@
+ subdir-$(CONFIG_ZLIB_INFLATE) += zlib_inflate
+ subdir-$(CONFIG_ZLIB_DEFLATE) += zlib_deflate
+ 
++# LZMA Support
++subdir-$(CONFIG_LZMA_INFLATE) += lzma_inflate
++
+ include $(TOPDIR)/drivers/net/Makefile.lib
+ include $(TOPDIR)/drivers/usb/Makefile.lib
+ include $(TOPDIR)/drivers/bluetooth/Makefile.lib

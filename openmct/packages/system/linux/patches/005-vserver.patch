@@ -550,15 +550,15 @@ diff -Naru linux-2.4.32/drivers/block/Config.in linux-2.4.32-vserver/drivers/blo
 diff -Naru linux-2.4.32/drivers/block/Makefile linux-2.4.32-vserver/drivers/block/Makefile
 --- linux-2.4.32/drivers/block/Makefile	2005-11-18 11:10:08.690333696 +0100
 +++ linux-2.4.32-vserver/drivers/block/Makefile	2005-11-18 11:10:34.170904688 +0100
+diff -Naru linux-2.4.32/drivers/block/vroot.c linux-2.4.32-vserver/drivers/block/vroot.c
 @@ -32,6 +32,7 @@
  obj-$(CONFIG_BLK_DEV_UMEM)	+= umem.o
  obj-$(CONFIG_BLK_DEV_NBD)	+= nbd.o
  obj-$(CONFIG_BLK_DEV_SX8)	+= sx8.o
 +obj-$(CONFIG_BLK_DEV_VROOT)	+= vroot.o
- obj-$(CONFIG_BLK_DEV_CRYPTOLOOP)+= cryptoloop.o
  
  subdir-$(CONFIG_PARIDE) += paride
-diff -Naru linux-2.4.32/drivers/block/vroot.c linux-2.4.32-vserver/drivers/block/vroot.c
+ 
 --- linux-2.4.32/drivers/block/vroot.c	1970-01-01 01:00:00.000000000 +0100
 +++ linux-2.4.32-vserver/drivers/block/vroot.c	2005-11-18 11:10:34.170904688 +0100
 @@ -0,0 +1,329 @@

@@ -1,5 +1,5 @@
 # e2fsprogs
-DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/e2fsprogs/e2fsprogs-1.38.tar.gz
+DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/e2fsprogs/e2fsprogs-1.39.tar.gz
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-elf-shlibs
 
