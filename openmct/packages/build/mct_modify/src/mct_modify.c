@@ -164,8 +164,8 @@ int mct_modify_dump_header(struct mct_h_t *header, int flashbase, int updateoffs
 	printf("[*] subversion:				0x%04x\n", header->version_b);
  	printf("[*] ramdisk offset from base of flash: 	0x%08x\n", header->ramdisk_offset_from_base - flashbase);
  	printf("[*] ramdisk offset from kernel header:  0x%08x\n", header->ramdisk_start_offset_from_kernel);
-    	printf("[*] ramdisk size: 			0x%08x\n", size_ramdisk);
- 	printf("[*] kernel size: 			0x%08x\n", size_kernel);
+	printf("[*] ramdisk size: 			0x%08x	%d=%.2f\n", size_ramdisk, size_ramdisk, size_ramdisk/1024.0);
+	printf("[*] kernel size: 			0x%08x	%d=%.2f\n", size_kernel, size_kernel, size_kernel/1024.0);
  	printf("[*] signature offset raw: 		0x%08x\n", header->signature_offset_from_base);
 	printf("[*] signature offset: 			0x%08x\n", sig_offset);
 

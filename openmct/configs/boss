@@ -29,4 +29,5 @@ IMAGEPACKAGES=	packages/base/busybox \
 		packages/system/ethtool \
 		packages/system/owi \
 		packages/system/vserver \
-		packages/system/vserverdebiantools
+		packages/system/vserverdebiantools \
+		packages/system/scsi-idle

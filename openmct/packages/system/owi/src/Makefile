@@ -32,6 +32,6 @@ install:
 	$(LN) -sf $(BINARY) $(DESTDIR)/cgi-bin/sysinfo.cgi
 	$(LN) -sf $(BINARY) $(DESTDIR)/cgi-bin/nfs.cgi
 	$(LN) -sf $(BINARY) $(DESTDIR)/cgi-bin/shell.cgi
-	# $(CP) -a ../www/* $(DESTDIR)
+	$(CP) -a ../www/* $(DESTDIR)
 
 uninstall:

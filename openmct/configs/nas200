@@ -47,4 +47,5 @@ IMAGEPACKAGES=	packages/base/busybox \
 		packages/system/parted \
 		packages/system/smartd \
 		packages/system/vserver \
-		packages/system/vserverdebiantools
+		packages/system/vserverdebiantools \
+		packages/system/scsi-idle

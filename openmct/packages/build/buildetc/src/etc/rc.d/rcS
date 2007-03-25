@@ -25,13 +25,17 @@ if [ $? -ne 0 ]; then
    /bin/cp /etc/default/interfaces /etc/network/interfaces
    /sbin/ifup -a
 fi
+if [ "$ENABLE_IPFORWARDING" == "yes" ]; then
+   echo -n "Enable ip-forwarding"
+   echo 1 > /proc/sys/net/ipv4/ip_forward
+fi
 echo ""
 
 # Web Server?
-if [ "$START_NTPDATE" == "yes" ]; then
+if [ "$START_HTTPD" == "yes" ]; then
    echo -n "Starting Web Server ..."
-   if [ -d /usr/www ]; then
-      /sbin/httpd -h /usr/www
+   if [ -d /usr/data/www ]; then
+      /sbin/httpd -h /usr/data/www
    else
       /sbin/httpd -h /www
    fi

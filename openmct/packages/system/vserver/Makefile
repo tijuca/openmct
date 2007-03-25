@@ -44,6 +44,7 @@ INSTALL=	$(CP) $(SRCDIR)/src/capchroot			$(NEWROOTDIR)/sbin/ && \
 		$(CP) $(SRCDIR)/scripts/vunify.sh		$(NEWROOTDIR)/sbin/ && \
 		$(CP) $(SRCDIR)/scripts/vserver			$(NEWROOTDIR)/sbin/ && \
 		$(CP) $(SRCDIR)/scripts/util-vserver-vars	$(NEWROOTDIR)/sbin/ && \
+		chmod 644 $(NEWROOTDIR)/sbin/util-vserver-vars && \
 		$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-sstrip		\
 		$(NEWROOTDIR)/sbin/capchroot	$(NEWROOTDIR)/sbin/chbind	\
 		$(NEWROOTDIR)/sbin/chcontext	$(NEWROOTDIR)/sbin/fakerunlevel	\
