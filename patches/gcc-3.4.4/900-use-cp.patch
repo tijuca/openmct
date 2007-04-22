@@ -1,0 +1,16 @@
+$FreeWRT$
+
+	some shells segfault on their use of `${PWDCMD-pwd}`
+	within the tar and cpio targets, thus use cp(1)
+
+--- gcc-3.4.4/gcc/Makefile.in.orig	Thu Feb 24 09:26:35 2005
++++ gcc-3.4.4/gcc/Makefile.in	Sun Jul 16 17:40:27 2006
+@@ -270,7 +270,7 @@ TARGET_GETGROUPS_T = @TARGET_GETGROUPS_T
+ 
+ # Target to use when installing include directory.  Either
+ # install-headers-tar, install-headers-cpio or install-headers-cp.
+-INSTALL_HEADERS_DIR = @build_install_headers_dir@
++INSTALL_HEADERS_DIR = install-headers-cp
+ 
+ # Header files that are made available under the same name
+ # to programs compiled with GCC.

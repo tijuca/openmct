@@ -1,11 +1,14 @@
-Mi 05 Apr 2006 21:13:14 CEST §carsten
+So 22 Apr 2007 17:55:00 CEST carsten
+* merging my static makefile to Makefile.am to build the CDK Toolchain
+* little changes to configure.ac to let it work
+
+Mi 05 Apr 2006 21:13:14 CEST carsten
 * adding subdirectory for some progs in /bin and /sbin
 
-Do 09 Mär 2006 08:40:51 CET §carsten r.348-350
-*fixed up a missing directory check for symbolic link
+Do 09 Maerz 2006 08:40:51 CET carsten r.348-350
+* fixed up a missing directory check for symbolic link
 of the download dir from buildroot
-*change the patching of the buildroot files for the correct
-URL for ccache
+* change the patching of the buildroot files for the correct URL for ccache
 
-Di 07 Mär 2006 20:58:17 CET §carsten r.345
-*initial collection
+Di 07 Maerz 2006 20:58:17 CET carsten r.345
+* initial collection
