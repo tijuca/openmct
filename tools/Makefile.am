@@ -1,12 +1,5 @@
 # Makefile.am for helper applications
+AUTOMAKE_OPTIONS = gnu
 
-CC = @CC@
-
-#mct_modify_SOURCES = mct_modify.c
-all: tools
-
-tools:
-	$(CC) $(CFLAGS) mct_modify.c -o mct_modify
-
-clean:
-	rm mct_modify
+SUBDIRS = \
+	mct_modify mkfs.jffs2

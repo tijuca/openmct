@@ -1,4 +1,4 @@
-mct_modify
+.deps
 Makefile
 Makefile.in
-
+mkfs.jffs2

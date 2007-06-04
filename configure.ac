@@ -42,35 +42,25 @@ AC_PROG_MAKE_SET
 #AC_FUNC_SELECT_ARGTYPES
 #AC_CHECK_FUNCS([select strerror strncasecmp])
 
-AC_PREFIX_DEFAULT(mct-build)
-if test "$prefix" = "NONE"; then
-        prefix=$HOME/openmct-build
-fi
-AC_SUBST(prefix)
-
-
-ACTDIR=pwd
-PATCHDIR=$ACTDIR/patches
-AC_SUBST(PATCHDIR)
-
 # only needed for testing anything on the main Makefiles
 AC_ARG_ENABLE(test,
 	AS_HELP_STRING(--with-test,specify if want to run some test on the Makefile/s),
 	,[enable_test=yes])
 
-AM_CONDITIONAL(TEST,test "$enable_test" = "yes")
 
 ############
 #
-AC_ARG_ENABLE(debug, [  --enable-debug          Enable debugging output (disabled by default)],
+AC_ARG_ENABLE(debug, [  --enable-debug=yes          Enable debugging output (disabled by default and only useful for developing)],
     [if test x$enableval = xyes; then
     AC_DEFINE(DEBUG, 1, [Define this to enable debug messages.])
 	 debug_support=yes
     fi])
+AM_CONDITIONAL(DEBUG,test "x$debug_support" = "xyes")
+
 #
 ############
 
-AC_ARG_WITH(serno,[  --with-serno="..."      Add a build description (shows in revision field) ],
+AC_ARG_WITH(comment,[  --with-comment="..."    Add a build description (shows in revision field) ],
     SERIAL_ADDENDUM="_$withval",
     SERIAL_ADDENDUM="")
 AC_DEFINE_UNQUOTED(SERIAL_ADDENDUM, "$SERIAL_ADDENDUM", [Description of build])
@@ -90,6 +80,11 @@ AC_DEFINE_UNQUOTED(SERIAL_ADDENDUM, "$SERIAL_ADDENDUM", [Description of build])
 
 
 # Checks for user options.
+AC_PREFIX_DEFAULT(openmct-build)
+if test "$prefix" = "NONE"; then
+        prefix=$HOME/openmct-build
+fi
+AC_SUBST(prefix)
 
 AC_MSG_CHECKING([for prefix directory])
 if test -d "$prefix" ; then
@@ -100,22 +95,29 @@ else
 	mkdir $prefix
 fi
 
-# the directory for thr downloads
+
+# the directory for the downloads
 # its usaly to keep the archiv for later reuse
 archives=$prefix/archives
 AC_SUBST(archives)
+
 # the directory for cross compiler enviroment
 cdk=$prefix/cdk
 AC_SUBST(cdk)
+
 # the target filesystem directory
 # this is the basic there the image is build from
-#rootfs=$prefix/rootfs
-#AC_SUBST(rootfs)
+rootfs=$prefix/rootfs
+AC_SUBST(rootfs)
+
 # the directory for a NFS boot 
 # (to let it work change your /etc/exports!)
-#nfsboot=$prefix/nfsboot
-#AC_SUBST(nfsboot)
+nfsboot=$prefix/nfsboot
+AC_SUBST(nfsboot)
 
+# the directory for a tftp file
+tftpboot=$prefix/tftpboot
+AC_SUBST(tftpboot)
 
 # from another file, will be removed next time
 #def_timeout=-1
@@ -145,7 +147,7 @@ if test "$device" = "nas110" || \
    test "$device" = "sa113"  || \
    test "$device" = "nas200" || \
    test "$device" = "sa200" ; then 
-   devicetest="ok"
+    devicetest="ok"
 else
     devicetest="fail"
 fi
@@ -188,8 +190,9 @@ Your specified device:           $device
 prefix directory:                $prefix
 download directory for archives: $archives
 crosscompiler & headers:	 $cdk
-filesystem directory:		 $rootfs
+flash filesystem directory:	 $rootfs
 bootdir for nfs boot:		 $nfsboot
+tftpdir for flashing:		 $tftpboot
 
 kernel-configfile:		 kernel-$kernelconfig.config
 ])
@@ -200,9 +203,12 @@ kernel-configfile:		 kernel-$kernelconfig.config
 
 AC_CONFIG_FILES([
 Makefile
+tools/Makefile
+tools/mct_modify/Makefile
+tools/mkfs.jffs2/Makefile
 ])
 #progs/Makefile
-#tools/Makefile
+
 
 #libs/Makefile
 

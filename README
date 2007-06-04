@@ -1,12 +1,28 @@
-Whats this?
-
+ 1. Whats this?
 This Files are Part of the software collection to build own Images
 of OpenMCT Firmware.
+This software is designed to run on
+    Claxan NAS110
+    Claxan SA110
+    Claxan SA113
+    
+    Claxan NAS200
+    Claxan SA200
+    
+    BOSS devices    (fixme!)
+    Tritton devices (fixme!)
+    IOGear devices  (fixme!)
 
+ 2. How to build?
 First you have to run ./prepare.sh .
-After this run the builded configure with the arguments you want.
+After this run the builded script 'configure' with the arguments you want.
 Finally just type 'make' an wait some fee minutes.
 
-After all you will find in ~/openmct-build/images the separates Images.
+ 3. What arguments for './configure' can or have I to use?
+You need to specify your device! 
+  --with-device=<device>
+device could be nas110, sa110, sa113, nas200, sa200
 
-carsten
+ 4. Where I find the stuff?
+After all you will find in ~/openmct-build/ the separates Images.
+

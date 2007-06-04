@@ -1,3 +1,6 @@
+Sa 11 May 2007 20:46:00 CEST carsten
+* some improvements to the tools section
+
 So 22 Apr 2007 17:55:00 CEST carsten
 * merging my static makefile to Makefile.am to build the CDK Toolchain
 * little changes to configure.ac to let it work

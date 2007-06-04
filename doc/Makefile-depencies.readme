@@ -1,0 +1,44 @@
+This is a simple File to show the depencies in the Makefile in the topdir.
+Basicly are two parts in the Makefile.
+
+1. The cdk part (that have nothing to do with the later targets that build the Image or parts of it)
+   This target is splittet in the Crosscompiler and the tools that needed for later work.
+
+ -------     --------      -------------------     -----------
+ | cdk | --- | core | ---- | kernel-header   | --- | prepare |
+ -------  |  --------   |  -------------------     -----------
+          |             |  -------------------
+          |             |- | uclibc-header   |
+          |             |  -------------------
+          |             |  -------------------
+          |             |- | binutils        |
+          |             |  -------------------
+          |             |  -------------------
+          |             |- | coregcc         |
+          |             |  -------------------
+          |             |  -------------------
+          |             |- | uclibc          |
+          |             |  -------------------
+          |             |  -------------------
+          |             |- | gcc-final       |
+          |             |  -------------------
+          |             |  -------------------
+          |             |- | cdk-extra       |
+          |             |  -------------------
+          |             |  -------------------
+          |             |- | gdb             |
+          |                -------------------
+          |
+          |  ---------     -------------------
+          |- | tools | --- | mct_modify      |
+             ---------  |  -------------------
+                        |  -------------------
+                        |- | mkjffs2         |
+                        |  -------------------
+                        |  -------------------
+                        |- | mksquashfs.lzma |
+                           -------------------
+
+
+2. The image build part
+   ( not started yet! )
