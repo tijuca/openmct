@@ -1,3 +1,4 @@
+.deps
 Makefile
 Makefile.in
-
+mct_modify

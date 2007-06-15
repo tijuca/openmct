@@ -46,6 +46,10 @@ DEPS    = $(TOPDIR)/.deps
 
 TARGET=mipsel-linux-uclibc
 
+MKSQUASHFS=$(PREFIX)/bin/mksquashfs
+MKJFFS2=$(PREFIX)/bin/mkfs.jffs2
+MCTMODIFY=$(PREFIX)/bin/mct_modify
+
 BUILDENV:=AR=$(TARGET)-ar\
           AS=$(TARGET)-ar\
           GCC=$(TARGET)-gcc\
@@ -510,11 +514,25 @@ $(DOWNLOAD)/mtd_20050122:
 
 image:
 	@echo -e "\033[1;33mbuild image for @device@\033[0m ..."
-if DEBUG
-	@echo DEBUG enabeld
-else
-	@echo DEBUG disabeld
-endif
+#if DEBUG
+#	@echo DEBUG enabeld
+#else
+#	@echo DEBUG disabeld
+#endif
+
+etc:
+	@echo -e "\033[1;33mbuild rootfs/etc\033[0m ..."
+	$(SVN) --force --quiet export fs/etc $(CDKROOT)/etc
+	echo "Welcome to OpenMCT $(rev) from $(shell date)!" > $(CDKROOT)/etc/motd
+	echo "Builded from $(SVN_URL)" >> $(CDKROOT)/etc/motd
+	echo "@device@" > $(CDKROOT)/etc/hostname
+	$(MKJFFS2) -d $(CDKROOT)/etc -o $(prefix)/etc.jffs2 -l -p 65128
+	
+
+rootfs:
+	@echo -e "\033[1;33mbuild rootfs /\033[0m ..."
+	$(MKSQUASHFS) $(CDKROOT) $(prefix)/root.fs -le -all-root -ef $(CDKROOT)/etc/
+
 
 ##########################################################################################
 # cleaning
