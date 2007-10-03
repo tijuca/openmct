@@ -1,6 +1,6 @@
-diff -Naru linux-2.4.32/fs/Config.in linux-2.4.32-lzma/fs/Config.in
---- linux-2.4.32/fs/Config.in	2006-12-04 13:33:04.000000000 +0100
-+++ linux-2.4.32-lzma/fs/Config.in	2006-12-04 13:33:26.000000000 +0100
+diff -Naru linux-2.4.35.3/fs/Config.in linux-2.4.35.3-mct/fs/Config.in
+--- linux-2.4.35.3/fs/Config.in	2007-10-03 13:20:31.000000000 +0200
++++ linux-2.4.35.3-mct/fs/Config.in	2007-10-03 13:21:11.000000000 +0200
 @@ -59,6 +59,14 @@
  int 'Number of fragments cached' CONFIG_SQUASHFS_FRAGMENT_CACHE_SIZE 3
  bool 'Use Vmalloc rather than Kmalloc'  CONFIG_SQUASHFS_VMALLOC
@@ -16,9 +16,9 @@ diff -Naru linux-2.4.32/fs/Config.in linux-2.4.32-lzma/fs/Config.in
  bool 'Virtual memory file system support (former shm fs)' CONFIG_TMPFS
  define_bool CONFIG_RAMFS y
  
-diff -Naru linux-2.4.32/fs/squashfs/inode.c linux-2.4.32-lzma/fs/squashfs/inode.c
---- linux-2.4.32/fs/squashfs/inode.c	2006-12-04 11:43:37.000000000 +0100
-+++ linux-2.4.32-lzma/fs/squashfs/inode.c	2006-12-04 11:52:01.000000000 +0100
+diff -Naru linux-2.4.35.3/fs/squashfs/inode.c linux-2.4.35.3-mct/fs/squashfs/inode.c
+--- linux-2.4.35.3/fs/squashfs/inode.c	2007-10-03 13:20:31.000000000 +0200
++++ linux-2.4.35.3-mct/fs/squashfs/inode.c	2007-10-03 13:21:11.000000000 +0200
 @@ -21,7 +21,9 @@
   * inode.c
   */

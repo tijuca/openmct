@@ -1,6 +1,6 @@
-diff -Naru linux-2.4.32/drivers/usb/Config.in linux-2.4.32-mct/drivers/usb/Config.in
---- linux-2.4.32/drivers/usb/Config.in	2006-05-01 14:57:15.000000000 +0200
-+++ linux-2.4.32-mct/drivers/usb/Config.in	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/Config.in linux-2.4.35.3-mct/drivers/usb/Config.in
+--- linux-2.4.35.3/drivers/usb/Config.in	2007-10-03 13:14:52.000000000 +0200
++++ linux-2.4.35.3-mct/drivers/usb/Config.in	2007-10-03 13:15:41.000000000 +0200
 @@ -76,6 +76,7 @@
        dep_tristate '  USB Konica Webcam support' CONFIG_USB_KONICAWC $CONFIG_USB $CONFIG_VIDEO_DEV
        dep_tristate '  USB OV511 Camera support' CONFIG_USB_OV511 $CONFIG_USB $CONFIG_VIDEO_DEV
@@ -9,9 +9,9 @@ diff -Naru linux-2.4.32/drivers/usb/Config.in linux-2.4.32-mct/drivers/usb/Confi
        dep_tristate '  USB SE401 Camera support' CONFIG_USB_SE401 $CONFIG_USB $CONFIG_VIDEO_DEV
        dep_tristate '  USB STV680 (Pencam) Camera support' CONFIG_USB_STV680 $CONFIG_USB $CONFIG_VIDEO_DEV
        dep_tristate '  USB W996[87]CF Camera support' CONFIG_USB_W9968CF $CONFIG_USB $CONFIG_VIDEO_DEV $CONFIG_I2C
-diff -Naru linux-2.4.32/drivers/usb/Makefile linux-2.4.32-mct/drivers/usb/Makefile
---- linux-2.4.32/drivers/usb/Makefile	2006-05-01 14:57:15.000000000 +0200
-+++ linux-2.4.32-mct/drivers/usb/Makefile	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/Makefile linux-2.4.35.3-mct/drivers/usb/Makefile
+--- linux-2.4.35.3/drivers/usb/Makefile	2007-10-03 13:14:52.000000000 +0200
++++ linux-2.4.35.3-mct/drivers/usb/Makefile	2007-10-03 13:15:41.000000000 +0200
 @@ -77,6 +77,11 @@
  	obj-y += host/usb-ohci.o
  endif
@@ -24,9 +24,9 @@ diff -Naru linux-2.4.32/drivers/usb/Makefile linux-2.4.32-mct/drivers/usb/Makefi
  subdir-$(CONFIG_USB_SL811HS_ALT)	+= host
  subdir-$(CONFIG_USB_SL811HS)	+= host
  
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/Makefile linux-2.4.32-mct/drivers/usb/spca5xx/Makefile
---- linux-2.4.32/drivers/usb/spca5xx/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/Makefile	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/Makefile linux-2.4.35.3-mct/drivers/usb/spca5xx/Makefile
+--- linux-2.4.35.3/drivers/usb/spca5xx/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/Makefile	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,9 @@
 +
 +spca5xx-objs := spcadecoder.o spca_core.o
@@ -37,9 +37,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/Makefile linux-2.4.32-mct/drivers/us
 +
 +spca5xx.o: $(spca5xx-objs)
 +	$(LD) -r -o $@ $(spca5xx-objs)
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/Makefile-2.6 linux-2.4.32-mct/drivers/usb/spca5xx/Makefile-2.6
---- linux-2.4.32/drivers/usb/spca5xx/Makefile-2.6	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/Makefile-2.6	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/Makefile-2.6 linux-2.4.35.3-mct/drivers/usb/spca5xx/Makefile-2.6
+--- linux-2.4.35.3/drivers/usb/spca5xx/Makefile-2.6	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/Makefile-2.6	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,9 @@
 +
 +spca5xx-objs := spcadecoder.o spca_core.o
@@ -50,9 +50,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/Makefile-2.6 linux-2.4.32-mct/driver
 +	rm -f *.[oas] .*.flags *.ko .*.cmd .*.d .*.tmp *.mod.c 
 +	rm -rf .tmp_versions
 +
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/Makefile.org linux-2.4.32-mct/drivers/usb/spca5xx/Makefile.org
---- linux-2.4.32/drivers/usb/spca5xx/Makefile.org	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/Makefile.org	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/Makefile.org linux-2.4.35.3-mct/drivers/usb/spca5xx/Makefile.org
+--- linux-2.4.35.3/drivers/usb/spca5xx/Makefile.org	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/Makefile.org	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,218 @@
 +VERSION    = 00.57.06LE
 +CVSVERSION = "$Experimental work Michel Xhaard && Reza Jelveh 03/02/2004"
@@ -272,9 +272,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/Makefile.org linux-2.4.32-mct/driver
 +	.spca_core.o.cmd  *.o *.ko *.mod.* .[a-z]* core *.i
 +	
 +############################################################################## 
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/cs2102.h linux-2.4.32-mct/drivers/usb/spca5xx/cs2102.h
---- linux-2.4.32/drivers/usb/spca5xx/cs2102.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/cs2102.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/cs2102.h linux-2.4.35.3-mct/drivers/usb/spca5xx/cs2102.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/cs2102.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/cs2102.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,413 @@
 + 
 +#ifndef CS2102USB_H
@@ -689,9 +689,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/cs2102.h linux-2.4.32-mct/drivers/us
 + };
 +
 +#endif //CS2102USB_H
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/hdcs2020.h linux-2.4.32-mct/drivers/usb/spca5xx/hdcs2020.h
---- linux-2.4.32/drivers/usb/spca5xx/hdcs2020.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/hdcs2020.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/hdcs2020.h linux-2.4.35.3-mct/drivers/usb/spca5xx/hdcs2020.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/hdcs2020.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/hdcs2020.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,897 @@
 + 
 +/****************************************************************************
@@ -1590,9 +1590,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/hdcs2020.h linux-2.4.32-mct/drivers/
 + { 0xa0, 0x40, 0x0118},
 + {0,0,0}
 + };
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/hv7131b.h linux-2.4.32-mct/drivers/usb/spca5xx/hv7131b.h
---- linux-2.4.32/drivers/usb/spca5xx/hv7131b.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/hv7131b.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/hv7131b.h linux-2.4.35.3-mct/drivers/usb/spca5xx/hv7131b.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/hv7131b.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/hv7131b.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,458 @@
 + 
 +/****************************************************************************
@@ -2052,9 +2052,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/hv7131b.h linux-2.4.32-mct/drivers/u
 +// { 0xA0, 0x02, 0x0008},
 + {0,0,0}
 + };
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/hv7131c.h linux-2.4.32-mct/drivers/usb/spca5xx/hv7131c.h
---- linux-2.4.32/drivers/usb/spca5xx/hv7131c.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/hv7131c.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/hv7131c.h linux-2.4.35.3-mct/drivers/usb/spca5xx/hv7131c.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/hv7131c.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/hv7131c.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,343 @@
 +  
 +/****************************************************************************
@@ -2399,9 +2399,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/hv7131c.h linux-2.4.32-mct/drivers/u
 + { 0xa0, 0x42, 0x0180},
 + {0,0,0}
 + };
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/icm105a.h linux-2.4.32-mct/drivers/usb/spca5xx/icm105a.h
---- linux-2.4.32/drivers/usb/spca5xx/icm105a.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/icm105a.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/icm105a.h linux-2.4.35.3-mct/drivers/usb/spca5xx/icm105a.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/icm105a.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/icm105a.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,1170 @@
 +/****************************************************************************
 +#	 	Ic-media ICM105A library                                    #
@@ -3573,9 +3573,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/icm105a.h linux-2.4.32-mct/drivers/u
 + { 0xa0, 0x40, 0x0118},
 + {0,0,0}
 + };
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/pas106b.h linux-2.4.32-mct/drivers/usb/spca5xx/pas106b.h
---- linux-2.4.32/drivers/usb/spca5xx/pas106b.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/pas106b.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/pas106b.h linux-2.4.35.3-mct/drivers/usb/spca5xx/pas106b.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/pas106b.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/pas106b.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,443 @@
 + 
 +/****************************************************************************
@@ -4020,9 +4020,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/pas106b.h linux-2.4.32-mct/drivers/u
 + {0,0,0}
 + };
 + 
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/pb0330.h linux-2.4.32-mct/drivers/usb/spca5xx/pb0330.h
---- linux-2.4.32/drivers/usb/spca5xx/pb0330.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/pb0330.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/pb0330.h linux-2.4.35.3-mct/drivers/usb/spca5xx/pb0330.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/pb0330.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/pb0330.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,463 @@
 +  
 +/****************************************************************************
@@ -4487,9 +4487,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/pb0330.h linux-2.4.32-mct/drivers/us
 +// { 0xa0, 0x00, 0x0007},
 + {0,0,0}
 + };
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/sn9cxxx.h linux-2.4.32-mct/drivers/usb/spca5xx/sn9cxxx.h
---- linux-2.4.32/drivers/usb/spca5xx/sn9cxxx.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/sn9cxxx.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/sn9cxxx.h linux-2.4.35.3-mct/drivers/usb/spca5xx/sn9cxxx.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/sn9cxxx.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/sn9cxxx.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,874 @@
 +#ifndef SONIXJPGUSB_H
 +#define SONIXJPGUSB_H
@@ -5365,9 +5365,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/sn9cxxx.h linux-2.4.32-mct/drivers/u
 +
 +#endif
 +#endif //SONIXJPGUSB
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/sp5xxfw2.dat linux-2.4.32-mct/drivers/usb/spca5xx/sp5xxfw2.dat
---- linux-2.4.32/drivers/usb/spca5xx/sp5xxfw2.dat	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/sp5xxfw2.dat	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/sp5xxfw2.dat linux-2.4.35.3-mct/drivers/usb/spca5xx/sp5xxfw2.dat
+--- linux-2.4.35.3/drivers/usb/spca5xx/sp5xxfw2.dat	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/sp5xxfw2.dat	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,307 @@
 + 
 +/* Initialisation data for the Creative PC-CAM 600 */
@@ -5676,9 +5676,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/sp5xxfw2.dat linux-2.4.32-mct/driver
 +    0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e
 +  }
 +};
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/sp5xxfw2.h linux-2.4.32-mct/drivers/usb/spca5xx/sp5xxfw2.h
---- linux-2.4.32/drivers/usb/spca5xx/sp5xxfw2.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/sp5xxfw2.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/sp5xxfw2.h linux-2.4.35.3-mct/drivers/usb/spca5xx/sp5xxfw2.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/sp5xxfw2.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/sp5xxfw2.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,733 @@
 +#ifndef SP5XXFW2_H
 +#define SP5XXFW2_H
@@ -6413,9 +6413,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/sp5xxfw2.h linux-2.4.32-mct/drivers/
 +	return ;
 +}
 +#endif //SP5XXFW2
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/spca5xx.h linux-2.4.32-mct/drivers/usb/spca5xx/spca5xx.h
---- linux-2.4.32/drivers/usb/spca5xx/spca5xx.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/spca5xx.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/spca5xx.h linux-2.4.35.3-mct/drivers/usb/spca5xx/spca5xx.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/spca5xx.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/spca5xx.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,319 @@
 +#ifndef SPCA50X_H
 +#define SPCA50X_H
@@ -6736,9 +6736,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/spca5xx.h linux-2.4.32-mct/drivers/u
 +
 +
 +#endif /* SPCA50X_H */
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/spcaCompat.h linux-2.4.32-mct/drivers/usb/spca5xx/spcaCompat.h
---- linux-2.4.32/drivers/usb/spca5xx/spcaCompat.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/spcaCompat.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/spcaCompat.h linux-2.4.35.3-mct/drivers/usb/spca5xx/spcaCompat.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/spcaCompat.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/spcaCompat.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,33 @@
 + 
 +#ifndef SPCA_COMPAT_H
@@ -6773,9 +6773,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/spcaCompat.h linux-2.4.32-mct/driver
 +#endif
 +
 +#endif
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/spca_core.c linux-2.4.32-mct/drivers/usb/spca5xx/spca_core.c
---- linux-2.4.32/drivers/usb/spca5xx/spca_core.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/spca_core.c	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/spca_core.c linux-2.4.35.3-mct/drivers/usb/spca5xx/spca_core.c
+--- linux-2.4.35.3/drivers/usb/spca5xx/spca_core.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/spca_core.c	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,4437 @@
 +/*
 + * SPCA5xx based usb camera driver (currently supports
@@ -11214,9 +11214,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/spca_core.c linux-2.4.32-mct/drivers
 +module_exit (usb_spca5xx_exit);
 +
 +//eof
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/spcadecoder.c linux-2.4.32-mct/drivers/usb/spca5xx/spcadecoder.c
---- linux-2.4.32/drivers/usb/spca5xx/spcadecoder.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/spcadecoder.c	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/spcadecoder.c linux-2.4.35.3-mct/drivers/usb/spca5xx/spcadecoder.c
+--- linux-2.4.35.3/drivers/usb/spca5xx/spcadecoder.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/spcadecoder.c	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,332 @@
 +/*******************************************************************************
 +#	 	spcadecoder: Generic decoder for various input stream yyuv	#
@@ -11550,9 +11550,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/spcadecoder.c linux-2.4.32-mct/drive
 +	myframe->scanlength +=(JPEGHEADER_LENGTH-33);
 +return 0;
 +}
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/spcadecoder.h linux-2.4.32-mct/drivers/usb/spca5xx/spcadecoder.h
---- linux-2.4.32/drivers/usb/spca5xx/spcadecoder.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/spcadecoder.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/spcadecoder.h linux-2.4.35.3-mct/drivers/usb/spca5xx/spcadecoder.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/spcadecoder.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/spcadecoder.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,14 @@
 +
 +#ifndef SPCADECODER_H
@@ -11568,9 +11568,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/spcadecoder.h linux-2.4.32-mct/drive
 +
 +
 +#endif /* SPCADECODER_H */
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/spcausb.h linux-2.4.32-mct/drivers/usb/spca5xx/spcausb.h
---- linux-2.4.32/drivers/usb/spca5xx/spcausb.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/spcausb.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/spcausb.h linux-2.4.35.3-mct/drivers/usb/spca5xx/spcausb.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/spcausb.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/spcausb.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,315 @@
 +
 +#ifndef SPCAUSB_H
@@ -11887,9 +11887,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/spcausb.h linux-2.4.32-mct/drivers/u
 +
 +	 
 +#endif /* SPCAUSB_H */
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/tas5130c.h linux-2.4.32-mct/drivers/usb/spca5xx/tas5130c.h
---- linux-2.4.32/drivers/usb/spca5xx/tas5130c.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/tas5130c.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/tas5130c.h linux-2.4.35.3-mct/drivers/usb/spca5xx/tas5130c.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/tas5130c.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/tas5130c.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,283 @@
 +/****************************************************************************
 +#	 	TAS5130C      library                                       #
@@ -12174,9 +12174,9 @@ diff -Naru linux-2.4.32/drivers/usb/spca5xx/tas5130c.h linux-2.4.32-mct/drivers/
 + {0,0,0},
 + };
 + 
-diff -Naru linux-2.4.32/drivers/usb/spca5xx/zc3xx.h linux-2.4.32-mct/drivers/usb/spca5xx/zc3xx.h
---- linux-2.4.32/drivers/usb/spca5xx/zc3xx.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/usb/spca5xx/zc3xx.h	2006-05-01 14:53:52.000000000 +0200
+diff -Naru linux-2.4.35.3/drivers/usb/spca5xx/zc3xx.h linux-2.4.35.3-mct/drivers/usb/spca5xx/zc3xx.h
+--- linux-2.4.35.3/drivers/usb/spca5xx/zc3xx.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/usb/spca5xx/zc3xx.h	2007-10-03 13:15:41.000000000 +0200
 @@ -0,0 +1,559 @@
 + 
 +#ifndef ZC3XXUSB_H
