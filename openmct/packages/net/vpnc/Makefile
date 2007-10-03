@@ -1,5 +1,5 @@
 # vpnc
-DOWNLOAD=	http://www.unix-ag.uni-kl.de/~massar/vpnc/vpnc-0.3.3.tar.gz
+DOWNLOAD=	http://www.unix-ag.uni-kl.de/~massar/vpnc/vpnc-0.5.1.tar.gz
 
 # DEPENDSON=      packages/lib/libgcrypt
 

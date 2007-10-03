@@ -1,5 +1,5 @@
 # GD
-DOWNLOAD=	http://www.libgd.org/releases/gd-2.0.34.tar.bz2
+DOWNLOAD=	http://www.libgd.org/releases/gd-2.0.35.tar.bz2
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET)
 

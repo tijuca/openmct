@@ -1,5 +1,5 @@
 # cTorrent
-DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/ctorrent/ctorrent-1.3.2.tar.gz
+DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/ctorrent/ctorrent-1.3.4.tar.gz
 
 INSTALL=	$(CP) $(SRCDIR)/ctorrent $(NEWROOTDIR)/bin && \
 		$(STRIP) $(NEWROOTDIR)/bin/ctorrent

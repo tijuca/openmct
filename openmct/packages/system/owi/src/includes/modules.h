@@ -15,14 +15,14 @@ struct modules_t {
    char *description;
    char *style;
 } modules[] = {
-   { "sysinfo.cgi", sysinfo_main, SYSINFO_NAV_DESCRIPTION, SYSINFO_NAV_CLASS },
-   { "interface.cgi", interface_main, INTERFACE_NAV_DESCRIPTION, INTERFACE_NAV_CLASS },
-   { "nfs.cgi", nfs_main, NFS_NAV_DESCRIPTION, NFS_NAV_CLASS },
-   { "ftp.cgi", ftp_main, FTP_NAV_DESCRIPTION, FTP_NAV_CLASS },
-   { "user.cgi", user_main, USER_NAV_DESCRIPTION, USER_NAV_CLASS },
-   { "group.cgi", group_main, GROUP_NAV_DESCRIPTION, GROUP_NAV_CLASS },
-#ifdef SECURIT   
-   { "shell.cgi", shell_main, SHELL_NAV_DESCRIPTION, SHELL_NAV_CLASS },
+   { "sysinfo", sysinfo_main, SYSINFO_NAV_DESCRIPTION, SYSINFO_NAV_CLASS },
+   { "interface", interface_main, INTERFACE_NAV_DESCRIPTION, INTERFACE_NAV_CLASS },
+   { "nfs", nfs_main, NFS_NAV_DESCRIPTION, NFS_NAV_CLASS },
+   { "ftp", ftp_main, FTP_NAV_DESCRIPTION, FTP_NAV_CLASS },
+   { "user", user_main, USER_NAV_DESCRIPTION, USER_NAV_CLASS },
+   { "group", group_main, GROUP_NAV_DESCRIPTION, GROUP_NAV_CLASS },
+#ifdef SECURITY
+   { "shell", shell_main, SHELL_NAV_DESCRIPTION, SHELL_NAV_CLASS },
 #endif   
    { NULL, NULL, NULL, NULL }
 };

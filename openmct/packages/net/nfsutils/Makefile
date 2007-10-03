@@ -1,5 +1,5 @@
 # NFS Utils
-DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/nfs/nfs-utils-1.0.7.tar.gz
+DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/nfs/nfs-utils-1.1.0.tar.gz
 
 CONFIGUREARGS=  --prefix=$(PREFIX) --host=$(TARGET) --disable-nfsv4 --disable-gss
 

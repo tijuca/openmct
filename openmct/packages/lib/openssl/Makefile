@@ -1,5 +1,5 @@
 # OpenSSL
-DOWNLOAD=	http://www.openssl.org/source/openssl-0.9.8d.tar.gz
+DOWNLOAD=	http://www.openssl.org/source/openssl-0.9.8e.tar.gz
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --openssldir=/ shared openmct-mipsel
 

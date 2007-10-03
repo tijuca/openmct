@@ -1,10 +1,10 @@
 # torrent
-DOWNLOAD=	http://libtorrent.rakshasa.no/downloads/libtorrent-0.11.2.tar.gz
+DOWNLOAD=	http://libtorrent.rakshasa.no/downloads/libtorrent-0.11.8.tar.gz
 
 CONFIGUREENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc \
 		CXX=$(OPENMCT_CROSS_COMPILE)g++ \
-		CFLAGS="-Os -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.0 -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.0/sigc++" \
-		CXXFLAGS="-Os -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.0 -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.0/sigc++"
+		CFLAGS="-Os -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.1 -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.1/sigc++" \
+		CXXFLAGS="-Os -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.1 -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.1/sigc++"
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-shared --disable-aligned \
 		--with-openssl=$(OPENMCT_CROSS_BASE)

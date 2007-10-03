@@ -1,2 +1,0 @@
-[ ! -d /var/run ] && mkdir -p /var/run
-/sbin/vserver-stat > /var/run/vserver-stat

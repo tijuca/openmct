@@ -1,5 +1,5 @@
 # Debootstrap
-DOWNLOAD=	http://ftp.debian.org/debian/pool/main/d/debootstrap/debootstrap_0.3.3.1.tar.gz
+DOWNLOAD=	http://ftp.debian.org/debian/pool/main/d/debootstrap/debootstrap_1.0.3.tar.gz
 
 BUILD=		$(OPENMCT_CROSS_COMPILE)gcc -Os \
 		-o pkgdetails pkgdetails.c

@@ -1,5 +1,0 @@
-. ../actions/functions
-html
-thead
-vexec 'reboot -d5'
-tfoot

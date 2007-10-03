@@ -62,7 +62,7 @@ void owi_header(char *title) {
           "</div>\n"*/
           "<div id=\"taskbar\">\n"
           "<a class=\"button-internet\" target=\"_blank\" href=\"http://www.openmct.org\">OpenMCT Homepage</a>\n"
-          "<a class=\"button-community\" target=\"_blank\" href=\"http://claxan.hangar18.org/forum\">OpenMCT Forum</a>\n"
+          "<a class=\"button-community\" target=\"_blank\" href=\"http://forum.openmct.org\">OpenMCT Forum</a>\n"
           "<a class=\"button-contact\" href=\"mailto:dev@openmct.org\">OpenMCT Kontakt</a>\n"
           "</div>\n"
           "<div id=\"content\">\n");
@@ -101,6 +101,12 @@ int main(int argc, char **argv) {
    }
 
    owi_request();
+
+   module = variable_get("module");
+
+   if (!strcmp(module, "")) {
+      module = "sysinfo.cgi";
+   }
 
    for (i = 0; modules[i].name != NULL; i++) {
       if (!strcmp(module, modules[i].name)) {

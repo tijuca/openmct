@@ -1,5 +1,6 @@
 # NTP
-DOWNLOAD=	http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-4.2.4.tar.gz
+DOWNLOAD=	http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-4.2.4p4.tar.gz
+
 CONFIGUREARGS=	--prefix=$(PREFIX) --host=$(TARGET) \
 		--enable-all-clocks=no --without-arlib \
 	        --without-crypto --without-electricfence --with-sntp

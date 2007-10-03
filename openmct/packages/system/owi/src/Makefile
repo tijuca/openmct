@@ -6,7 +6,7 @@ OUTPUT=../www
 CP=cp
 MKDIR=mkdir
 LN=ln
-BINARY=owi.cgi
+BINARY=index.cgi
 LDFLAGS=-lcrypt
 DESTDIR=/www
 

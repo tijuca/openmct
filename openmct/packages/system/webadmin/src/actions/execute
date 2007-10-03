@@ -1,8 +1,0 @@
-. ../actions/functions
-html
-thead
-vexec "$FORM_command"
-echo -n '</pre></p><p>Command: <input type="text" name="command" value="'
-echo -n "$FORM_command"
-echo -n '">'
-tfoot

@@ -1,5 +1,5 @@
 # curl
-DOWNLOAD=	http://curl.haxx.se/download/curl-7.16.0.tar.bz2
+DOWNLOAD=	http://curl.haxx.se/download/curl-7.17.0.tar.bz2
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-shared --with-random=/dev/urandom
 

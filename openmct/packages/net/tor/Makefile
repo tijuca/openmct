@@ -1,5 +1,5 @@
 # TOR
-DOWNLOAD=	http://tor.eff.org/dist/tor-0.1.1.23.tar.gz	
+DOWNLOAD=	http://tor.eff.org/dist/tor-0.1.2.17.tar.gz
 
 DEPENDSON=	packages/lib/zlib
 

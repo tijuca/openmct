@@ -1,5 +1,5 @@
 # VServer Debiantools
-DOWNLOAD=	http://ftp.debian.org/debian/pool/main/v/vserver-debiantools/vserver-debiantools_0.1.10.tar.gz
+DOWNLOAD=	http://ftp.debian.org/debian/pool/main/v/vserver-debiantools/vserver-debiantools_0.4.1.tar.gz
 
 BUILD=
 

@@ -1,7 +1,0 @@
-. ../actions/functions
-html
-thead
-vexec 'uptime -a'
-vexec 'df -h /usr'
-vexec 'who'
-tfoot

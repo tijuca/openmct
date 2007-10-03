@@ -1,5 +1,0 @@
-. ../actions/functions
-html
-thead
-vexec 'halt -d5'
-tfoot

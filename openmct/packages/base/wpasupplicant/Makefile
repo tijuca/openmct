@@ -1,5 +1,5 @@
 # wpa_supplicant
-DOWNLOAD=	http://hostap.epitest.fi/releases/wpa_supplicant-0.4.8.tar.gz
+DOWNLOAD=	http://hostap.epitest.fi/releases/wpa_supplicant-0.6.0.tar.gz
 
 MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc
 

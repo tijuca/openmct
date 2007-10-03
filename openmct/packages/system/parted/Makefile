@@ -1,5 +1,5 @@
 # parted
-DOWNLOAD=	http://ftp.gnu.org/gnu/parted/parted-1.8.2.tar.bz2
+DOWNLOAD=	http://ftp.gnu.org/gnu/parted/parted-1.8.8.tar.bz2
 
 DEPENDSON=	packages/lib/e2fsprogs
 
