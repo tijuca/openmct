@@ -15,6 +15,8 @@ void file_free();
 void file_line_action(int mode, int line_index, char *format, ...);
 int file_get_pad(char *string, char *match);
 int proc_open(char *command);
+char *proc_read_line(char *command, int index);
+char *file_read_line(char *file, int index);
 
 extern int file_line_counter;
 

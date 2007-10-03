@@ -45,33 +45,42 @@ void owi_header(char *title) {
           "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" />\n"
           "</head>\n"
           "<body>\n"
-          "<div id=\"navigation-outer\">Navigation</div>\n"
-          "<div id=\"navigation-inner\">\n"
-          "<ul id=\"navigation\">\n", title);
-   for (i = 0; modules[i].name != NULL; i++) {
-      printf("<li class=\"navigation %s\"><a href=\"%s?module=%s\">%s</a></li>\n",
-             modules[i].style,
-	     getenv("SCRIPT_NAME"),
-	     modules[i].name,
-	     modules[i].description);
+	  "<table class=\"main\">\n"
+	  "<tr>\n"
+	  "<td class=\"logo\"><h1>OpenMCT</h1></td>\n"
+	  "<td class=\"description\"><h2>Administration Interface</h2></td>\n"
+	  "<td class=\"domain\" align=\"right\">domainname</td>\n"
+	  "</tr>\n"
+	  "<tr>\n"
+	  "<td class=\"navigation\">\n"
+	  "<table>\n",
+	  title);
+   for (i = 0; modules[i].description != NULL; i++) {
+      printf("<tr><td>\n");
+      if (modules[i].main) {
+         printf("<a href=\"%s?module=%s\">%s</a>\n",
+                getenv("SCRIPT_NAME"),
+	        modules[i].name,
+	        modules[i].description);
+      } else {
+         printf("%s", modules[i].description);
+      }
+      printf("</td></tr>\n");
    }
-   printf("</ul>\n"
-          "</div>\n"
-          /*"<div id=\"toolbar\">\n"
-          "<a href=\"user.cgi?command=new\">Neu</a>\n"
-          "<a href=\"user.cgi?command=csv\">CSV</a>\n"
-          "</div>\n"*/
-          "<div id=\"taskbar\">\n"
-          "<a class=\"button-internet\" target=\"_blank\" href=\"http://www.openmct.org\">OpenMCT Homepage</a>\n"
-          "<a class=\"button-community\" target=\"_blank\" href=\"http://forum.openmct.org\">OpenMCT Forum</a>\n"
-          "<a class=\"button-contact\" href=\"mailto:dev@openmct.org\">OpenMCT Kontakt</a>\n"
-          "</div>\n"
-          "<div id=\"content\">\n");
+   printf("</table>\n"
+          "</td>\n"
+          "<td class=\"content\">\n");
 }
 
 void owi_footer() {
-   printf("</div>\n"
-          "</body>\n"
+   printf("</td>\n"
+          "</tr>\n"
+	  "</table>\n"
+	  "<table class=\"footer\">\n"
+	  "<tr>\n"
+	  "<td>OpenMCT. All rights reserved.</td>\n"
+	  "</tr>\n"
+	  "</table>\n"
           "</html>\n");
 }
 

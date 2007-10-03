@@ -43,13 +43,10 @@
 #define  GROUP_NAV_DESCRIPTION               "Gruppe"
 
 /* sysinfo */
-#define  SYSINFO_HEADLINE                    "Systeminformation"
-#define  SYSINFO_DESCRIPTION                 "Anbei finden Sie aktuelle Informationen zum laufenden System"
-#define  SYSINFO_NETWORK_DEVICES             "Netzwerkger&auml;te"
-#define  SYSINFO_NETWORK_DEVICES_DESCRIPTION "Folgende Netzwerkkomponenten sind derzeit auf dem System konfiguriert"
-#define  SYSINFO_FILESYSTEMS                 "Dateisysteme"
-#define  SYSINFO_FILESYSTEMS_DESCRIPTION     "Anbei finden Sie alle aktuell verwendeten Dateisysteme"
-#define  SYSINFO_NAV_DESCRIPTION             "System"
+#define  SYSINFO_HEADLINE                    "OpenMCT"
+#define  SYSINFO_HEADLINE_BOX                "Systeminformation"
+#define  SYSINFO_NAV_SYSTEM                  "System"
+#define  SYSINFO_NAV_DESCRIPTION             "DESC"
 
 /* nfs */
 #define  NFS_TABLE_DESCRIPTION               "Freigabe"
@@ -69,10 +66,9 @@
 #define  NFS_NAV_DESCRIPTION                 "NFS"
 
 /* ftp */
-#define  FTP_HEADLINE                        "FTP (File Transfer Protocol) Verwaltung"
-#define  FTP_DESCRIPTION                     "Diese Einstellungsbereich erlaubt Ihnen die Einstellungen Ihres FTP Servers zu &auml;ndern. Nachdem die Einstellungen mit dem <i>Speichern</i> Button best&auml;tigt werden, wird die Konfiguration des FTP Servers automatisch neu geladen."
-#define  FTP_DETAIL                          "Sie befinden Sich nun im Detailbereich f&uuml;r ihren FTP Server. Hier k&ouml;nnen Sie globale Einstellungen einsehen und aktualisieren. Die Einstellungen werden mit dem Bet&auml;tigen des <i>Speichern</i> Buttons sofort &uuml;bernommen."
-#define  FTP_FILE_FAILED                     "FTP (File Transfer Protocol) Konfiguration konnte nicht ge&ouml;ffnet werden"
+#define  FTP_HEADLINE                        "Services: FTP"
+#define	 FTP_HEADLINE_BOX                    "FTP Server"
+#define  FTP_FILE_FAILED                     "FTP Konfiguration konnte nicht ge&ouml;ffnet werden"
 
 #define  FTP_TABLE_LISTEN                    "Listen"
 #define  FTP_TABLE_LISTEN_YES                "Ja"

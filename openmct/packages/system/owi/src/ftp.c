@@ -74,7 +74,7 @@ int ftp_main(int argc, char **argv) {
       file_free(FTP_FILE);
    } else {
       /* Print error message */
-      owi_headline(1, FTP_HEADLINE);
+      owi_headline(3, FTP_HEADLINE);
       owi_headline(2, FTP_FILE_FAILED);
    }
 
@@ -97,26 +97,20 @@ void ftp_list() {
    int j = 0;
 
    /* Print external table for design */
-   printf("<table class=\"%s\">\n"
-          "<tr>\n"
-          "<td>\n"
-          "<h1>%s</h1>\n"
-          "<br />%s<br /><br />\n"
+   printf("<h3>%s</h3>\n"
           "<form action=\"%s\" method=\"post\">\n"
           "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
-          "<table class=\"%s\" width=\"100%%\" cellspacing=\"0\" cellpading=\"0\">\n"
+          "<table class=\"detail\">\n"
 	  "<thead>\n"
 	  "<tr>\n"
-	  "<th colspan=\"2\">FTP Konfiguration</th>\n"
+	  "<th colspan=\"2\">%s</th>\n"
 	  "</tr>\n"
 	  "</thead>\n",
-          CONTENT_TABLE_CLASS,
           FTP_HEADLINE,
-          FTP_DETAIL,
           getenv("SCRIPT_NAME"),
 	  variable_get("module"),
-          CONTENT_TABLE_BOX_CLASS);
+	  FTP_HEADLINE_BOX);
 
    /* Loop through config file */
    for (i = 0;  i < file_line_counter; i++) {
@@ -134,8 +128,8 @@ void ftp_list() {
    /* Loop through all availbe config variables */
    for (i = 0; ftp_ini[i].variable != NULL; i++) {
       printf("<tr>\n"
-             "<td width=\"250\">%s</td>\n"
-	     "<td>", ftp_ini[i].description);
+             "<td class=\"description\">%s</td>\n"
+	     "<td class=\"value\">", ftp_ini[i].description);
       /* valid set? */
       if (ftp_ini[i].valid) {
          /* Valid values */

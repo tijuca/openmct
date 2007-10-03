@@ -110,9 +110,6 @@ void user_list() {
           "<tr>\n"
           "<th>%s</th>\n"
           "<th>%s</th>\n"
-          "<th>%s</th>\n"
-          "<th>%s</th>\n"
-          "<th>%s</th>\n"
           "</tr>\n"
 	  "</thead>\n"
           "<tbody>",
@@ -124,9 +121,6 @@ void user_list() {
 	  variable_get("search"),
 	  CONTENT_TABLE_LIST_CLASS,
           USER_TABLE_DESCRIPTION,
-          USER_TABLE_GECOS,
-          USER_TABLE_DIRECTORY,
-          USER_TABLE_SHELL,
           USER_TABLE_ACTION);
 
    /* Start at first password entry */
@@ -146,9 +140,6 @@ void user_list() {
          printf("<tr onmouseover=\"this.className='%s';\""
                 " onmouseout=\"this.className='%s';\">\n"
                 "<td width=\"80\">%s</td>\n"
-                "<td width=\"160\">%s</td>\n"
-                "<td width=\"160\">%s</td>\n"
-                "<td width=\"160\">%s</td>\n"
                 "<td width=\"160\">"
 		"<input type=\"button\" onClick=\"location='%s?module=%s&command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
 		"<input type=\"button\" onClick=\"location='%s?module=%s&command=delete&amp;id=%s'\" value=\"%s\" />"
@@ -157,9 +148,6 @@ void user_list() {
                 CONTENT_TABLE_CLASS_MOUSEOVER,
                 CONTENT_TABLE_CLASS_MOUSEOUT,
                 argument_get_part(passwd, 0),
-                argument_get_part(passwd, 4),
-                argument_get_part(passwd, 5),
-                argument_get_part(passwd, 6),
                 getenv("SCRIPT_NAME"),
 		variable_get("module"),
                 argument_get_part(passwd, 0),

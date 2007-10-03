@@ -13,16 +13,17 @@ struct modules_t {
    char *name;
    int (*main)(int, char **);
    char *description;
-   char *style;
+   int  level;
 } modules[] = {
-   { "sysinfo", sysinfo_main, SYSINFO_NAV_DESCRIPTION, SYSINFO_NAV_CLASS },
-   { "interface", interface_main, INTERFACE_NAV_DESCRIPTION, INTERFACE_NAV_CLASS },
-   { "nfs", nfs_main, NFS_NAV_DESCRIPTION, NFS_NAV_CLASS },
-   { "ftp", ftp_main, FTP_NAV_DESCRIPTION, FTP_NAV_CLASS },
-   { "user", user_main, USER_NAV_DESCRIPTION, USER_NAV_CLASS },
-   { "group", group_main, GROUP_NAV_DESCRIPTION, GROUP_NAV_CLASS },
+   { "system", NULL, SYSINFO_NAV_SYSTEM, 0 },
+   { "sysinfo", sysinfo_main, SYSINFO_NAV_DESCRIPTION, 1},
+   { "interface", interface_main, INTERFACE_NAV_DESCRIPTION, 1 },
+   { "nfs", nfs_main, NFS_NAV_DESCRIPTION, 1 },
+   { "ftp", ftp_main, FTP_NAV_DESCRIPTION, 1 },
+   { "user", user_main, USER_NAV_DESCRIPTION, 1 },
+   { "group", group_main, GROUP_NAV_DESCRIPTION, 1 },
 #ifdef SECURITY
-   { "shell", shell_main, SHELL_NAV_DESCRIPTION, SHELL_NAV_CLASS },
+   { "shell", shell_main, SHELL_NAV_DESCRIPTION, 1 },
 #endif   
-   { NULL, NULL, NULL, NULL }
+   { NULL, NULL, NULL, 0 }
 };

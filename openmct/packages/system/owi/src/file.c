@@ -260,8 +260,8 @@ void file_line_action(int mode, int line_index, char *format, ...) {
          file_line_counter++;
          /* Reallocate new index array */
          file_line = (char**)realloc(file_line,
-                                                    sizeof(char *) *
-                                                    (file_line_counter + 1));
+                                     sizeof(char *) *
+                                     (file_line_counter + 1));
          /* Move pointers */
          for (i = file_line_counter - 1; i > line_index; i--) {
             file_line[i] = file_line[i - 1];
@@ -287,4 +287,48 @@ void file_line_action(int mode, int line_index, char *format, ...) {
  */
 int file_get_pad(char *string, char *match) {
    return (strstr(string, match) - string) + strlen(match);
+}
+
+/* \fn proc_read_line(command, index)
+ * \param[in] proc command to execute
+ * \param[in] index return this line
+ * \return string
+ */
+char *proc_read_line(char *command, int index) {
+   int lines = proc_open(command);
+   char *line = NULL;
+
+   if (lines >= 0) {
+      if (index <= lines) {
+         line = (char*)malloc(strlen(file_line_get(index)) + 1);
+	 if (line) {
+            strcpy(line, file_line_get(index));
+	 }
+      }
+      file_free();
+   }
+
+   return line;
+}
+
+/* \fn file_read_line(command, index)
+ * \param[in] file to be read
+ * \param[in] index return this line
+ * \return string
+ */
+char *file_read_line(char *file, int index) {
+   int lines = file_open(file);
+   char *line = NULL;
+
+   if (lines >= 0) {
+      if (index <= lines) {
+         line = (char*)malloc(strlen(file_line_get(index)) + 1);
+         if (line) {
+            strcpy(line, file_line_get(index));
+         }
+      }
+      file_free();
+   }
+
+   return line;
 }

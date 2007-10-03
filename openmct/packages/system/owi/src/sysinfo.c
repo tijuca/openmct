@@ -33,6 +33,7 @@
 #include <arpa/inet.h>
 #include <sys/sysinfo.h>
 #include "includes/argument.h"
+#include "includes/file.h"
 #include "includes/language.h"
 #include "includes/template.h"
 #include "includes/variable.h"
@@ -69,161 +70,66 @@ int sysinfo_main(int argc, char **argv) {
  * Show system information
  */
 void sysinfo_list() {
-   sysinfo_general();
-   
-   printf("<table>\n"
-          "<tr><td valign=\"top\">\n");
-    
-   sysinfo_filesystems();
- 
-   printf("</td><td>&nbsp;</td><td valign=\"top\">\n");
-
-   sysinfo_network();
-
-   printf("</td></tr>\n"
-          "</table>\n");
-}
-
-/* \fn sysinfo_general()
- * Display general system information like swap, ram, uptime ...
- */
-void sysinfo_general() {
    /* System information */
    struct sysinfo si;
+   /* Hostname */
+   char *hostname = proc_read_line("/bin/hostname -f", 0);
+   /* Version */
+   char *version = file_read_line("/etc/openmct.release", 0);
+   /* OS Version */
+   char *osversion = proc_read_line("/bin/uname -a", 0);
+   /* Datum */
+   char *date = proc_read_line("date", 0);
+   /* Uptime */
+   char *uptime = proc_read_line("uptime", 0);
 
-   /* Get system information */
-   if (!sysinfo(&si)) {
-      owi_headline(1, SYSINFO_HEADLINE);
-      owi_headline(2, SYSINFO_DESCRIPTION);
-      printf("<table class=\"%s\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n"
-             "<thead>\n"
-             "<tr>\n"
-             "<th>Load (1 / 5 / 15 minute load avarage)</th>\n"
-             "<th>Memory (All / Free / Shared)</th>\n"
-             "<th>Speicher in Puffern:</t>\n"
-             "<th>Swap (All / Free):</th>\n"
-             "<th>Tasks</th>\n"
-             "</tr>\n"
-             "</thead>\n"
-             "<tr onmouseover=\"this.className='%s';\""
-             " onmouseout=\"this.className='%s';\">\n"
-             "<td>%u / %u / %u</td>\n"
-             "<td>%u MB / %u MB / %u MB</td>\n"
-             "<td>%u</td>\n"
-             "<td>%u MB / %u MB</td>\n"
-             "<td>%d</td>\n"
-             "</tr>\n"
-             "</table>\n",
-             CONTENT_TABLE_BOX_CLASS,
-             CONTENT_TABLE_CLASS_MOUSEOVER,
-             CONTENT_TABLE_CLASS_MOUSEOUT,
-             (unsigned int)si.loads[0], (unsigned int)si.loads[1],
-	     (unsigned int)si.loads[2], (unsigned int)(si.totalram / 1024 / 1024),
-             (unsigned int)(si.freeram / 1024 / 1024),
-             (unsigned int)(si.sharedram / 1024 / 1024),
-             (unsigned int)si.bufferram,
-             (unsigned int)(si.totalswap / 1024 / 1024),
-             (unsigned int)(si.freeswap / 1024 / 1024),
-             (unsigned int)si.procs);
-   }
-}
+   sysinfo(&si);
 
-/* \fn sysinfo_filesystems()
- * Display information about mounted devices (like filesystem, diskspace ...)
- */
-void sysinfo_filesystems() {
-   /* File handler */
-   FILE *fp = NULL;
-   /* Mount information */
-   char device[256], mountpoint[256], fs[256];
-
-   /* Try to open mount information file */
-   fp = fopen("/proc/mounts", "r");
-   /* Ok? */
-   if (fp) {
-      owi_headline(1, SYSINFO_FILESYSTEMS);
-      owi_headline(2, SYSINFO_FILESYSTEMS_DESCRIPTION);
-      printf("<table class=\"%s\" cellpadding=\"0\" cellspacing=\"0\" align=\"left\">\n"
-             "<thead>\n"
-             "<tr>\n"
-             "<th>Ger&auml;t</th>\n"
-             "<th>Eingeh&auml;ngt auf</th>\n"
-             "<th>Dateisystem</th>\n"
-             "</tr>\n"
-             "</thead>\n",
-             CONTENT_TABLE_BOX_CLASS);
-      /* Read until file end reached */
-      while (fscanf(fp, "%s %s %s", device, mountpoint, fs) == 3) {
-         if (strcasecmp(fs, "0")) {
-            printf("<tr onmouseover=\"this.className='%s';\""
-                      " onmouseout=\"this.className='%s';\">\n"
-                   "<td>%s</td>\n"
-                   "<td>%s</td>\n"
-                   "<td>%s</td>\n"
-                   "</tr>\n",
-                   CONTENT_TABLE_CLASS_MOUSEOVER,
-                   CONTENT_TABLE_CLASS_MOUSEOUT,
-                   device,
-                   mountpoint,
-                   fs);
-         }
-      }
-      printf("</table>\n");
-      /* Close */
-      fclose(fp);
-   }
-}
-
-/* \fn sysinfo_network()
- * Display network devices information
- */
-void sysinfo_network() {
-   /* File handler */
-   FILE *fp = NULL;
-   /* Device information */
-   char device[1024], line[1024];
-   /* Trafic information */
-   int in, out;
-
-   /* Try to open network information file */
-   fp = fopen("/proc/net/dev", "r");
-   /* Ok? */
-   if (fp) {
-      owi_headline(1, SYSINFO_NETWORK_DEVICES);
-      owi_headline(2, SYSINFO_NETWORK_DEVICES_DESCRIPTION);
-      printf("<table class=\"%s\" cellpadding=\"0\" cellspacing=\"0\" align=\"left\">\n"
-             "<thead>\n"
-             "<tr>\n"
-             "<th>Interface</th>\n"
-             "<th>In</th>\n"
-             "<th>Out</th>\n"
-             "</tr>\n"
-             "</thead>\n",
-             CONTENT_TABLE_BOX_CLASS);
-      /* Skip first line */
-      fgets(line, sizeof(line) - 1, fp);
-      /* Read while not end of file */
-      while (fgets(line, sizeof(line) - 1, fp)) {
-         /* : found? */
-         if (strchr(line, ':')) {
-            sscanf(line, "%*[ ]%[^:]:%d %*s %*s %*s %*s %*s %*s %*s %d", device, &in, &out);
-            /* printf("[%s]<>[%s]\n", device, p->ifa_name); */
-            printf("<tr onmouseover=\"this.className='%s';\""
-                   " onmouseout=\"this.className='%s';\">\n"
-                   "<td>%s</td>\n"
-                   "<td>%d MB</td>\n"
-                   "<td>%d MB</td>\n"
-                   "</tr>\n",
-                   CONTENT_TABLE_CLASS_MOUSEOVER,
-                   CONTENT_TABLE_CLASS_MOUSEOUT,
-                   device,
-                   in / 1024 / 1024,
-                   out / 1024 / 1024);
-         }
-      }
-
-      printf("</table>\n");
-       /* Close */
-      fclose(fp);
-   }
+   printf("<h4>%s</h4>\n"
+          "<table class=\"detail\">\n"
+          "<thead>\n"
+	  "<tr>\n"
+	  "<th colspan=\"2\">%s</th>\n"
+	  "</tr>\n"
+	  "</thead>\n"
+	  "<tbody>\n"
+	  "<tr>\n"
+	  "<td class=\"description\">Name</td>\n"
+	  "<td class=\"value\">%s</td>\n"
+	  "</tr>\n"
+	  "<tr>\n"
+	  "<td class=\"description\">Version</td>\n"
+	  "<td class=\"value\">%s</td>\n"
+	  "</tr>\n"
+	  "<tr>\n"
+	  "<td class=\"description\">OS Version</td>\n"
+	  "<td class=\"value\">%s</td>\n"
+	  "</tr>\n"
+	  "<tr>\n"
+	  "<td class=\"description\">Date</td>\n"
+	  "<td class=\"value\">%s</td>\n"
+	  "</tr>\n"
+	  "<tr>\n"
+	  "<td class=\"description\">Uptime</td>\n"
+	  "<td class=\"value\">%s</td>\n"
+	  "</tr>\n"
+	  "<tr>\n"
+	  "<td class=\"description\">Memory Usage</td>\n"
+	  "<td class=\"value\">%ld %%</td>\n"
+	  "</tr>\n"
+	  "<tr>\n"
+	  "<td class=\"description\">Diskspace Usage</td>\n"
+	  "<td class=\"value\">%s</td>\n"
+	  "</tr>\n"
+          "</tbody>\n"
+	  "</table>\n",
+	  SYSINFO_HEADLINE,
+	  SYSINFO_HEADLINE_BOX,
+	  hostname,
+	  version,
+	  osversion,
+	  date,
+	  uptime,
+	  (si.totalram - si.freeram) / (si.totalram * 100),
+	  "0");
 }
