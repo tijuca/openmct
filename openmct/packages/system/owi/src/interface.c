@@ -92,6 +92,7 @@ void interface_list() {
 
    /* Start form / external table / scroll area / internal table*/
    printf("<form action=\"%s\" method=\"post\">\n"
+          "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"\" />\n"
           "<table class=\"%s\">\n"
           "<tr>\n"
@@ -117,6 +118,7 @@ void interface_list() {
 	  "</thead>\n"
           "<tbody>",
           getenv("SCRIPT_NAME"),
+	  variable_get("module"),
 	  CONTENT_TABLE_CLASS,
 	  INTERFACE_HEADLINE,
 	  INTERFACE_DESCRIPTION,
@@ -158,8 +160,8 @@ void interface_list() {
                 "<td width=\"160\">%s</td>\n"
                 "<td width=\"160\">%s</td>\n"
                 "<td width=\"160\">"
-		"<input type=\"button\" onClick=\"location='%s?command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
-		"<input type=\"button\" onClick=\"location='%s?command=delete&amp;id=%s'\" value=\"%s\" />"
+		"<input type=\"button\" onClick=\"location='%s?module=%s&command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
+		"<input type=\"button\" onClick=\"location='%s?module=%s&command=delete&amp;id=%s'\" value=\"%s\" />"
 		"</td>\n"
                 "</tr>\n",
                 CONTENT_TABLE_CLASS_MOUSEOVER,
@@ -169,9 +171,11 @@ void interface_list() {
                 interface_ini[1].current ? interface_ini[1].current[1] : "",
                 interface_ini[2].current ? interface_ini[2].current[1] : "",
                 getenv("SCRIPT_NAME"),
+		variable_get("module"),
                 current_interface,
 		INTERFACE_BUTTON_MODIFY,
 		getenv("SCRIPT_NAME"),
+		variable_get("module"),
                 current_interface,
 		INTERFACE_BUTTON_DELETE);
          }
@@ -225,7 +229,7 @@ void interface_list() {
           "<table width=\"100%%\">\n"
 	  "<tr>\n"
 	  "<td colspan=\"7\" align=\"right\">\n"
-	  "<input type=\"button\" onClick=\"location='%s?command=new'\" value=\"%s\" />"
+	  "<input type=\"button\" onClick=\"location='%s?module=%s&command=new'\" value=\"%s\" />"
 	  "</td>\n"
 	  "</tr>\n"
 	  "</table>\n"
@@ -234,6 +238,7 @@ void interface_list() {
 	  "</table>\n"
           "</form>\n",
 	  getenv("SCRIPT_NAME"),
+	  variable_get("module"),
 	  INTERFACE_BUTTON_NEW);
 }
 
@@ -278,6 +283,7 @@ void interface_detail(char *interfacename) {
          if (!strcmp(current_interface, interfacename)) {
             /* Print network interface */
             printf("<form action=\"%s\" method=\"post\">\n"
+                   "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
                    "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
                    "<input type=\"hidden\" name=\"id\" value=\"%s\" />\n"
                    "<table class=\"%s\" width=\"100%%\">\n"
@@ -308,6 +314,7 @@ void interface_detail(char *interfacename) {
                    "</form>\n"
                    ,
                    getenv("SCRIPT_NAME"),
+		   variable_get("module"),
                    current_interface,
                    CONTENT_TABLE_BOX_CLASS,
                    INTERFACE_TABLE_DESCRIPTION,

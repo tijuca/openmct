@@ -89,6 +89,7 @@ void user_list() {
 
    /* Start form / external table / scroll area / internal table*/
    printf("<form action=\"%s\" method=\"post\">\n"
+          "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"\" />\n"
           "<table class=\"%s\">\n"
           "<tr>\n"
@@ -116,6 +117,7 @@ void user_list() {
 	  "</thead>\n"
           "<tbody>",
           getenv("SCRIPT_NAME"),
+	  variable_get("module"),
 	  CONTENT_TABLE_CLASS,
 	  USER_HEADLINE,
 	  USER_DESCRIPTION,
@@ -148,8 +150,8 @@ void user_list() {
                 "<td width=\"160\">%s</td>\n"
                 "<td width=\"160\">%s</td>\n"
                 "<td width=\"160\">"
-		"<input type=\"button\" onClick=\"location='%s?command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
-		"<input type=\"button\" onClick=\"location='%s?command=delete&amp;id=%s'\" value=\"%s\" />"
+		"<input type=\"button\" onClick=\"location='%s?module=%s&command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
+		"<input type=\"button\" onClick=\"location='%s?module=%s&command=delete&amp;id=%s'\" value=\"%s\" />"
 		"</td>\n"
                 "</tr>\n",
                 CONTENT_TABLE_CLASS_MOUSEOVER,
@@ -159,9 +161,11 @@ void user_list() {
                 argument_get_part(passwd, 5),
                 argument_get_part(passwd, 6),
                 getenv("SCRIPT_NAME"),
+		variable_get("module"),
                 argument_get_part(passwd, 0),
 		USER_BUTTON_MODIFY,
 		getenv("SCRIPT_NAME"),
+		variable_get("module"),
 		argument_get_part(passwd, 0),
 		USER_BUTTON_DELETE);
       }
@@ -176,7 +180,7 @@ void user_list() {
           "<table width=\"100%%\">\n"
 	  "<tr>\n"
 	  "<td colspan=\"7\" align=\"right\">\n"
-	  "<a class=\"%s\" href=\"#\" onClick=\"location='%s?command=new'\"><div class=\"%s\">%s</div></a>\n"
+	  "<a class=\"%s\" href=\"#\" onClick=\"location='%s?module=%s&command=new'\"><div class=\"%s\">%s</div></a>\n"
 	  "</td>\n"
 	  "</tr>\n"
 	  "</table>\n"
@@ -186,6 +190,7 @@ void user_list() {
           "</form>\n",
 	  CONTENT_LINK_AQUA_CLASS,
 	  getenv("SCRIPT_NAME"),
+	  variable_get("module"),
 	  CONTENT_BUTTON_AQUA_CLASS,
 	  USER_BUTTON_NEW);
 }
@@ -217,6 +222,7 @@ void user_detail(char *username) {
       /* Match found? */
       if (!strcmp(argument_get_part(passwd, 0), username)) {
          printf("<form action=\"%s\" method=\"post\">\n"
+                "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
                 "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
                 "<input type=\"hidden\" name=\"id\" value=\"%s\" />\n"
                 "<table class=\"%s\" width=\"100%%\">\n"
@@ -259,6 +265,7 @@ void user_detail(char *username) {
                 "</form>\n"
                 ,
                 getenv("SCRIPT_NAME"),
+		variable_get("module"),
                 argument_get_part(passwd, 0),
 		CONTENT_TABLE_BOX_CLASS,
                 USER_TABLE_DESCRIPTION,
@@ -431,6 +438,7 @@ void user_new() {
 	  "<h1>%s</h1>"
 	  "<br />%s<br /><br />\n"
           "<form action=\"%s\" method=\"post\">\n"
+          "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"add\" />\n"
           "<table class=\"%s\" width=\"100%%\">\n"
           "<tr>\n"
@@ -469,6 +477,7 @@ void user_new() {
 	  USER_HEADLINE,
 	  USER_NEW,
           getenv("SCRIPT_NAME"),
+	  variable_get("module"),
           CONTENT_TABLE_BOX_CLASS,
           USER_TABLE_DESCRIPTION,
           USER_TABLE_NEW_PASSWORD,

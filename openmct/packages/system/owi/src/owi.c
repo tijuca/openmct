@@ -49,8 +49,9 @@ void owi_header(char *title) {
           "<div id=\"navigation-inner\">\n"
           "<ul id=\"navigation\">\n", title);
    for (i = 0; modules[i].name != NULL; i++) {
-      printf("<li class=\"navigation %s\"><a href=\"%s\">%s</a></li>\n",
+      printf("<li class=\"navigation %s\"><a href=\"%s?module=%s\">%s</a></li>\n",
              modules[i].style,
+	     getenv("SCRIPT_NAME"),
 	     modules[i].name,
 	     modules[i].description);
    }
@@ -84,28 +85,15 @@ void owi_headline(int size, char *headline) {
 
 int main(int argc, char **argv) {
    int i;
-   char *p = strrchr(argv[0], '/');
    char *module = NULL;
-   struct rlimit rlimit;
-
-   getrlimit(RLIMIT_CORE, &rlimit);
-
-   rlimit.rlim_max = 20000;
-
-   setrlimit(RLIMIT_CORE, &rlimit);
-
-   if (p) {
-      module = p + 1;
-   } else {
-      module = argv[0];
-   }
 
    owi_request();
 
    module = variable_get("module");
 
    if (!strcmp(module, "")) {
-      module = "sysinfo.cgi";
+      variable_set("module", "sysinfo");
+      module =  variable_get("module");
    }
 
    for (i = 0; modules[i].name != NULL; i++) {

@@ -55,11 +55,13 @@ int shell_main(int argc, char **argv) {
 
    /* Print table head */
    printf("<form action=\"%s\" method=\"post\">\n"
+          "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"execute\" />\n"
           "<table class=\"%s\" width=\"100%%\">\n"
 	  "<tr>\n"
 	  "<td>\n",
           getenv("SCRIPT_NAME"),
+	  variable_get("module"),
           CONTENT_TABLE_CLASS);
 
    /* No directory set? */

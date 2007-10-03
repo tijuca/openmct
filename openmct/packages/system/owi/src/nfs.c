@@ -91,6 +91,7 @@ void nfs_list() {
 
    /* Start form / external table / scroll area / internal table*/
    printf("<form action=\"%s\" method=\"post\">\n"
+          "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"\" />\n"
           "<table class=\"%s\">\n"
           "<tr>\n"
@@ -114,6 +115,7 @@ void nfs_list() {
           "</thead>\n"
           "<tbody>",
           getenv("SCRIPT_NAME"),
+	  variable_get("module"),
           CONTENT_TABLE_CLASS,
           NFS_HEADLINE,
           NFS_DESCRIPTION,
@@ -146,8 +148,8 @@ void nfs_list() {
                    "<td width=\"80\">%s</td>\n"
                    "<td width=\"480\">%s</td>\n"
    	           "<td width=\"160\">\n"
-	           "<input type=\"button\" onClick=\"location='%s?command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
-                   "<input type=\"button\" onClick=\"location='%s?command=delete&amp;id=%s'\" value=\"%s\" />"
+	           "<input type=\"button\" onClick=\"location='%s?module=%s&command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
+                   "<input type=\"button\" onClick=\"location='%s?module=%s&command=delete&amp;id=%s'\" value=\"%s\" />"
                    "</td>\n"
                    "</tr>\n",
                    CONTENT_TABLE_CLASS_MOUSEOVER,
@@ -155,9 +157,11 @@ void nfs_list() {
                    argument_get_part(nfs, 0),
                    options,
 	           getenv("SCRIPT_NAME"),
+		   variable_get("module"),
                    argument_get_part(nfs, 0),
 	           NFS_BUTTON_MODIFY,
   	           getenv("SCRIPT_NAME"),
+		   variable_get("module"),
                    argument_get_part(nfs, 0),
   	           NFS_BUTTON_DELETE);
 	 }
@@ -177,7 +181,7 @@ void nfs_list() {
           "<table width=\"100%%\">\n"
           "<tr>\n"
           "<td colspan=\"7\" align=\"right\">\n"
-          "<input type=\"button\" onClick=\"location='%s?command=new'\" value=\"%s\" />"
+          "<input type=\"button\" onClick=\"location='%s?module=%s&command=new'\" value=\"%s\" />"
           "</td>\n"
           "</tr>\n"
           "</table>\n"
@@ -186,6 +190,7 @@ void nfs_list() {
           "</table>\n"
           "</form>\n",
           getenv("SCRIPT_NAME"),
+	  variable_get("module"),
           NFS_BUTTON_NEW);
 }
 
@@ -221,6 +226,7 @@ void nfs_detail(char *nfsname) {
          if (options) {
             /* Print data */
             printf("<form action=\"%s\" method=\"post\">\n"
+                   "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
                    "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
                    "<input type=\"hidden\" name=\"id\" value=\"%s\" />\n"
                    "<table class=\"%s\" width=\"100%%\">\n"
@@ -242,6 +248,7 @@ void nfs_detail(char *nfsname) {
                    "</form>\n"
                    ,
                    getenv("SCRIPT_NAME"),
+		   variable_get("module"),
                    argument_get_part(nfs, 0),
    	   	   CONTENT_TABLE_BOX_CLASS,
                    NFS_TABLE_DESCRIPTION,
@@ -366,6 +373,7 @@ void nfs_new() {
 	  "<h1>%s</h1>"
 	  "<br />%s<br /><br />\n"
           "<form action=\"%s\" method=\"post\">\n"
+          "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"add\" />\n"
           "<table class=\"%s\" width=\"100%%\">\n"
           "<tr>\n"
@@ -391,6 +399,7 @@ void nfs_new() {
 	  NFS_HEADLINE,
 	  NFS_NEW,
           getenv("SCRIPT_NAME"),
+	  variable_get("module"),
           CONTENT_TABLE_BOX_CLASS,
           NFS_TABLE_DESCRIPTION,
           NFS_TABLE_OPTIONS,

@@ -103,6 +103,7 @@ void ftp_list() {
           "<h1>%s</h1>\n"
           "<br />%s<br /><br />\n"
           "<form action=\"%s\" method=\"post\">\n"
+          "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
           "<table class=\"%s\" width=\"100%%\" cellspacing=\"0\" cellpading=\"0\">\n"
 	  "<thead>\n"
@@ -114,6 +115,7 @@ void ftp_list() {
           FTP_HEADLINE,
           FTP_DETAIL,
           getenv("SCRIPT_NAME"),
+	  variable_get("module"),
           CONTENT_TABLE_BOX_CLASS);
 
    /* Loop through config file */
