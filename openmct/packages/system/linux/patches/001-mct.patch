@@ -818,7 +818,9 @@ diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/basic_io.c linux-2.4.35.3
 +
 +	ret = exec_usermodehelper(reset_path, argv, envp);
 +	if (ret) {
-+		printk("kmod: failed to exec %s\n",reset_path);
++		printk(KERN_ERR
++			"kmod: failed to exec %s\n",
++			reset_path);
 +	}
 +	return ret;
 +}
