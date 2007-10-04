@@ -6,7 +6,7 @@ echo -n "Mounting Data ... "
 echo ""
 
 echo -n "Added /usr/lib directory ... "
-ldconfig -C /etc/ld.so.cache -f /etc/ld.so.conf -X /usr/lib
+/sbin/ldconfig -C /var/etc/ld.so.cache -f /var/etc/ld.so.conf -X /usr/lib
 echo ""
 
 /bin/sh /etc/rc.conf
@@ -34,10 +34,10 @@ echo ""
 # Web Server?
 if [ "$START_HTTPD" == "yes" ]; then
    echo -n "Starting Web Server ..."
-   if [ -d /usr/data/www ]; then
-      /sbin/httpd -h /usr/data/www
+   if [ -d /usr/var/www ]; then
+      /sbin/httpd -h /usr/var/www
    else
-      /sbin/httpd -h /www
+      /sbin/httpd -h /var/www
    fi
    echo ""
 fi
@@ -45,14 +45,14 @@ fi
 # checking for directorys on HD, else no login via FTP or use of Samba, NFS is possibile
 # we create the directory with '-p' option on mkdir, so every directory ahead the named directory is builded automaticly
 
-DIRECTORY="/usr/var /usr/var/empty /usr/var/log/samba /usr/var/run/samba /usr/var/lib/samba /usr/var/lib/nfs"
+DIRECTORY="/var/empty /var/log/samba /var/run/samba /var/lib/samba /var/lib/nfs"
 echo "looking up for $DIRECTORY"
 for i in $DIRECTORY; do
     test -d $i || mkdir -p $i;
 done
 
 # ok, and now checking for some files needed for NFS
-FILES="/usr/var/lib/nfs/rmtab /usr/var/lib/nfs/etab /usr/var/lib/nfs/xtab"
+FILES="/var/lib/nfs/rmtab /var/lib/nfs/etab /var/lib/nfs/xtab"
 for i in $FILES; do
     test -d $i || touch $i;
 done

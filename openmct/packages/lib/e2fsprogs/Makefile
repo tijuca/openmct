@@ -7,6 +7,10 @@ INSTALL=	$(CP) $(SRCDIR)/lib/libuuid.so.1.2 $(NEWROOTDIR)/lib && \
 		$(STRIP) $(NEWROOTDIR)/lib/libuuid.so.1.2 && \
 		$(LN) -sf libuuid.so.1.2 $(NEWROOTDIR)/lib/libuuid.so.1 && \
 		$(LN) -sf libuuid.so.1.2 $(NEWROOTDIR)/lib/libuuid.so && \
+		$(CP) $(SRCDIR)/lib/libblkid.so.1.0 $(NEWROOTDIR)/lib && \
+		$(STRIP) $(NEWROOTDIR)/lib/libblkid.so.1.0 && \
+		$(LN) -sf libblkid.so.1.0 $(NEWROOTDIR)/lib/libblkid.so.1 && \
+		$(LN) -sf libblkid.so.1.0 $(NEWROOTDIR)/lib/libblkid.so && \
 		cd $(SRCDIR) && make install-libs && cd ..
 
 include		$(OPENMCT_DEVEL_PREFIX)Rules
