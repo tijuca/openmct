@@ -29,7 +29,7 @@ config:
 			for package in $(ADDITIONALPACKAGES); do \
 			   $(ECHO) -e "\t"$$package ; \
 			done ; \
-			$(ECHO) -e "\033[1;33mDON'T FORGET TO ADD ADDITIONAL PACKAGES IN $(CONFIG)" ; \
+			$(ECHO) -e "\033[1;33mDON'T FORGET TO ADD ADDITIONAL PACKAGES IN $(CONFIG)\033[0m" ; \
 		else \
 			$(ECHO) -e "\033[1;33mCONFIGURE FAILED\033[0m" ; \
 			$(ECHO) "$(CONFIGDIR)/$(MCT) does not exist" ; \
