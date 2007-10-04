@@ -1,0 +1,21 @@
+diff -Naru nfs-utils-1.1.0/utils/mountd/cache.c nfs-utils-1.1.0-mct/utils/mountd/cache.c
+--- nfs-utils-1.1.0/utils/mountd/cache.c	2007-05-11 05:40:57.000000000 +0200
++++ nfs-utils-1.1.0-mct/utils/mountd/cache.c	2007-10-04 08:10:04.000000000 +0200
+@@ -131,17 +131,6 @@
+ 	pw = getpwuid(uid);
+ 	if (!pw)
+ 		rv = -1;
+-	else {
+-		rv = getgrouplist(pw->pw_name, pw->pw_gid, groups, &ngroups);
+-		if (rv == -1 && ngroups >= 100) {
+-			groups = malloc(sizeof(gid_t)*ngroups);
+-			if (!groups)
+-				rv = -1;
+-			else
+-				rv = getgrouplist(pw->pw_name, pw->pw_gid,
+-						  groups, &ngroups);
+-		}
+-	}
+ 	qword_printint(f, uid);
+ 	qword_printint(f, time(0)+30*60);
+ 	if (rv >= 0) {
