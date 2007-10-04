@@ -12,7 +12,7 @@ if [ "$1" != "" ]; then
 	mkdir $1/usr/home
 	mkdir $1/usr/var
 	mkdir $1/usr/vservers
+	mkdir $1/var
 	ln -s usr/home $1/home
-	ln -s usr/var $1/var
 	ln -s usr/vservers $1/vservers
 fi

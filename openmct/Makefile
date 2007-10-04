@@ -90,7 +90,7 @@ $(OUTPUTDIR):
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(OUTPUTDIR)\033[0m"
 	@$(MKDIR) $(OUTPUTDIR)
 
-$(OUTPUTDIR)/$(KERNEL):	packages/system/linux/$(SRCDIR)/$(CONFIG) $(NEWROOTDIR) $(NEWCONFDIR)
+$(OUTPUTDIR)/$(KERNEL):	packages/system/linux/$(SRCDIR)/$(CONFIG) $(NEWROOTDIR) $(NEWVARDIR)
 	@$(MAKE) -C packages/system/linux OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-build
 	@$(MAKE) -C packages/system/linux OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-install
 
@@ -112,47 +112,47 @@ else
 	fi
 endif
 
-$(NEWCONFDIR):
+$(NEWVARDIR):
 	@$(MAKE) -C packages/build/buildetc OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-all
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/$(IMAGERELEASEFILENAME)\033[0m"
 	@$(ECHO) "OpenMCT $(IMAGEVERSION) $(IMAGESUBVERSION) $(IMAGEPRODCODE)" > $(NEWROOTDIR)/etc/$(IMAGERELEASEFILENAME)
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hostname\033[0m"
-	@$(ECHO) $(IMAGETARGET) > $(NEWCONFDIR)/etc/hostname
+	@$(ECHO) $(IMAGETARGET) > $(NEWVARDIR)/etc/hostname
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/issue\033[0m"
-	@$(ECHO) "Welcome on OpenMCT $(IMAGEVERSION) - Kernel \r (\t)" > $(NEWCONFDIR)/etc/issue
+	@$(ECHO) "Welcome on OpenMCT $(IMAGEVERSION) - Kernel \r (\t)" > $(NEWVARDIR)/etc/issue
 ifdef ETH0IPADDR 
 	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth0\033[0m"
-	@$(ECHO) "auto eth0" >> $(NEWCONFDIR)/etc/network/interfaces
-	@$(ECHO) "iface eth0 inet static" >> $(NEWCONFDIR)/etc/network/interfaces
-	@$(ECHO) -e "\taddress $(ETH0IPADDR)" >> $(NEWCONFDIR)/etc/network/interfaces
+	@$(ECHO) "auto eth0" >> $(NEWVARDIR)/etc/network/interfaces
+	@$(ECHO) "iface eth0 inet static" >> $(NEWVARDIR)/etc/network/interfaces
+	@$(ECHO) -e "\taddress $(ETH0IPADDR)" >> $(NEWVARDIR)/etc/network/interfaces
 ifdef ETH0NETMASK
-	@$(ECHO) -e "\tnetmask $(ETH0NETMASK)" >> $(NEWCONFDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tnetmask $(ETH0NETMASK)" >> $(NEWVARDIR)/etc/network/interfaces
 else
-	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWCONFDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWVARDIR)/etc/network/interfaces
 endif
 ifdef ETH0DEFAULTGW
-	@$(ECHO) -e "\tgateway $(ETH0DEFAULTGW)" >> $(NEWCONFDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tgateway $(ETH0DEFAULTGW)" >> $(NEWVARDIR)/etc/network/interfaces
 endif
-	@$(ECHO) "" >> $(NEWCONFDIR)/etc/network/interfaces 
+	@$(ECHO) "" >> $(NEWVARDIR)/etc/network/interfaces 
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hosts\033[0m"
-	@$(ECHO) $(ETH0IPADDR) $(IMAGETARGET) > $(NEWCONFDIR)/etc/hosts
+	@$(ECHO) $(ETH0IPADDR) $(IMAGETARGET) > $(NEWVARDIR)/etc/hosts
 endif
 ifdef ETH1IPADDR 
 	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth1\033[0m"
-	@$(ECHO) "auto eth1" >> $(NEWCONFDIR)/etc/network/interfaces
-	@$(ECHO) "iface eth1 inet static" >> $(NEWCONFDIR)/etc/network/interfaces
-	@$(ECHO) -e "\taddress $(ETH1IPADDR)" >> $(NEWCONFDIR)/etc/network/interfaces
+	@$(ECHO) "auto eth1" >> $(NEWVARDIR)/etc/network/interfaces
+	@$(ECHO) "iface eth1 inet static" >> $(NEWVARDIR)/etc/network/interfaces
+	@$(ECHO) -e "\taddress $(ETH1IPADDR)" >> $(NEWVARDIR)/etc/network/interfaces
 ifdef ETH1NETMASK
-	@$(ECHO) -e "\tnetmask $(ETH1NETMASK)" >> $(NEWCONFDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tnetmask $(ETH1NETMASK)" >> $(NEWVARDIR)/etc/network/interfaces
 else
-	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWCONFDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWVARDIR)/etc/network/interfaces
 endif
 ifdef ETH1DEFAULTGW
-	@$(ECHO) -e "\tgateway $(ETH1DEFAULTGW)" >> $(NEWCONFDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tgateway $(ETH1DEFAULTGW)" >> $(NEWVARDIR)/etc/network/interfaces
 endif
-	@$(ECHO) "" >> $(NEWCONFDIR)/etc/network/interfaces 
+	@$(ECHO) "" >> $(NEWVARDIR)/etc/network/interfaces 
 endif
-	@$(CP) $(NEWCONFDIR)/etc/network/interfaces $(NEWROOTDIR)/etc/default/interfaces
+	@$(CP) $(NEWVARDIR)/etc/network/interfaces $(NEWROOTDIR)/etc/default/interfaces
 
 $(OUTPUTDIR)/$(ROOT):
 	@$(ECHO) -e "\033[1;33mREMOVE .svn FROM $(NEWROOTDIR)" 
@@ -160,12 +160,11 @@ $(OUTPUTDIR)/$(ROOT):
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"
 	$(OUTPUTDIR)/$(MKSQUASHFS) $(NEWROOTDIR) $(OUTPUTDIR)/$(ROOT) $(ROOTOPTS)
 
-$(OUTPUTDIR)/$(ETC):	
-	@$(ECHO) -e "\033[1;33mREMOVE .svn FROM $(NEWCONFDIR)" 
-	@$(REMOVESVN) $(NEWCONFDIR)
-	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ETC)\033[0m"
-	@$(MKFSJFFS2) -d $(NEWCONFDIR) -o $(OUTPUTDIR)/$(ETC) $(ETCOPTS)
-
+$(OUTPUTDIR)/$(VAR):	
+	@$(ECHO) -e "\033[1;33mREMOVE .svn FROM $(NEWVARDIR)" 
+	@$(REMOVESVN) $(NEWVARDIR)
+	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(VAR)\033[0m"
+	@$(MKFSJFFS2) -d $(NEWVARDIR) -o $(OUTPUTDIR)/$(VAR)
 
 $(IMAGEFILENAME):	$(OUTPUTDIR)/$(MCT_MODIFY) $(OUTPUTDIR)/$(MKSQUASHFS) $(OUTPUTDIR)/$(KERNEL) pkg $(OUTPUTDIR)/$(ROOT) $(OUTPUTDIR)/$(ETC)
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(IMAGEFILENAME)\033[0m"

@@ -7,7 +7,6 @@ MAKEARGS=	BUILD_DIR=$(OUTPUTDIR)
 INSTALL=	if [ ! -d $(NEWROOTDIR) ]; then \
 			$(CP) -a $(ROOTDIR) $(NEWROOTDIR) ; \
 			$(CLEANUPROOT) $(NEWROOTDIR) ; \
-			$(LN) -s ../etc/var $(NEWROOTDIR)/var ; \
 		fi
 
 UNINSTALL=	if [ ! -d $(NEWROOTDIR) ]; then \
