@@ -4,6 +4,8 @@
 
 # Base packages
 BASEPACKAGES=	packages/base/busybox \
+		packages/lib/e2fsprogs \
+		packages/net/dropbear \
 		packages/net/nfsutils \
 		packages/net/tcpwrapper \
 		packages/net/portmap \
