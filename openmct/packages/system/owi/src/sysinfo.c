@@ -57,6 +57,8 @@ int sysinfo_main(int argc, char **argv) {
    if (!command || !strcmp(command, "")) {
       /* Just print user list */
       sysinfo_list();
+   } else if (!strcmp(command, "process")) {
+      sysinfo_process();
    }
 
    /* Print footer information */
@@ -132,4 +134,34 @@ void sysinfo_list() {
 	  uptime,
 	  (si.totalram - si.freeram) / (si.totalram * 100),
 	  "0");
+}
+
+/* \fn sysinfo_process()
+ * Show process
+ */
+void sysinfo_process() {
+   int i = 0;
+
+   printf("<h3>%s</h3>\n"
+          "<table class=\"box\">\n"
+	  "<tr>\n"
+	  "<td>\n"
+	  "<pre>\n",
+	  SYSINFO_PROCESS_HEADLINE);
+
+   /* Execute command now */
+   proc_open("/bin/ps");
+   /* Loop through results */
+   for (i = 0; i < file_line_counter; i++) {
+      printf("%s\n", file_line_get(i));
+   }
+   file_free();
+
+   printf("</pre>\n"
+	  "</td>\n"
+	  "</tr>\n"
+	  "</table>\n");
+
+
+   
 }

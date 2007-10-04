@@ -88,42 +88,26 @@ void group_list() {
    char *search = variable_get("search");
 
    /* Start form / external table / scroll area / internal table*/
-   printf("<form action=\"%s\" method=\"post\">\n"
+   printf("<h3>%s</h3>\n"
+          "<form action=\"%s\" method=\"post\">\n"
           "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"\" />\n"
-          "<table class=\"%s\">\n"
+          "<table class=\"outside\">\n"
           "<tr>\n"
           "<td>\n"
-          "<h1>%s</h1>\n"
-          "<br />%s<br /><br />\n"
-          "<table width=\"100%%\">\n"
-          "<tr>\n"
-          "<td align=\"right\">"
-          "<div class=\"searchbar\">\n"
-          "<input class=\"searchbox\" type=\"text\" name=\"search\" value=\"%s\" /><a href=\"#\" onclick=\"javascript:document.forms[0].reset()\" class=\"searchreset\" title=\"L&ouml;schen\"><img src=\"images/reset.gif\" id=\"searchreset\" border=\"0\" alt=\"\" /></a>\n"
-          "</div>\n"
-          "</td>\n"
-          "</tr>\n"
-          "</table>\n"
-          "<table class=\"%s\" cellpadding=\"0\" cellspacing=\"0\">\n"
+          "<table class=\"list\">\n"
           "<thead>\n"
           "<tr>\n"
-          "<th>%s</th>\n"
           "<th>%s</th>\n"
           "<th>%s</th>\n"
           "<th>%s</th>\n"
           "</tr>\n"
           "</thead>\n"
           "<tbody>",
+          GROUP_HEADLINE,
           getenv("SCRIPT_NAME"),
 	  variable_get("module"),
-          CONTENT_TABLE_CLASS,
-          GROUP_HEADLINE,
-          GROUP_DESCRIPTION,
-          variable_get("search"),
-          CONTENT_TABLE_LIST_CLASS,
           GROUP_TABLE_DESCRIPTION,
-          GROUP_TABLE_GID,
           GROUP_TABLE_MEMBERS,
           GROUP_TABLE_ACTION);
    /* Loop through all user entries in group file */
@@ -135,23 +119,20 @@ void group_list() {
            (strstr(argument_get_part(group, 0), search) ||
             strstr(argument_get_part(group, 1), search)))) {
          /* Print entry */
-         printf("<tr onmouseover=\"this.style.backgroundColor='%s';\""
-                     " onmouseout=\"this.style.backgroundColor='%s';\">\n"
-                "<td>%s</td>\n"
-                "<td>%s</td>\n"
-                "<td>%s</td>\n"
-                "<td><input type=\"button\" onClick=\"location='%s?module=%s&command=detail&id=%s'\" value=\"%s\" />&nbsp;<input type=\"button\" onClick=\"location='%s?command=delete&id=%s'\" value=\"%s\" /></td>\n"
+         printf("<tr onmouseover=\"this.className='mover';\""
+                     " onmouseout=\"this.className='mout';\">\n"
+                "<td width=\"200\">%s</td>\n"
+                "<td width=\"212\">%s</td>\n"
+                "<td width=\"100\"><input type=\"button\" onClick=\"location='%s?module=%s&command=detail&id=%s'\" value=\"%s\" />&nbsp;<input type=\"button\" onClick=\"location='%s?module=%s&amp;command=delete&amp;id=%s'\" value=\"%s\" /></td>\n"
                 "</tr>\n",
-                CONTENT_TABLE_CLASS_MOUSEOVER,
-                CONTENT_TABLE_CLASS_MOUSEOUT,
                 argument_get_part(group, 0),
-                argument_get_part(group, 2),
                 argument_get_part(group, 3),
                 getenv("SCRIPT_NAME"),
 		variable_get("module"),
                 argument_get_part(group, 0),
                 GROUP_BUTTON_MODIFY,
 		getenv("SCRIPT_NAME"),
+		variable_get("module"),
                 argument_get_part(group, 0),
                 GROUP_BUTTON_DELETE);
       }
@@ -166,7 +147,7 @@ void group_list() {
           "<table width=\"100%%\">\n"
           "<tr>\n"
           "<td colspan=\"7\" align=\"right\">\n"
-	  "<a class=\"%s\" href=\"#\" onClick=\"location='%s?module=%s&command=new'\"><div class=\"%s\">%s</div></a>\n"
+	  "<input type=\"button\" onClick=\"location='%s?module=%s&command=new'\" value=\"%s\" />\n"
           "</td>\n"
           "</tr>\n"
           "</table>\n"
@@ -174,10 +155,8 @@ void group_list() {
           "</tr>\n"
           "</table>\n"
           "</form>\n",
-	  CONTENT_LINK_AQUA_CLASS,
           getenv("SCRIPT_NAME"),
 	  variable_get("module"),
-	  CONTENT_BUTTON_AQUA_CLASS,
           GROUP_BUTTON_NEW);
 }
 
@@ -191,14 +170,8 @@ void group_detail(char *groupname) {
    int group_found = 0;
 
    /* Print external table for design */
-   printf("<table class=\"%s\">\n"
-          "<tr>\n"
-          "<td>\n"
-          "<h1>%s</h1>\n"
-          "<br />%s<br /><br />\n",
-          CONTENT_TABLE_CLASS,
-          GROUP_HEADLINE,
-          GROUP_DETAIL);
+   printf("<h3>%s</h3>\n",
+          GROUP_HEADLINE);
 
    /* Loop through passwd database */
    while ( i < file_line_counter) {
@@ -210,19 +183,10 @@ void group_detail(char *groupname) {
                 "<input type=\"hidden\" name=\"module\" value=\"%s\">\n"
                 "<input type=\"hidden\" name=\"command\" value=\"update\">\n"
                 "<input type=\"hidden\" name=\"id\" value=\"%s\">\n"
-                "<table class=\"%s\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\">\n"
+                "<table class=\"detail\">\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
                 "<td>%s</td>\n"
-                "</tr>\n"
-                "<tr>\n"
-                "<td>%s</td>\n"
-                "<td><input type=\"group_password\" /></td>\n"
-                "</tr>\n"
-                "<tr>\n"
-                "<td>%s</td>\n"
-                "<td>%s</td>\n"
-                "</tr>\n"
                 "<tr>\n"
                 "<td>%s</td>\n"
                 "<td><input type=\"text\" name=\"members\" value=\"%s\" /></td>\n"
@@ -231,7 +195,7 @@ void group_detail(char *groupname) {
                 "<table width=\"100%%\">\n"
                 "<tr>\n"
                 "<td colspan=\"2\" align=\"right\">\n"
-	        "<a class=\"%s\" href=\"#\" onClick=\"javascript:document.forms[0].submit()\"><div class=\"%s\">%s</div></a>\n"
+	        "<input type=\"button\" onClick=\"javascript:document.forms[0].submit()\" value=\"%s\" />\n"
                 "</td>\n"
                 "</table>\n"
                 "</form>\n"
@@ -239,16 +203,10 @@ void group_detail(char *groupname) {
                 getenv("SCRIPT_NAME"),
 		variable_get("module"),
                 argument_get_part(group, 0),
-		CONTENT_TABLE_BOX_CLASS,
                 GROUP_TABLE_DESCRIPTION,
                 argument_get_part(group, 0),
-                GROUP_TABLE_NEW_PASSWORD,
-                GROUP_TABLE_GID,
-                argument_get_part(group, 2),
                 GROUP_TABLE_MEMBERS,
                 argument_get_part(group, 3),
-		CONTENT_LINK_AQUA_CLASS,
-		CONTENT_BUTTON_AQUA_CLASS,
 		GROUP_BUTTON_UPDATE);
 
 
@@ -264,7 +222,7 @@ void group_detail(char *groupname) {
    /* No user found? */
    if (!group_found) {
       /* Print information screen */
-      owi_headline(2, "Group not found");
+      owi_headline(2, GROUP_NOT_FOUND);
    }
 
    /* Close external table */
@@ -303,8 +261,8 @@ void group_update(char *groupname, char *members) {
    /* Save result in user file */
    file_save(GROUP_FILE);
 
-   /* Display group */
-   group_detail(groupname);
+   /* Display group list */
+   group_list();
 }
 
 /* \fn group_delete(username)
@@ -331,7 +289,7 @@ void group_delete(char *groupname) {
    /* Save result in user file */
    file_save(GROUP_FILE);
 
-   /* Display user */
+   /* Display group list */
    group_list();
 }
 
@@ -393,48 +351,36 @@ void group_add(char *groupname) {
  */
 void group_new() {
    /* Print external table for design */
-   printf("<table class=\"%s\">\n"
+   printf("<h3>%s</h3>\n"
+          "<table class=\"outside\">\n"
           "<tr>\n"
           "<td>\n"
-	  "<h1>%s</h1>"
-	  "<br />%s<br /><br />\n"
           "<form action=\"%s\" method=\"post\">\n"
           "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"add\" />\n"
-          "<table class=\"%s\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\">\n"
+          "<table class=\"detail\">\n"
           "<tr>\n"
-          "<td width=\"250\">%s</td>\n"
-          "<td><input type=\"text\" name=\"id\" /></td>\n"
+          "<td class=\"description\">%s</td>\n"
+          "<td class=\"value\"><input type=\"text\" name=\"id\" /></td>\n"
           "</tr>\n"
           "<tr>\n"
-          "<td>%s</td>\n"
-          "<td><input type=\"password\" /></td>\n"
+          "<td class=\"description\">%s</td>\n"
+          "<td class=\"value\"><input type=\"text\" name=\"members\" /></td>\n"
           "</tr>\n"
           "<tr>\n"
-          "<td>%s</td>\n"
-          "<td><input type=\"text\" name=\"members\" /></td>\n"
-          "</tr>\n"
-          "</table>\n"
-          "<table width=\"100%%\">\n"
-          "<tr>\n"
-          "<td colspan=\"2\" align=\"right\">\n"
-	  "<a class=\"%s\" href=\"#\" onClick=\"javascript:document.forms[0].submit()\"><div class=\"%s\">%s</div></a>\n"
+          "<td></td>\n"
+	  "<td>\n"
+	  "<input type=\"button\" onClick=\"javascript:document.forms[0].submit()\" value=\"%s\" />\n"
           "</td>\n"
           "</table>\n"
           "</form>\n"
           "</td>\n"
           "</tr>\n"
           "</table>\n",
-          CONTENT_TABLE_CLASS,
 	  GROUP_HEADLINE,
-	  GROUP_NEW,
           getenv("SCRIPT_NAME"),
 	  variable_get("module"),
-          CONTENT_TABLE_BOX_CLASS,
           GROUP_TABLE_DESCRIPTION,
-          GROUP_TABLE_NEW_PASSWORD,
           GROUP_TABLE_MEMBERS,
-          CONTENT_LINK_AQUA_CLASS,
-          CONTENT_BUTTON_AQUA_CLASS,
           GROUP_BUTTON_ADD);
 }

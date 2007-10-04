@@ -88,39 +88,27 @@ void user_list() {
    int i = 0;
 
    /* Start form / external table / scroll area / internal table*/
-   printf("<form action=\"%s\" method=\"post\">\n"
+   printf("<h3>%s</h3>\n"
+          "<form action=\"%s\" method=\"post\">\n"
           "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"\" />\n"
-          "<table class=\"%s\">\n"
-          "<tr>\n"
+	  "<table class=\"outside\">\n"
+	  "<tr>\n"
 	  "<td>\n"
-	  "<h1>%s</h1>\n"
-          "<br />%s<br /><br />\n"
-          "<table width=\"100%%\">\n"
-          "<tr>\n"
-	  "<td align=\"right\">"
-          "<div class=\"searchbar\">\n"
-          "<input class=\"searchbox\" type=\"text\" name=\"search\" value=\"%s\" /><a href=\"#\" onclick=\"javascript:document.forms[0].reset()\" class=\"searchreset\" title=\"L&ouml;schen\"><img src=\"images/reset.gif\" id=\"searchreset\" border=\"0\" alt=\"\" /></a>\n"
-          "</div>\n"
-	  "</td>\n"
-	  "</tr>\n"
-	  "</table>\n"
-          "<table class=\"%s\" cellpadding=\"0\" cellspacing=\"0\">\n"
+          "<table class=\"list\">\n"
           "<thead>\n"
           "<tr>\n"
+          "<th>%s</th>\n"
           "<th>%s</th>\n"
           "<th>%s</th>\n"
           "</tr>\n"
 	  "</thead>\n"
           "<tbody>",
+	  USER_HEADLINE,
           getenv("SCRIPT_NAME"),
 	  variable_get("module"),
-	  CONTENT_TABLE_CLASS,
-	  USER_HEADLINE,
-	  USER_DESCRIPTION,
-	  variable_get("search"),
-	  CONTENT_TABLE_LIST_CLASS,
           USER_TABLE_DESCRIPTION,
+          USER_TABLE_GECOS,
           USER_TABLE_ACTION);
 
    /* Start at first password entry */
@@ -137,17 +125,17 @@ void user_list() {
             strstr(argument_get_part(passwd, 4), search) ||
             strstr(argument_get_part(passwd, 5), search)))) {
          /* Print entry */
-         printf("<tr onmouseover=\"this.className='%s';\""
-                " onmouseout=\"this.className='%s';\">\n"
-                "<td width=\"80\">%s</td>\n"
-                "<td width=\"160\">"
-		"<input type=\"button\" onClick=\"location='%s?module=%s&command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
-		"<input type=\"button\" onClick=\"location='%s?module=%s&command=delete&amp;id=%s'\" value=\"%s\" />"
+         printf("<tr onmouseover=\"this.className='mover';\""
+                " onmouseout=\"this.className='mout';\">\n"
+                "<td width=\"200\">%s</td>\n"
+                "<td width=\"212\">%s</td>\n"
+                "<td width=\"100\">"
+		"<input type=\"button\" onClick=\"location='%s?module=%s&amp;command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
+		"<input type=\"button\" onClick=\"location='%s?module=%s&amp;command=delete&amp;id=%s'\" value=\"%s\" />"
 		"</td>\n"
                 "</tr>\n",
-                CONTENT_TABLE_CLASS_MOUSEOVER,
-                CONTENT_TABLE_CLASS_MOUSEOUT,
                 argument_get_part(passwd, 0),
+                argument_get_part(passwd, 4),
                 getenv("SCRIPT_NAME"),
 		variable_get("module"),
                 argument_get_part(passwd, 0),
@@ -168,18 +156,16 @@ void user_list() {
           "<table width=\"100%%\">\n"
 	  "<tr>\n"
 	  "<td colspan=\"7\" align=\"right\">\n"
-	  "<a class=\"%s\" href=\"#\" onClick=\"location='%s?module=%s&command=new'\"><div class=\"%s\">%s</div></a>\n"
+	  "<input type=\"button\" onClick=\"location='%s?module=%s&amp;command=new'\" value=\"%s\" />\n"
 	  "</td>\n"
 	  "</tr>\n"
 	  "</table>\n"
-          "</td>\n"
-          "</tr>\n"
+	  "</td>\n"
+	  "</tr>\n"
 	  "</table>\n"
           "</form>\n",
-	  CONTENT_LINK_AQUA_CLASS,
 	  getenv("SCRIPT_NAME"),
 	  variable_get("module"),
-	  CONTENT_BUTTON_AQUA_CLASS,
 	  USER_BUTTON_NEW);
 }
 
@@ -194,14 +180,11 @@ void user_detail(char *username) {
    int i = 0;
 
    /* Print external table for design */
-   printf("<table class=\"%s\">\n"
-          "<tr>\n"
-          "<td>\n"
-	  "<h1>%s</h1>\n"
-	  "<br />%s<br /><br />\n",
-          CONTENT_TABLE_CLASS,
-	  USER_HEADLINE,
-	  USER_DETAIL);
+   printf("<h3>%s</h3>\n"
+          "<table class=\"outside\">\n"
+	  "<tr>\n"
+	  "<td>\n",
+	  USER_HEADLINE);
 
    /* Loop through all user entries in /etc/passwd */
    while ( i < file_line_counter) {
@@ -213,40 +196,27 @@ void user_detail(char *username) {
                 "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
                 "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
                 "<input type=\"hidden\" name=\"id\" value=\"%s\" />\n"
-                "<table class=\"%s\" width=\"100%%\">\n"
+                "<table class=\"detail\">\n"
                 "<tr>\n"
-                "<td width=\"250\">%s</td>\n"
-                "<td>%s</td>\n"
+                "<td width=\"200\" class=\"description\">%s</td>\n"
+                "<td width=\"312\" class=\"value\">%s</td>\n"
                 "</tr>\n"
                 "<tr>\n"
-                "<td>%s</td>\n"
-                "<td><input type=\"password\" /></td>\n"
+                "<td class=\"description\">%s</td>\n"
+                "<td class=\"value\"><input type=\"password\" name=\"password\" /><br />%s</td>\n"
                 "</tr>\n"
                 "<tr>\n"
-                "<td>%s</td>\n"
-                "<td>%s</td>\n"
+                "<td class=\"description\">%s</td>\n"
+                "<td class=\"value\"><input type=\"text\" name=\"gecos\" value=\"%s\" /><br />%s</td>\n"
                 "</tr>\n"
                 "<tr>\n"
-                "<td>%s</td>\n"
-                "<td>%s</td>\n"
+                "<td class=\"description\">%s</td>\n"
+                "<td class=\"value\"><input type=\"checkbox\" name=\"shell\" value=\"y\" %s /><br />%s</td>\n"
                 "</tr>\n"
                 "<tr>\n"
-                "<td>%s</td>\n"
-                "<td><input type=\"text\" name=\"gecos\" value=\"%s\" /></td>\n"
-                "</tr>\n"
-                "<tr>\n"
-                "<td>%s</td>\n"
-                "<td><input type=\"text\" name=\"directory\" value=\"%s\" /></td>\n"
-                "</tr>\n"
-                "<tr>\n"
-                "<td>%s</td>\n"
-                "<td><input type=\"text\" name=\"shell\" value=\"%s\" /></td>\n"
-                "</tr>\n"
-                "</table>\n"
-                "<table width=\"100%%\">\n"
-                "<tr>\n"
-                "<td colspan=\"2\" align=\"right\">\n"
-                "<a href=\"#\" onClick=\"javascript:document.forms[0].submit()\" class=\"%s\"><div class=\"%s\">%s</div></a>\n"
+                "<td></td>\n"
+		"<td>\n"
+                "<input type=\"button\" onClick=\"javascript:document.forms[0].submit()\" value=\"%s\" />\n"
                 "</td>\n"
 	        "</tr>\n"
                 "</table>\n"
@@ -255,22 +225,16 @@ void user_detail(char *username) {
                 getenv("SCRIPT_NAME"),
 		variable_get("module"),
                 argument_get_part(passwd, 0),
-		CONTENT_TABLE_BOX_CLASS,
                 USER_TABLE_DESCRIPTION,
                 argument_get_part(passwd, 0),
                 USER_TABLE_NEW_PASSWORD,
-                USER_TABLE_UID,
-                argument_get_part(passwd, 2),
-                USER_TABLE_GID,
-                argument_get_part(passwd, 3),
+	        USER_PASSWORD_DESCRIPTION,
                 USER_TABLE_GECOS,
                 argument_get_part(passwd, 4),
-                USER_TABLE_DIRECTORY,
-                argument_get_part(passwd, 5),
+	        USER_GECOS_DESCRIPTION,
                 USER_TABLE_SHELL,
-                argument_get_part(passwd, 6),
-		CONTENT_LINK_AQUA_CLASS,
-		CONTENT_BUTTON_AQUA_CLASS,
+                strcmp(argument_get_part(passwd, 6), USER_SHELL_FALSE) == 0 ? "" : "checked",              
+                USER_SHELL_DESCRIPTION,
 		USER_BUTTON_UPDATE);
 
 
@@ -289,7 +253,6 @@ void user_detail(char *username) {
       owi_headline(2, USER_NOT_FOUND);
    }
 
-   /* Close external table */
    printf("</td>\n"
           "</tr>\n"
 	  "</table>\n");
@@ -316,9 +279,9 @@ void user_update(char *username) {
                           crypt(variable_get("password"), "OM"),
                           argument_get_part(passwd, 2),
                           argument_get_part(passwd, 3),
-                          variable_ltrim(variable_filter(variable_get("gecos"), ":")),
-                          variable_ltrim(variable_filter(variable_get("directory"), ":")),
-                          variable_ltrim(variable_filter(variable_get("shell"), ":")));
+			  variable_get("gecos"),
+			  argument_get_part(passwd, 5),
+			  argument_get_part(passwd, 6));
       }
       /* Free passwd entry */
       argument_free(passwd);
@@ -327,8 +290,8 @@ void user_update(char *username) {
    /* Save result in user file */
    file_save(USER_FILE);
 
-   /* Display user */
-   user_detail(username);
+   /* Display user list */
+   user_list();
 }
 
 /* \fn user_add(username)
@@ -371,20 +334,23 @@ void user_add(char *username) {
    if (!found) {
       /* Add new passwd line in memory */
       file_line_action(FILE_LINE_ADD, i,
-                       "%s:%s:%d:%d:%s:%s:%s",
+                       "%s:%s:%d:%d:%s:/home/%s:%s",
                        variable_ltrim(variable_filter(username, ":")),
                        crypt(variable_get("password"), "OM"),
                        start_uid,
                        start_uid,
                        variable_ltrim(variable_filter(variable_get("gecos"), ":")),
-                       variable_ltrim(variable_filter(variable_get("directory"), ":")),
-                       variable_ltrim(variable_filter(variable_get("shell"), ":")));
+		       variable_ltrim(variable_filter(username, ":")),
+		       strcmp(variable_get("shell"), "y") == 0 ? USER_SHELL_DEFAULT : USER_SHELL_FALSE);
       /* Save result in user file */
       file_save(USER_FILE);
+      /* Display user list */
+      user_list();
+   } else {
+      variable_set("error", USER_ALREADY_EXISTS);
+      /* Display user add page with error */
+      user_new();
    }
-
-   /* Display new user*/
-   user_detail(username);
 }
 
 /* \fn user_delete(username)
@@ -411,7 +377,7 @@ void user_delete(char *username) {
    /* Save result in user file */
    file_save(USER_FILE);
 
-   /* Display user */
+   /* Display user list */
    user_list();
 }
 
@@ -420,59 +386,58 @@ void user_delete(char *username) {
  */
 void user_new() {
    /* Print external table for design */
-   printf("<table class=\"%s\">\n"
-          "<tr>\n"
-          "<td>\n"
-	  "<h1>%s</h1>"
-	  "<br />%s<br /><br />\n"
-          "<form action=\"%s\" method=\"post\">\n"
+   printf("<h3>%s</h3>",
+          USER_HEADLINE);
+
+   if (strcmp(variable_get("error"), "")) {	  
+      printf("<div class=\"error\">%s</div>\n",
+             variable_get("error"));
+   }	     
+	  
+   printf("<form action=\"%s\" method=\"post\">\n"
           "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"add\" />\n"
-          "<table class=\"%s\" width=\"100%%\">\n"
+	  "<table class=\"outside\">\n"
+	  "<tr>\n"
+	  "<td>\n"
+          "<table class=\"detail\">\n"
           "<tr>\n"
-          "<td width=\"250\">%s</td>\n"
-          "<td><input type=\"text\" name=\"id\" /></td>\n"
+          "<td class=\"description\">%s</td>\n"
+          "<td class=\"value\"><input type=\"text\" name=\"id\" value=\"%s\" /><br />%s</td>\n"
           "</tr>\n"
           "<tr>\n"
-          "<td>%s</td>\n"
-          "<td><input type=\"password\" /></td>\n"
+          "<td class=\"description\">%s</td>\n"
+          "<td class=\"value\"><input type=\"password\" name=\"password\" value=\"%s\" /><br />%s</td>\n"
           "</tr>\n"
           "<tr>\n"
-          "<td>%s</td>\n"
-          "<td><input type=\"text\" name=\"gecos\" /></td>\n"
+          "<td class=\"description\">%s</td>\n"
+          "<td class=\"value\"><input type=\"text\" name=\"gecos\" value=\"%s\" /><br />%s</td>\n"
           "</tr>\n"
           "<tr>\n"
-          "<td>%s</td>\n"
-          "<td><input type=\"text\" name=\"directory\" /></td>\n"
+          "<td class=\"description\">%s</td>\n"
+          "<td class=\"value\"><input type=\"checkbox\" name=\"shell\" value=\"y\" %s /><br />%s</td>\n"
           "</tr>\n"
           "<tr>\n"
-          "<td>%s</td>\n"
-          "<td><input type=\"text\" name=\"shell\" /></td>\n"
-          "</tr>\n"
-          "</table>\n"
-          "<table width=\"100%%\">\n"
-          "<tr>\n"
-          "<td colspan=\"2\" align=\"right\">\n"
-          "<a href=\"#\" onClick=\"javascript:document.forms[0].submit()\" class=\"%s\"><div class=\"%s\">%s</div></a>\n"
+          "<td></td>\n"
+	  "<td>\n"
+          "<input type=\"button\" onClick=\"javascript:document.forms[0].submit()\" value=\"%s\" />\n"
           "</td>\n"
 	  "</tr>\n"
           "</table>\n"
-          "</form>\n"
-          "</td>\n"
-          "</tr>\n"
-          "</table>\n",
-          CONTENT_TABLE_CLASS,
-	  USER_HEADLINE,
-	  USER_NEW,
+          "</form>\n",
           getenv("SCRIPT_NAME"),
 	  variable_get("module"),
-          CONTENT_TABLE_BOX_CLASS,
           USER_TABLE_DESCRIPTION,
+	  variable_get("id"),
+	  USER_LOGIN_DESCRIPTION,
           USER_TABLE_NEW_PASSWORD,
+	  variable_get("password"),
+	  USER_PASSWORD_DESCRIPTION,
           USER_TABLE_GECOS,
-          USER_TABLE_DIRECTORY,
-          USER_TABLE_SHELL,
-          CONTENT_LINK_AQUA_CLASS,
-          CONTENT_BUTTON_AQUA_CLASS,
+	  variable_get("gecos"),
+	  USER_GECOS_DESCRIPTION,
+	  USER_TABLE_SHELL,
+	  strcmp(variable_get("shell"), "y") == 0 ? "checked" : "",
+	  USER_SHELL_DESCRIPTION,
           USER_BUTTON_ADD);
 }

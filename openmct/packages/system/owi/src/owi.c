@@ -33,6 +33,7 @@
 void owi_header(char *title) {
    /* Loop counter */
    int i = 0;
+   int j = 0;
 
    printf("Content-Type: text/html\n\n");
    fflush(stdout);
@@ -57,6 +58,9 @@ void owi_header(char *title) {
 	  title);
    for (i = 0; modules[i].description != NULL; i++) {
       printf("<tr><td>\n");
+      for (j = 0; j < modules[i].level * 5; j++) {
+         printf("&nbsp;");
+      }
       if (modules[i].main) {
          printf("<a href=\"%s?module=%s\">%s</a>\n",
                 getenv("SCRIPT_NAME"),
@@ -101,7 +105,7 @@ int main(int argc, char **argv) {
    module = variable_get("module");
 
    if (!strcmp(module, "")) {
-      variable_set("module", "sysinfo");
+      variable_set("module", "user");
       module =  variable_get("module");
    }
 

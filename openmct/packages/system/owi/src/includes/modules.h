@@ -15,6 +15,7 @@ struct modules_t {
    char *description;
    int  level;
 } modules[] = {
+/*
    { "system", NULL, SYSINFO_NAV_SYSTEM, 0 },
    { "sysinfo", sysinfo_main, SYSINFO_NAV_DESCRIPTION, 1},
    { "interface", interface_main, INTERFACE_NAV_DESCRIPTION, 1 },
@@ -24,6 +25,12 @@ struct modules_t {
    { "group", group_main, GROUP_NAV_DESCRIPTION, 1 },
 #ifdef SECURITY
    { "shell", shell_main, SHELL_NAV_DESCRIPTION, 1 },
-#endif   
+#endif   */
+   { "access", NULL, ACCESS_NAV_DESCRIPTION, 0 },
+   { "user", user_main, USER_NAV_DESCRIPTION, 1 },
+   { "group", group_main, GROUP_NAV_DESCRIPTION, 1 },
+   { "status", NULL, STATUS_NAV_DESCRIPTION, 0 },
+   { "system", sysinfo_main, SYSTEM_NAV_DESCRIPTION, 1 },
+   { "system&amp;command=process", sysinfo_main, PROCESS_NAV_DESCRIPTION, 1 },
    { NULL, NULL, NULL, 0 }
 };
