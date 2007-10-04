@@ -18,7 +18,18 @@ config:
 		if [ -f $(CONFIGDIR)/$(MCT) ]; then \
 			$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32mOpenMCT\033[0m" ; \
 			$(CP) $(CONFIGDIR)/$(MCT) $(CONFIG) ; \
-			$(MKDIR) $(OUTPUTDIR) ; \
+			if [ ! -d $(OUTPUTDIR) ]; then \
+			   $(MKDIR) $(OUTPUTDIR) ; \
+			fi ; \
+			$(ECHO) -e "\033[1;33mBASE PACKAGES:\033[0m" ; \
+			for package in $(BASEPACKAGES); do \
+			   $(ECHO) -e "\t"$$package ; \
+			done ; \
+			$(ECHO) -e "\033[1;33mADDITIONAL PACKAGES:\033[0m" ; \
+			for package in $(ADDITIONALPACKAGES); do \
+			   $(ECHO) -e "\t"$$package ; \
+			done ; \
+			$(ECHO) -e "\033[1;33mDON'T FORGET TO ADD ADDITIONAL PACKAGES IN $(CONFIG)" ; \
 		else \
 			$(ECHO) -e "\033[1;33mCONFIGURE FAILED\033[0m" ; \
 			$(ECHO) "$(CONFIGDIR)/$(MCT) does not exist" ; \
@@ -66,13 +77,16 @@ endif
 	@$(shell if [ -f $(CONFIG) ]; then rm -rf $(CONFIG); fi)
 
 pkg:
-	@$(foreach package,$(IMAGEPACKAGES),$(MAKE) -C $(package) OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ do-all ; )
+	@$(foreach package,$(BASEPACKAGES),$(MAKE) -C $(package) OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ do-all ; )
+	@$(foreach package,$(ADDITIONALPACKAGES),$(MAKE) -C $(package) OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ do-all ; )
 
 pkgclean:
-	@$(foreach package,$(IMAGEPACKAGES),$(MAKE) -C $(package) OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ do-clean ; )
+	@$(foreach package,$(BASEPACKAGES),$(MAKE) -C $(package) OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ do-clean ; )
+	@$(foreach package,$(ADDITIONALPACKAGES),$(MAKE) -C $(package) OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ do-clean ; )
 
 pkgdistclean:
-	@$(foreach package,$(IMAGEPACKAGES),$(MAKE) -C $(package) OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ do-distclean ; )
+	@$(foreach package,$(BASEPACKAGES),$(MAKE) -C $(package) OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ do-distclean ; )
+	@$(foreach package,$(ADDITIONALPACKAGES),$(MAKE) -C $(package) OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ do-distclean ; )
 
 packages/system/linux/$(SRCDIR)/$(CONFIG):
 	@$(MAKE) -C packages/system/linux OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ $(SRCDIR)

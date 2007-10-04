@@ -15,44 +15,7 @@ IMAGEFLASHROOTSIZE=6208
 IMAGEFLASHETCSIZE=1024
 IMAGEKERNELCONFIG=sa200
 IMAGEFILENAME=OpenMCT_$(IMAGEVERSION)_$(IMAGESUBVERSION)_$(IMAGEPRODCODE).bin
-IMAGERELEASEFILENAME=openmct-release
 ETH0IPADDR=192.168.1.254
 ETH0DEFAULTGW=192.168.1.1
 ETH1IPADDR=172.16.0.254
-IMAGEPACKAGES=	packages/base/busybox \
-		packages/lib/openssl \
-		packages/lib/ncurses \
-		packages/lib/curl \
-		packages/lib/sigc \
-		packages/lib/torrent \
-		packages/base/htop \
-		packages/base/nano \
-		packages/base/screen \
-		packages/net/dropbear \
-		packages/net/nfsutils \
-		packages/net/iptables \
-		packages/net/nzbget \
-		packages/net/tcpwrapper \
-		packages/net/mt-daapd \
-		packages/net/ppp \
-		packages/net/pppoe \
-		packages/net/pptp \
-		packages/net/pptpd \
-		packages/net/portmap \
-		packages/net/openvpn \
-		packages/net/oidentd \
-		packages/net/rtorrent \
-		packages/net/samba2 \
-		packages/net/vsftpd \
-		packages/system/chpax \
-		packages/system/debootstrap \
-		packages/system/ethtool \
-		packages/system/fcp \
-		packages/system/gradm \
-		packages/system/lsof \
-		packages/system/owi \
-		packages/system/parted \
-		packages/system/smartd \
-		packages/system/vserver \
-		packages/system/vserverdebiantools \
-		packages/system/scsi-idle
+ADDITIONALPACKAGES=

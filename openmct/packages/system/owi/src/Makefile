@@ -23,15 +23,7 @@ clean:
 	rm $(BINARY) $(OBJECTS) 2> /dev/null
 
 install:
-	$(MKDIR) -p $(DESTDIR)/cgi-bin
-	$(CP) $(BINARY) $(DESTDIR)/cgi-bin
-	$(LN) -sf $(BINARY) $(DESTDIR)/cgi-bin/ftp.cgi
-	$(LN) -sf $(BINARY) $(DESTDIR)/cgi-bin/interface.cgi
-	$(LN) -sf $(BINARY) $(DESTDIR)/cgi-bin/user.cgi
-	$(LN) -sf $(BINARY) $(DESTDIR)/cgi-bin/group.cgi
-	$(LN) -sf $(BINARY) $(DESTDIR)/cgi-bin/sysinfo.cgi
-	$(LN) -sf $(BINARY) $(DESTDIR)/cgi-bin/nfs.cgi
-	$(LN) -sf $(BINARY) $(DESTDIR)/cgi-bin/shell.cgi
-	$(CP) -a ../www/* $(DESTDIR)
+	$(MKDIR) -p $(DESTDIR)
+	$(CP) -a $(BINARY) $(DESTDIR)
 
 uninstall:

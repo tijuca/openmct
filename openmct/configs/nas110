@@ -15,20 +15,6 @@ IMAGEFLASHROOTSIZE=2368
 IMAGEFLASHETCSIZE=768
 IMAGEKERNELCONFIG=sa100
 IMAGEFILENAME=OpenMCT_$(IMAGEVERSION)_$(IMAGESUBVERSION)_$(IMAGEPRODCODE).bin
-IMAGERELEASEFILENAME=openmct-release
 ETH0IPADDR=192.168.1.254
 ETH0DEFAULTGW=192.168.1.1
-IMAGEPACKAGES=	packages/base/busybox \
-		packages/net/dropbear \
-		packages/net/nfsutils \
-		packages/net/tcpwrapper \
-		packages/net/portmap \
-		packages/net/samba2 \
-		packages/net/vsftpd \
-		packages/system/debootstrap \
-		packages/system/fcp \
-		packages/system/ethtool \
-		packages/system/owi \
-		packages/system/vserver \
-		packages/system/vserverdebiantools \
-		packages/system/scsi-idle
+ADDITIONALPACKAGES=
