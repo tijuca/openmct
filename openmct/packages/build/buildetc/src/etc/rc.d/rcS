@@ -1,6 +1,10 @@
 #!/bin/sh
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin
 
+/bin/echo -n "Mounting Data ... "
+/bin/mount -a
+/bin/echo ""
+
 # checking for directorys on HD, else no login via FTP or use of Samba, NFS is possibile
 # we create the directory with '-p' option on mkdir, so every directory ahead the named directory is builded automaticly
 
@@ -12,13 +16,11 @@ for i in $DIRECTORY; do
     fi
 done
 
-/bin/echo -n "Mounting Data ... "
-/bin/mount -a
-/bin/echo ""
-
-/bin/echo -n "Added /usr/lib directory ... "
-/sbin/ldconfig -C /var/etc/ld.so.cache -f /var/etc/ld.so.conf -X /usr/lib
-/bin/echo ""
+if [ -d /usr/lib ]; then
+   /bin/echo -n "Added /usr/lib directory ... "
+   /sbin/ldconfig -C /var/etc/ld.so.cache -f /var/etc/ld.so.conf -X /usr/lib
+   /bin/echo ""
+fi
 
 /bin/sh /etc/rc.conf
 if [ $? -ne 0 ]; then
@@ -154,6 +156,7 @@ if [ "$START_NFS" == "yes" ]; then
    fi
    /sbin/rpc.mountd
    /sbin/rpc.nfsd
+   /sbin/exportfs -rfa
    /bin/echo ""
 fi
 
