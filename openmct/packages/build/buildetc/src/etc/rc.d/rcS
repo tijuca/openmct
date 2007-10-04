@@ -6,7 +6,7 @@ echo -n "Mounting Data ... "
 echo ""
 
 echo -n "Added /usr/lib directory ... "
-ldconfig -C /conf/etc/ld.so.cache -f /conf/etc/ld.so.conf -X /usr/lib
+ldconfig -C /etc/ld.so.cache -f /etc/ld.so.conf -X /usr/lib
 echo ""
 
 /bin/sh /etc/rc.conf
@@ -177,8 +177,8 @@ if [ "$START_SAMBA" == "yes" ]; then
 fi
 
 # Starting user defined startup commands
-if [ -x /conf/etc/rc.d/rcS.local ]; then
+if [ -x /var/etc/rc.d/rcS.local ]; then
    echo -n "Starting rcS.local ... "
-   /bin/sh /etc/rc.d/rcS.local
+   /bin/sh /var/etc/rc.d/rcS.local
    echo ""
 fi

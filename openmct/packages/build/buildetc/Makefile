@@ -4,7 +4,8 @@ INSTALL=	if [ ! -d $(NEWROOTDIR)/etc ]; then \
 			$(CP) -a $(SRCDIR)/etc $(NEWROOTDIR)/etc ; \
 		fi && \
 		if [ ! -d $(NEWVARDIR) ]; then \
-			$(CP) -a $(SRCDIR)/var/etc $(NEWVARDIR); \
+			$(MKDIR) -p $(NEWVARDIR)/etc ; \
+			$(CP) -a $(SRCDIR)/var/etc $(NEWVARDIR) ; \
 		fi
 
 UNINSTALL=	if [ -d $(NEWROOTDIR)/etc ]; then \
