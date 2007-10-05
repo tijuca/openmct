@@ -96,6 +96,7 @@ REMOVESYMLINKS=$(SCRIPTDIR)/remove-symlinks.sh
 SUBSTITUTE=$(SCRIPTDIR)/substitute.sh
 REMOVESVN=$(SCRIPTDIR)/remove-svn.sh
 CLEANUPROOT=$(SCRIPTDIR)/cleanup-root.sh
+DEPMOD=$(SCRIPTDIR)/depmod.pl
 
 # tar options
 TAROPT=--strip-components=1
