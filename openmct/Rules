@@ -87,6 +87,7 @@ MKSQUASHFS=mksquashfs
 
 # Options
 ROOTOPTS=-le -all-root
+VAROPTS=-U
 
 # Scripts
 PATCHSOURCE=$(SCRIPTDIR)/patch-source.sh
