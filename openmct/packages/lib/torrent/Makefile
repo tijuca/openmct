@@ -7,7 +7,7 @@ CONFIGUREENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc \
 		CFLAGS="-Os -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.1 -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.1/sigc++" \
 		CXXFLAGS="-Os -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.1 -I$(OPENMCT_CROSS_INCLUDE)/sigc++-2.1/sigc++"
 
-CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-shared --disable-aligned 
+CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-shared --disable-aligned --with-boost=$(OPENMCT_CROSS_LIB)
 #\
 #		--with-openssl=$(OPENMCT_CROSS_BASE)
 
