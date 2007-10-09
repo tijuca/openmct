@@ -560,8 +560,8 @@ diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/Makefile linux-2.4.35.3-m
 +include $(TOPDIR)/Rules.make
 diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/basic_io.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/basic_io.c
 --- linux-2.4.35.3/arch/mips/mct-boards/generic/basic_io.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/basic_io.c	2007-10-05 09:39:07.000000000 +0200
-@@ -0,0 +1,336 @@
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/basic_io.c	2007-10-09 08:06:11.000000000 +0200
+@@ -0,0 +1,317 @@
 +#include <linux/config.h>
 +#include <linux/init.h>
 +#include <linux/sched.h>
@@ -809,24 +809,6 @@ diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/basic_io.c linux-2.4.35.3
 +}
 +#endif
 +
-+char reset_path[256] = "/sbin/reset";
-+
-+static int exec_reset()
-+{
-+	static char * envp[] = { "HOME=/", "TERM=linux", "PATH=/sbin:/usr/sbin:/bin:/usr/bin", NULL };
-+	char *argv[] = { reset_path, NULL };
-+	int ret;
-+
-+	ret = exec_usermodehelper(reset_path, argv, envp);
-+	if (ret) {
-+		printk(KERN_ERR
-+			"kmod: failed to exec %s\n",
-+			reset_path);
-+	}
-+	return ret;
-+}
-+
-+
 +static void conf_reset_callback(unsigned long dummy)
 +{
 +	int	normal_interval;
@@ -853,7 +835,6 @@ diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/basic_io.c linux-2.4.35.3
 +			!conf_reset_in_progress ) {	// low active
 +		if ( conf_reset_tick_count >= 50 ) {	// trigger "config reset" if the "config reset" button is held at least 5 seconds.
 +#if defined(CONFIG_MCT_SG100) || defined(CONFIG_MCT_SG600) || defined(CONFIG_MCT_SA100) || defined(CONFIG_MCT_SA200)
-+			exec_reset();
 +			del_timer(&speaker_timer);
 +			SPK_OFF();
 +#endif
@@ -13802,8 +13783,8 @@ diff -Naru linux-2.4.35.3/drivers/mtd/maps/Makefile linux-2.4.35.3-mct/drivers/m
  include $(TOPDIR)/Rules.make
 diff -Naru linux-2.4.35.3/drivers/mtd/maps/mct.c linux-2.4.35.3-mct/drivers/mtd/maps/mct.c
 --- linux-2.4.35.3/drivers/mtd/maps/mct.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.35.3-mct/drivers/mtd/maps/mct.c	2007-10-05 09:39:07.000000000 +0200
-@@ -0,0 +1,249 @@
++++ linux-2.4.35.3-mct/drivers/mtd/maps/mct.c	2007-10-09 09:03:44.000000000 +0200
+@@ -0,0 +1,293 @@
 +/*
 + * MCT flash driver
 + */
@@ -13870,6 +13851,10 @@ diff -Naru linux-2.4.35.3/drivers/mtd/maps/mct.c linux-2.4.35.3-mct/drivers/mtd/
 +		mask_flags: 0
 +	}
 +};
++
++DECLARE_WAIT_QUEUE_HEAD(flash_wq);
++/* Reset "etc" mtd_partition? */
++int     conf_reset_in_progress;
 +
 +#define NUM_PARTITIONS (sizeof(partition_info) / sizeof(partition_info[0]))
 +
@@ -13991,6 +13976,43 @@ diff -Naru linux-2.4.35.3/drivers/mtd/maps/mct.c linux-2.4.35.3-mct/drivers/mtd/
 +	copy_to: mct_flash_copy_to
 +};
 +
++extern int exec_usermodehelper(char *program_path, char *argv[], char *envp[]);
++extern int call_usermodehelper(char *path, char *argv[], char *envp[]);
++char reset_path[256] = "/sbin/reset";
++
++static int mct_flash_reset_thread(void *data)
++{
++	static char * envp[] = { "HOME=/", "TERM=linux", "PATH=/sbin:/usr/sbin:/bin:/usr/bin", NULL };
++	char *argv[] = { reset_path, NULL };
++	int ret;
++        struct task_struct *task = current;
++
++	DECLARE_WAITQUEUE(wait, task);
++	daemonize();
++	exit_files(current);
++	reparent_to_init();
++	strcpy(current->comm, "resetd");
++
++	printk("MCT: Reset thread starting.\n");
++
++	for (;;) {
++		add_wait_queue(&flash_wq, &wait);
++		set_current_state(TASK_INTERRUPTIBLE);
++		schedule_timeout(6 * HZ);
++		if ( conf_reset_in_progress ) {
++			printk(KERN_INFO "Reset: calling reset binary\n");
++			ret = exec_usermodehelper(reset_path, argv, envp);
++			if (ret) {
++				printk(KERN_ERR "MCT: Reset call %s failed\n", reset_path);
++			}
++			conf_reset_in_progress = 0;
++		}
++                remove_wait_queue(&flash_wq, &wait);
++	}
++
++	return 0;
++}
++
 +int __init init_mct_flash(void)
 +{
 +       	printk(KERN_NOTICE "MCT flash driver (size->0x%X mem->0x%X)\n", WINDOW_SIZE, WINDOW_ADDR);
@@ -14017,6 +14039,9 @@ diff -Naru linux-2.4.35.3/drivers/mtd/maps/mct.c linux-2.4.35.3-mct/drivers/mtd/
 +
 +                /* Create MTD devices for each partition. */
 +	        add_mtd_partitions(mymtd, partition_info, NUM_PARTITIONS);
++
++		/* Start kernel thread detecting reset button */
++		kernel_thread(mct_flash_reset_thread, NULL, 0);		
 +		
 +		return 0;
 +	}
