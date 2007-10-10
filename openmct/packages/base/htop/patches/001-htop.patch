@@ -1,5 +1,6 @@
+diff -Naur htop-0.6.6/configure src/configure
 --- htop-0.6.6/configure	2007-05-21 20:06:50.000000000 +0200
-+++ src/configure	2007-10-09 21:05:43.000000000 +0200 
++++ src/configure	2007-10-09 21:26:18.000000000 +0200
 @@ -5503,10 +5503,6 @@
  esac
  
@@ -74,3 +75,43 @@
  ac_config_files="$ac_config_files Makefile"
  
  cat >confcache <<\_ACEOF
+diff -Naur htop-0.6.6/Hashtable.c src/Hashtable.c
+--- htop-0.6.6/Hashtable.c	2007-05-17 19:07:38.000000000 +0200
++++ src/Hashtable.c	2007-10-10 18:55:37.000000000 +0200
+@@ -32,7 +32,7 @@
+ };
+ }*/
+ 
+-#ifdef DEBUG
++//#ifdef DEBUG
+ 
+ bool Hashtable_isConsistent(Hashtable* this) {
+    int items = 0;
+@@ -59,7 +59,7 @@
+    return items;
+ }
+ 
+-#endif
++//#endif
+ 
+ HashtableItem* HashtableItem_new(unsigned int key, void* value) {
+    HashtableItem* this;
+diff -Naur htop-0.6.6/Hashtable.h src/Hashtable.h
+--- htop-0.6.6/Hashtable.h	2007-05-21 21:26:17.000000000 +0200
++++ src/Hashtable.h	2007-10-10 18:55:39.000000000 +0200
+@@ -33,13 +33,13 @@
+    bool owner;
+ };
+ 
+-#ifdef DEBUG
++//#ifdef DEBUG
+ 
+ bool Hashtable_isConsistent(Hashtable* this);
+ 
+ int Hashtable_count(Hashtable* this);
+ 
+-#endif
++//#endif
+ 
+ HashtableItem* HashtableItem_new(unsigned int key, void* value);
+ 
