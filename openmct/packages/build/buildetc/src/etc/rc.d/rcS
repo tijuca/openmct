@@ -33,6 +33,7 @@ fi
 /bin/echo ""
 
 /bin/echo -n "Starting Network ..."
+/sbin/ifdown -a
 /sbin/ifup -a
 if [ $? -ne 0 ]; then
    /bin/cp /etc/default/interfaces /etc/network/interfaces

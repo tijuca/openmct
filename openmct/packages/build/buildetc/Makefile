@@ -6,7 +6,9 @@ INSTALL=	if [ ! -d $(NEWROOTDIR)/etc ]; then \
 		if [ ! -d $(NEWVARDIR) ]; then \
 			$(MKDIR) -p $(NEWVARDIR)/etc ; \
 			$(CP) -a $(SRCDIR)/var/etc $(NEWVARDIR) ; \
-		fi
+		fi && \
+		$(CP) $(SRCDIR)/sbin/reset $(NEWROOTDIR)/sbin/reset && \
+		$(CHMOD) 755 $(NEWROOTDIR)/sbin/reset
 
 UNINSTALL=	if [ -d $(NEWROOTDIR)/etc ]; then \
 			$(RM) -rf $(NEWROOTDIR)/etc ; \

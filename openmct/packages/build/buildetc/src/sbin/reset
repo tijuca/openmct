@@ -1,0 +1,4 @@
+#!/bin/sh
+/bin/cat /etc/default/passwd > /etc/passwd
+/bin/cat /etc/default/interfaces > /etc/network/interfaces
+/bin/cat /etc/default/rc.conf > /etc/rc.conf
