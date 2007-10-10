@@ -1,5 +1,5 @@
 # GNU Coreutils
-DOWNLOAD=	ftp://www.gnu.org/gnu/coreutils/coreutils-5.3.0.tar.gz
+DOWNLOAD=	http://alpha.gnu.org/gnu/coreutils//coreutils-5.3.0.tar.gz
 
 INSTALL=	$(CP) $(SRCDIR)/src/su $(NEWROOTDIR)/bin && \
 		$(STRIP) $(NEWROOTDIR)/bin/su && \
