@@ -21,6 +21,8 @@
 #define  USER_ALREADY_EXISTS                 "User already exists"
 #define  USER_TABLE_SHELL                    "Full Shell"
 #define  USER_SHELL_DESCRIPTION              "Give full shell to user"
+#define  USER_LOGIN_INVALID                  "Invalid syntax for username"
+#define  USER_GECOS_INVALID                  "Invalid syntax for description"
 
 /* group */
 
@@ -36,6 +38,11 @@
 #define  GROUP_NAV_DESCRIPTION               "Group"
 #define  GROUP_FILE_FAILED                   "Can't open group database"
 #define  GROUP_NOT_FOUND                     "Can't find group"
+#define  GROUP_DESCRIPTION                   "Unique group name."
+#define  GROUP_MEMBERS_DESCRIPTION           "Comma separated member list."
+#define  GROUP_INVALID                       "Invalid syntax for groupname"
+#define  GROUP_MEMBERS_INVALID               "Invalid syntax for members"
+#define  GROUP_ALREADY_EXISTS                "Group already exists"
 
 /* sysinfo */
 #define  SYSINFO_HEADLINE                    "OpenMCT"
@@ -48,43 +55,44 @@
 #define  PROCESS_NAV_DESCRIPTION             "Process"
 
 /* nfs */
-#define  NFS_TABLE_DESCRIPTION               "Freigabe"
-#define  NFS_TABLE_OPTIONS		     "Eigenschaften"
-#define  NFS_TABLE_ACTION                    "Aktion"
-#define  NFS_HEADLINE                        "NFS (Network File System) Verwaltung"
-#define  NFS_DESCRIPTION                     "Die nachfolgende Liste f&uuml;hrt Ihre NFS Freigaben an inkl. Eigenschaften wie freigeschaltete IP Adressen, Schreibzugriff etc. Bitte beachten Sie, dass diese Freigaben nur f&uuml;r den Dienst NFS gelten. Die Freigaben f&uuml;r Windows sind von diesen Einstellungen nicht betroffen."
-#define  NFS_DETAIL                          "Sie befinden Sich nun im Detailbereich f&uuml;r eine NFS Freigabe. Hier k&ouml;nnen Sie sowohl das Clients als auch Zugriffsrechte setzen. Die Einstellungen werden mit dem Bet&auml;tigen des <i>Speichern</i> Buttons sofort &uuml;bernommen."
-#define  NFS_NEW                            "In diesem Bereich k&ouml;nnen Sie eine neue NFS Freigabe erstellen. Bitte geben Sie dazu alle Felder an um sicherzustellen, dass die NFS Freigabe dann ordnungsgem&auml;&szlig; funktioniert. Sobald alle Daten eingegeben worden sind kann die Aktion mit dem Klicken auf den <i>Neu</i> Button abgeschlossen werden."
-#define  NFS_FILE_FAILED                     "NFS Datenbank konnte nicht ge&ouml;ffnet werden"
-#define  NFS_NOT_FOUND                       "NFS Freigabe konnte nicht gefunden werden"
-#define  NFS_BUTTON_DELETE                   "Entfernen"
-#define  NFS_BUTTON_UPDATE                   "Speichern"
-#define  NFS_BUTTON_MODIFY                   "Bearbeiten"
-#define  NFS_BUTTON_NEW                      "Neue Freigabe"
-#define  NFS_BUTTON_ADD                      "Hinzuf&uuml;gen"
+#define  NFS_TABLE_DESCRIPTION               "Share"
+#define  NFS_TABLE_OPTIONS		     "Properties"
+#define  NFS_TABLE_ACTION                    "Action"
+#define  NFS_HEADLINE                        "Services: NFS"
+#define  NFS_FILE_FAILED                     "Can't open NFS database"
+#define  NFS_NOT_FOUND                       "Can't find NFS share"
+#define  NFS_BUTTON_DELETE                   "Delete"
+#define  NFS_BUTTON_UPDATE                   "Save"
+#define  NFS_BUTTON_MODIFY                   "Edit"
+#define  NFS_BUTTON_NEW                      "New"
+#define  NFS_BUTTON_ADD                      "Add"
 #define  NFS_NAV_DESCRIPTION                 "NFS"
+#define  NFS_DESCRIPTION                     "Unique share name."
+#define  NFS_OPTIONS_DESCRIPTION             "Share properties."
+#define  NFS_INVALID                         "Invalid syntax for share"
+#define  NFS_OPTIONS_INVALID                 "Invalid syntax for share options"
+#define  NFS_ALREADY_EXISTS                  "Share already exists"
 
 /* ftp */
 #define  FTP_HEADLINE                        "Services: FTP"
-#define	 FTP_HEADLINE_BOX                    "FTP Server"
-#define  FTP_FILE_FAILED                     "FTP Konfiguration konnte nicht ge&ouml;ffnet werden"
+#define  FTP_FILE_FAILED                     "Can't open FTP configuration"
 
 #define  FTP_TABLE_LISTEN                    "Listen"
-#define  FTP_TABLE_LISTEN_YES                "Ja"
-#define  FTP_TABLE_LISTEN_NO                 "Nein"
+#define  FTP_TABLE_LISTEN_YES                "Yes"
+#define  FTP_TABLE_LISTEN_NO                 "No"
 
-#define  FTP_BUTTON_UPDATE                   "Speichern"
+#define  FTP_BUTTON_UPDATE                   "Save"
 
-#define  FTP_INI_LISTEN	                     "Daemon Modus"
-#define  FTP_INI_ANONYMOUS_ENABLE            "Erlaube anonymous Logins"
-#define  FTP_INI_LOCAL_ENABLE                "Lokale Accounts fuer FTP Zugriff erlauben"
-#define  FTP_INI_WRITE_ENABLE                "Schreibzugriff"
-#define  FTP_INI_LOCAL_UMASK                 "Lokale Umask"
-#define  FTP_INI_DIRMESSAGE_ENABLED          "Verzeichnis Nachrichten einschalten"
-#define  FTP_INI_XFERLOG_ENABLE              "Up/Download mitprotokollieren"
-#define  FTP_INI_CONNECT_FROM_PORT_20        "PORT Befehlen sollen Port 20 verwenden"
-#define  FTP_INI_SECURE_CHROOT_DIR           "Sicheres Verzeichnis (chroot/jail)"
-#define  FTP_INI_FTPD_BANNER                 "Begr&uuml;&szlig;ungstext"
+#define  FTP_INI_LISTEN	                     "Daemon Mode"
+#define  FTP_INI_ANONYMOUS_ENABLE            "Enable anonymous logins"
+#define  FTP_INI_LOCAL_ENABLE                "Enable local users"
+#define  FTP_INI_WRITE_ENABLE                "Enable write access"
+#define  FTP_INI_LOCAL_UMASK                 "Local umask"
+#define  FTP_INI_DIRMESSAGE_ENABLED          "Directory message"
+#define  FTP_INI_XFERLOG_ENABLE              "Log up/download"
+#define  FTP_INI_CONNECT_FROM_PORT_20        "PORT Port 20"
+#define  FTP_INI_SECURE_CHROOT_DIR           "Secure directory (chroot/jail)"
+#define  FTP_INI_FTPD_BANNER                 "Banner"
 #define  FTP_NAV_DESCRIPTION                 "FTP"
 
 /* shell */
@@ -120,5 +128,7 @@
 #define  INTERFACE_NAV_DESCRIPTION                "Netzwerk"
 
 #define  ACCESS_NAV_DESCRIPTION                   "System"
+
+#define  SERVICES_NAV_DESCRIPTION                 "Services"
 
 #endif

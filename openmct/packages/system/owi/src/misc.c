@@ -19,6 +19,7 @@
  *
  */
 #include <string.h>
+#include <regex.h>
 
 /* \fn hex2byte(string, pos)
  * \param[in] string hex string
@@ -69,4 +70,19 @@ int hex2byte(char *string, int pos) {
    }
    /* return result */
    return value;
+}
+
+int match(char *string, char *pattern) {
+   int status;
+   regex_t re;
+
+   if (regcomp(&re, pattern, REG_EXTENDED|REG_NOSUB)) {
+      return 0;
+   }
+   status = regexec(&re, string, 0, NULL, 0);
+   regfree(&re);
+   if (status) {
+      return 0; 
+   }
+   return 1;
 }

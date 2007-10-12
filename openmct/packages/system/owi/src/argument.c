@@ -45,6 +45,8 @@ char **argument_parse(char *value, char *seperator) {
    int argument_count = 0;
    /* argument data */
    char **argument = NULL;
+   /* fisrt argument character position */
+   int first_index = 0;
 
    /* set index to zero */
    i = 0;
@@ -54,13 +56,20 @@ char **argument_parse(char *value, char *seperator) {
       switch(state) {
          /* pre parsing? */
          case ARGUMENT_PRE:
+	      first_index = i;
               /* skip seperator signs */
               while (i < strlen(value) && strchr(seperator, value[i])) {
                  /* increase pointer */
                  i++;
               }
+	      /* Two seperator signs after each other */
+	      if (first_index + 1 < i &&
+	          value[first_index] == value[i - 1]) {
+                 state = ARGUMENT_ADD;
+		 start_index = i;
+		 stop_index = i;
               /* end of string reached? */
-              if (i == strlen(value)) {
+              } else if (i == strlen(value)) {
                  /* set end state */
                  state = ARGUMENT_INVALID;
               } else {
@@ -99,13 +108,13 @@ char **argument_parse(char *value, char *seperator) {
               if (stop_character) {
                  /* skip next character */
                  i++;
-              }                                        
+              }
               /* switch to next state */
               state = ARGUMENT_ADD;
               break;
                         
          /* add argument to dynamic array now */                                
-         case ARGUMENT_ADD:                        
+         case ARGUMENT_ADD:
               /* increase argument counter */
               argument_count++;
               /* allocate space for argument data */

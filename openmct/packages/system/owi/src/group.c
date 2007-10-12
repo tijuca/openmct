@@ -30,6 +30,7 @@
 #include "includes/owi.h"
 #include "includes/group.h"
 #include "includes/file.h"
+#include "includes/misc.h"
 
 /* \fn group_main(argc, argv)
  * Show all groups from system
@@ -84,8 +85,6 @@ int group_main(int argc, char **argv) {
 void group_list() {
    /* Index counter */
    int i = 0;	
-   /* Search string */
-   char *search = variable_get("search");
 
    /* Start form / external table / scroll area / internal table*/
    printf("<h3>%s</h3>\n"
@@ -113,29 +112,23 @@ void group_list() {
    /* Loop through all user entries in group file */
    while ( i < file_line_counter) {
       char **group = argument_parse(file_line_get(i), ":");
-      /* Search string specified? */
-      if (!search || !strcmp(search, "") ||
-          (search &&
-           (strstr(argument_get_part(group, 0), search) ||
-            strstr(argument_get_part(group, 1), search)))) {
-         /* Print entry */
-         printf("<tr onmouseover=\"this.className='mover';\""
-                     " onmouseout=\"this.className='mout';\">\n"
-                "<td width=\"200\">%s</td>\n"
-                "<td width=\"212\">%s</td>\n"
-                "<td width=\"100\"><input type=\"button\" onClick=\"location='%s?module=%s&command=detail&id=%s'\" value=\"%s\" />&nbsp;<input type=\"button\" onClick=\"location='%s?module=%s&amp;command=delete&amp;id=%s'\" value=\"%s\" /></td>\n"
-                "</tr>\n",
-                argument_get_part(group, 0),
-                argument_get_part(group, 3),
-                getenv("SCRIPT_NAME"),
-		variable_get("module"),
-                argument_get_part(group, 0),
-                GROUP_BUTTON_MODIFY,
-		getenv("SCRIPT_NAME"),
-		variable_get("module"),
-                argument_get_part(group, 0),
-                GROUP_BUTTON_DELETE);
-      }
+      /* Print entry */
+      printf("<tr onmouseover=\"this.className='mover';\""
+             " onmouseout=\"this.className='mout';\">\n"
+             "<td width=\"200\">%s</td>\n"
+             "<td width=\"212\">%s</td>\n"
+             "<td width=\"100\"><input type=\"button\" onClick=\"location='%s?module=%s&command=detail&id=%s'\" value=\"%s\" />&nbsp;<input type=\"button\" onClick=\"location='%s?module=%s&amp;command=delete&amp;id=%s'\" value=\"%s\" /></td>\n"
+             "</tr>\n",
+             argument_get_part(group, 0),
+             argument_get_part(group, 3),
+             getenv("SCRIPT_NAME"),
+             variable_get("module"),
+             argument_get_part(group, 0),
+             GROUP_BUTTON_MODIFY,
+             getenv("SCRIPT_NAME"),
+             variable_get("module"),
+             argument_get_part(group, 0),
+             GROUP_BUTTON_DELETE);
       /* Increase index counter */
       i++;
       /* Free group entry */
@@ -165,13 +158,18 @@ void group_list() {
  */
 void group_detail(char *groupname) {
    /* Index counter */
-   int i = 0;	
-   /* Group found? */
+   int i = 0;
+   /* Group */
    int group_found = 0;
 
    /* Print external table for design */
    printf("<h3>%s</h3>\n",
           GROUP_HEADLINE);
+
+   if (strcmp(variable_get("error"), "")) {
+      printf("<div class=\"error\">%s</div>\n",
+             variable_get("error"));
+   }
 
    /* Loop through passwd database */
    while ( i < file_line_counter) {
@@ -180,23 +178,25 @@ void group_detail(char *groupname) {
       /* Match found? */
       if (!strcmp(argument_get_part(group, 0), groupname)) {
          printf("<form action=\"%s\" method=\"POST\">\n"
+                "<table class=\"outside\">\n"
+                "<tr>\n"
+                "<td>\n"
                 "<input type=\"hidden\" name=\"module\" value=\"%s\">\n"
                 "<input type=\"hidden\" name=\"command\" value=\"update\">\n"
                 "<input type=\"hidden\" name=\"id\" value=\"%s\">\n"
                 "<table class=\"detail\">\n"
                 "<tr>\n"
-                "<td>%s</td>\n"
-                "<td>%s</td>\n"
+                "<td class=\"description\">%s</td>\n"
+                "<td class=\"value\">%s</td>\n"
                 "<tr>\n"
-                "<td>%s</td>\n"
-                "<td><input type=\"text\" name=\"members\" value=\"%s\" /></td>\n"
+                "<td class=\"description\">%s</td>\n"
+                "<td class=\"value\"><input type=\"text\" name=\"members\" value=\"%s\" /><br />%s</td>\n"
                 "</tr>\n"
-                "</table>\n"
-                "<table width=\"100%%\">\n"
                 "<tr>\n"
-                "<td colspan=\"2\" align=\"right\">\n"
-	        "<input type=\"button\" onClick=\"javascript:document.forms[0].submit()\" value=\"%s\" />\n"
+                "<td></td>\n"
+	        "<td><input type=\"button\" onClick=\"javascript:document.forms[0].submit()\" value=\"%s\" />\n"
                 "</td>\n"
+		"</tr>\n"
                 "</table>\n"
                 "</form>\n"
                 ,
@@ -207,6 +207,7 @@ void group_detail(char *groupname) {
                 argument_get_part(group, 0),
                 GROUP_TABLE_MEMBERS,
                 argument_get_part(group, 3),
+		GROUP_MEMBERS_DESCRIPTION,
 		GROUP_BUTTON_UPDATE);
 
 
@@ -232,37 +233,50 @@ void group_detail(char *groupname) {
 }
 
 /* \fn group_update(groupname, members)
- * Update an entry in password file
+ * Update an entry in group file
  * \param[in] groupname group that will be updated
  * \param[in] members comma seperated list of usernames
  */
 void group_update(char *groupname, char *members) {
    /* Index counter */
    unsigned int i;
+   /* Error */
+   char *error = NULL;
 
-   /* Loop through passwd entries */
-   for (i = 0; i < file_line_counter; i++) {
-      /* Get passwd entry */
-      char **group = argument_parse(file_line_get(i), ":");
-      /* Passwd entry found? */
-      if (!strcasecmp(groupname, argument_get_part(group, 0))) {
-         /* Set new passwd line in memory */
-         file_line_action(FILE_LINE_SET, i,
-                          "%s:%s:%s:%s",
-                          argument_get_part(group, 0),
-                          argument_get_part(group, 1),
-                          argument_get_part(group, 2),
-                          members);
-      }
-      /* Free passwd entry */
-      argument_free(group);
+   /* Invalid syntax for user description */
+   if (!match(members, GROUP_MEMBERS_VALID)) {
+      error = GROUP_MEMBERS_INVALID;
    }
 
-   /* Save result in user file */
-   file_save(GROUP_FILE);
+   /* No error? */
+   if (!error) {
+      /* Loop through group entries */
+      for (i = 0; i < file_line_counter; i++) {
+         /* Get group entry */
+         char **group = argument_parse(file_line_get(i), ":");
+         /* Passwd entry found? */
+         if (!strcasecmp(groupname, argument_get_part(group, 0))) {
+            /* Set new group line in memory */
+            file_line_action(FILE_LINE_SET, i,
+                             "%s:%s:%s:%s",
+                             argument_get_part(group, 0),
+                             argument_get_part(group, 1),
+                             argument_get_part(group, 2),
+                             members);
+         }
+         /* Free group entry */
+         argument_free(group);
+      }
 
-   /* Display group list */
-   group_list();
+      /* Save result in user file */
+      file_save(GROUP_FILE);
+
+      /* Display group list */
+      group_list();
+   } else {
+      variable_set("error", error);
+      group_detail(groupname);
+   }
 }
 
 /* \fn group_delete(username)
@@ -273,7 +287,7 @@ void group_delete(char *groupname) {
    /* Index counter */
    unsigned int i;
 
-   /* Loop through passwd entries */
+   /* Loop through group entries */
    for (i = 0; i < file_line_counter; i++) {
       /* Get group entry */
       char **group = argument_parse(file_line_get(i), ":");
@@ -302,10 +316,10 @@ void group_add(char *groupname) {
    int i;
    /* Max uid */
    unsigned int start_gid = 1000;
-   /* Group already found? */
-   int found = 0;
+   /* Error */
+   char *error = NULL;
 
-   /* Loop through passwd entries */
+   /* Loop through group entries */
    for (i = 0; i < file_line_counter; i++) {
       /* Get group entry */
       char **group = argument_parse(file_line_get(i), ":");
@@ -319,31 +333,42 @@ void group_add(char *groupname) {
       /* Found? */
       if (!strcasecmp(groupname, argument_get_part(group, 0))) {
          /* Mark as found */
-	 found = 1;
+	 error = GROUP_ALREADY_EXISTS;
       }
-      /* Free passwd entry */
+      /* Free group entry */
       argument_free(group);
       /* Found? */
-      if (found) {
+      if (error) {
          break;
       }
    }
+
+   if (!match(groupname, GROUP_VALID)) {
+      error = GROUP_INVALID;
+   } else if (!match(variable_get("members"), GROUP_MEMBERS_VALID)) {
+      error = GROUP_MEMBERS_INVALID;
+   }
+
    /* Not found? */
-   if (!found) {
+   if (!error) {
       /* Add new group line in memory */
       file_line_action(FILE_LINE_ADD, i,
-                       "%s:%s:%d:%d:%s:%s:%s",
+                       "%s:x:%d:%s",
                        groupname,
-                       crypt(variable_get("password"), "OM"),
                        start_gid,
-                       variable_ltrim(variable_filter(variable_get("shell"), ":")));
+                       variable_ltrim(variable_get("members")));
 
       /* Save result in group file */
       file_save(GROUP_FILE);
-   }
 
-   /* Show all groups */
-   group_detail(groupname);
+      /* Show all groups */
+      group_list();
+   } else {
+      /* Assign template */
+      variable_set("error", error);
+      /* Display add screen */
+      group_new();
+   }
 }
 
 /* \fn group_new()
@@ -351,8 +376,15 @@ void group_add(char *groupname) {
  */
 void group_new() {
    /* Print external table for design */
-   printf("<h3>%s</h3>\n"
-          "<table class=\"outside\">\n"
+   printf("<h3>%s</h3>\n",
+          GROUP_HEADLINE);
+
+   if (strcmp(variable_get("error"), "")) {
+      printf("<div class=\"error\">%s</div>\n",
+             variable_get("error"));
+   }
+
+   printf("<table class=\"outside\">\n"
           "<tr>\n"
           "<td>\n"
           "<form action=\"%s\" method=\"post\">\n"
@@ -361,11 +393,11 @@ void group_new() {
           "<table class=\"detail\">\n"
           "<tr>\n"
           "<td class=\"description\">%s</td>\n"
-          "<td class=\"value\"><input type=\"text\" name=\"id\" /></td>\n"
+          "<td class=\"value\"><input type=\"text\" name=\"id\" value=\"%s\" /><br />%s</td>\n"
           "</tr>\n"
           "<tr>\n"
           "<td class=\"description\">%s</td>\n"
-          "<td class=\"value\"><input type=\"text\" name=\"members\" /></td>\n"
+          "<td class=\"value\"><input type=\"text\" name=\"members\" value=\"%s\" /><br />%s</td>\n"
           "</tr>\n"
           "<tr>\n"
           "<td></td>\n"
@@ -377,10 +409,13 @@ void group_new() {
           "</td>\n"
           "</tr>\n"
           "</table>\n",
-	  GROUP_HEADLINE,
           getenv("SCRIPT_NAME"),
 	  variable_get("module"),
           GROUP_TABLE_DESCRIPTION,
+	  variable_get("id"),
+	  GROUP_DESCRIPTION,
           GROUP_TABLE_MEMBERS,
+	  variable_get("members"),
+	  GROUP_MEMBERS_DESCRIPTION,
           GROUP_BUTTON_ADD);
 }

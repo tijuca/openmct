@@ -50,7 +50,6 @@ void owi_header(char *title) {
 	  "<tr>\n"
 	  "<td class=\"logo\"><h1>OpenMCT</h1></td>\n"
 	  "<td class=\"description\"><h2>Administration Interface</h2></td>\n"
-	  "<td class=\"domain\" align=\"right\">domainname</td>\n"
 	  "</tr>\n"
 	  "<tr>\n"
 	  "<td class=\"navigation\">\n"

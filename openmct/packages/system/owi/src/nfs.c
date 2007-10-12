@@ -30,6 +30,7 @@
 #include "includes/owi.h"
 #include "includes/nfs.h"
 #include "includes/file.h"
+#include "includes/misc.h"
 
 /* \fn nfs_main(argc, argv)
  * Show all nfs shares from system
@@ -90,37 +91,25 @@ void nfs_list() {
    int i = 0;
 
    /* Start form / external table / scroll area / internal table*/
-   printf("<form action=\"%s\" method=\"post\">\n"
+   printf("<h3>%s</h3\n"
+          "<form action=\"%s\" method=\"post\">\n"
           "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"\" />\n"
-          "<table class=\"%s\">\n"
+          "<table class=\"outside\">\n"
           "<tr>\n"
           "<td>\n"
-          "<h1>%s</h1>\n"
-          "<br />%s<br /><br />\n"
-          "<table width=\"100%%\">\n"
-          "<tr>\n"
-          "<td align=\"right\">"
-          "<input type=\"text\" name=\"search\" value=\"%s\" />&nbsp;"
-          "<input type=\"submit\" value=\"Suchen\" /></td>\n"
-          "</tr>\n"
-          "</table>\n"
-          "<table class=\"%s\" cellpadding=\"0\" cellspacing=\"0\">\n"
-          "<thead>\n"
+          "<table class=\"list\">\n"
+	  "<thead>\n"
           "<tr>\n"
           "<th width=\"80\">%s</th>\n"
           "<th width=\"480\">%s</th>\n"
           "<th width=\"160\">%s</th>\n"
           "</tr>\n"
           "</thead>\n"
-          "<tbody>",
+          "<tbody>\n",
+          NFS_HEADLINE,
           getenv("SCRIPT_NAME"),
 	  variable_get("module"),
-          CONTENT_TABLE_CLASS,
-          NFS_HEADLINE,
-          NFS_DESCRIPTION,
-          variable_get("search"),
-          CONTENT_TABLE_LIST_CLASS,
           NFS_TABLE_DESCRIPTION,
           NFS_TABLE_OPTIONS,
           NFS_TABLE_ACTION);
@@ -143,8 +132,8 @@ void nfs_list() {
               (strstr(argument_get_part(nfs, 0), search) ||
                strstr(options, search))))) {
             /* Print entry */
-            printf("<tr onmouseover=\"this.className='%s';\""
-                     " onmouseout=\"this.className='%s';\">\n"
+            printf("<tr onmouseover=\"this.className='mover';\""
+                     " onmouseout=\"this.className='mout';\">\n"
                    "<td width=\"80\">%s</td>\n"
                    "<td width=\"480\">%s</td>\n"
    	           "<td width=\"160\">\n"
@@ -152,8 +141,6 @@ void nfs_list() {
                    "<input type=\"button\" onClick=\"location='%s?module=%s&command=delete&amp;id=%s'\" value=\"%s\" />"
                    "</td>\n"
                    "</tr>\n",
-                   CONTENT_TABLE_CLASS_MOUSEOVER,
-                   CONTENT_TABLE_CLASS_MOUSEOUT,
                    argument_get_part(nfs, 0),
                    options,
 	           getenv("SCRIPT_NAME"),
@@ -178,10 +165,9 @@ void nfs_list() {
    /* Print table footer / close internal table / close scroll / print footer / ... */
    printf("</tbody>\n"
           "</table>\n"
-          "<table width=\"100%%\">\n"
+	  "<table width=\"100%%\">\n"
           "<tr>\n"
-          "<td colspan=\"7\" align=\"right\">\n"
-          "<input type=\"button\" onClick=\"location='%s?module=%s&command=new'\" value=\"%s\" />"
+          "<td align=\"right\"><input type=\"button\" onClick=\"location='%s?module=%s&command=new'\" value=\"%s\" />"
           "</td>\n"
           "</tr>\n"
           "</table>\n"
@@ -209,10 +195,8 @@ void nfs_detail(char *nfsname) {
           "<tr>\n"
           "<td>\n"
 	  "<h1>%s</h1>\n"
-	  "<br />%s<br /><br />\n",
           CONTENT_TABLE_CLASS,
-	  NFS_HEADLINE,
-	  NFS_DETAIL);
+	  NFS_HEADLINE);
 
    /* Loop through all user entries in /etc/nfs */
    while ( i < file_line_counter) {
@@ -318,20 +302,51 @@ void nfs_update(char *nfsname) {
  * \param[in] nfsname nfsname that will be updated
  */
 void nfs_add(char *nfsname) {
-   /* Options value */
-   char *options = variable_get("options");
+   /* Error */
+   char *error = NULL;
+   /* Counter */
+   int i;
 
-   /* Add new nfs line in memory */
-   file_line_action(FILE_LINE_ADD, file_line_counter,
-                    "%s %s",
-                    nfsname,
-                    options);
+   /* Loop through passwd entries */
+   for (i = 0; i < file_line_counter; i++) {
+      /* Get passwd entry */
+      char **nfs = argument_parse(file_line_get(i), ARGUMENT_SEPERATOR_STANDARD);
+      /* New share already in nfs database */
+      if (!strcasecmp(argument_get_part(nfs, 0),
+          nfsname)) {
+         /* Set error to already exists */
+         error = NFS_ALREADY_EXISTS;
+      }
+      /* Free passwd entry */
+      argument_free(nfs);
+      /* Found? */
+      if (error) {
+         break;
+      }
+   }
 
-   /* Save result in nfs file */
-   file_save(NFS_FILE);
+   if (!match(nfsname, NFS_VALID)) {
+      error = NFS_INVALID;
+   } else if (!match(variable_get("options"), NFS_OPTIONS_VALID)) {
+      error = NFS_OPTIONS_INVALID;
+   }
 
-   /* Display all nfs shares */
-   nfs_list();
+   if (!error) {
+      /* Add new nfs line in memory */
+      file_line_action(FILE_LINE_ADD, file_line_counter,
+                       "%s %s",
+                       nfsname,
+                       variable_get("options"));
+
+      /* Save result in nfs file */
+      file_save(NFS_FILE);
+
+      /* Display all nfs shares */
+      nfs_list();
+   } else {
+      variable_set("error", error);
+      nfs_new();
+   } 
 }
 
 /* \fn nfs_delete(nfsname)
@@ -367,41 +382,46 @@ void nfs_delete(char *nfsname) {
  */
 void nfs_new() {
    /* Print external table for design */
-   printf("<table class=\"%s\">\n"
+   printf("<h3>%s</h3>",
+          NFS_HEADLINE);
+
+   if (strcmp(variable_get("error"), "")) {
+      printf("<div class=\"error\">%s</div>\n",
+             variable_get("error"));
+   }
+
+   printf("<table class=\"outside\">\n"
           "<tr>\n"
           "<td>\n"
-	  "<h1>%s</h1>"
-	  "<br />%s<br /><br />\n"
           "<form action=\"%s\" method=\"post\">\n"
           "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"add\" />\n"
-          "<table class=\"%s\" width=\"100%%\">\n"
+          "<table class=\"detail\">\n"
           "<tr>\n"
-          "<td width=\"250\">%s</td>\n"
-          "<td><input type=\"text\" name=\"id\" /></td>\n"
+          "<td class=\"description\">%s</td>\n"
+          "<td class=\"value\"><input type=\"text\" name=\"id\" value=\"%s\" /><br />%s</td>\n"
           "</tr>\n"
           "<tr>\n"
-          "<td>%s</td>\n"
-          "<td><input type=\"text\" name=\"options\" /></td>\n"
+          "<td class=\"description\">%s</td>\n"
+          "<td class=\"value\"><input type=\"text\" name=\"members\" value=\"%s\" /><br />%s</td>\n"
           "</tr>\n"
-          "</table>\n"
-          "<table width=\"100%%\">\n"
           "<tr>\n"
-          "<td colspan=\"2\" align=\"right\">\n"
-          "<input type=\"submit\" value=\"%s\" />\n"
+          "<td></td>\n"
+          "<td>\n"
+          "<input type=\"button\" onClick=\"javascript:document.forms[0].submit()\" value=\"%s\" />\n"
           "</td>\n"
           "</table>\n"
-	  "</form>\n"
-	  "</td>\n"
-	  "</tr>\n"
-	  "</table>\n",
-          CONTENT_TABLE_CLASS,
-	  NFS_HEADLINE,
-	  NFS_NEW,
+          "</form>\n"
+          "</td>\n"
+          "</tr>\n"
+          "</table>\n",
           getenv("SCRIPT_NAME"),
-	  variable_get("module"),
-          CONTENT_TABLE_BOX_CLASS,
+          variable_get("module"),
           NFS_TABLE_DESCRIPTION,
+          variable_get("id"),
+          NFS_DESCRIPTION,
           NFS_TABLE_OPTIONS,
+          variable_get("options"),
+          NFS_OPTIONS_DESCRIPTION,
           NFS_BUTTON_ADD);
 }

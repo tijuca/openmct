@@ -26,4 +26,8 @@ install:
 	$(MKDIR) -p $(DESTDIR)
 	$(CP) -a $(BINARY) $(DESTDIR)
 
+ose: misc.o variable.o argument.o file.o ose.o
+	$(CC) $(LDFLAGS) $(CFLAGS) -o ose misc.o variable.o argument.o file.o ose.o
+	$(STRIP) -s ose
+
 uninstall:

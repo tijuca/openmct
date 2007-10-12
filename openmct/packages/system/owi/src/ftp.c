@@ -68,7 +68,7 @@ int ftp_main(int argc, char **argv) {
          /* Update configuration failed */
 	 ftp_update();
 	 /* Reload konfiguration */
-	 proc_open("killall -HUP vsftpd");
+	 proc_open("/bin/killall -HUP vsftpd");
       } 
       /* Free file */
       file_free(FTP_FILE);
@@ -98,19 +98,16 @@ void ftp_list() {
 
    /* Print external table for design */
    printf("<h3>%s</h3>\n"
+          "<table class=\"outside\">\n"
+	  "<tr>\n"
+	  "<td>\n"
           "<form action=\"%s\" method=\"post\">\n"
           "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
           "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
-          "<table class=\"detail\">\n"
-	  "<thead>\n"
-	  "<tr>\n"
-	  "<th colspan=\"2\">%s</th>\n"
-	  "</tr>\n"
-	  "</thead>\n",
+          "<table class=\"detail\">\n",
           FTP_HEADLINE,
           getenv("SCRIPT_NAME"),
-	  variable_get("module"),
-	  FTP_HEADLINE_BOX);
+	  variable_get("module"));
 
    /* Loop through config file */
    for (i = 0;  i < file_line_counter; i++) {
@@ -156,12 +153,15 @@ void ftp_list() {
    }
 
    /* Print Submit button */
-   printf("</table>\n"
-          "<table width=\"100%%\">\n"
+   printf(
 	  "<tr>\n"
-	  "<td align=\"right\"><input type=\"submit\" value=\"%s\" /></td>\n"
+	  "<td></td>\n"
+	  "<td><input type=\"submit\" value=\"%s\" /></td>\n"
 	  "</tr>\n"
           "</table>\n"
+	  "</td>\n"
+	  "</tr>\n"
+	  "</table>\n"
           "</form>\n",
 	  FTP_BUTTON_UPDATE);
 

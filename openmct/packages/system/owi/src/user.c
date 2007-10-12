@@ -30,6 +30,7 @@
 #include "includes/owi.h"
 #include "includes/user.h"
 #include "includes/file.h"
+#include "includes/misc.h"
 
 /* \fn user_main(argc, argv)
  * Show all users from system
@@ -82,8 +83,6 @@ int user_main(int argc, char **argv) {
  * Show all users from system
  */
 void user_list() {
-   /* Get command for this module */        
-   char *search = variable_get("search");
    /* Index counter */
    int i = 0;
 
@@ -117,34 +116,26 @@ void user_list() {
    while ( i < file_line_counter) {
       /* Parse passwd entry */
       char **passwd = argument_parse(file_line_get(i), ":");
-      /* Search string specified? */
-      if (!search || !strcmp(search, "") ||
-          (search && 
-           (strstr(argument_get_part(passwd, 0), search) ||
-            strstr(argument_get_part(passwd, 3), search) ||
-            strstr(argument_get_part(passwd, 4), search) ||
-            strstr(argument_get_part(passwd, 5), search)))) {
-         /* Print entry */
-         printf("<tr onmouseover=\"this.className='mover';\""
-                " onmouseout=\"this.className='mout';\">\n"
-                "<td width=\"200\">%s</td>\n"
-                "<td width=\"212\">%s</td>\n"
-                "<td width=\"100\">"
-		"<input type=\"button\" onClick=\"location='%s?module=%s&amp;command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
-		"<input type=\"button\" onClick=\"location='%s?module=%s&amp;command=delete&amp;id=%s'\" value=\"%s\" />"
-		"</td>\n"
-                "</tr>\n",
-                argument_get_part(passwd, 0),
-                argument_get_part(passwd, 4),
-                getenv("SCRIPT_NAME"),
-		variable_get("module"),
-                argument_get_part(passwd, 0),
-		USER_BUTTON_MODIFY,
-		getenv("SCRIPT_NAME"),
-		variable_get("module"),
-		argument_get_part(passwd, 0),
-		USER_BUTTON_DELETE);
-      }
+      /* Print entry */
+      printf("<tr onmouseover=\"this.className='mover';\""
+             " onmouseout=\"this.className='mout';\">\n"
+             "<td width=\"200\">%s</td>\n"
+             "<td width=\"212\">%s</td>\n"
+             "<td width=\"100\">"
+             "<input type=\"button\" onClick=\"location='%s?module=%s&amp;command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
+             "<input type=\"button\" onClick=\"location='%s?module=%s&amp;command=delete&amp;id=%s'\" value=\"%s\" />"
+             "</td>\n"
+             "</tr>\n",
+             argument_get_part(passwd, 0),
+             argument_get_part(passwd, 4),
+             getenv("SCRIPT_NAME"),
+             variable_get("module"),
+             argument_get_part(passwd, 0),
+             USER_BUTTON_MODIFY,
+             getenv("SCRIPT_NAME"),
+             variable_get("module"),
+             argument_get_part(passwd, 0),
+             USER_BUTTON_DELETE);
       /* Increase counter */
       i++;
       /* Free passwd entry */
@@ -180,11 +171,17 @@ void user_detail(char *username) {
    int i = 0;
 
    /* Print external table for design */
-   printf("<h3>%s</h3>\n"
-          "<table class=\"outside\">\n"
+   printf("<h3>%s</h3>\n",
+          USER_HEADLINE);
+
+   if (strcmp(variable_get("error"), "")) {
+      printf("<div class=\"error\">%s</div>\n",
+             variable_get("error"));
+   }
+
+   printf("<table class=\"outside\">\n"
 	  "<tr>\n"
-	  "<td>\n",
-	  USER_HEADLINE);
+	  "<td>\n");
 
    /* Loop through all user entries in /etc/passwd */
    while ( i < file_line_counter) {
@@ -265,33 +262,54 @@ void user_detail(char *username) {
 void user_update(char *username) {
    /* Index counter */
    unsigned int i;
-
-   /* Loop through passwd entries */
-   for (i = 0; i < file_line_counter; i++) {
-      /* Get passwd entry */
-      char **passwd = argument_parse(file_line_get(i), ":");
-      /* Passwd entry found? */
-      if (!strcasecmp(username, argument_get_part(passwd, 0))) {
-         /* Set new passwd line in memory */
-         file_line_action(FILE_LINE_SET, i,
-                          "%s:%s:%s:%s:%s:%s:%s",
-                          username,
-                          crypt(variable_get("password"), "OM"),
-                          argument_get_part(passwd, 2),
-                          argument_get_part(passwd, 3),
-			  variable_get("gecos"),
-			  argument_get_part(passwd, 5),
-			  argument_get_part(passwd, 6));
-      }
-      /* Free passwd entry */
-      argument_free(passwd);
+   /* Error variable */
+   char *error = NULL;
+   /* password */
+   char *password = NULL;
+ 
+   /* Invalid syntax for user description */
+   if (!match(variable_get("gecos"), USER_GECOS_VALID)) {
+      error = USER_GECOS_INVALID;
    }
-   
-   /* Save result in user file */
-   file_save(USER_FILE);
 
-   /* Display user list */
-   user_list();
+   /* Everything fine? */
+   if (!error) {
+      /* Loop through passwd entries */
+      for (i = 0; i < file_line_counter; i++) {
+         /* Get passwd entry */
+         char **passwd = argument_parse(file_line_get(i), ":");
+         /* Passwd entry found? */
+         if (!strcasecmp(username, argument_get_part(passwd, 0))) {
+	    /* Password set in webinterface? */
+	    if (strcmp(variable_get("password"), "")) {
+               password = crypt(variable_get("password"), "OM");
+	    } else {
+               password = argument_get_part(passwd, 1);
+	    }
+            /* Set new passwd line in memory */
+            file_line_action(FILE_LINE_SET, i,
+                             "%s:%s:%s:%s:%s:%s:%s",
+                             username,
+                             password,
+                             argument_get_part(passwd, 2),
+                             argument_get_part(passwd, 3),
+                             variable_get("gecos"),
+                             argument_get_part(passwd, 5),
+                             strcmp(variable_get("shell"), "y") == 0 ? USER_SHELL_DEFAULT : USER_SHELL_FALSE);
+         }
+         /* Free passwd entry */
+         argument_free(passwd);
+      }
+   
+      /* Save result in user file */
+      file_save(USER_FILE);
+   
+      /* Display user list */
+      user_list();
+   } else {
+      variable_set("error", error);
+      user_detail(username);
+   }
 }
 
 /* \fn user_add(username)
@@ -303,8 +321,8 @@ void user_add(char *username) {
    int i;
    /* Max uid */
    unsigned int start_uid = 1000;
-   /* User already found? */
-   int found = 0;
+   /* Error variable */
+   char *error = NULL;
 
    /* Loop through passwd entries */
    for (i = 0; i < file_line_counter; i++) {
@@ -320,18 +338,25 @@ void user_add(char *username) {
       /* New user already in user database */
       if (!strcasecmp(argument_get_part(passwd, 0), 
           variable_ltrim(variable_filter(username, ":")))) {
-         /* Set found to true */
-         found = 1;
+         /* Set error to already exists */
+         error = USER_ALREADY_EXISTS;
       } 
       /* Free passwd entry */
       argument_free(passwd);
       /* Found? */
-      if (found) {
+      if (error) {
          break;
       }
    }
+
+   if (!match(username, USER_LOGIN_VALID)) {
+      error = USER_LOGIN_INVALID;
+   } else if (!match(variable_get("gecos"), USER_GECOS_VALID)) {
+      error = USER_GECOS_INVALID;
+   }
+
    /* User not found? */
-   if (!found) {
+   if (!error) {
       /* Add new passwd line in memory */
       file_line_action(FILE_LINE_ADD, i,
                        "%s:%s:%d:%d:%s:/home/%s:%s",
@@ -347,7 +372,7 @@ void user_add(char *username) {
       /* Display user list */
       user_list();
    } else {
-      variable_set("error", USER_ALREADY_EXISTS);
+      variable_set("error", error);
       /* Display user add page with error */
       user_new();
    }
