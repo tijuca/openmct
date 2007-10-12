@@ -88,7 +88,7 @@ void sysinfo_list() {
    sysinfo(&si);
 
    printf("<h4>%s</h4>\n"
-          "<table class=\"detail\">\n"
+          "<table class=\"detail\" width=\"100%%\">\n"
           "<thead>\n"
 	  "<tr>\n"
 	  "<th colspan=\"2\">%s</th>\n"
@@ -124,7 +124,8 @@ void sysinfo_list() {
 	  "<td class=\"value\">%s</td>\n"
 	  "</tr>\n"
           "</tbody>\n"
-	  "</table>\n",
+	  "</table>\n"
+	  "<br />\n",
 	  SYSINFO_HEADLINE,
 	  SYSINFO_HEADLINE_BOX,
 	  hostname,

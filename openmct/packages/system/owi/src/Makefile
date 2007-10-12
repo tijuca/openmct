@@ -1,5 +1,5 @@
 LANGUAGE=LANG_GERMAN
-CFLAGS=-D$(LANGUAGE) -Os -Wall
+CFLAGS=-D$(LANGUAGE) -Os -Wall -DFILE_BASE='"../examples"'
 CC=$(CROSS)gcc
 STRIP=$(CROSS)strip
 OUTPUT=../www
@@ -9,6 +9,7 @@ LN=ln
 BINARY=index.cgi
 LDFLAGS=-lcrypt
 DESTDIR=/www
+CSS=openmct.css
 
 OBJECTS=ftp.o misc.o variable.o interface.o argument.o user.o group.o sysinfo.o file.o nfs.o shell.o owi.o
 
@@ -23,8 +24,10 @@ clean:
 	rm $(BINARY) $(OBJECTS) 2> /dev/null
 
 install:
-	$(MKDIR) -p $(DESTDIR)
-	$(CP) -a $(BINARY) $(DESTDIR)
+	$(MKDIR) -p $(DESTDIR)/cgi-bin
+	$(CP) -a $(BINARY) $(DESTDIR)/cgi-bin
+	$(MKDIR) -p $(DESTDIR)/css
+	$(CP) -a $(CSS) $(DESTDIR)/css
 
 ose: misc.o variable.o argument.o file.o ose.o
 	$(CC) $(LDFLAGS) $(CFLAGS) -o ose misc.o variable.o argument.o file.o ose.o

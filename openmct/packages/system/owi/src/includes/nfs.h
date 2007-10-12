@@ -1,7 +1,7 @@
 #define	NFS_FILE	"/etc/exports"
 
 #define NFS_VALID "^[a-z0-9_/]{1,64}$"
-#define NFS_OPTIONS_VALID "^[a-zA-Z0-9_,()]*$"
+#define NFS_OPTIONS_VALID "^[a-zA-Z0-9_.,()/]*$"
 
 int nfs_main(int argc, char **arv);
 void nfs_list();

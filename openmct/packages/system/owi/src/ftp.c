@@ -32,16 +32,12 @@
 
 /* Define ini configuration tags */
 struct file_ini_t ftp_ini[] = {
-   { FTP_INI_LISTEN, "listen", "YES|NO", "YES", NULL, 0 },
-   { FTP_INI_ANONYMOUS_ENABLE, "anonymous_enable", "YES|NO", "NO", NULL, 0 },
-   { FTP_INI_LOCAL_ENABLE, "local_enable", "YES|NO", "YES", NULL, 0 },
-   { FTP_INI_WRITE_ENABLE, "write_enable", "YES|NO", "YES", NULL, 0 },
-   { FTP_INI_LOCAL_UMASK, "local_umask", NULL, "022", NULL, 0 },
-   { FTP_INI_DIRMESSAGE_ENABLED, "dirmessage_enable", "YES|NO", "YES", NULL, 0 },
-   { FTP_INI_XFERLOG_ENABLE, "xferlog_enable", "YES|NO", "NO", NULL, 0 },
-   { FTP_INI_CONNECT_FROM_PORT_20, "connect_from_port_20", "YES|NO", "NO", NULL, 0 },
-   { FTP_INI_SECURE_CHROOT_DIR, "secure_chroot_dir", NULL, "/tmp", NULL, 0 },
-   { FTP_INI_FTPD_BANNER, "ftpd_banner", NULL, "Welcome on the OpenMCT Release!", NULL, 0},
+   { FTP_INI_LISTEN_PORT, NULL, "listen_port", NULL, "21", NULL, 0 },
+   { FTP_INI_MAX_CLIENTS, FTP_INI_MAX_CLIENTS_DESCRIPTION, "max_clients", NULL, "5", NULL, 0 },
+   { FTP_INI_MAX_PER_IP, FTP_INI_MAX_PER_IP_DESCRIPTION, "max_per_ip", NULL, "2", NULL, 0 },
+   { FTP_INI_IDLE_SESSION_TIMEOUT, FTP_INI_IDLE_SESSION_TIMEOUT_DESCRIPTION,  "idle_session_timeout", NULL, "300", NULL, 0 },
+   { FTP_INI_ANONYMOUS_ENABLE,FTP_INI_ANONYMOUS_ENABLE_DESCRIPTION, "anonymous_enable", "YES", "NO", NULL, 0 },
+   { FTP_INI_LOCAL_ENABLE, FTP_INI_LOCAL_ENABLE_DESCRIPTION, "local_enable", "YES", "YES", NULL, 0 },
    { NULL, NULL, NULL, NULL, NULL, 0 }
 };
 
@@ -126,7 +122,7 @@ void ftp_list() {
    for (i = 0; ftp_ini[i].variable != NULL; i++) {
       printf("<tr>\n"
              "<td class=\"description\">%s</td>\n"
-	     "<td class=\"value\">", ftp_ini[i].description);
+	     "<td class=\"value\">", ftp_ini[i].value);
       /* valid set? */
       if (ftp_ini[i].valid) {
          /* Valid values */
@@ -145,8 +141,12 @@ void ftp_list() {
 	 /* Free valid values */
 	 argument_free(valid_values);
       } else {
-         printf("<input type=\"text\" name=\"%s\" value=\"%s\" />\n",
+         printf("<input type=\"text\" name=\"%s\" value=\"%s\" />",
 	        ftp_ini[i].variable, ftp_ini[i].current ? ftp_ini[i].current[1] : "");
+         if (ftp_ini[i].description) {
+            printf("<br />%s", ftp_ini[i].description);
+	 }
+	 printf("\n");
       }
       printf("</td>\n"
              "</tr>\n");

@@ -85,8 +85,6 @@ int nfs_main(int argc, char **argv) {
  * Show all nfss from system
  */
 void nfs_list() {
-   /* Get command for this module */        
-   char *search = variable_get("search");
    /* Index counter */
    int i = 0;
 
@@ -111,52 +109,35 @@ void nfs_list() {
           getenv("SCRIPT_NAME"),
 	  variable_get("module"),
           NFS_TABLE_DESCRIPTION,
-          NFS_TABLE_OPTIONS,
+          NFS_TABLE_MAP,
           NFS_TABLE_ACTION);
 
    /* Loop through all nfs entries in nfs file */
    while ( i < file_line_counter) {
       /* Parse nfs entry */
       char **nfs = argument_parse(file_line_get(i), ARGUMENT_SEPERATOR_STANDARD);
-      /* Get options data for this share */
-      char *options = NULL;
-      /* Valid line? */
-      if (argument_get_part(nfs, 0)[0] != '#') {
-         options = argument_get(nfs, 1, ARGUMENT_SEPERATOR_STANDARD);
+      if (nfs[0][0] != '#') {
+         /* Print entry */
+         printf("<tr onmouseover=\"this.className='mover';\""
+                " onmouseout=\"this.className='mout';\">\n"
+                "<td width=\"80\">%s</td>\n"
+                "<td width=\"480\">%s</td>\n"
+   	        "<td width=\"160\">\n"
+	        "<input type=\"button\" onClick=\"location='%s?module=%s&command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
+                "<input type=\"button\" onClick=\"location='%s?module=%s&command=delete&amp;id=%s'\" value=\"%s\" />"
+                "</td>\n"
+                "</tr>\n",
+                argument_get_part(nfs, 0),
+                argument_get_part(nfs, 1),
+	        getenv("SCRIPT_NAME"),
+		variable_get("module"),
+                argument_get_part(nfs, 0),
+	        NFS_BUTTON_MODIFY,
+  	        getenv("SCRIPT_NAME"),
+		variable_get("module"),
+                argument_get_part(nfs, 0),
+  	        NFS_BUTTON_DELETE);
       }
-      /* Everything ok? */
-      if (options) {
-         /* Search string specified? */
-         if ((!search || !strcmp(search, "") ||
-             (search && 
-              (strstr(argument_get_part(nfs, 0), search) ||
-               strstr(options, search))))) {
-            /* Print entry */
-            printf("<tr onmouseover=\"this.className='mover';\""
-                     " onmouseout=\"this.className='mout';\">\n"
-                   "<td width=\"80\">%s</td>\n"
-                   "<td width=\"480\">%s</td>\n"
-   	           "<td width=\"160\">\n"
-	           "<input type=\"button\" onClick=\"location='%s?module=%s&command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
-                   "<input type=\"button\" onClick=\"location='%s?module=%s&command=delete&amp;id=%s'\" value=\"%s\" />"
-                   "</td>\n"
-                   "</tr>\n",
-                   argument_get_part(nfs, 0),
-                   options,
-	           getenv("SCRIPT_NAME"),
-		   variable_get("module"),
-                   argument_get_part(nfs, 0),
-	           NFS_BUTTON_MODIFY,
-  	           getenv("SCRIPT_NAME"),
-		   variable_get("module"),
-                   argument_get_part(nfs, 0),
-  	           NFS_BUTTON_DELETE);
-	 }
-      }
-      if (options) {
-         /* Free options */
-         free(options);
-      }	 
       /* Increase counter */
       i++;
       /* Free nfs entry */
@@ -237,7 +218,7 @@ void nfs_detail(char *nfsname) {
    	   	   CONTENT_TABLE_BOX_CLASS,
                    NFS_TABLE_DESCRIPTION,
                    argument_get_part(nfs, 0),
-                   NFS_TABLE_OPTIONS,
+                   NFS_TABLE_MAP,
                    options,
 		   NFS_BUTTON_UPDATE);
             /* Free options data */
@@ -328,7 +309,7 @@ void nfs_add(char *nfsname) {
    if (!match(nfsname, NFS_VALID)) {
       error = NFS_INVALID;
    } else if (!match(variable_get("options"), NFS_OPTIONS_VALID)) {
-      error = NFS_OPTIONS_INVALID;
+      // error = NFS_MAPS_INVALID;
    }
 
    if (!error) {
@@ -403,7 +384,11 @@ void nfs_new() {
           "</tr>\n"
           "<tr>\n"
           "<td class=\"description\">%s</td>\n"
-          "<td class=\"value\"><input type=\"text\" name=\"members\" value=\"%s\" /><br />%s</td>\n"
+          "<td class=\"value\"><select name=\"map\" size=\"1\"><option>yes</option><option>no</option></select><br />%s</td>\n"
+          "</tr>\n"
+          "<tr>\n"
+          "<td class=\"description\">%s</td>\n"
+          "<td class=\"value\"><input type=\"text\" name=\"network\" value=\"%s\" />/<select name=\"range\" size=\"1\"><option>8</option><option>16</option><option>24</option><option>32</option></select><br />%s</td>\n"
           "</tr>\n"
           "<tr>\n"
           "<td></td>\n"
@@ -420,8 +405,10 @@ void nfs_new() {
           NFS_TABLE_DESCRIPTION,
           variable_get("id"),
           NFS_DESCRIPTION,
-          NFS_TABLE_OPTIONS,
-          variable_get("options"),
-          NFS_OPTIONS_DESCRIPTION,
+          NFS_TABLE_MAP,
+          NFS_MAP_DESCRIPTION,
+          NFS_TABLE_AUTHORIZED_NETWORK,
+          variable_get("network"),
+          NFS_AUTHORIZED_NETWORK_DESCRIPTION,
           NFS_BUTTON_ADD);
 }

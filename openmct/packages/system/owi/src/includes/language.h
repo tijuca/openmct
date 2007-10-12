@@ -55,8 +55,9 @@
 #define  PROCESS_NAV_DESCRIPTION             "Process"
 
 /* nfs */
-#define  NFS_TABLE_DESCRIPTION               "Share"
-#define  NFS_TABLE_OPTIONS		     "Properties"
+#define  NFS_TABLE_DESCRIPTION               "Directory"
+#define  NFS_TABLE_MAP                       "map all users to root"
+#define  NFS_TABLE_AUTHORIZED_NETWORK        "Authorized network"
 #define  NFS_TABLE_ACTION                    "Action"
 #define  NFS_HEADLINE                        "Services: NFS"
 #define  NFS_FILE_FAILED                     "Can't open NFS database"
@@ -67,11 +68,11 @@
 #define  NFS_BUTTON_NEW                      "New"
 #define  NFS_BUTTON_ADD                      "Add"
 #define  NFS_NAV_DESCRIPTION                 "NFS"
-#define  NFS_DESCRIPTION                     "Unique share name."
-#define  NFS_OPTIONS_DESCRIPTION             "Share properties."
+#define  NFS_DESCRIPTION                     "Unique directory name."
 #define  NFS_INVALID                         "Invalid syntax for share"
-#define  NFS_OPTIONS_INVALID                 "Invalid syntax for share options"
-#define  NFS_ALREADY_EXISTS                  "Share already exists"
+#define  NFS_ALREADY_EXISTS                  "Directory already exists"
+#define  NFS_MAP_DESCRIPTION                 "All users will have the root privilege."
+#define  NFS_AUTHORIZED_NETWORK_DESCRIPTION  "Network that is authorized to access to NFS share."
 
 /* ftp */
 #define  FTP_HEADLINE                        "Services: FTP"
@@ -83,17 +84,17 @@
 
 #define  FTP_BUTTON_UPDATE                   "Save"
 
-#define  FTP_INI_LISTEN	                     "Daemon Mode"
-#define  FTP_INI_ANONYMOUS_ENABLE            "Enable anonymous logins"
-#define  FTP_INI_LOCAL_ENABLE                "Enable local users"
-#define  FTP_INI_WRITE_ENABLE                "Enable write access"
-#define  FTP_INI_LOCAL_UMASK                 "Local umask"
-#define  FTP_INI_DIRMESSAGE_ENABLED          "Directory message"
-#define  FTP_INI_XFERLOG_ENABLE              "Log up/download"
-#define  FTP_INI_CONNECT_FROM_PORT_20        "PORT Port 20"
-#define  FTP_INI_SECURE_CHROOT_DIR           "Secure directory (chroot/jail)"
-#define  FTP_INI_FTPD_BANNER                 "Banner"
-#define  FTP_NAV_DESCRIPTION                 "FTP"
+#define  FTP_INI_LISTEN_PORT	             "TCP port"
+#define  FTP_INI_MAX_CLIENTS                 "Number of clients"
+#define  FTP_INI_MAX_CLIENTS_DESCRIPTION     "Maximum number of simultaneous clients."
+#define  FTP_INI_MAX_PER_IP                  "Max conn per ip"
+#define  FTP_INI_MAX_PER_IP_DESCRIPTION      "Maximum connection per IP address."
+#define  FTP_INI_IDLE_SESSION_TIMEOUT        "Timeout"
+#define  FTP_INI_IDLE_SESSION_TIMEOUT_DESCRIPTION "Maximum idle time in seconds"
+#define  FTP_INI_ANONYMOUS_ENABLE            "Enable Anonymous"
+#define  FTP_INI_ANONYMOUS_ENABLE_DESCRIPTION "Accept anonymous connection."
+#define  FTP_INI_LOCAL_ENABLE                "Enable Authenticated User"
+#define  FTP_INI_LOCAL_ENABLE_DESCRIPTION    "Accept authenticated user connection."
 
 /* shell */
 #define  SHELL_HEADLINE                      "Remote Console"

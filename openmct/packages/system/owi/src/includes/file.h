@@ -3,8 +3,6 @@
 #define  FILE_LINE_DEL     2
 #define  FILE_LINE_ADD     3
 
-#define  FILE_BASE         "../examples"
-
 int file_open(char *filename);
 int proc_open(char *filename);
 int file_read(FILE *fp);
@@ -21,6 +19,7 @@ char *file_read_line(char *file, int index);
 extern int file_line_counter;
 
 struct file_ini_t {
+   char *value;
    char *description;
    char *variable;
    char *valid;
