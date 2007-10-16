@@ -1,5 +1,5 @@
 /* -*- mode: C; c-file-style: "gnu" -*- */
-/* group.c  group management
+/* group.c Group management
  *
  * Copyright (C) 2006 OpenMCT
  *
@@ -22,15 +22,58 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <crypt.h>
 #include "includes/argument.h"
 #include "includes/language.h"
 #include "includes/template.h"
 #include "includes/variable.h"
-#include "includes/owi.h"
-#include "includes/group.h"
 #include "includes/file.h"
 #include "includes/misc.h"
+#include "includes/owi.h"
+#include "includes/group.h"
+
+struct file_data_t group_data[] = {
+   { 
+     FILE_DATA_TYPE_TEXT,
+     -1,
+     "login",
+     GROUP_NAME_LOGIN,
+     GROUP_DESCRIPTION_LOGIN,
+     NULL,
+     "^[A-Za-z0-9_]{3,8}$",
+     NULL,
+     0,
+     NULL,
+     FILE_DATA_FLAG_ADD | FILE_DATA_FLAG_LIST | FILE_DATA_FLAG_ID
+   },
+
+   { 
+     FILE_DATA_TYPE_TEXT,
+     -1,
+     "members",
+     GROUP_NAME_MEMBERS,
+     GROUP_DESCRIPTION_MEMBERS, 
+     NULL,
+     "^[A-Za-z0-9,]{0,40}$",
+     NULL,
+     3,
+     NULL,
+     FILE_DATA_FLAG_ADD | FILE_DATA_FLAG_UPDATE | FILE_DATA_FLAG_LIST
+   },
+
+   { 
+      0,
+      -1,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      0,
+      NULL,
+      0,
+   }
+};
 
 /* \fn group_main(argc, argv)
  * Show all groups from system
@@ -41,31 +84,35 @@
 int group_main(int argc, char **argv) {
    /* Get command for this module */        
    char *command = variable_get("command");
-   
-   /* Print header information */
-   owi_header("Group Management");
  
+   /* Print header information */
+   owi_header(GROUP_HEADLINE);
+
    /* Read file into memory */
    if (file_open(GROUP_FILE) != -1) {
       /* Command NULL or empty? */
       if (!command || !strcmp(command, "")) {
-         /* Just print user list */
+         /* Just print group list */
          group_list();
-      /* show user detail */
-      } else if (!strcasecmp(command, "detail")) {
-         /* Show user detail */
+      /* show group detail */
+      } else if (!strcasecmp(command, OWI_BUTTON_DETAIL)) {
+         /* Show group detail */
          group_detail(variable_get("id"));
-      } else if (!strcasecmp(command, "update")) {
-         group_update(variable_get("id"), variable_get("members"));
-      } else if (!strcasecmp(command, "new")) {
+      } else if (!strcasecmp(command, OWI_BUTTON_UPDATE)) {
+	 /* Update group now */
+         group_update(variable_get("id"));
+      } else if (!strcasecmp(command, OWI_BUTTON_NEW)) {
+	 /* Show form for adding a group */
          group_new(variable_get("id"));
-      } else if (!strcasecmp(command, "add")) {
+      } else if (!strcasecmp(command, OWI_BUTTON_ADD)) {
+	 /* Add group now */
          group_add(variable_get("id"));
-      } else if (!strcasecmp(command, "delete")) {
+      } else if (!strcasecmp(command, OWI_BUTTON_DELETE)) {
+	 /* Delete group now */
          group_delete(variable_get("id"));
       }
       /* Free file */
-      file_free(GROUP_FILE);
+      file_free();
    } else {
       /* Print error message */
       owi_headline(1, GROUP_HEADLINE);
@@ -80,208 +127,171 @@ int group_main(int argc, char **argv) {
 }
 
 /* \fn group_list()
- * Show all users from system
+ * Show all groups from system
  */
 void group_list() {
    /* Index counter */
-   int i = 0;	
+   int i = 0;
 
-   /* Start form / external table / scroll area / internal table*/
-   printf("<h3>%s</h3>\n"
-          "<form action=\"%s\" method=\"post\">\n"
-          "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
-          "<input type=\"hidden\" name=\"command\" value=\"\" />\n"
-          "<table class=\"outside\">\n"
-          "<tr>\n"
-          "<td>\n"
-          "<table class=\"list\">\n"
-          "<thead>\n"
-          "<tr>\n"
-          "<th>%s</th>\n"
-          "<th>%s</th>\n"
-          "<th>%s</th>\n"
-          "</tr>\n"
-          "</thead>\n"
-          "<tbody>",
-          GROUP_HEADLINE,
-          getenv("SCRIPT_NAME"),
-	  variable_get("module"),
-          GROUP_TABLE_DESCRIPTION,
-          GROUP_TABLE_MEMBERS,
-          GROUP_TABLE_ACTION);
-   /* Loop through all user entries in group file */
-   while ( i < file_line_counter) {
-      char **group = argument_parse(file_line_get(i), ":");
-      /* Print entry */
-      printf("<tr onmouseover=\"this.className='mover';\""
-             " onmouseout=\"this.className='mout';\">\n"
-             "<td width=\"200\">%s</td>\n"
-             "<td width=\"212\">%s</td>\n"
-             "<td width=\"100\"><input type=\"button\" onClick=\"location='%s?module=%s&command=detail&id=%s'\" value=\"%s\" />&nbsp;<input type=\"button\" onClick=\"location='%s?module=%s&amp;command=delete&amp;id=%s'\" value=\"%s\" /></td>\n"
-             "</tr>\n",
-             argument_get_part(group, 0),
-             argument_get_part(group, 3),
-             getenv("SCRIPT_NAME"),
-             variable_get("module"),
-             argument_get_part(group, 0),
-             GROUP_BUTTON_MODIFY,
-             getenv("SCRIPT_NAME"),
-             variable_get("module"),
-             argument_get_part(group, 0),
-             GROUP_BUTTON_DELETE);
-      /* Increase index counter */
-      i++;
+   /* Print outside table */
+   owi_outside_open(OWI_LIST);
+
+   /* Print table header */
+   owi_table_header(group_data);
+
+   /* Loop through all group entries in group file */
+   for (i = 0; i < file_line_counter; i++) {
+      /* Parse group entry */
+      char **group = NULL;
+      if (file_line_get(i)[0] == '#') {
+         continue;
+      }
+      group = argument_parse(file_line_get(i), ":");
+      /* Display line */
+      owi_data_list(group_data, group);
       /* Free group entry */
       argument_free(group);
    }
+
    /* Print table footer / close internal table / close scroll / print footer / ... */
-   printf("</tbody>\n"
-          "</table>\n"
-          "<table width=\"100%%\">\n"
-          "<tr>\n"
-          "<td colspan=\"7\" align=\"right\">\n"
-	  "<input type=\"button\" onClick=\"location='%s?module=%s&command=new'\" value=\"%s\" />\n"
-          "</td>\n"
-          "</tr>\n"
-          "</table>\n"
-          "</td>\n"
-          "</tr>\n"
-          "</table>\n"
-          "</form>\n",
-          getenv("SCRIPT_NAME"),
-	  variable_get("module"),
-          GROUP_BUTTON_NEW);
+   owi_outside_close(OWI_DETAIL, OWI_BUTTON_NEW);
 }
 
 /* \fn group_detail(groupname)
  * Show one group account
+ * \param[in] groupname group that will be displayed
  */
 void group_detail(char *groupname) {
+   /* Group found? */
+   int group_found = 0;
    /* Index counter */
    int i = 0;
-   /* Group */
-   int group_found = 0;
 
-   /* Print external table for design */
-   printf("<h3>%s</h3>\n",
-          GROUP_HEADLINE);
+   /* Print info box if variable info is set */
+   owi_box_info();
 
-   if (strcmp(variable_get("error"), "")) {
-      printf("<div class=\"error\">%s</div>\n",
-             variable_get("error"));
-   }
+   /* Print outside table content */
+   owi_outside_open(OWI_DETAIL);
 
-   /* Loop through passwd database */
-   while ( i < file_line_counter) {
-      /* Get group entry */	   
-      char **group = argument_parse(file_line_get(i), ":");
+   /* Loop through all group entries in group file */
+
+   for (i = 0; i < file_line_counter; i++) {
+      /* Parse group entry */
+      char **group = NULL;
+      /* Skip inactive groups */
+      if (file_line_get(i)[0] == '#') {
+         continue;
+      }
+      /* Parse entry */
+      group = argument_parse(file_line_get(i), ":");
       /* Match found? */
       if (!strcmp(argument_get_part(group, 0), groupname)) {
-         printf("<form action=\"%s\" method=\"POST\">\n"
-                "<table class=\"outside\">\n"
-                "<tr>\n"
-                "<td>\n"
-                "<input type=\"hidden\" name=\"module\" value=\"%s\">\n"
-                "<input type=\"hidden\" name=\"command\" value=\"update\">\n"
-                "<input type=\"hidden\" name=\"id\" value=\"%s\">\n"
-                "<table class=\"detail\">\n"
-                "<tr>\n"
-                "<td class=\"description\">%s</td>\n"
-                "<td class=\"value\">%s</td>\n"
-                "<tr>\n"
-                "<td class=\"description\">%s</td>\n"
-                "<td class=\"value\"><input type=\"text\" name=\"members\" value=\"%s\" /><br />%s</td>\n"
-                "</tr>\n"
-                "<tr>\n"
-                "<td></td>\n"
-	        "<td><input type=\"button\" onClick=\"javascript:document.forms[0].submit()\" value=\"%s\" />\n"
-                "</td>\n"
-		"</tr>\n"
-                "</table>\n"
-                "</form>\n"
-                ,
-                getenv("SCRIPT_NAME"),
-		variable_get("module"),
-                argument_get_part(group, 0),
-                GROUP_TABLE_DESCRIPTION,
-                argument_get_part(group, 0),
-                GROUP_TABLE_MEMBERS,
-                argument_get_part(group, 3),
-		GROUP_MEMBERS_DESCRIPTION,
-		GROUP_BUTTON_UPDATE);
-
-
-         /* Set user found to one */
+         /* Get details from config line */
+	 file_data_detail(group_data, group);
+	 /* Display details */
+         owi_data_detail(group_data);
+         /* Set group found to one */
          group_found = 1;
       }
-      /* Increase index counter */
-      i++;
       /* Free group entry */
       argument_free(group);
    }
 
-   /* No user found? */
+   /* No group found? */
    if (!group_found) {
       /* Print information screen */
       owi_headline(2, GROUP_NOT_FOUND);
    }
 
-   /* Close external table */
-   printf("</td>\n"
-          "</tr>\n"
-          "</table>\n");
+   /* Print Submit button */
+   owi_outside_close(OWI_DETAIL, OWI_BUTTON_UPDATE);
 }
 
-/* \fn group_update(groupname, members)
- * Update an entry in group file
- * \param[in] groupname group that will be updated
- * \param[in] members comma seperated list of usernames
+/* \fn group_update(groupname)
+ * Update an entry in password file
+ * \param[in] groupname groupname that will be updated
  */
-void group_update(char *groupname, char *members) {
+void group_update(char *groupname) {
    /* Index counter */
-   unsigned int i;
-   /* Error */
-   char *error = NULL;
+   int i;
 
-   /* Invalid syntax for user description */
-   if (!match(members, GROUP_MEMBERS_VALID)) {
-      error = GROUP_MEMBERS_INVALID;
+   /* Loop through group entries */
+   for (i = 0; i < file_line_counter; i++) {
+      /* Get group entry */
+      char **group = argument_parse(file_line_get(i), ":");
+      /* Groupname found? */
+      if (!strcmp(argument_get_part(group, 0), groupname)) {
+         file_data_update_column(group_data, i, group);
+      }
+      argument_free(group);
    }
 
-   /* No error? */
-   if (!error) {
-      /* Loop through group entries */
-      for (i = 0; i < file_line_counter; i++) {
-         /* Get group entry */
-         char **group = argument_parse(file_line_get(i), ":");
-         /* Passwd entry found? */
-         if (!strcasecmp(groupname, argument_get_part(group, 0))) {
-            /* Set new group line in memory */
-            file_line_action(FILE_LINE_SET, i,
-                             "%s:%s:%s:%s",
-                             argument_get_part(group, 0),
-                             argument_get_part(group, 1),
-                             argument_get_part(group, 2),
-                             members);
-         }
-         /* Free group entry */
-         argument_free(group);
-      }
-
-      /* Save result in user file */
+   if (!strcmp(variable_get("error"), "")) {
+      /* Set info */
+      variable_set("info", GROUP_FILE_UPDATE);
+      /* Save file */
       file_save(GROUP_FILE);
-
       /* Display group list */
       group_list();
    } else {
-      variable_set("error", error);
+      variable_set("error", GROUP_FILE_ERROR);
       group_detail(groupname);
    }
 }
 
-/* \fn group_delete(username)
- * Delete an entry from group file
- * \param[in] groupname group that will be deleted
+/* \fn group_add(groupname)
+ * Execute a new group now
+ * \param[in] groupname groupname that will be updated
+ */
+void group_add(char *groupname) {
+   /* Index counter */
+   int i;
+   /* Max uid */
+   unsigned int start_uid = 1000;
+   /* Error variable */
+   char *error = NULL;
+
+   /* Loop through group entries */
+   for (i = 0; i < file_line_counter; i++) {
+      /* Get group entry */
+      char **group = argument_parse(file_line_get(i), ":");
+      /* Current uid start uid found? */
+      if (atoi(argument_get_part(group, 2)) == start_uid) {
+         /* Increase start uid */
+         start_uid++;
+	 /* And scan again */
+	 i = 0;
+      }
+      /* New group already in group database */
+      if (!strcasecmp(argument_get_part(group, 0), 
+          variable_ltrim(variable_filter(groupname, ":")))) {
+         /* Set error to already exists */
+         error = GROUP_ALREADY_EXISTS;
+      } 
+      /* Free group entry */
+      argument_free(group);
+      /* Found? */
+      if (error) {
+         break;
+      }
+   }
+
+   /* Group not found? */
+   if (!error) {
+      /* Save result in group file */
+      file_save(GROUP_FILE);
+      /* Display group list */
+      group_list();
+   } else {
+      variable_set("error", error);
+      /* Display group add page with error */
+      group_new();
+   }
+}
+
+/* \fn group_delete(groupname)
+ * Delete an entry from password file
+ * \param[in] groupname groupname that will be deleted
  */
 void group_delete(char *groupname) {
    /* Index counter */
@@ -293,129 +303,33 @@ void group_delete(char *groupname) {
       char **group = argument_parse(file_line_get(i), ":");
       /* Passwd entry found? */
       if (!strcasecmp(groupname, argument_get_part(group, 0))) {
-         /* Delete group line in memory */
+         /* Set new group line in memory */
          file_line_action(FILE_LINE_DEL, i, NULL);
       }
       /* Free group entry */
       argument_free(group);
    }
 
-   /* Save result in user file */
+   /* Save result in group file */
    file_save(GROUP_FILE);
 
    /* Display group list */
    group_list();
 }
 
-/* \fn group_add(groupname)
- * Execute a new group now
- * \param[in] groupname groupname that will be updated
- */
-void group_add(char *groupname) {
-   /* Index counter */
-   int i;
-   /* Max uid */
-   unsigned int start_gid = 1000;
-   /* Error */
-   char *error = NULL;
-
-   /* Loop through group entries */
-   for (i = 0; i < file_line_counter; i++) {
-      /* Get group entry */
-      char **group = argument_parse(file_line_get(i), ":");
-      /* Current uid greater than max uid? */
-      if (atoi(argument_get_part(group, 2)) == start_gid) {
-         /* Set new start gid */
-         start_gid++;
-	 /* Start rescan */
-	 i = 0;
-      }
-      /* Found? */
-      if (!strcasecmp(groupname, argument_get_part(group, 0))) {
-         /* Mark as found */
-	 error = GROUP_ALREADY_EXISTS;
-      }
-      /* Free group entry */
-      argument_free(group);
-      /* Found? */
-      if (error) {
-         break;
-      }
-   }
-
-   if (!match(groupname, GROUP_VALID)) {
-      error = GROUP_INVALID;
-   } else if (!match(variable_get("members"), GROUP_MEMBERS_VALID)) {
-      error = GROUP_MEMBERS_INVALID;
-   }
-
-   /* Not found? */
-   if (!error) {
-      /* Add new group line in memory */
-      file_line_action(FILE_LINE_ADD, i,
-                       "%s:x:%d:%s",
-                       groupname,
-                       start_gid,
-                       variable_ltrim(variable_get("members")));
-
-      /* Save result in group file */
-      file_save(GROUP_FILE);
-
-      /* Show all groups */
-      group_list();
-   } else {
-      /* Assign template */
-      variable_set("error", error);
-      /* Display add screen */
-      group_new();
-   }
-}
-
 /* \fn group_new()
- * Show the add screen for adding a group
+ * Show the add screen for adding a group 
  */
 void group_new() {
-   /* Print external table for design */
-   printf("<h3>%s</h3>\n",
-          GROUP_HEADLINE);
+   /* Print error box if variable error is set */
+   owi_box_error();
 
-   if (strcmp(variable_get("error"), "")) {
-      printf("<div class=\"error\">%s</div>\n",
-             variable_get("error"));
-   }
+   /* Print outside table content */
+   owi_outside_open(OWI_DETAIL);
 
-   printf("<table class=\"outside\">\n"
-          "<tr>\n"
-          "<td>\n"
-          "<form action=\"%s\" method=\"post\">\n"
-          "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
-          "<input type=\"hidden\" name=\"command\" value=\"add\" />\n"
-          "<table class=\"detail\">\n"
-          "<tr>\n"
-          "<td class=\"description\">%s</td>\n"
-          "<td class=\"value\"><input type=\"text\" name=\"id\" value=\"%s\" /><br />%s</td>\n"
-          "</tr>\n"
-          "<tr>\n"
-          "<td class=\"description\">%s</td>\n"
-          "<td class=\"value\"><input type=\"text\" name=\"members\" value=\"%s\" /><br />%s</td>\n"
-          "</tr>\n"
-          "<tr>\n"
-          "<td></td>\n"
-	  "<td>\n"
-	  "<input type=\"button\" onClick=\"javascript:document.forms[0].submit()\" value=\"%s\" />\n"
-          "</td>\n"
-          "</table>\n"
-          "</form>\n"
-          "</td>\n"
-          "</tr>\n"
-          "</table>\n",
-          getenv("SCRIPT_NAME"),
-	  variable_get("module"),
-          GROUP_TABLE_DESCRIPTION,
-	  variable_get("id"),
-	  GROUP_DESCRIPTION,
-          GROUP_TABLE_MEMBERS,
-	  variable_get("members"),
-	  GROUP_MEMBERS_DESCRIPTION,
-          GROUP_BUTTON_ADD);
+   /* Print all required fields for add request */
+   owi_data_detail(group_data);
+
+   /* Print command button */
+   owi_outside_close(OWI_DETAIL, OWI_BUTTON_ADD);
 }

@@ -120,12 +120,58 @@ void variable_set(char *name, char *value) {
    }
 }
 
+/* \fn variable_error_set(variable, value)
+ * Set error variable for another variable
+ * \param[in] variable
+ * \param[in] value
+ */
+void variable_error_set(char *variable, char *value) {
+   /* Allocate memory for error variable name */
+   char *error_variable = (char*)malloc(strlen(VARIABLE_ERROR) + strlen(variable) + 1);
+
+   /* Enouqh memory? */
+   if (error_variable) {
+      /* Set error variable name */
+      strcpy(error_variable, VARIABLE_ERROR);
+      strcat(error_variable, variable);
+      /* Assign value */
+      variable_set(error_variable, value);
+      free(error_variable);
+   }
+}
+
+/* \fn variable_error_get(variable)
+ * Get error variable for antoher variable
+ * \param[in] variable
+ * \return variable value
+ */
+char *variable_error_get(char *variable) {
+   /* Allocate memory for error variable name */
+   char *error_variable = (char*)malloc(strlen(VARIABLE_ERROR) + strlen(variable) + 1);
+   /* Return value */
+   char *ret = "";
+
+   /* Enouqh memory? */
+   if (error_variable) {
+      /* Set error variable name */
+      strcpy(error_variable, VARIABLE_ERROR);
+      strcat(error_variable, variable);
+      ret = variable_get(error_variable);
+      free(error_variable);     
+   }
+  
+   /* Return result */
+   return ret;
+}
+
 /* \fn variable_dump()
  * Dump complete variable information from memory
  */
 void variable_dump() {
    /* variable for loop */
    int i;
+
+   printf("<code><pre>\n");
    /* loop through array */
    for (i = 0; variable && variable[i] != NULL; i++) {
       printf("[%03d] [%s] [%s]\n",
@@ -133,6 +179,7 @@ void variable_dump() {
               variable[i]->name,
               variable[i]->value);
    }
+   printf("</pre></code>\n");
 }
 
 /* \fn variable_free()

@@ -22,15 +22,17 @@
 #include <string.h>
 #include <stdlib.h>
 #include <malloc.h>
+#include <stdarg.h>
 #include <sys/resource.h>
 #include "includes/argument.h"
 #include "includes/modules.h"
 #include "includes/template.h"
 #include "includes/variable.h"
 #include "includes/misc.h"
+#include "includes/file.h"
 #include "includes/owi.h"
 
-void owi_header(char *title) {
+void owi_header(char *headline) {
    /* Loop counter */
    int i = 0;
    int j = 0;
@@ -54,7 +56,7 @@ void owi_header(char *title) {
 	  "<tr>\n"
 	  "<td class=\"navigation\">\n"
 	  "<table>\n",
-	  title);
+	  headline);
    for (i = 0; modules[i].description != NULL; i++) {
       printf("<tr><td>\n");
       for (j = 0; j < modules[i].level * 5; j++) {
@@ -72,13 +74,25 @@ void owi_header(char *title) {
    }
    printf("</table>\n"
           "</td>\n"
-          "<td class=\"content\">\n");
+          "<td class=\"content\">\n"
+          "<h3>%s</h3>\n"
+          "<form action=\"%s\" method=\"post\">\n"
+          "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
+	  "<input type=\"hidden\" name=\"command\" value=\"%s\" />\n"
+	  "<input type=\"hidden\" name=\"id\" value=\"%s\" />\n",
+          headline,
+          getenv("SCRIPT_NAME"),
+          variable_get("module"),
+	  variable_get("command"),
+	  variable_get("id"));
 }
 
 void owi_footer() {
-   printf("</td>\n"
+   printf("</form>\n"
+          "</td>\n"
           "</tr>\n"
 	  "</table>\n"
+	  "<br />\n"
 	  "<table class=\"footer\">\n"
 	  "<tr>\n"
 	  "<td>OpenMCT. All rights reserved.</td>\n"
@@ -87,12 +101,213 @@ void owi_footer() {
           "</html>\n");
 }
 
-void owi_image(char *image, char *title, char *alt) {
-   printf("<img src=\"%s\" title=\"%s\" alt=\"%s\" />", image, title, alt);
+void owi_headline(int size, char *headline) {
+   printf("<h%d>%s</h%d>\n",
+          size,
+	  headline,
+	  size);
 }
 
-void owi_headline(int size, char *headline) {
-   printf("<h%d>%s</h%d>\n", size, headline, size);
+void owi_outside_open(int mode) {
+   printf("<table class=\"outside\">\n"
+          "<tr>\n"
+          "<td>\n"
+          "<table class=\"%s\" width=\"100%%\">\n",
+          mode == OWI_DETAIL ? "detail": "list");
+}
+
+void owi_outside_close(int mode, char *value) {
+   if (mode == OWI_LIST) {
+      printf("</tbody>\n");
+   }
+   printf("</table>\n"
+          "<table width=\"100%%\">\n"
+	  "<tr>\n"
+	  "<td></td>\n"
+          "<td><input type=\"button\" onClick=\"javascript:document.forms[0].command.value='%s';document.forms[0].submit();\" value=\"%s\" /></td>\n"
+          "</tr>\n"
+	  "</table>\n",
+	  value, value);
+}
+
+void owi_error(char *value) {
+   if (!value) {
+      value = variable_get("error");
+   }
+   if (strcmp(value, "")) {
+      printf("<span class=\"error\">%s</span>\n",
+             value);
+   }
+}
+
+void owi_box_error() {
+   if (strcmp(variable_get("error"), "")) {
+      printf("<div class=\"boxerror\">%s</div>\n",
+             variable_get("error"));
+   }
+}
+
+void owi_box_info() {
+   if (strcmp(variable_get("info"), "")) {
+      printf("<div class=\"boxinfo\">%s</div>\n",
+             variable_get("info"));
+   }
+}
+
+void owi_table_header(struct file_data_t *ini) {
+   /* Loop */
+   int i = 0;
+
+   printf("<thead>\n"
+          "<tr>\n");
+ 
+   for (i = 0; ini[i].html != NULL; i++) {
+      if (ini[i].flags & FILE_DATA_FLAG_LIST) {
+         printf("<th>%s</th>\n", ini[i].name);
+      }
+   }
+   printf("<th>%s</th>\n", "Action");
+
+   /* Start form / external table / scroll area / internal table*/
+   printf("</tr>\n"
+          "</thead>\n"
+          "<tbody>");
+}
+
+void owi_data_name(struct file_data_t *ini) {
+   printf("%s\n", ini->name);
+}
+
+void owi_data_value(struct file_data_t *ini) {
+   /* Loop */
+   int i = 0;
+   /* Valid values for html elements */
+   char **valid_values;
+
+   /* Checkbox? */
+   if (ini->type == FILE_DATA_TYPE_CHECKBOX) {
+      /* Parse valid values from string */
+      valid_values = argument_parse(ini->valid, "|");
+      /* Print checkbox */
+      printf("<input type=\"checkbox\" name=\"%s\" value=\"%s\" %s /> ",
+             ini->html,
+	     valid_values[0],
+             ini->current && !strcmp(ini->current, valid_values[0]) ?  "checked" : "");
+      /* Free valid values */
+      free(valid_values);
+   /* Selectbox? */
+   } else if (ini->type == FILE_DATA_TYPE_SELECT) {
+      /* Parse valid values from string */
+      valid_values = argument_parse(ini->valid, "|");
+
+      /* Print selectbox */
+      printf("<select name=\"%s\">\n", ini->html);
+      /* Loop through values */
+      for (i = 0; valid_values[i] != NULL; i++) {
+         /* Flag for current value */
+         int current_value = 0;
+	 /* Current value? */
+	 if (ini->current && ini->current &&
+	    strcmp(ini->current, valid_values[i])) {
+            current_value = 1;
+	 }
+         /* Print on stdout */
+         printf("<option value=\"%s\" %s>%s</option>\n",
+                valid_values[i],
+		current_value == 0 ? " selected" : "",
+		valid_values[i]);
+      }
+      printf("</select><br />\n");
+      /* Free valid values */
+      argument_free(valid_values);
+         
+   } else if (ini->type == FILE_DATA_TYPE_TEXT) {
+      printf("<input type=\"text\" name=\"%s\" value=\"%s\"%s />",
+             ini->html,
+	     ini->flags & FILE_DATA_FLAG_DONTFILL ? "" : ini->current ? ini->current : "",
+	     strcmp(variable_error_get(ini->html), "") ? " class=\"inputerror\"" : "");
+      if (strcmp(variable_error_get(ini->html), "")) {
+         printf("&nbsp;");
+	 owi_error(variable_error_get(ini->html));
+      } 
+      printf("<br />\n");
+   } else if (ini->type == FILE_DATA_TYPE_PASSWORD) {
+      printf("<input type=\"password\" name=\"%s\" value=\"%s\"%s />",
+             ini->html,
+             ini->flags & FILE_DATA_FLAG_DONTFILL ? "" : ini->current ? ini->current : "",
+             strcmp(variable_error_get(ini->html), "") ? " class=\"inputerror\"" : "");
+      if (strcmp(variable_error_get(ini->html), "")) {
+         printf("&nbsp;");
+         owi_error(variable_error_get(ini->html));
+      }
+      printf("<br />\n");
+      
+   } else if (ini->type == FILE_DATA_TYPE_TEXTAREA) {
+      printf("<textarea name=\"%s\" rows=\"4\" cols=\"55\" %s>%s</textarea>",
+             ini->html,
+	     strcmp(variable_error_get(ini->html), "") ? " class=\"inputerror\"" : "",
+	     ini->current ? ini->current : "");
+      if (strcmp(variable_error_get(ini->html), "")) {
+         printf("<br />\n");
+         owi_error(variable_error_get(ini->html));
+      }
+      printf("<br />\n");
+   }
+   if (ini->description) {
+      printf("%s", ini->description);
+   }
+}
+
+void owi_data_detail(struct file_data_t *ini) {
+   /* Loop */
+   int i = 0;
+
+   /* Loop through all configs */
+   for (i = 0; ini[i].html != NULL; i++) {
+      if (ini[i].type != FILE_DATA_TYPE_INTERNAL) {
+      printf("<tr>\n"
+             "<td class=\"name\">\n");
+
+      /* Display name */
+      owi_data_name(&ini[i]);
+
+      printf("</td>\n"
+             "<td class=\"value\">\n");
+
+      /* Display value */
+      owi_data_value(&ini[i]);
+
+      printf("</td>\n"
+             "</tr>\n");
+      }	    
+   }
+}
+
+void owi_data_list(struct file_data_t *column, char **entry) {
+   /* Loop */
+   int j = 0;
+   /* id */
+   char *id = NULL;
+
+   printf("<tr onmouseover=\"this.className='mover';\" onmouseout=\"this.className='mout';\">\n");
+
+   for (j = 0; column[j].html != NULL; j++) {
+      if (column[j].flags & FILE_DATA_FLAG_LIST) {
+         printf("<td>%s</td>\n", argument_get_part(entry, column[j].index));
+      }
+      if (column[j].flags & FILE_DATA_FLAG_ID) {
+         id = argument_get_part(entry, column[j].index);
+      }
+   }
+
+   printf("<td>\n"
+          "<input type=\"button\" onClick=\"javascript:document.forms[0].command.value='%s';document.forms[0].id.value='%s';document.forms[0].submit();\" value=\"%s\" />\n"
+          "<input type=\"button\" onClick=\"javascript:document.forms[0].command.value='%s';document.forms[0].id.value='%s';document.forms[0].submit();\" value=\"%s\" />\n"
+	  "</td>\n",
+	  OWI_BUTTON_DETAIL, id, OWI_BUTTON_DETAIL,
+	  OWI_BUTTON_DELETE, id, OWI_BUTTON_DELETE);
+
+   printf("</tr>\n");
 }
 
 int main(int argc, char **argv) {
@@ -104,7 +319,7 @@ int main(int argc, char **argv) {
    module = variable_get("module");
 
    if (!strcmp(module, "")) {
-      variable_set("module", "user");
+      variable_set("module", "ftp");
       module =  variable_get("module");
    }
 

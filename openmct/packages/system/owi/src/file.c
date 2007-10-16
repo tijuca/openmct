@@ -23,14 +23,22 @@
 #include <stdarg.h>
 #include <string.h>
 #include <malloc.h>
+#include <crypt.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include "includes/file.h"
 #include "includes/argument.h"
+#include "includes/variable.h"
+#include "includes/misc.h"
+#include "includes/language.h"
 
-char **file_line= NULL;
+char **file_line = NULL;
+
 int file_line_counter = 0;
+
+int file_section_start = -1;
+int file_section_stop = -1;
 
 /* \fn file_open(filename)
  * Read file into memory (char**) 
@@ -230,7 +238,7 @@ void file_line_action(int mode, int line_index, char *format, ...) {
          /* Allocate data for new line */
          file_line[line_index] = (char*)malloc(strlen(line) + 1);
          /* Reset data */
-         memset(file_line[line_index], strlen(line) + 1, 0);
+         memset(file_line[line_index], 0, strlen(line) + 1);
          /* Copy data to index */
          strcpy(file_line[line_index], line);
       }
@@ -249,8 +257,8 @@ void file_line_action(int mode, int line_index, char *format, ...) {
          file_line_counter--;
          /* Reallocate new index array */
          file_line = (char**)realloc(file_line,
-                                                    sizeof(char *) *
-                                                    (file_line_counter + 1));
+                                     sizeof(char *) *
+                                     (file_line_counter + 1));
       }         
    /* Add line? */         
    } else if (mode == FILE_LINE_ADD) {
@@ -331,4 +339,279 @@ char *file_read_line(char *file, int index) {
    }
 
    return line;
+}
+
+/* \fn file_data_read(ini) 
+ * Read contents from file into ini structure 
+ * \param[in] ini file ini structure
+ */
+void file_data_read(struct file_data_t *ini, char *separator) {
+   /* Loop */
+   int i = 0;
+   /* Loop */
+   int j = 0;
+   /* Config line */
+   char **entry = NULL;
+   /* Start file parsing at position start */
+   int start = file_section_start >= 0 ? file_section_start : 0;
+   /* Stop file parsing at position stop */
+   int stop = file_section_stop >= 0 ? file_section_stop : file_line_counter;
+
+   for (j = 0; ini[j].html != NULL; j++) {
+      /* Reset to zero per default */
+      ini[j].current = NULL;
+      for (i = start; i < file_line_counter && i < stop; i++) {
+         /* Parse line */
+         entry = argument_parse(file_line_get(i), separator);
+         /* Directive found? */
+         if (entry && entry[0] && !strcmp(entry[0], ini[j].directive)) {
+            /* HTML variable set (during update process)? */
+            if (strcmp(variable_get(ini[j].html), "")) {
+               /* Set current value */
+               ini[j].current = variable_get(ini[j].html);
+            /* Just display from config? */
+            } else {
+               /* Set current value */
+               ini[j].current = strdup(argument_get_part(entry, 1));
+            }
+            /* Set line */
+            ini[j].position = i;
+         }
+         /* Free configuration line */
+         argument_free(entry);
+      }
+   }
+}
+
+/* \fn file_data_detail(ini)
+ * \param[in] ini file ini structure
+ */
+void file_data_detail(struct file_data_t *ini, char **entry) {
+   int j;
+
+   for (j = 0; ini[j].html != NULL; j++) {
+      /* HTML variable set (during update process)? */
+      if (strcmp(variable_get(ini[j].html), "")) {
+         /* Set current value */
+         ini[j].current = variable_get(ini[j].html);
+      /* Just display from config? */
+      } else {
+         /* Set current value */
+         ini[j].current = strdup(argument_get_part(entry, ini[j].index));
+      }
+   }
+
+}
+
+/* \fn file_data_update(ini)
+ * Update contents in file from ini structure
+ * \param[in] ini file ini structure
+ */
+void file_data_update(struct file_data_t *ini, char *separator) {
+   /* Loop */
+   int i = 0;
+   /* Loop */
+   int j = 0;
+   /* Variable empty? */
+   int empty = 0;
+
+   /* Loop through all directives */
+   for (i = 0; ini[i].html != NULL; i++) {
+      /* Skip empty config values? */
+      if (ini[i].flags & FILE_DATA_FLAG_SKIP_EMPTY &&
+          !strcmp(variable_get(ini[i].html), "")) {
+         empty = 1;
+      } else {
+         empty = 0;
+      }
+      /* Config setting found in config file? */
+      if (ini[i].position != -1) {
+         /* Empty and remove line? */
+	 if (empty) {
+	    /* Remove line */
+	    file_line_action(FILE_LINE_DEL, ini[i].position, NULL);
+	    /* Remove variable so it will not be displayed */
+	    ini[i].current = NULL;
+	    /* Decrease section stop */
+	    file_section_stop--;
+	    /* Decrease position pointers */
+	    for (j = 0; ini[j].html != NULL; j++) {
+               if (ini[j].position > ini[i].position) {
+                  ini[j].position--;
+	       }
+	    }
+	 } else {
+            /* Set in file */
+            file_data_update_detail(&ini[i], ini[i].position, separator);
+	 }
+      /* Config setting not found? */
+      } else if (!empty) {
+         /* Update current line */
+         file_data_update_detail(&ini[i],
+	                         file_section_stop != -1 ? file_section_stop : file_line_counter,
+				 separator);
+      }
+   }
+}
+
+/* \fn file_data_update_detail(ini, line_index)
+ * Update one config setting
+ * \param[in] ini file ini structure
+ * \param[in] line_index index for current setting in file
+ */
+void file_data_update_detail(struct file_data_t *ini, int line_index, char *separator) {
+   /* Current value */
+   char *value = NULL;
+   /* Valid values for config value */
+   char **valid_values = NULL;
+   /* Default file action */
+   int action = FILE_LINE_SET;
+
+   if (ini->type == FILE_DATA_TYPE_CHECKBOX) {
+      /* Valid values */
+      valid_values = argument_parse(ini->valid, "|");
+      if (strcmp(variable_get(ini->html), "") &&
+          !strcmp(valid_values[0], variable_get(ini->html))) {
+         value = valid_values[0];
+      } else {
+         value = valid_values[1];
+      }
+   } else {
+      if ( (ini->valid && match(variable_get(ini->html), ini->valid)) ||
+           !(ini->valid)) {
+         value = variable_get(ini->html);
+      }
+   }
+
+   /* Set current value for display -
+    * can be different from file because of errors */
+   ini->current = strdup(variable_get(ini->html));
+
+   /* Last line in file or block? */
+   if (line_index == file_line_counter ||
+       line_index == file_section_stop) {
+      /* Its and add request */
+      action = FILE_LINE_ADD;
+      /* Increase stop section */
+      file_section_stop++;
+   }
+
+   if (value) {
+      /* Write new config line */
+      file_line_action(action, line_index,
+                       "%s%s%s",
+                       ini->directive,
+		       separator,
+                       variable_get(ini->html));
+   } else {
+      variable_error_set(ini->html, OWI_SYNTAX_INVALID);
+      variable_set("error", OWI_ERROR_INVALID);
+   }
+}
+
+/* \fn file_data_update_column(column, line_index)
+ * Update one column line
+ * \param[in] column file column structure
+ */
+void file_data_update_column(struct file_data_t *column, int line_index, char **entry) {
+   /* Index counter */
+   int i;
+   /* Index counter */
+   int j;
+   /* Error variable */
+   char *error = NULL;
+   /* Column found? */
+   int column_found = 0;
+   /* Current value */
+   char *p = NULL;
+   /* Data */
+   char *data = NULL;
+   /* Length for data memory */
+   int data_length = 0;
+   /* Separator needed? */
+   int separator = 0;
+
+   /* Verify syntax of columns */
+   for (i = 0; column[i].html != NULL; i++) {
+      if ( !(column[i].flags & FILE_DATA_FLAG_DONTFILL) &&
+            column[i].type != FILE_DATA_TYPE_CHECKBOX &&
+            column[i].type != FILE_DATA_TYPE_INTERNAL &&
+           (!match(variable_get(column[i].html), column[i].valid)) ) {
+         error = OWI_ERROR_INVALID;
+	 variable_error_set(column[i].html, OWI_SYNTAX_INVALID);
+	 variable_set("error", OWI_ERROR_INVALID);
+      }
+   }
+
+   /* Error during update? */
+   if (error) {
+
+   } else {
+      /* Lookup internal details */
+      for (j = 0; column[j].html != NULL; j++) {
+         if (column[j].type == FILE_DATA_TYPE_INTERNAL) {
+            for (i = 0; column[i].html != NULL; i++) {
+               if (!strcmp(column[i].name, column[j].name)) {
+	           char **valid_names = argument_parse(column[i].valid, "|");
+                   if (!strcmp(valid_names[0], variable_get(column[i].html))) {
+                      variable_set(column[j].html, column[j].standard);
+		   }
+		   free(valid_names);
+	       }
+	    }
+	 }
+      }
+
+      /* Loop through all entries */
+      for (i = 0; entry[i] != NULL; i++) {
+         /* Mark column as not found per default */
+         column_found = 0;
+	 /* Check for a config variable for this index position */
+         for (j = 0; column[j].html != NULL; j++) {
+	    /* Variable found? */
+            if (i == column[j].index && strcmp(variable_get(column[j].html), "")) {
+	       column_found = 1;
+               p = variable_get(column[j].html);
+	       if (column[j].flags & FILE_DATA_FLAG_CRYPT) {
+	          p = crypt(p, "OM");
+	       }
+	    }
+	 }
+         /* Not found or value not set via http? */
+	 if (!column_found || !p) {
+            /* Use value from config file */
+	    p = argument_get_part(entry, i);
+	 }
+	 /* Need separator? */
+	 if (entry[i + 1] != NULL) {
+            separator = 1;
+	 } else {
+            separator = 0;
+	 }
+	 /* Calculate string size */
+         data_length += strlen(p) + separator;
+	 /* Allocate memory for line */
+	 data = realloc(data, data_length + 1);
+	 /* find? */
+	 if (data) {
+	    /* First allocate? */
+	    if (data_length == strlen(p) + separator) {
+	        /* Reset buffer */
+                memset(data, 0, data_length + 1);
+	    }
+	    /* Copy data */
+	    strcat(data, p);
+	    if (separator) {
+               strcat(data, ":");
+	    }
+	 }
+      }
+      /* Write new config line */
+      file_line_action(FILE_LINE_SET, line_index,
+                       "%s",
+                       data);
+      
+      /* Free line */
+      free(data);
+   }
 }

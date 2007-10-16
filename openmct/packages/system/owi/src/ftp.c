@@ -26,19 +26,150 @@
 #include "includes/language.h"
 #include "includes/template.h"
 #include "includes/variable.h"
-#include "includes/owi.h"
 #include "includes/file.h"
+#include "includes/owi.h"
 #include "includes/ftp.h"
 
 /* Define ini configuration tags */
-struct file_ini_t ftp_ini[] = {
-   { FTP_INI_LISTEN_PORT, NULL, "listen_port", NULL, "21", NULL, 0 },
-   { FTP_INI_MAX_CLIENTS, FTP_INI_MAX_CLIENTS_DESCRIPTION, "max_clients", NULL, "5", NULL, 0 },
-   { FTP_INI_MAX_PER_IP, FTP_INI_MAX_PER_IP_DESCRIPTION, "max_per_ip", NULL, "2", NULL, 0 },
-   { FTP_INI_IDLE_SESSION_TIMEOUT, FTP_INI_IDLE_SESSION_TIMEOUT_DESCRIPTION,  "idle_session_timeout", NULL, "300", NULL, 0 },
-   { FTP_INI_ANONYMOUS_ENABLE,FTP_INI_ANONYMOUS_ENABLE_DESCRIPTION, "anonymous_enable", "YES", "NO", NULL, 0 },
-   { FTP_INI_LOCAL_ENABLE, FTP_INI_LOCAL_ENABLE_DESCRIPTION, "local_enable", "YES", "YES", NULL, 0 },
-   { NULL, NULL, NULL, NULL, NULL, 0 }
+struct file_data_t ftp_ini[] = {
+   {
+     FILE_DATA_TYPE_TEXT,
+     -1,
+     "port",
+     FTP_NAME_LISTEN_PORT,
+     NULL,
+     NULL,
+     "^[0-9]{2,5}$",
+     "listen_port",
+     0,
+     "21",
+     0
+   },
+
+   {
+     FILE_DATA_TYPE_TEXT,
+     -1,
+     "maxclients",
+     FTP_NAME_MAX_CLIENTS,
+     FTP_DESCRIPTION_MAX_CLIENTS,
+     NULL,
+     "^[0-9]{1,3}$",
+     "max_clients",
+     0,
+     "5",
+     0
+   },
+
+   {
+     FILE_DATA_TYPE_TEXT,
+     -1,
+     "maxperip",
+     FTP_NAME_MAX_PER_IP,
+     FTP_DESCRIPTION_MAX_PER_IP,
+     NULL,
+     "^[0-9]{1,3}$",
+     "max_per_ip",
+     0,
+     "2",
+     0
+   },
+
+   { 
+     FILE_DATA_TYPE_TEXT,
+     -1,
+     "idletimeout",
+     FTP_NAME_IDLE_SESSION_TIMEOUT,
+     FTP_DESCRIPTION_IDLE_SESSION_TIMEOUT,
+     NULL,
+     "^[0-9]{1,3}$",
+     "idle_session_timeout",
+     0,
+     "300",
+     0
+   },
+
+   {
+     FILE_DATA_TYPE_CHECKBOX,
+     -1,
+     "anonymous",
+     FTP_NAME_ANONYMOUS_ENABLE,
+     FTP_DESCRIPTION_ANONYMOUS_ENABLE,
+     NULL,
+     "yes|no",
+     "anonymous_enable",
+     0,
+     "no",
+     0
+   },
+
+   { 
+     FILE_DATA_TYPE_CHECKBOX,
+     -1,
+     "local",
+     FTP_NAME_LOCAL_ENABLE,
+     FTP_DESCRIPTION_LOCAL_ENABLE,
+     NULL,
+     "yes|no",
+     "local_enable",
+     0,
+     "yes",
+     0
+   },
+
+   {
+     FILE_DATA_TYPE_TEXTAREA,
+     -1,
+     "banner",
+     FTP_NAME_BANNER,
+     FTP_DESCRIPTION_BANNER,
+     NULL,
+     "^[0-9A-Za-z .]{0,255}$",
+     "ftpd_banner",
+     0,
+     NULL,
+     0
+   },
+
+   {
+     FILE_DATA_TYPE_TEXT,
+     -1,
+     "createmask",
+     FTP_NAME_FILE_OPEN_MODE,
+     FTP_DESCRIPTION_FILE_OPEN_MODE,
+     NULL,
+     "^[0-7]{3}$",
+     "file_open_mode",
+     0,
+     NULL,
+     0
+   },
+
+   { 
+     FILE_DATA_TYPE_CHECKBOX,
+     -1,
+     "fxp",
+     FTP_NAME_PASV_PROMISCUOUS,
+     FTP_DESCRIPTION_PASV_PROMISCUOUS,
+     NULL,
+     "yes|no",
+     "pasv_promiscuous",
+     0,
+     "yes",
+     0
+   },
+
+   { 0,
+     -1,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     0,
+     NULL,
+     0
+   }
 };
 
 /* \fn ftp_main(argc, argv)
@@ -52,25 +183,26 @@ int ftp_main(int argc, char **argv) {
    char *command = variable_get("command");
  
    /* Print header information */
-   owi_header("FTP Management");
+   owi_header(FTP_HEADLINE);
 
    /* Read file into memory */
    if (file_open(FTP_FILE) != -1) {
+      /* Read data */
+      file_data_read(ftp_ini, "=");
       /* Command NULL or empty? */
       if (!command || !strcmp(command, "")) {
          /* Just print ftp list */
          ftp_list();
-      } else if (!strcmp(command, "update")) {
+      } else if (!strcmp(command, OWI_BUTTON_UPDATE)) {
          /* Update configuration failed */
 	 ftp_update();
 	 /* Reload konfiguration */
-	 proc_open("/bin/killall -HUP vsftpd");
+	 proc_open(FTP_RESTART);
       } 
       /* Free file */
-      file_free(FTP_FILE);
+      file_free();
    } else {
       /* Print error message */
-      owi_headline(3, FTP_HEADLINE);
       owi_headline(2, FTP_FILE_FAILED);
    }
 
@@ -85,137 +217,41 @@ int ftp_main(int argc, char **argv) {
  * Show all ftps from system
  */
 void ftp_list() {
-   /* Index counter */
-   int i = 0;
-   /* Listen line */
-   char **ini_listen = NULL;
-   /* Index counter */
-   int j = 0;
+   /* Print info box if variable info is set */
+   owi_box_info();
 
-   /* Print external table for design */
-   printf("<h3>%s</h3>\n"
-          "<table class=\"outside\">\n"
-	  "<tr>\n"
-	  "<td>\n"
-          "<form action=\"%s\" method=\"post\">\n"
-          "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
-          "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
-          "<table class=\"detail\">\n",
-          FTP_HEADLINE,
-          getenv("SCRIPT_NAME"),
-	  variable_get("module"));
+   /* Print error box if variable info is set */
+   owi_box_error();
 
-   /* Loop through config file */
-   for (i = 0;  i < file_line_counter; i++) {
-      /* Parse line */
-      char **ini = argument_parse(file_line_get(i), "=");
+   /* Print outside table content */
+   owi_outside_open(OWI_DETAIL);
 
-      /* Parse through all available commands */
-      for (j = 0; ftp_ini[j].variable != NULL; j++) { 
-         if (!strcasecmp(argument_get_part(ini, 0), ftp_ini[j].variable)) {
-            ftp_ini[j].current = ini;
-	 }
-      }
-   }
-
-   /* Loop through all availbe config variables */
-   for (i = 0; ftp_ini[i].variable != NULL; i++) {
-      printf("<tr>\n"
-             "<td class=\"description\">%s</td>\n"
-	     "<td class=\"value\">", ftp_ini[i].value);
-      /* valid set? */
-      if (ftp_ini[i].valid) {
-         /* Valid values */
-	 char **valid_values = argument_parse(ftp_ini[i].valid, "|");
-
-         printf("<select name=\"%s\">\n", ftp_ini[i].variable);
-         /* Loop through values */
-	 for (j = 0; valid_values[j] != NULL; j++) {
-	    /* Current value */
-            int current_value = strcmp(ftp_ini[i].current[1], valid_values[j]);
-	    /* Print on stdout */
-            printf("<option value=\"%s\" %s>%s</option>\n",
-	           valid_values[j], current_value == 0 ? " selected" : "", valid_values[j]);
-	 }
-	 printf("</select>\n");
-	 /* Free valid values */
-	 argument_free(valid_values);
-      } else {
-         printf("<input type=\"text\" name=\"%s\" value=\"%s\" />",
-	        ftp_ini[i].variable, ftp_ini[i].current ? ftp_ini[i].current[1] : "");
-         if (ftp_ini[i].description) {
-            printf("<br />%s", ftp_ini[i].description);
-	 }
-	 printf("\n");
-      }
-      printf("</td>\n"
-             "</tr>\n");
-   }
+   /* Display all settings in HTML */
+   owi_data_detail(ftp_ini);
 
    /* Print Submit button */
-   printf(
-	  "<tr>\n"
-	  "<td></td>\n"
-	  "<td><input type=\"submit\" value=\"%s\" /></td>\n"
-	  "</tr>\n"
-          "</table>\n"
-	  "</td>\n"
-	  "</tr>\n"
-	  "</table>\n"
-          "</form>\n",
-	  FTP_BUTTON_UPDATE);
-
-   /* Listen directive found? */	  
-   if (ini_listen) {
-      /* Free data */
-      argument_free(ini_listen);
-   }
+   owi_outside_close(OWI_DETAIL, OWI_BUTTON_UPDATE);
 }
 
 /* \fn ftp_update()
  * Update FTP configuration file
  */
 void ftp_update() {
-   /* Index counter */
-   int i = 0;
-   /* Index counter */
-   int j = 0;
+   /* Update ini configuration */
+   file_data_update(ftp_ini, "=");
 
-   /* Loop through config file */
-   for (i = 0; i < file_line_counter; i++) {
-      /* Parse line */
-      char **ini = argument_parse(file_line_get(i), "=");
+   /* Errors during update? */
+   if (!strcmp(variable_get("error"), "")) {
+      /* Save result in ftp file */
+      file_save(FTP_FILE);
 
-      /* Parse through all available commands */
-      for (j = 0; ftp_ini[j].variable != NULL; j++) {
-         /* Entry found? */
-         if (!strcasecmp(argument_get_part(ini, 0), ftp_ini[j].variable)) {
-            /* Write new config line */
-            file_line_action(FILE_LINE_SET, i,
-	                     "%*s=%s",
-			     file_get_pad(file_line_get(i), ftp_ini[j].variable),
-			     ftp_ini[j].variable,
-			     variable_get(ftp_ini[j].variable));
-            /* Mark entry as found */
-            ftp_ini[j].found = 1;
-         }
-      }
+      /* Set info message box */
+      variable_set("info", FTP_FILE_UPDATE);
+   } else {
+      /* Set error message box */
+      variable_set("error", FTP_FILE_ERROR);
+
    }
-
-   /* Loop trough variables */
-   for (j = 0; ftp_ini[j].variable != NULL; j++) {
-      /* Not found? */
-      if (!ftp_ini[j].found) {
-         /* Append to config file */
-	 file_line_action(FILE_LINE_ADD, file_line_counter,
-	                  "%s=%s",
-			  ftp_ini[j].variable,
-			  variable_get(ftp_ini[j].variable));
-      }
-   }
-
-   /* Save result in ftp file */
-   file_save(FTP_FILE);
 
    /* Display new configuration now*/
    ftp_list();

@@ -27,8 +27,8 @@
 #include "includes/language.h"
 #include "includes/template.h"
 #include "includes/variable.h"
-#include "includes/owi.h"
 #include "includes/file.h"
+#include "includes/owi.h"
 #include "includes/shell.h"
 
 /* \fn shell_main(argc, argv)
@@ -51,7 +51,6 @@ int shell_main(int argc, char **argv) {
 
    /* Print headline information */
    owi_headline(1, SHELL_HEADLINE);
-   printf("<br />%s<br /><br />\n", SHELL_DESCRIPTION);
 
    /* Print table head */
    printf("<form action=\"%s\" method=\"post\">\n"

@@ -22,15 +22,101 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <crypt.h>
 #include "includes/argument.h"
 #include "includes/language.h"
 #include "includes/template.h"
 #include "includes/variable.h"
-#include "includes/owi.h"
-#include "includes/user.h"
 #include "includes/file.h"
 #include "includes/misc.h"
+#include "includes/owi.h"
+#include "includes/user.h"
+
+struct file_data_t user_data[] = {
+   { 
+     FILE_DATA_TYPE_TEXT,
+     -1,
+     "login",
+     USER_NAME_LOGIN,
+     USER_DESCRIPTION_LOGIN,
+     NULL,
+     "^[A-Za-z0-9_]{3,8}$",
+     NULL,
+     0,
+     NULL,
+     FILE_DATA_FLAG_ADD | FILE_DATA_FLAG_LIST | FILE_DATA_FLAG_ID
+   },
+
+   {
+     FILE_DATA_TYPE_PASSWORD,
+     -1,
+     "password",
+     USER_NAME_PASSWORD,
+     USER_DESCRIPTION_PASSWORD,
+     NULL, 
+     "^[A-Za-z0-9_]{3,8}$",
+     NULL,
+     1,
+     NULL,
+     FILE_DATA_FLAG_ADD | FILE_DATA_FLAG_UPDATE | FILE_DATA_FLAG_DONTFILL |
+     FILE_DATA_FLAG_CRYPT
+   },
+
+   { 
+     FILE_DATA_TYPE_TEXT,
+     -1,
+     "gecos",
+     USER_NAME_GECOS,
+     USER_DESCRIPTION_GECOS, 
+     NULL,
+     "^[A-Za-z0-9]{4,40}$",
+     NULL,
+     4,
+     NULL,
+     FILE_DATA_FLAG_ADD | FILE_DATA_FLAG_UPDATE | FILE_DATA_FLAG_LIST
+   },
+
+   {
+      FILE_DATA_TYPE_CHECKBOX,
+      -1,
+      "shell",
+      USER_NAME_SHELL,
+      USER_DESCRIPTION_SHELL,
+      NULL,
+      "yes|no",
+      NULL,
+      -1,
+      NULL,
+      FILE_DATA_FLAG_ADD | FILE_DATA_FLAG_UPDATE
+   },
+
+   {
+      FILE_DATA_TYPE_INTERNAL,
+      -1,
+      "shell_internal",
+      USER_NAME_SHELL,
+      USER_DESCRIPTION_SHELL,
+      NULL,
+      "/bin/sh|/bin/false",
+      NULL,
+      6,
+      "/bin/false",
+      FILE_DATA_FLAG_ADD | FILE_DATA_FLAG_UPDATE
+   },
+
+   { 
+      0,
+      -1,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      0,
+      NULL,
+      0,
+   }
+};
 
 /* \fn user_main(argc, argv)
  * Show all users from system
@@ -52,20 +138,24 @@ int user_main(int argc, char **argv) {
          /* Just print user list */
          user_list();
       /* show user detail */
-      } else if (!strcasecmp(command, "detail")) {
+      } else if (!strcasecmp(command, OWI_BUTTON_DETAIL)) {
          /* Show user detail */
          user_detail(variable_get("id"));
-      } else if (!strcasecmp(command, "update")) {
+      } else if (!strcasecmp(command, OWI_BUTTON_UPDATE)) {
+	 /* Update user now */
          user_update(variable_get("id"));
-      } else if (!strcasecmp(command, "new")) {
+      } else if (!strcasecmp(command, OWI_BUTTON_NEW)) {
+	 /* Show form for adding a user */
          user_new(variable_get("id"));
-      } else if (!strcasecmp(command, "add")) {
+      } else if (!strcasecmp(command, OWI_BUTTON_ADD)) {
+	 /* Add user now */
          user_add(variable_get("id"));
-      } else if (!strcasecmp(command, "delete")) {
+      } else if (!strcasecmp(command, OWI_BUTTON_DELETE)) {
+	 /* Delete user now */
          user_delete(variable_get("id"));
       }
       /* Free file */
-      file_free(USER_FILE);
+      file_free();
    } else {
       /* Print error message */
       owi_headline(1, USER_HEADLINE);
@@ -86,78 +176,28 @@ void user_list() {
    /* Index counter */
    int i = 0;
 
-   /* Start form / external table / scroll area / internal table*/
-   printf("<h3>%s</h3>\n"
-          "<form action=\"%s\" method=\"post\">\n"
-          "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
-          "<input type=\"hidden\" name=\"command\" value=\"\" />\n"
-	  "<table class=\"outside\">\n"
-	  "<tr>\n"
-	  "<td>\n"
-          "<table class=\"list\">\n"
-          "<thead>\n"
-          "<tr>\n"
-          "<th>%s</th>\n"
-          "<th>%s</th>\n"
-          "<th>%s</th>\n"
-          "</tr>\n"
-	  "</thead>\n"
-          "<tbody>",
-	  USER_HEADLINE,
-          getenv("SCRIPT_NAME"),
-	  variable_get("module"),
-          USER_TABLE_DESCRIPTION,
-          USER_TABLE_GECOS,
-          USER_TABLE_ACTION);
+   /* Print outside table */
+   owi_outside_open(OWI_LIST);
 
-   /* Start at first password entry */
-   i = 0;
+   /* Print table header */
+   owi_table_header(user_data);
+
    /* Loop through all user entries in passwd file */
-   while ( i < file_line_counter) {
+   for (i = 0; i < file_line_counter; i++) {
       /* Parse passwd entry */
-      char **passwd = argument_parse(file_line_get(i), ":");
-      /* Print entry */
-      printf("<tr onmouseover=\"this.className='mover';\""
-             " onmouseout=\"this.className='mout';\">\n"
-             "<td width=\"200\">%s</td>\n"
-             "<td width=\"212\">%s</td>\n"
-             "<td width=\"100\">"
-             "<input type=\"button\" onClick=\"location='%s?module=%s&amp;command=detail&amp;id=%s'\" value=\"%s\" />&nbsp;"
-             "<input type=\"button\" onClick=\"location='%s?module=%s&amp;command=delete&amp;id=%s'\" value=\"%s\" />"
-             "</td>\n"
-             "</tr>\n",
-             argument_get_part(passwd, 0),
-             argument_get_part(passwd, 4),
-             getenv("SCRIPT_NAME"),
-             variable_get("module"),
-             argument_get_part(passwd, 0),
-             USER_BUTTON_MODIFY,
-             getenv("SCRIPT_NAME"),
-             variable_get("module"),
-             argument_get_part(passwd, 0),
-             USER_BUTTON_DELETE);
-      /* Increase counter */
-      i++;
+      char **passwd = NULL;
+      if (file_line_get(i)[0] == '#') {
+         continue;
+      }
+      passwd = argument_parse(file_line_get(i), ":");
+      /* Display line */
+      owi_data_list(user_data, passwd);
       /* Free passwd entry */
       argument_free(passwd);
    }
+
    /* Print table footer / close internal table / close scroll / print footer / ... */
-   printf("</tbody>\n"
-          "</table>\n"
-          "<table width=\"100%%\">\n"
-	  "<tr>\n"
-	  "<td colspan=\"7\" align=\"right\">\n"
-	  "<input type=\"button\" onClick=\"location='%s?module=%s&amp;command=new'\" value=\"%s\" />\n"
-	  "</td>\n"
-	  "</tr>\n"
-	  "</table>\n"
-	  "</td>\n"
-	  "</tr>\n"
-	  "</table>\n"
-          "</form>\n",
-	  getenv("SCRIPT_NAME"),
-	  variable_get("module"),
-	  USER_BUTTON_NEW);
+   owi_outside_close(OWI_DETAIL, OWI_BUTTON_NEW);
 }
 
 /* \fn user_detail(username)
@@ -170,76 +210,34 @@ void user_detail(char *username) {
    /* Index counter */
    int i = 0;
 
-   /* Print external table for design */
-   printf("<h3>%s</h3>\n",
-          USER_HEADLINE);
+   /* Print info box if variable info is set */
+   owi_box_info();
 
-   if (strcmp(variable_get("error"), "")) {
-      printf("<div class=\"error\">%s</div>\n",
-             variable_get("error"));
-   }
+   /* Print error box if variable info is set */
+   owi_box_error();
 
-   printf("<table class=\"outside\">\n"
-	  "<tr>\n"
-	  "<td>\n");
+   /* Print outside table content */
+   owi_outside_open(OWI_DETAIL);
 
    /* Loop through all user entries in /etc/passwd */
-   while ( i < file_line_counter) {
+   for (i = 0; i < file_line_counter; i++) {
       /* Parse passwd entry */
-      char **passwd = argument_parse(file_line_get(i), ":");
+      char **passwd = NULL;
+      /* Skip inactive users */
+      if (file_line_get(i)[0] == '#') {
+         continue;
+      }
+      /* Parse entry */
+      passwd = argument_parse(file_line_get(i), ":");
       /* Match found? */
       if (!strcmp(argument_get_part(passwd, 0), username)) {
-         printf("<form action=\"%s\" method=\"post\">\n"
-                "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
-                "<input type=\"hidden\" name=\"command\" value=\"update\" />\n"
-                "<input type=\"hidden\" name=\"id\" value=\"%s\" />\n"
-                "<table class=\"detail\">\n"
-                "<tr>\n"
-                "<td width=\"200\" class=\"description\">%s</td>\n"
-                "<td width=\"312\" class=\"value\">%s</td>\n"
-                "</tr>\n"
-                "<tr>\n"
-                "<td class=\"description\">%s</td>\n"
-                "<td class=\"value\"><input type=\"password\" name=\"password\" /><br />%s</td>\n"
-                "</tr>\n"
-                "<tr>\n"
-                "<td class=\"description\">%s</td>\n"
-                "<td class=\"value\"><input type=\"text\" name=\"gecos\" value=\"%s\" /><br />%s</td>\n"
-                "</tr>\n"
-                "<tr>\n"
-                "<td class=\"description\">%s</td>\n"
-                "<td class=\"value\"><input type=\"checkbox\" name=\"shell\" value=\"y\" %s /><br />%s</td>\n"
-                "</tr>\n"
-                "<tr>\n"
-                "<td></td>\n"
-		"<td>\n"
-                "<input type=\"button\" onClick=\"javascript:document.forms[0].submit()\" value=\"%s\" />\n"
-                "</td>\n"
-	        "</tr>\n"
-                "</table>\n"
-                "</form>\n"
-                ,
-                getenv("SCRIPT_NAME"),
-		variable_get("module"),
-                argument_get_part(passwd, 0),
-                USER_TABLE_DESCRIPTION,
-                argument_get_part(passwd, 0),
-                USER_TABLE_NEW_PASSWORD,
-	        USER_PASSWORD_DESCRIPTION,
-                USER_TABLE_GECOS,
-                argument_get_part(passwd, 4),
-	        USER_GECOS_DESCRIPTION,
-                USER_TABLE_SHELL,
-                strcmp(argument_get_part(passwd, 6), USER_SHELL_FALSE) == 0 ? "" : "checked",              
-                USER_SHELL_DESCRIPTION,
-		USER_BUTTON_UPDATE);
-
-
+         /* Get details from config line */
+	 file_data_detail(user_data, passwd);
+	 /* Display details */
+         owi_data_detail(user_data);
          /* Set user found to one */
          user_found = 1;
       }
-      /* Increase index counter */
-      i++;
       /* Free passwd entry */
       argument_free(passwd);
    }
@@ -250,9 +248,8 @@ void user_detail(char *username) {
       owi_headline(2, USER_NOT_FOUND);
    }
 
-   printf("</td>\n"
-          "</tr>\n"
-	  "</table>\n");
+   /* Print Submit button */
+   owi_outside_close(OWI_DETAIL, OWI_BUTTON_UPDATE);
 }
 
 /* \fn user_update(username)
@@ -261,53 +258,30 @@ void user_detail(char *username) {
  */
 void user_update(char *username) {
    /* Index counter */
-   unsigned int i;
-   /* Error variable */
-   char *error = NULL;
-   /* password */
-   char *password = NULL;
- 
-   /* Invalid syntax for user description */
-   if (!match(variable_get("gecos"), USER_GECOS_VALID)) {
-      error = USER_GECOS_INVALID;
+   int i;
+
+   /* Loop through passwd entries */
+   for (i = 0; i < file_line_counter; i++) {
+      /* Get passwd entry */
+      char **passwd = argument_parse(file_line_get(i), ":");
+      /* Username found? */
+      if (!strcmp(argument_get_part(passwd, 0), username)) {
+         file_data_update_column(user_data, i, passwd);
+      }
+      argument_free(passwd);
    }
 
-   /* Everything fine? */
-   if (!error) {
-      /* Loop through passwd entries */
-      for (i = 0; i < file_line_counter; i++) {
-         /* Get passwd entry */
-         char **passwd = argument_parse(file_line_get(i), ":");
-         /* Passwd entry found? */
-         if (!strcasecmp(username, argument_get_part(passwd, 0))) {
-	    /* Password set in webinterface? */
-	    if (strcmp(variable_get("password"), "")) {
-               password = crypt(variable_get("password"), "OM");
-	    } else {
-               password = argument_get_part(passwd, 1);
-	    }
-            /* Set new passwd line in memory */
-            file_line_action(FILE_LINE_SET, i,
-                             "%s:%s:%s:%s:%s:%s:%s",
-                             username,
-                             password,
-                             argument_get_part(passwd, 2),
-                             argument_get_part(passwd, 3),
-                             variable_get("gecos"),
-                             argument_get_part(passwd, 5),
-                             strcmp(variable_get("shell"), "y") == 0 ? USER_SHELL_DEFAULT : USER_SHELL_FALSE);
-         }
-         /* Free passwd entry */
-         argument_free(passwd);
-      }
-   
-      /* Save result in user file */
+   if (!strcmp(variable_get("error"), "")) {
+      /* Set info */
+      variable_set("info", USER_FILE_UPDATE);
+      /* Save file */
       file_save(USER_FILE);
-   
       /* Display user list */
       user_list();
    } else {
-      variable_set("error", error);
+      /* Set error */
+      variable_set("error", USER_FILE_ERROR);
+      /* Display user */
       user_detail(username);
    }
 }
@@ -349,24 +323,8 @@ void user_add(char *username) {
       }
    }
 
-   if (!match(username, USER_LOGIN_VALID)) {
-      error = USER_LOGIN_INVALID;
-   } else if (!match(variable_get("gecos"), USER_GECOS_VALID)) {
-      error = USER_GECOS_INVALID;
-   }
-
    /* User not found? */
    if (!error) {
-      /* Add new passwd line in memory */
-      file_line_action(FILE_LINE_ADD, i,
-                       "%s:%s:%d:%d:%s:/home/%s:%s",
-                       variable_ltrim(variable_filter(username, ":")),
-                       crypt(variable_get("password"), "OM"),
-                       start_uid,
-                       start_uid,
-                       variable_ltrim(variable_filter(variable_get("gecos"), ":")),
-		       variable_ltrim(variable_filter(username, ":")),
-		       strcmp(variable_get("shell"), "y") == 0 ? USER_SHELL_DEFAULT : USER_SHELL_FALSE);
       /* Save result in user file */
       file_save(USER_FILE);
       /* Display user list */
@@ -410,59 +368,15 @@ void user_delete(char *username) {
  * Show the add screen for adding a user 
  */
 void user_new() {
-   /* Print external table for design */
-   printf("<h3>%s</h3>",
-          USER_HEADLINE);
+   /* Print error box if variable error is set */
+   owi_box_error();
 
-   if (strcmp(variable_get("error"), "")) {	  
-      printf("<div class=\"error\">%s</div>\n",
-             variable_get("error"));
-   }	     
-	  
-   printf("<form action=\"%s\" method=\"post\">\n"
-          "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
-          "<input type=\"hidden\" name=\"command\" value=\"add\" />\n"
-	  "<table class=\"outside\">\n"
-	  "<tr>\n"
-	  "<td>\n"
-          "<table class=\"detail\">\n"
-          "<tr>\n"
-          "<td class=\"description\">%s</td>\n"
-          "<td class=\"value\"><input type=\"text\" name=\"id\" value=\"%s\" /><br />%s</td>\n"
-          "</tr>\n"
-          "<tr>\n"
-          "<td class=\"description\">%s</td>\n"
-          "<td class=\"value\"><input type=\"password\" name=\"password\" value=\"%s\" /><br />%s</td>\n"
-          "</tr>\n"
-          "<tr>\n"
-          "<td class=\"description\">%s</td>\n"
-          "<td class=\"value\"><input type=\"text\" name=\"gecos\" value=\"%s\" /><br />%s</td>\n"
-          "</tr>\n"
-          "<tr>\n"
-          "<td class=\"description\">%s</td>\n"
-          "<td class=\"value\"><input type=\"checkbox\" name=\"shell\" value=\"y\" %s /><br />%s</td>\n"
-          "</tr>\n"
-          "<tr>\n"
-          "<td></td>\n"
-	  "<td>\n"
-          "<input type=\"button\" onClick=\"javascript:document.forms[0].submit()\" value=\"%s\" />\n"
-          "</td>\n"
-	  "</tr>\n"
-          "</table>\n"
-          "</form>\n",
-          getenv("SCRIPT_NAME"),
-	  variable_get("module"),
-          USER_TABLE_DESCRIPTION,
-	  variable_get("id"),
-	  USER_LOGIN_DESCRIPTION,
-          USER_TABLE_NEW_PASSWORD,
-	  variable_get("password"),
-	  USER_PASSWORD_DESCRIPTION,
-          USER_TABLE_GECOS,
-	  variable_get("gecos"),
-	  USER_GECOS_DESCRIPTION,
-	  USER_TABLE_SHELL,
-	  strcmp(variable_get("shell"), "y") == 0 ? "checked" : "",
-	  USER_SHELL_DESCRIPTION,
-          USER_BUTTON_ADD);
+   /* Print outside table content */
+   owi_outside_open(OWI_DETAIL);
+
+   /* Print all required fields for add request */
+   owi_data_detail(user_data);
+
+   /* Print command button */
+   owi_outside_close(OWI_DETAIL, OWI_BUTTON_ADD);
 }

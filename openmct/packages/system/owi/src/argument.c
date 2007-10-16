@@ -201,7 +201,7 @@ void argument_free(char **argument) {
  */
 char *argument_get(char **argument, int index, char *seperator) {
    /* Option data (from 1st argument until n-th argument) */
-   char *string = NULL;
+   char *string = "";
    /* Define whole string len for all options */
    int string_length = 0;
    /* Index counter */
@@ -218,7 +218,7 @@ char *argument_get(char **argument, int index, char *seperator) {
    /* Everything ok? */
    if (string) {
       /* Clear buffer */
-      memset(string, string_length + 1, 0);
+      memset(string, 0, string_length + 1);
       /* Loop through all argument values */
       for (i = index; argument[i] != NULL; i++) {
          /* Append data to string */
