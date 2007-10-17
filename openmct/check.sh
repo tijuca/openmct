@@ -48,65 +48,6 @@ DIE=0
 #                                          Subroutines                                           #
 ##################################################################################################
 
-function make_ccpath () {
-#building the head of the script
-echo "#!/bin/bash" > $FILE
-echo "#" >> $FILE
-echo "# make_ccpath.sh" >> $FILE
-echo "#" >> $FILE
-echo "# Script that build the path for the Crosscompiler for the TD" >> $FILE
-echo "# builded by makecc4td.sh" >> $FILE
-echo "#" >> $FILE
-echo "# Autor: doc (http://www.tripledragon-fan.de)" >> $FILE
-echo "# Version 0.2 from 04.07.2005" >> $FILE
-echo "#" >> $FILE
-echo "# NOTE: Run this script as root! Otherwise you will exit this script with nothing is happen!" >> $FILE
-echo "" >> $FILE
-echo "CCPATH=$CCPATH" >> $FILE
-echo "STBPATH=$STBPATH" >> $FILE
-echo "clear" >> $FILE
-
-# proofing for running as root
-echo "#------------------- Skript running as root ? ------------------#" >> $FILE
-echo "echo" >> $FILE
-echo "echo -n \"Script runs with root rights ? ..\"" >> $FILE
-echo "if [ \"\$UID\" -eq 0 ]; then" >> $FILE
-echo "    echo -e \"\t\t\033[1;32mo.k.\033[0m Yes, run as user '\$USER'"\" >> $FILE
-echo "else" >> $FILE
-echo "    echo -e \"\t\t\033[1;5;31mNO!\033[0m You can not run this script as simply user!\"" >> $FILE
-echo "    exit 1" >> $FILE
-echo "fi" >> $FILE
-echo "" >> $FILE
-# building the path
-echo "#------------------------- making the CC Path ------------------#" >> $FILE
-echo "echo -n \"setting up the path \$CCPATH ..\"" >> $FILE
-echo "mkdir \$CCPATH" >> $FILE
-echo "echo -e \"\t\t\t\033[1;32mo.k.\033[0m done\"" >> $FILE
-echo "" >> $FILE
-# setting the owner of /opt/db3000
-echo "" >> $FILE
-echo "# setting the owner of /opt/db3000" >> $FILE
-echo "chown $USER:$USER \$CCPATH" >> $FILE
-echo "" >> $FILE
-# making the script executable
-chmod +x $FILE
-
-}
-
-function add_stbpath () {
-echo "#------------------------- making the /stb Path ------------------#" >> $FILE
-echo "echo -n \"setting up the path \$STBPATH ..\"" >> $FILE
-echo "mkdir \$STBPATH" >> $FILE
-echo "echo -e \"\t\t\033[1;32mo.k.\033[0m done\"" >> $FILE
-echo "" >> $FILE
-# setting the owner of /stb
-echo "" >> $FILE
-echo "# setting the owner of /stb" >> $FILE
-echo "chown $USER:$USER \$STBPATH" >> $FILE
-echo "" >> $FILE
-
-}
-
 function check_hostapp () {
 
 test -f `which autoconf` && AUTOCONF=`autoconf --version | $GREP "autoconf " | $CUT -f4 -d " "` || AUTOCONF=
@@ -558,5 +499,3 @@ echo
 check_hostapp
 sleep 1
 echo
-#exit
-
