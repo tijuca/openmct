@@ -11,10 +11,10 @@ BASEPACKAGES=	packages/base/busybox \
 		packages/net/portmap \
 		packages/net/samba2 \
 		packages/net/vsftpd \
-		packages/system/debootstrap \
 		packages/system/fcp \
-		packages/system/ethtool \
-		packages/system/owi
+		packages/system/ethtool 
+#		packages/system/debootstrap \
+#		packages/system/owi
 
 # Filename for release
 IMAGERELEASEFILENAME=openmct-release
@@ -34,7 +34,7 @@ GZIP=/bin/gzip
 MAKE=/usr/bin/make
 TOUCH=/usr/bin/touch
 LN=/bin/ln
-MKDIR=/bin/mkdir
+MKDIR=/bin/mkdir -p
 MKFSJFFS2=$(shell if [ -f /usr/bin/mkfs.jffs2 ]; then $(ECHO) /usr/bin/mkfs.jffs2; else $(ECHO) /usr/sbin/mkfs.jffs2; fi)
 MAKE=/usr/bin/make
 GCC=/usr/bin/gcc
