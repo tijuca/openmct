@@ -127,13 +127,13 @@ else
 endif
 
 $(NEWVARDIR):
-	@$(MAKE) -C packages/build/buildetc OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-all
+	@$(MAKE) -C packages/build/buildetc/src OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ all
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/$(IMAGERELEASEFILENAME)\033[0m"
-	@$(ECHO) "OpenMCT $(IMAGEVERSION) $(IMAGESUBVERSION) $(IMAGEPRODCODE)" > $(NEWROOTDIR)/etc/$(IMAGERELEASEFILENAME)
-	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hostname\033[0m"
+	@$(ECHO) "OpenMCT $(IMAGETARGET) $(IMAGEVERSION) $(IMAGESUBVERSION) $(IMAGEPRODCODE)" > $(NEWROOTDIR)/etc/$(IMAGERELEASEFILENAME)
+	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/var/etc/hostname\033[0m"
 	@$(ECHO) $(IMAGETARGET) > $(NEWVARDIR)/etc/hostname
-	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/issue\033[0m"
-	@$(ECHO) "Welcome on OpenMCT $(IMAGEVERSION) - Kernel \r (\t)" > $(NEWVARDIR)/etc/issue
+	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/var/etc/issue\033[0m"
+	@$(ECHO) "Welcome on OpenMCT $(IMAGETARGET) $(IMAGEVERSION) - Kernel \r (\t)" > $(NEWVARDIR)/etc/issue
 ifdef ETH0IPADDR 
 	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth0\033[0m"
 	@$(ECHO) "auto eth0" >> $(NEWVARDIR)/etc/network/interfaces

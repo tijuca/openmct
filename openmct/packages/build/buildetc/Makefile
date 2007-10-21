@@ -1,5 +1,7 @@
 # Buildetc
 
+# this file is deprecated!
+
 INSTALL=	if [ ! -d $(NEWROOTDIR)/etc ]; then \
 			$(CP) -a $(SRCDIR)/etc $(NEWROOTDIR)/etc ; \
 		fi && \
