@@ -1099,8 +1099,8 @@ CONFIG_USB_USBNET=m
 #
 # USB WLAN adaptors
 #
-#CONFIG_USB_ZD1211 is not set
-#CONFIG_USB_RT2570 is not set
+CONFIG_USB_ZD1211=y
+CONFIG_USB_RT2570=y
 
 #
 # USB port drivers
