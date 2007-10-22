@@ -2,7 +2,7 @@
 #DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/nfs/nfs-utils-1.1.0.tar.gz
 DOWNLOAD=	http://www.ch.kernel.org/pub/linux/utils/nfs/nfs-utils-1.1.0.tar.gz
 
-DEPENDS_ON=	packages/net/tcpwrapper \
+DEPENDSON=	packages/net/tcpwrapper \
 		packages/lib/e2fsprogs
 
 CONFIGUREARGS=  --prefix=$(PREFIX) --host=$(TARGET) --disable-nfsv4 --disable-gss \
