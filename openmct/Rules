@@ -13,8 +13,8 @@ BASEPACKAGES=	packages/base/busybox \
 		packages/net/vsftpd \
 		packages/system/fcp \
 		packages/system/ethtool 
-#		packages/system/debootstrap \
-#		packages/system/owi
+		packages/system/debootstrap \
+		packages/system/owi
 
 # Filename for release
 IMAGERELEASEFILENAME=openmct-release
