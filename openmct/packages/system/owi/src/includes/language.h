@@ -21,7 +21,6 @@
 #define  USER_FILE_UPDATE                    "User has been changed"
 #define  USER_FILE_ERROR                     "User has not been changed"
 
-
 /* group */
 
 #define  GROUP_HEADLINE                       "Access: Groups"
@@ -44,32 +43,30 @@
 #define  SYSINFO_HEADLINE_BOX                "Systeminformation"
 #define  SYSINFO_NAV_SYSTEM                  "System"
 #define  SYSINFO_NAV_DESCRIPTION             "DESC"
-#define  SYSINFO_PROCESS_HEADLINE            "Status: Processes"
 #define  SYSTEM_NAV_DESCRIPTION              "System"
 #define  STATUS_NAV_DESCRIPTION              "Status"
 #define  PROCESS_NAV_DESCRIPTION             "Process"
 
+/* process */
+#define  PROCESS_HEADLINE                    "Status: Processes"
+
 /* nfs */
-#define  NFS_TABLE_DESCRIPTION               "Directory"
-#define  NFS_TABLE_SOURCE                    "Source"
-#define  NFS_TABLE_OPTIONS                   "Options"
-#define  NFS_TABLE_ACTION                    "Action"
+
 #define  NFS_HEADLINE                        "Services: NFS"
 #define  NFS_FILE_FAILED                     "Can't open NFS database"
 #define  NFS_NOT_FOUND                       "Can't find NFS share"
-#define  NFS_BUTTON_DELETE                   "Delete"
-#define  NFS_BUTTON_UPDATE                   "Save"
-#define  NFS_BUTTON_MODIFY                   "Edit"
-#define  NFS_BUTTON_NEW                      "New"
-#define  NFS_BUTTON_ADD                      "Add"
 #define  NFS_NAV_DESCRIPTION                 "NFS"
-#define  NFS_DESCRIPTION                     "Unique directory name."
-#define  NFS_INVALID                         "Invalid syntax for share"
-#define  NFS_SOURCE_INVALID                  "Invalid syntax for source"
-#define  NFS_OPTIONS_INVALID                 "Invalid syntax for options"
 #define  NFS_ALREADY_EXISTS                  "Directory already exists"
-#define  NFS_SOURCE_DESCRIPTION              "Network/Host that is authorized to access to NFS share."
-#define  NFS_OPTIONS_DESCRIPTION             "Properties for share."
+
+#define  NFS_NAME_DIRECTORY                  "Directory"
+#define  NFS_NAME_SOURCE                     "Source"
+#define  NFS_NAME_OPTIONS                    "Options"
+#define  NFS_DESCRIPTION_DIRECTORY           "Unique directory name."
+#define  NFS_DESCRIPTION_SOURCE              "Network/Host that is authorized to access to NFS share."
+#define  NFS_DESCRIPTION_OPTIONS             "Properties for share."
+
+#define  NFS_FILE_UPDATE                     "Share has been changed"
+#define  NFS_FILE_ERROR                      "Share has not been changed"
 
 /* ftp */
 #define  FTP_HEADLINE                        "Services: FTP"

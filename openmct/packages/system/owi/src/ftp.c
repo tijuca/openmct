@@ -24,14 +24,13 @@
 #include <unistd.h>
 #include "includes/argument.h"
 #include "includes/language.h"
-#include "includes/template.h"
 #include "includes/variable.h"
 #include "includes/file.h"
 #include "includes/owi.h"
 #include "includes/ftp.h"
 
 /* Define ini configuration tags */
-struct file_data_t ftp_ini[] = {
+struct file_data_t ftp_data[] = {
    {
      FILE_DATA_TYPE_TEXT,
      -1,
@@ -43,7 +42,7 @@ struct file_data_t ftp_ini[] = {
      "listen_port",
      0,
      "21",
-     0
+     FILE_DATA_FLAG_UPDATE
    },
 
    {
@@ -57,7 +56,7 @@ struct file_data_t ftp_ini[] = {
      "max_clients",
      0,
      "5",
-     0
+     FILE_DATA_FLAG_UPDATE
    },
 
    {
@@ -71,7 +70,7 @@ struct file_data_t ftp_ini[] = {
      "max_per_ip",
      0,
      "2",
-     0
+     FILE_DATA_FLAG_UPDATE
    },
 
    { 
@@ -85,7 +84,7 @@ struct file_data_t ftp_ini[] = {
      "idle_session_timeout",
      0,
      "300",
-     0
+     FILE_DATA_FLAG_UPDATE
    },
 
    {
@@ -99,7 +98,7 @@ struct file_data_t ftp_ini[] = {
      "anonymous_enable",
      0,
      "no",
-     0
+     FILE_DATA_FLAG_UPDATE
    },
 
    { 
@@ -113,7 +112,7 @@ struct file_data_t ftp_ini[] = {
      "local_enable",
      0,
      "yes",
-     0
+     FILE_DATA_FLAG_UPDATE
    },
 
    {
@@ -127,7 +126,7 @@ struct file_data_t ftp_ini[] = {
      "ftpd_banner",
      0,
      NULL,
-     0
+     FILE_DATA_FLAG_UPDATE
    },
 
    {
@@ -141,7 +140,7 @@ struct file_data_t ftp_ini[] = {
      "file_open_mode",
      0,
      NULL,
-     0
+     FILE_DATA_FLAG_UPDATE
    },
 
    { 
@@ -155,7 +154,7 @@ struct file_data_t ftp_ini[] = {
      "pasv_promiscuous",
      0,
      "yes",
-     0
+     FILE_DATA_FLAG_UPDATE
    },
 
    { 0,
@@ -168,7 +167,7 @@ struct file_data_t ftp_ini[] = {
      NULL,
      0,
      NULL,
-     0
+     FILE_DATA_FLAG_UPDATE
    }
 };
 
@@ -181,78 +180,38 @@ struct file_data_t ftp_ini[] = {
 int ftp_main(int argc, char **argv) {
    /* Get command for this module */        
    char *command = variable_get("command");
+   /* File structure */
+   struct file_t f;
+
+   /* Set correct type */
+   f.type = FILE_TYPE_SECTION;
+   /* Set config settings */
+   f.fd = ftp_data;
+   /* Set separator */
+   f.separator = FTP_SEPARATOR;
+   /* Read config into memory */
+   file_open(&f, FTP_FILE);
  
    /* Print header information */
    owi_header(FTP_HEADLINE);
 
-   /* Read file into memory */
-   if (file_open(FTP_FILE) != -1) {
-      /* Read data */
-      file_data_read(ftp_ini, "=");
-      /* Command NULL or empty? */
-      if (!command || !strcmp(command, "")) {
-         /* Just print ftp list */
-         ftp_list();
-      } else if (!strcmp(command, OWI_BUTTON_UPDATE)) {
-         /* Update configuration failed */
-	 ftp_update();
-	 /* Reload konfiguration */
-	 proc_open(FTP_RESTART);
-      } 
-      /* Free file */
-      file_free();
-   } else {
-      /* Print error message */
-      owi_headline(2, FTP_FILE_FAILED);
-   }
+   /* Command NULL or empty? */
+   if (!command || !strcmp(command, "")) {
+      /* Just print ftp list */
+      owi_detail(&f);
+   } else if (!strcmp(command, OWI_BUTTON_UPDATE)) {
+      /* Update configuration failed */
+      owi_update(&f, FTP_FILE_UPDATE, FTP_FILE_ERROR);
+      /* Reload konfiguration */
+      // proc_open(FTP_RESTART);
+      owi_detail(&f);
+   } 
+   /* Free file */
+   file_free(&f);
 
    /* Print footer information */
    owi_footer();
 
    /* Return success */
    return 0;
-}
-
-/* \fn ftp_list()
- * Show all ftps from system
- */
-void ftp_list() {
-   /* Print info box if variable info is set */
-   owi_box_info();
-
-   /* Print error box if variable info is set */
-   owi_box_error();
-
-   /* Print outside table content */
-   owi_outside_open(OWI_DETAIL);
-
-   /* Display all settings in HTML */
-   owi_data_detail(ftp_ini);
-
-   /* Print Submit button */
-   owi_outside_close(OWI_DETAIL, OWI_BUTTON_UPDATE);
-}
-
-/* \fn ftp_update()
- * Update FTP configuration file
- */
-void ftp_update() {
-   /* Update ini configuration */
-   file_data_update(ftp_ini, "=");
-
-   /* Errors during update? */
-   if (!strcmp(variable_get("error"), "")) {
-      /* Save result in ftp file */
-      file_save(FTP_FILE);
-
-      /* Set info message box */
-      variable_set("info", FTP_FILE_UPDATE);
-   } else {
-      /* Set error message box */
-      variable_set("error", FTP_FILE_ERROR);
-
-   }
-
-   /* Display new configuration now*/
-   ftp_list();
 }

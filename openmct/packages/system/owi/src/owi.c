@@ -18,19 +18,25 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*
  *
  */
+#include <stdio.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <stdarg.h>
 #include <sys/resource.h>
+#include "includes/language.h"
 #include "includes/argument.h"
-#include "includes/modules.h"
-#include "includes/template.h"
 #include "includes/variable.h"
 #include "includes/misc.h"
 #include "includes/file.h"
 #include "includes/owi.h"
+#include "includes/user.h"
+#include "includes/group.h"
+#include "includes/nfs.h"
+#include "includes/ftp.h"
+#include "includes/process.h"
+#include "includes/modules.h"
 
 void owi_header(char *headline) {
    /* Loop counter */
@@ -75,12 +81,23 @@ void owi_header(char *headline) {
    printf("</table>\n"
           "</td>\n"
           "<td class=\"content\">\n"
-          "<h3>%s</h3>\n"
+	  "<br />\n"
+          "<table width=\"100%%\">\n"
+	  "<tr>\n"
+	  "<td class=\"headline_%s\">%s</td>\n"
+	  "<td align=\"right\"><a class=\"reload\" href=\"%s?module=%s&amp;command=%s&amp;id=%s\">Reload</a>\n"
+	  "</tr>\n"
+	  "</table>\n"
+	  "<br />\n"
           "<form action=\"%s\" method=\"post\">\n"
           "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
 	  "<input type=\"hidden\" name=\"command\" value=\"%s\" />\n"
 	  "<input type=\"hidden\" name=\"id\" value=\"%s\" />\n",
-          headline,
+          variable_get("module"), headline ? headline: "",
+	  getenv("SCRIPT_NAME"),
+	  variable_get("module"),
+	  variable_get("command"),
+	  variable_get("id"),
           getenv("SCRIPT_NAME"),
           variable_get("module"),
 	  variable_get("command"),
@@ -88,7 +105,10 @@ void owi_header(char *headline) {
 }
 
 void owi_footer() {
-   printf("</form>\n"
+   printf("</td>\n"
+          "</tr>\n"
+	  "</table>\n"
+          "</form>\n"
           "</td>\n"
           "</tr>\n"
 	  "</table>\n"
@@ -123,8 +143,7 @@ void owi_outside_close(int mode, char *value) {
    printf("</table>\n"
           "<table width=\"100%%\">\n"
 	  "<tr>\n"
-	  "<td></td>\n"
-          "<td><input type=\"button\" onClick=\"javascript:document.forms[0].command.value='%s';document.forms[0].submit();\" value=\"%s\" /></td>\n"
+          "<td width=\"100%%\" align=\"right\"><input type=\"button\" class=\"button\" onClick=\"javascript:document.forms[0].command.value='%s';document.forms[0].submit()\" value=\"%s\" /></td>\n"
           "</tr>\n"
 	  "</table>\n",
 	  value, value);
@@ -135,8 +154,8 @@ void owi_error(char *value) {
       value = variable_get("error");
    }
    if (strcmp(value, "")) {
-      printf("<span class=\"error\">%s</span>\n",
-             value);
+      printf("<img class=\"error\" src=\"/images/icon_warning.png\" alt=\"%s\" title=\"%s\"/>\n",
+             value, value);
    }
 }
 
@@ -154,19 +173,23 @@ void owi_box_info() {
    }
 }
 
-void owi_table_header(struct file_data_t *ini) {
+void owi_table_header(struct file_t *f) {
    /* Loop */
    int i = 0;
 
    printf("<thead>\n"
           "<tr>\n");
  
-   for (i = 0; ini[i].html != NULL; i++) {
-      if (ini[i].flags & FILE_DATA_FLAG_LIST) {
-         printf("<th>%s</th>\n", ini[i].name);
+   printf("<th></th>\n");
+
+   for (i = 0; f->fd[i].html != NULL; i++) {
+      if (f->fd[i].flags & FILE_DATA_FLAG_LIST) {
+         printf("<th class=\"header_%s_%s\">%s</th>\n",
+	        variable_get("module"), f->fd[i].html, f->fd[i].name);
       }
    }
-   printf("<th>%s</th>\n", "Action");
+   printf("<th class=\"header_%s_action\">%s</th>\n",
+           variable_get("module"), "Action");
 
    /* Start form / external table / scroll area / internal table*/
    printf("</tr>\n"
@@ -178,18 +201,19 @@ void owi_data_name(struct file_data_t *ini) {
    printf("%s\n", ini->name);
 }
 
-void owi_data_value(struct file_data_t *ini) {
+void owi_data_value(struct file_data_t *ini, int flags) {
    /* Loop */
    int i = 0;
    /* Valid values for html elements */
    char **valid_values;
 
+   if (ini->flags & flags) {
    /* Checkbox? */
    if (ini->type == FILE_DATA_TYPE_CHECKBOX) {
       /* Parse valid values from string */
       valid_values = argument_parse(ini->valid, "|");
       /* Print checkbox */
-      printf("<input type=\"checkbox\" name=\"%s\" value=\"%s\" %s /> ",
+      printf("<input type=\"checkbox\" class=\"checkbox\" name=\"%s\" value=\"%s\" %s /> ",
              ini->html,
 	     valid_values[0],
              ini->current && !strcmp(ini->current, valid_values[0]) ?  "checked" : "");
@@ -222,20 +246,20 @@ void owi_data_value(struct file_data_t *ini) {
       argument_free(valid_values);
          
    } else if (ini->type == FILE_DATA_TYPE_TEXT) {
-      printf("<input type=\"text\" name=\"%s\" value=\"%s\"%s />",
+      printf("<input type=\"text\" class=\"%s\" name=\"%s\" value=\"%s\" />",
+	     strcmp(variable_error_get(ini->html), "") ? "errortext" : "text",
              ini->html,
-	     ini->flags & FILE_DATA_FLAG_DONTFILL ? "" : ini->current ? ini->current : "",
-	     strcmp(variable_error_get(ini->html), "") ? " class=\"inputerror\"" : "");
+	     ini->flags & FILE_DATA_FLAG_DONTFILL ? "" : ini->current ? ini->current : "");
       if (strcmp(variable_error_get(ini->html), "")) {
          printf("&nbsp;");
 	 owi_error(variable_error_get(ini->html));
       } 
       printf("<br />\n");
    } else if (ini->type == FILE_DATA_TYPE_PASSWORD) {
-      printf("<input type=\"password\" name=\"%s\" value=\"%s\"%s />",
+      printf("<input type=\"password\" class=\"%s\" name=\"%s\" value=\"%s\" />",
+             strcmp(variable_error_get(ini->html), "") ? "errortext" : "text",
              ini->html,
-             ini->flags & FILE_DATA_FLAG_DONTFILL ? "" : ini->current ? ini->current : "",
-             strcmp(variable_error_get(ini->html), "") ? " class=\"inputerror\"" : "");
+             ini->flags & FILE_DATA_FLAG_DONTFILL ? "" : ini->current ? ini->current : "");
       if (strcmp(variable_error_get(ini->html), "")) {
          printf("&nbsp;");
          owi_error(variable_error_get(ini->html));
@@ -243,9 +267,9 @@ void owi_data_value(struct file_data_t *ini) {
       printf("<br />\n");
       
    } else if (ini->type == FILE_DATA_TYPE_TEXTAREA) {
-      printf("<textarea name=\"%s\" rows=\"4\" cols=\"55\" %s>%s</textarea>",
+      printf("<textarea name=\"%s\" class=\"%s\" rows=\"4\" cols=\"55\">%s</textarea>",
+	     strcmp(variable_error_get(ini->html), "") ? "errortext" : "text",
              ini->html,
-	     strcmp(variable_error_get(ini->html), "") ? " class=\"inputerror\"" : "",
 	     ini->current ? ini->current : "");
       if (strcmp(variable_error_get(ini->html), "")) {
          printf("<br />\n");
@@ -256,34 +280,39 @@ void owi_data_value(struct file_data_t *ini) {
    if (ini->description) {
       printf("%s", ini->description);
    }
+   } else {
+      printf("%s<br />\n", ini->current);
+   }
 }
 
-void owi_data_detail(struct file_data_t *ini) {
+void owi_data_detail(struct file_t *f, int flags) {
    /* Loop */
    int i = 0;
 
    /* Loop through all configs */
-   for (i = 0; ini[i].html != NULL; i++) {
-      if (ini[i].type != FILE_DATA_TYPE_INTERNAL) {
-      printf("<tr>\n"
-             "<td class=\"name\">\n");
+   for (i = 0; f->fd[i].html != NULL; i++) {
+      if (f->fd[i].type != FILE_DATA_TYPE_INTERNAL) {
+         printf("<tr>\n"
+                "<td class=\"name detail_name_%s_%s\">\n",
+                variable_get("module"), f->fd[i].html);
 
-      /* Display name */
-      owi_data_name(&ini[i]);
+         /* Display name */
+         owi_data_name(&f->fd[i]);
 
-      printf("</td>\n"
-             "<td class=\"value\">\n");
+         printf("</td>\n"
+                "<td class=\"value detail_value_%s_%s\">\n",
+	        variable_get("module"), f->fd[i].html);
 
-      /* Display value */
-      owi_data_value(&ini[i]);
+         /* Display value */
+         owi_data_value(&f->fd[i], flags);
 
-      printf("</td>\n"
-             "</tr>\n");
+         printf("</td>\n"
+                "</tr>\n");
       }	    
    }
 }
 
-void owi_data_list(struct file_data_t *column, char **entry) {
+void owi_data_list(struct file_t *f) {
    /* Loop */
    int j = 0;
    /* id */
@@ -291,23 +320,196 @@ void owi_data_list(struct file_data_t *column, char **entry) {
 
    printf("<tr onmouseover=\"this.className='mover';\" onmouseout=\"this.className='mout';\">\n");
 
-   for (j = 0; column[j].html != NULL; j++) {
-      if (column[j].flags & FILE_DATA_FLAG_LIST) {
-         printf("<td>%s</td>\n", argument_get_part(entry, column[j].index));
+   printf("<td class=\"icon_%s\"></td>\n",
+          variable_get("module"));
+
+   for (j = 0; f->fd[j].html != NULL; j++) {
+      if (f->fd[j].flags & FILE_DATA_FLAG_LIST) {
+         printf("<td class=\"list_%s_%s\">%s</td>\n",
+	        variable_get("module"), f->fd[j].html, f->fd[j].current ? f->fd[j].current : "");
       }
-      if (column[j].flags & FILE_DATA_FLAG_ID) {
-         id = argument_get_part(entry, column[j].index);
+      if (f->fd[j].flags & FILE_DATA_FLAG_ID) {
+         id = f->fd[j].current;
       }
    }
 
-   printf("<td>\n"
-          "<input type=\"button\" onClick=\"javascript:document.forms[0].command.value='%s';document.forms[0].id.value='%s';document.forms[0].submit();\" value=\"%s\" />\n"
-          "<input type=\"button\" onClick=\"javascript:document.forms[0].command.value='%s';document.forms[0].id.value='%s';document.forms[0].submit();\" value=\"%s\" />\n"
+   printf("<td class=\"list_%s_%s\">\n"
+          "<a href=\"#\" class=\"details\" onClick=\"javascript:document.forms[0].command.value='%s';document.forms[0].id.value='%s';document.forms[0].submit();\">%s</a>\n"
+          "<a href=\"#\" class=\"delete\" onClick=\"javascript:document.forms[0].command.value='%s';document.forms[0].id.value='%s';document.forms[0].submit();\">%s</a>\n"
 	  "</td>\n",
+	  variable_get("module"), "action",
 	  OWI_BUTTON_DETAIL, id, OWI_BUTTON_DETAIL,
 	  OWI_BUTTON_DELETE, id, OWI_BUTTON_DELETE);
 
    printf("</tr>\n");
+}
+
+/* \fn owi_detail(f)
+ * Show all settings from system
+ * \param[in] f file structure
+ */
+void owi_detail(struct file_t *f) {
+   /* Print info box if variable info is set */
+   owi_box_info();
+
+   /* Print error box if variable info is set */
+   owi_box_error();
+
+   /* Print outside table content */
+   owi_outside_open(OWI_DETAIL);
+
+   /* Display all settings in HTML */
+   owi_data_detail(f, FILE_DATA_FLAG_UPDATE);
+
+   /* Print Submit button */
+   owi_outside_close(OWI_DETAIL, OWI_BUTTON_UPDATE);
+}
+
+/* \fn owi_detail(f, id)
+ * Show one line with settings from file structure
+ * \param[in] f file structure
+ * \param[in] id 
+ */
+void owi_detail_id(struct file_t *f, char *id) {
+   /* Reset current line */
+   f->line_current = 0;
+   /* Reset line search */
+   f->line_search = 0;
+
+   /* User found? */
+   if (file_data_find(f, id)) {
+      /* Display details */
+      owi_detail(f);
+   }
+}
+
+/* \fn owi_list(f)
+ * Show all settings from system
+ * \param[in] f file structore for ftp settings
+ */
+void owi_list(struct file_t *f) {
+   /* Print info box if variable info is set */
+   owi_box_info();
+
+   /* Print error box if variable info is set */
+   owi_box_error();
+
+   /* Print outside table content */
+   owi_outside_open(OWI_LIST);
+
+   /* Display table header */
+   owi_table_header(f);
+
+   /* Reset line to zero */
+   f->line_current = 0;
+
+   /* Reset search */
+   f->line_search = 0;
+
+   /* Loop through all entries from file */
+   while (file_data_get_next(f)) {
+      /* Display */
+       owi_data_list(f);
+   }
+
+   /* Print Submit button */
+   owi_outside_close(OWI_DETAIL, OWI_BUTTON_NEW);
+}
+
+
+/* \fn owi_update()
+ * Update FTP configuration file
+ * \param[in] f file structore for ftp settings
+ */
+void owi_update(struct file_t *f, char *info, char *error) {
+   /* Update ini configuration */
+   file_data_update(f);
+
+   /* Errors during update? */
+   if (!strcmp(variable_get("error"), "")) {
+      /* Save result in ftp file */
+      file_save(f);
+
+      /* Set info message box */
+      variable_set("info", info);
+   } else {
+      /* Set error message box */
+      variable_set("error", error);
+   }
+}
+
+/* \fn owi_update()
+ * Update FTP configuration file
+ * \param[in] f file structore for ftp settings
+ */
+void owi_update_id(struct file_t *f, char *id, char *info, char *error) {
+   /* Reset current line */
+   f->line_current = 0;
+   /* Reset line search */
+   f->line_search = 0;
+
+   /* User found? */
+   if (file_data_find(f, id)) {
+      /* Display details */
+      owi_update(f, info, error);
+      /* Error found? */
+      if (strcmp(variable_get("error"), "")) {
+         /* Display detail again */
+         owi_detail(f);
+      } else {
+         /* Display list view */
+         owi_list(f);
+      }
+   } else {
+      /* Display list view */
+      owi_list(f);
+   }
+}
+
+/* \fn owi_delete_id(f, id)
+ * Show one line with settings from file structure
+ * \param[in] f file structure
+ * \param[in] id
+ */
+void owi_delete_id(struct file_t *f, char *id) {
+   /* Reset current line */
+   f->line_current = 0;
+   /* Reset line search */
+   f->line_search = 0;
+
+   /* User found? */
+   if (file_data_find(f, id)) {
+      /* Delete entry */
+      file_action(f, FILE_LINE_DEL, NULL);
+      /* Save */
+      file_save(f);
+   }
+   /* Display */
+   owi_list(f);
+}
+
+/* \fn owi_new(f)
+ * Show all settings for add
+ * \param[in] f file structure
+ */
+void owi_new(struct file_t *f) {
+   /* Print info box if variable info is set */
+   owi_box_info();
+
+   /* Print error box if variable info is set */
+   owi_box_error();
+
+   /* Print outside table content */
+   owi_outside_open(OWI_DETAIL);
+
+   /* Display all settings in HTML */
+   owi_data_detail(f, FILE_DATA_FLAG_ADD);
+
+   /* Print Submit button */
+   owi_outside_close(OWI_DETAIL, OWI_BUTTON_ADD);
+}
+
+void owi_add(struct file_t *f) {
 }
 
 int main(int argc, char **argv) {
@@ -319,7 +521,7 @@ int main(int argc, char **argv) {
    module = variable_get("module");
 
    if (!strcmp(module, "")) {
-      variable_set("module", "ftp");
+      variable_set("module", "user");
       module =  variable_get("module");
    }
 

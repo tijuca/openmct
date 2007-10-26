@@ -25,7 +25,6 @@
 #include <crypt.h>
 #include "includes/argument.h"
 #include "includes/language.h"
-#include "includes/template.h"
 #include "includes/variable.h"
 #include "includes/file.h"
 #include "includes/owi.h"

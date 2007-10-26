@@ -33,185 +33,246 @@
 #include "includes/misc.h"
 #include "includes/language.h"
 
-char **file_line = NULL;
-
-int file_line_counter = 0;
-
-int file_section_start = -1;
-int file_section_stop = -1;
-
-/* \fn file_open(filename)
- * Read file into memory (char**) 
- * \param[in] filename file that will be read into memory 
- * \return Amount of lines that have been read
+/* \fn file_open(f, filename)
+ * \param[in] f file structure for current file
+ * \param[in] filename text file that will be read
  */
-int file_open(char *filename) {
+void file_open(struct file_t *f, char *filename) {
    /* File handle */
    FILE *fp = NULL;
-   /* Line counter - set -1 on default for error */
-   int line_counter = -1;
-   /* Real filename */
-   char *real_filename = (char*)malloc(strlen(filename) + strlen(FILE_BASE) + 1);
+   /* Loop */
+   int i = 0;
 
-   /* Malloc ok? */
-   if (real_filename) {
-      /* Write real filename into variable */
-      sprintf(real_filename, "%s%s", FILE_BASE, filename);
-      /* Try to open file */
-      fp = fopen(real_filename, "r");
-      /* Successful? */
-      if (fp) {
-         /* Read data */
-         line_counter = file_read(fp);
-         /* Close file */
-         fclose(fp);
+   /* Allocate memory for filename */
+   f->name = (char*)malloc(strlen(filename) + strlen(FILE_BASE) + 1);
+
+   /* Loop through all config settings */
+   for (i = 0; f->fd[i].html != NULL; i++) {
+      f->fd[i].current = NULL;
+   }
+
+   if (f) {
+      /* Malloc ok? */
+      if (f->name) {
+         /* Write real filename into variable */
+         sprintf(f->name, "%s%s", FILE_BASE, filename);
+         /* Try to open file */
+         fp = fopen(f->name, "r");
+         /* Successful? */
+         if (fp) {
+            /* Read complete file into structure */
+            file_read(f, fp);
+            /* Close file now */
+            fclose(fp);
+         }
       }
-      /* Free memory for filename */
-      free(real_filename);
    }
-   /* Return amount of lines */
-   return line_counter;
 }
 
-/* \fn proc_read(char *command)
- * Execute program and parses output
- * \param[in] command command that will be executed
- * \return Amount of lines that have been read
- */
-int proc_open(char *command) {
-   /* File handle */
-   FILE *fp = NULL;
-   /* Line counter */
-   int line_counter;
-
-   /* Try to execute */
-   fp = popen(command, "r");
-   /* Successful? */
-   if (fp) {
-      /* Read data */
-      line_counter = file_read(fp);
-      /* Close file */
-      pclose(fp);
-   } else {
-      /* Set error */
-      line_counter = -1;
-   }
-
-   /* Return amount of lines */
-   return line_counter;
-}
-
-/* \fn file_read(fp)
+/* \fn file_read(f, fp)
+ * \param[in] f file structure for current file
  * \param[in] fp file pointer
  */
-int file_read(FILE *fp) {
+void file_read(struct file_t *f, FILE *fp) {
    /* Each line from file */
    char line[FILE_MAXLINE];
-   /* Line counter */
-   int line_counter = 0;
+
+   /* Set initial line counter to zero */
+   f->line_count = 0;
+   /* Set line to zero */
+   f->line = NULL;
+   /* Set current line to zero */
+   f->line_current = 0;
+   /* Set search line to zero */
+   f->line_search = 0;
 
    /* Loop through file */
    while (fgets(line, sizeof(line), fp)) {
       /* Strip \n from line */
       line[strlen(line) - 1] = 0;
       /* Reallocate array */
-      file_line = (char**)realloc(file_line,
-                                  sizeof(char *) * (line_counter + 1));
-      file_line[line_counter] = (char*)malloc(strlen(line) + 1);
-      /* Add to data */
-      strcpy(file_line[line_counter], line);
-      /* Increase line counter */
-      line_counter++;
+      f->line = (char**)realloc(f->line,
+                                sizeof(char *) * (f->line_count + 1));
+      /* Enough memory? */
+      if (f->line) {
+         /* Allocate memory for line */
+         f->line[f->line_count] = (char*)malloc(strlen(line) + 1);
+         /* Enough memory? */
+         if (f->line[f->line_count]) {
+            /* Copy line to data */
+            strcpy(f->line[f->line_count], line);
+            /* Increase line counter */
+            f->line_count++;
+         }
+      }
    }
-   file_line_counter = line_counter;
 
-   /* Return bytes */
-   return line_counter;
+   /* Section file? */
+   if (f->type == FILE_TYPE_SECTION) {
+      /* Read all lines until end of line and store result in data array */
+      while (file_data_get_next(f));
+   }
 }
 
-/* \fn file_line(line_number)
- * \param[in] line_number get data from this line
- * \return Pointer to data for this line or NULL on failure
+/* \fn file_data_free(f, fp)
+ * Free file data for current file structure
+ * \param[in] f file structure for current file
  */
-char *file_line_get(int line_number) {
-   /* line_number is valid? */
-   if (line_number >= 0 && line_number < file_line_counter) {
-      /* Return pointer for this line */
-      return file_line[line_number];
+void file_data_free(struct file_t *f) {
+   /* Loop */
+   int i = 0;
+
+   /* Loop through all config settings */
+   for (i = 0; f->fd[i].html != NULL; i++) {
+      /* Object allocated? */
+      if (f->fd[i].current) {
+         /* Free value */
+         free(f->fd[i].current);
+         /* Set to zero */
+         f->fd[i].current = NULL;
+      }
+   }
+}
+
+/* \fn file_free(f, fp)
+ * Free file content for current file structure
+ * \param[in] f file structure for current file
+ */
+void file_free(struct file_t *f) {
+   /* Loop */
+   int i = 0;
+
+   file_data_free(f);
+
+   if (f->line) {
+      for (i = 0; i < f->line_count; i++) {
+         if (f->line[i]) {
+            free(f->line[i]);
+            f->line[i] = NULL;
+         }
+      }
+      free(f->line);
+      f->line = NULL;
+   }
+
+   free(f->name);
+   f->name = NULL;
+
+}
+
+/* \fn file_data_read(f, fp)
+ * Read data from file into structure
+ * \param[in] f file structure for current file
+ * \param[in] entry values
+ */
+void file_data_read(struct file_t *f, char **entry) {
+   /* Loop for elements */
+   int i = 0;
+   /* Loop for config settings */
+   int j = 0;
+
+   /* Per line config? */
+   if (f->type == FILE_TYPE_LINE) {
+      file_data_free(f);
+
+      /* Loop through all entries */
+      for (i = 0; entry[i] != NULL; i++) {
+         /* Loop through all config settings */
+         for (j = 0; f->fd[j].html != NULL; j++) {
+            /* Position found? */
+            if (f->fd[j].index == i) {
+	       /* Copy value */
+               f->fd[j].current = strdup(argument_get_part(entry, i));
+	    }
+	 }
+      }
    } else {
-      /* Index invalid or not found? Return NULL */
-      return NULL;
+      /* Loop through all config settings */
+      for (j = 0; f->fd[j].html != NULL; j++) {
+         /* Directive found? */
+         if (!strcmp(f->fd[j].directive, argument_get_part(entry, 0))) {
+            /* Copy value */
+            f->fd[j].current = strdup(argument_get_part(entry, 1));
+	    /* Set line */
+	    f->fd[j].line = f->line_current;
+         }
+      }
    }
 }
 
-/* \fn file_print(fp)
- * Print whole file on file handle fp
- * \param[in] fp file handle
+/* \fn file_data_get_next(f)
+ * Read next file structure  from file
+ * \param[in] f file structure for current file
  */
-void file_print(FILE *fp) {
-   /* Index counter */
-   int i;
-   /* Loop through all lines */
-   for (i = 0; i < file_line_counter; i++) {
-      fprintf(fp, "%s\n", file_line_get(i));
+int file_data_get_next(struct file_t *f) {
+   /* Current line data */
+   char **entry = NULL;
+
+   /* Not first search */
+   if (f->line_search) {
+      f->line_current++;
+   }
+
+   /* Skip comment lines */
+   while (f->line && 
+          f->line_current < f->line_count &&
+	  f->line[f->line_current] &&
+          f->line[f->line_current][0] == '#') {
+        /* Increase counter */
+        f->line_current++;
+   }
+
+   /* Current line within index? */
+   if (f->line_current < f->line_count) {
+      /* Parse current line */
+      entry = argument_parse(f->line[f->line_current], f->separator);
+      /* Parse successful? */
+      if (entry) {
+         /* Get line into ini structure */
+         file_data_read(f, entry);
+         /* Free entry */
+         free(entry);
+      }
+      /* Increase search counter */
+      f->line_search++;
+      /* Return success */
+      return 1;
+   } else {
+      return 0;
    }
 }
 
-/* \fn file_save(filename)
+/* \fn file_save(f)
  * Save lines to this file
  * \param[in] filename data will be written to this file
  */
-void file_save(char *filename) {
+void file_save(struct file_t *f) {
    /* File handle */
    FILE *fp = NULL;
-   /* Real filename */
-   char *real_filename = (char*)malloc(strlen(filename) + strlen(FILE_BASE) + 1);
+   /* Loop */
+   int i = 0;
 
-   /* Malloc ok? */
-   if (real_filename) {
-      /* Write real filename into variable */
-      sprintf(real_filename, "%s%s", FILE_BASE, filename);
-      /* Try to open file for writing */
-      fp = fopen(real_filename, "w");
-      /* Successful? */
-      if (fp) {
-         /* Print data to file */
-         file_print(fp);
-         /* Close file */
-         fclose(fp);
+   /* Try to open file for writing */
+   fp = fopen(f->name, "w");
+   /* Successful? */
+   if (fp) {
+      /* Loop through all lines */
+      for (i = 0; i < f->line_count; i++) {
+         fprintf(fp, "%s\n", f->line[i]);
       }
-      /* Free filename */
-      free(real_filename);
+      /* Close file */
+      fclose(fp);
    }
 }
 
-/* \fn file_free()
- * Free all lines and reset data
- */
-void file_free() {
-   /* Index counter */
-   int i;
-   /* Loop through all lines */
-   for (i = 0; i < file_line_counter; i++) {
-      /* Free line */
-      free(file_line[i]);
-   }
-   /* Free index for lines */
-   free(file_line);
-   /* Set line counter to zero */
-   file_line_counter = 0;
-   /* Set pointer to NULL */
-   file_line = NULL;
-}
-
-/* \fn file_line_action
+/* \fn file_action
  * Add/Set/Del a line from line array
+ * \param[in] f file structure
  * \param[in] mode Delete, Add or Set line
- * \param[in] line_index Delete or Set this line or add a line at this index position
  * \param[in] format format string for line
  * \param[in] ... Arguments on stack for *printf
  */
-void file_line_action(int mode, int line_index, char *format, ...) {
+void file_action(struct file_t *f, int mode, char *format, ...) {
    /* Variable argument handling */
    va_list va;
    /* Buffer for this line */
@@ -231,387 +292,305 @@ void file_line_action(int mode, int line_index, char *format, ...) {
  
    /* Set line? */
    if (mode == FILE_LINE_SET) {
-      /* Valid index? */
-      if (line_index >= 0 && line_index < file_line_counter) {
-         /* Free old data */
-         free(file_line[line_index]);
-         /* Allocate data for new line */
-         file_line[line_index] = (char*)malloc(strlen(line) + 1);
-         /* Reset data */
-         memset(file_line[line_index], 0, strlen(line) + 1);
-         /* Copy data to index */
-         strcpy(file_line[line_index], line);
-      }
+      /* Free old data */
+      free(f->line[f->line_current]);
+      /* Allocate data for new line */
+      f->line[f->line_current] = (char*)malloc(strlen(line) + 1);
+      /* Reset data */
+      memset(f->line[f->line_current], 0, strlen(line) + 1);
+      /* Copy data to index */
+      strcpy(f->line[f->line_current], line);
    /* Del line? */        
    } else if (mode == FILE_LINE_DEL) {
-      /* Valid index? */
-      if (line_index >= 0 && line_index < file_line_counter) {
-         /* Free current line */
-         free(file_line[line_index]);
-         /* Copy every element after del index to its previous position */
-         for (i = line_index; i < file_line_counter - 1; i++) {
-            /* Just set pointer */              
-            file_line[i] = file_line[i + 1];
-         }
-         /* Decrease line counter */
-         file_line_counter--;
-         /* Reallocate new index array */
-         file_line = (char**)realloc(file_line,
-                                     sizeof(char *) *
-                                     (file_line_counter + 1));
-      }         
+      /* Free current line */
+      free(f->line[f->line_current]);
+      /* Copy every element after del index to its previous position */
+      for (i = f->line_current; i < f->line_count - 1; i++) {
+         /* Just set pointer */              
+         f->line[i] = f->line[i + 1];
+      }
+      /* Decrease line counter */
+      f->line_count--;
+      /* Reallocate new index array */
+      f->line = (char**)realloc(f->line,
+                                sizeof(char *) *
+                                (f->line_count + 1));
    /* Add line? */         
    } else if (mode == FILE_LINE_ADD) {
-      /* Valid index? */
-      if (line_index >= 0 && line_index <= file_line_counter) {
-         /* Increase line counter */
-         file_line_counter++;
-         /* Reallocate new index array */
-         file_line = (char**)realloc(file_line,
-                                     sizeof(char *) *
-                                     (file_line_counter + 1));
-         /* Move pointers */
-         for (i = file_line_counter - 1; i > line_index; i--) {
-            file_line[i] = file_line[i - 1];
-         }
-         /* Allocate space for new line */
-         file_line[line_index] =
-            (char*)malloc(strlen(line) + 1);
-         /* Reset data */
-         memset(file_line[line_index],
-                strlen(line) + 1,
-                0);
-         /* Copy data */
-         strcpy(file_line[line_index],
-                line);
+      /* Increase line counter */
+      f->line_count++;
+      /* Reallocate new index array */
+      f->line = (char**)realloc(f->line,
+                                sizeof(char *) *
+                                (f->line_count + 1));
+      /* Move pointers */
+      for (i = f->line_count - 1; i > f->line_current; i--) {
+         f->line[i] = f->line[i - 1];
       }
+      /* Allocate space for new line */
+      f->line[f->line_current] = (char*)malloc(strlen(line) + 1);
+      /* Reset data */
+      memset(f->line[f->line_current], strlen(line) + 1, 0);
+      /* Copy data */
+      strcpy(f->line[f->line_current], line);
    }
 }
 
-/* \fn file_get_pad(string, match)
- * \param[in] string search string (in most cases the whole line)
- * \param[in] match match string (in most variable name)
- * \return padding lengh for *printf functions
+/* \fn file_data_valid(f)
+ * Get valid entry for a config setting
  */
-int file_get_pad(char *string, char *match) {
-   return (strstr(string, match) - string) + strlen(match);
-}
-
-/* \fn proc_read_line(command, index)
- * \param[in] proc command to execute
- * \param[in] index return this line
- * \return string
- */
-char *proc_read_line(char *command, int index) {
-   int lines = proc_open(command);
-   char *line = NULL;
-
-   if (lines >= 0) {
-      if (index <= lines) {
-         line = (char*)malloc(strlen(file_line_get(index)) + 1);
-	 if (line) {
-            strcpy(line, file_line_get(index));
-	 }
-      }
-      file_free();
-   }
-
-   return line;
-}
-
-/* \fn file_read_line(command, index)
- * \param[in] file to be read
- * \param[in] index return this line
- * \return string
- */
-char *file_read_line(char *file, int index) {
-   int lines = file_open(file);
-   char *line = NULL;
-
-   if (lines >= 0) {
-      if (index <= lines) {
-         line = (char*)malloc(strlen(file_line_get(index)) + 1);
-         if (line) {
-            strcpy(line, file_line_get(index));
-         }
-      }
-      file_free();
-   }
-
-   return line;
-}
-
-/* \fn file_data_read(ini) 
- * Read contents from file into ini structure 
- * \param[in] ini file ini structure
- */
-void file_data_read(struct file_data_t *ini, char *separator) {
-   /* Loop */
-   int i = 0;
-   /* Loop */
-   int j = 0;
-   /* Config line */
-   char **entry = NULL;
-   /* Start file parsing at position start */
-   int start = file_section_start >= 0 ? file_section_start : 0;
-   /* Stop file parsing at position stop */
-   int stop = file_section_stop >= 0 ? file_section_stop : file_line_counter;
-
-   for (j = 0; ini[j].html != NULL; j++) {
-      /* Reset to zero per default */
-      ini[j].current = NULL;
-      for (i = start; i < file_line_counter && i < stop; i++) {
-         /* Parse line */
-         entry = argument_parse(file_line_get(i), separator);
-         /* Directive found? */
-         if (entry && entry[0] && !strcmp(entry[0], ini[j].directive)) {
-            /* HTML variable set (during update process)? */
-            if (strcmp(variable_get(ini[j].html), "")) {
-               /* Set current value */
-               ini[j].current = variable_get(ini[j].html);
-            /* Just display from config? */
-            } else {
-               /* Set current value */
-               ini[j].current = strdup(argument_get_part(entry, 1));
-            }
-            /* Set line */
-            ini[j].position = i;
-         }
-         /* Free configuration line */
-         argument_free(entry);
-      }
-   }
-}
-
-/* \fn file_data_detail(ini)
- * \param[in] ini file ini structure
- */
-void file_data_detail(struct file_data_t *ini, char **entry) {
-   int j;
-
-   for (j = 0; ini[j].html != NULL; j++) {
-      /* HTML variable set (during update process)? */
-      if (strcmp(variable_get(ini[j].html), "")) {
-         /* Set current value */
-         ini[j].current = variable_get(ini[j].html);
-      /* Just display from config? */
-      } else {
-         /* Set current value */
-         ini[j].current = strdup(argument_get_part(entry, ini[j].index));
-      }
-   }
-
-}
-
-/* \fn file_data_update(ini)
- * Update contents in file from ini structure
- * \param[in] ini file ini structure
- */
-void file_data_update(struct file_data_t *ini, char *separator) {
-   /* Loop */
-   int i = 0;
-   /* Loop */
-   int j = 0;
-   /* Variable empty? */
-   int empty = 0;
-
-   /* Loop through all directives */
-   for (i = 0; ini[i].html != NULL; i++) {
-      /* Skip empty config values? */
-      if (ini[i].flags & FILE_DATA_FLAG_SKIP_EMPTY &&
-          !strcmp(variable_get(ini[i].html), "")) {
-         empty = 1;
-      } else {
-         empty = 0;
-      }
-      /* Config setting found in config file? */
-      if (ini[i].position != -1) {
-         /* Empty and remove line? */
-	 if (empty) {
-	    /* Remove line */
-	    file_line_action(FILE_LINE_DEL, ini[i].position, NULL);
-	    /* Remove variable so it will not be displayed */
-	    ini[i].current = NULL;
-	    /* Decrease section stop */
-	    file_section_stop--;
-	    /* Decrease position pointers */
-	    for (j = 0; ini[j].html != NULL; j++) {
-               if (ini[j].position > ini[i].position) {
-                  ini[j].position--;
-	       }
-	    }
-	 } else {
-            /* Set in file */
-            file_data_update_detail(&ini[i], ini[i].position, separator);
-	 }
-      /* Config setting not found? */
-      } else if (!empty) {
-         /* Update current line */
-         file_data_update_detail(&ini[i],
-	                         file_section_stop != -1 ? file_section_stop : file_line_counter,
-				 separator);
-      }
-   }
-}
-
-/* \fn file_data_update_detail(ini, line_index)
- * Update one config setting
- * \param[in] ini file ini structure
- * \param[in] line_index index for current setting in file
- */
-void file_data_update_detail(struct file_data_t *ini, int line_index, char *separator) {
-   /* Current value */
-   char *value = NULL;
-   /* Valid values for config value */
+char *file_data_valid(struct file_data_t *fd) {
+   /* Valid values for checkbox */
    char **valid_values = NULL;
-   /* Default file action */
-   int action = FILE_LINE_SET;
+   /* Current valid value */
+   char *current = NULL;
 
-   if (ini->type == FILE_DATA_TYPE_CHECKBOX) {
+   if (fd->type == FILE_DATA_TYPE_CHECKBOX) {
       /* Valid values */
-      valid_values = argument_parse(ini->valid, "|");
-      if (strcmp(variable_get(ini->html), "") &&
-          !strcmp(valid_values[0], variable_get(ini->html))) {
-         value = valid_values[0];
+      valid_values = argument_parse(fd->valid, "|");
+      if (strcmp(variable_get(fd->html), "") &&
+          !strcmp(valid_values[0], variable_get(fd->html))) {
+         current = strdup(valid_values[0]);
       } else {
-         value = valid_values[1];
+         current = strdup(valid_values[1]);
       }
-   } else {
-      if ( (ini->valid && match(variable_get(ini->html), ini->valid)) ||
-           !(ini->valid)) {
-         value = variable_get(ini->html);
+      argument_free(valid_values);
+   } else if (fd->type != FILE_DATA_TYPE_INTERNAL) {
+      if (fd->valid) {
+	 if (fd->flags & FILE_DATA_FLAG_DONTFILL &&
+	     !strcmp(variable_get(fd->html), "")) {
+            current = strdup(fd->current);
+	 } else if (match(variable_get(fd->html), fd->valid)) {
+            current = strdup(variable_get(fd->html));
+            if (fd->flags & FILE_DATA_FLAG_CRYPT) {
+               current = strdup(crypt(current, "OM"));
+            }
+         } else {
+            variable_error_set(fd->html, OWI_SYNTAX_INVALID);
+            variable_set("error", OWI_SYNTAX_INVALID);
+         }
+      } else {
+         current = strdup(variable_get(fd->html));
       }
    }
 
-   /* Set current value for display -
-    * can be different from file because of errors */
-   ini->current = strdup(variable_get(ini->html));
-
-   /* Last line in file or block? */
-   if (line_index == file_line_counter ||
-       line_index == file_section_stop) {
-      /* Its and add request */
-      action = FILE_LINE_ADD;
-      /* Increase stop section */
-      file_section_stop++;
-   }
-
-   if (value) {
-      /* Write new config line */
-      file_line_action(action, line_index,
-                       "%s%s%s",
-                       ini->directive,
-		       separator,
-                       variable_get(ini->html));
-   } else {
-      variable_error_set(ini->html, OWI_SYNTAX_INVALID);
-      variable_set("error", OWI_ERROR_INVALID);
-   }
+   /* Return current value */
+   return current;
 }
 
-/* \fn file_data_update_column(column, line_index)
- * Update one column line
- * \param[in] column file column structure
+/* \fn file_data_update(f)
+ * Write current record to line array
+ * \param[in] f file structure
  */
-void file_data_update_column(struct file_data_t *column, int line_index, char **entry) {
-   /* Index counter */
-   int i;
-   /* Index counter */
-   int j;
-   /* Error variable */
-   char *error = NULL;
-   /* Column found? */
-   int column_found = 0;
-   /* Current value */
-   char *p = NULL;
-   /* Data */
-   char *data = NULL;
-   /* Length for data memory */
-   int data_length = 0;
-   /* Separator needed? */
-   int separator = 0;
+void file_data_update(struct file_t *f) {
+   /* Loop for line */
+   int i = 0;
+   /* Loop for config settings */
+   int j = 0;
+   /* Current entry */
+   char *current = NULL;
+   /* Entry */
+   char **entry = NULL;
+   /* Line */
+   char *line = NULL;
 
-   /* Verify syntax of columns */
-   for (i = 0; column[i].html != NULL; i++) {
-      if ( !(column[i].flags & FILE_DATA_FLAG_DONTFILL) &&
-            column[i].type != FILE_DATA_TYPE_CHECKBOX &&
-            column[i].type != FILE_DATA_TYPE_INTERNAL &&
-           (!match(variable_get(column[i].html), column[i].valid)) ) {
-         error = OWI_ERROR_INVALID;
-	 variable_error_set(column[i].html, OWI_SYNTAX_INVALID);
-	 variable_set("error", OWI_ERROR_INVALID);
+   /* Per line config? */
+   if (f->type == FILE_TYPE_LINE) {
+      /* Parse current line */
+      entry = argument_parse(f->line[f->line_current], f->separator);
+      /* Get line into ini structure */
+      file_data_read(f, entry);
+      /* Loop through all available config settings */
+      for (j = 0; f->fd[j].html != NULL; j++) {
+         /* Allow updates for this column? */
+	 if (f->fd[j].flags & FILE_DATA_FLAG_UPDATE) {
+            /* Get current valid value */
+            f->fd[j].current = file_data_valid(&(f->fd[j]));
+         }	    
+      }
+      /* Conver to line for writing */
+      line = file_data_write(f);
+      /* Write result to current line */
+      file_action(f,
+                  FILE_LINE_SET,
+                  "%s",
+                  line);
+      /* Free result from line */		  
+      free(line);
+      /* Loop through all available config settings 
+       * and write old config values back to current
+       * so user will see wrong syntax for his input */
+      for (j = 0; f->fd[j].html != NULL; j++) {
+         /* Allow updates for this column? */
+         if (f->fd[j].flags & FILE_DATA_FLAG_UPDATE) {
+            /* Get current valid value */
+            f->fd[j].current = strdup(variable_get(f->fd[j].html));
+         }
+      }
+   } else {
+      /* Loop through all config settings */
+      for (j = 0; f->fd[j].html != NULL; j++) {
+         /* Set current line */
+         f->line_current = f->fd[j].line;
+
+         /* Get current valid value */
+         current = file_data_valid(&(f->fd[j]));
+
+         /* Set current config for display too - this non validated value
+	  * will not be written to config file (only displayed) */
+	 f->fd[j].current = strdup(variable_get(f->fd[j].html));
+
+         /* Remove empty variable? */
+         if (f->fd[j].flags & FILE_DATA_FLAG_SKIP_EMPTY &&
+	     !strcmp(variable_get(f->fd[j].html), "")) {
+            /* Remove line */
+            file_action(f, FILE_LINE_DEL, NULL);
+            /* Update line index */
+            for (i = 0; f->fd[i].html != NULL; i++) {
+               if (f->fd[i].line > f->line_current) {
+                  f->fd[i].line--;
+               }
+            }
+         /* Set current line? */
+         } else if (f->fd[j].line != -1) {
+	    /* Update current line */
+            file_action(f,
+	                FILE_LINE_SET,
+			"%s%s%s",
+			f->fd[j].directive,
+			f->separator,
+                        current);
+         /* Not found in config file? */
+         } else {
+            /* Add at last position */
+            f->line_current = f->line_count;
+	    /* Add line line */
+            file_action(f,
+	                FILE_LINE_ADD,
+			"%s%s%s",
+			f->fd[j].directive,
+			f->separator,
+                        current);
+         }
       }
    }
 
-   /* Error during update? */
-   if (error) {
+}
 
-   } else {
-      /* Lookup internal details */
-      for (j = 0; column[j].html != NULL; j++) {
-         if (column[j].type == FILE_DATA_TYPE_INTERNAL) {
-            for (i = 0; column[i].html != NULL; i++) {
-               if (!strcmp(column[i].name, column[j].name)) {
-	           char **valid_names = argument_parse(column[i].valid, "|");
-                   if (!strcmp(valid_names[0], variable_get(column[i].html))) {
-                      variable_set(column[j].html, column[j].standard);
-		   }
-		   free(valid_names);
-	       }
-	    }
-	 }
+/* \fn file_data_update(f, id)
+ * Find line with correct id
+ * \param[in] f file structure
+ * \param[in] id id for file data
+ * \return 1 when found or 0 when not found
+ */
+int file_data_find(struct file_t *f, char *id) {
+   /* Index for attributes / file structure */
+   int index_id = -1;
+   /* Entry found? */
+   int found = 0;
+   /* Loop */
+   int i;
+
+   /* Find correct index */
+   for (i = 0; f->fd[i].html != NULL; i++) {
+      if (f->fd[i].flags & FILE_DATA_FLAG_ID) {
+         index_id = i;
+         break;
+      }
+   }
+
+   /* Index found? */
+   if (index_id != -1) {
+      /* Reset to first line */
+      f->line_current = 0;
+
+      /* Loop through all data entries */
+      while (file_data_get_next(f)) {
+         /* Found? */
+         if (!strcmp(f->fd[index_id].current, id)) {
+            /* Mark as found */
+            found = 1;
+            /* Break loop because we're now at correct position */
+            break;
+         }
+      }
+   }
+
+   return found;
+}
+
+/* \fn file_data_write(f)
+ * Convert file structure to one single line for output
+ */
+char *file_data_write(struct file_t *f) {
+   /* Index */
+   int i;
+   /* New line */
+   char *line = NULL;
+   /* Line length */
+   int line_length = 0;
+   /* Current data */
+   char *current = NULL;
+
+   /* Loop through all settings */
+   for (i = 0; f->fd[i].html != NULL; i++) {
+      /* Set current data */
+      current = f->fd[i].current;
+      /* Not defined? */
+      if (!current) {
+         /* Just set empty string */
+         current = "";
       }
 
-      /* Loop through all entries */
-      for (i = 0; entry[i] != NULL; i++) {
-         /* Mark column as not found per default */
-         column_found = 0;
-	 /* Check for a config variable for this index position */
-         for (j = 0; column[j].html != NULL; j++) {
-	    /* Variable found? */
-            if (i == column[j].index && strcmp(variable_get(column[j].html), "")) {
-	       column_found = 1;
-               p = variable_get(column[j].html);
-	       if (column[j].flags & FILE_DATA_FLAG_CRYPT) {
-	          p = crypt(p, "OM");
-	       }
-	    }
-	 }
-         /* Not found or value not set via http? */
-	 if (!column_found || !p) {
-            /* Use value from config file */
-	    p = argument_get_part(entry, i);
-	 }
-	 /* Need separator? */
-	 if (entry[i + 1] != NULL) {
-            separator = 1;
-	 } else {
-            separator = 0;
-	 }
-	 /* Calculate string size */
-         data_length += strlen(p) + separator;
-	 /* Allocate memory for line */
-	 data = realloc(data, data_length + 1);
-	 /* find? */
-	 if (data) {
-	    /* First allocate? */
-	    if (data_length == strlen(p) + separator) {
-	        /* Reset buffer */
-                memset(data, 0, data_length + 1);
-	    }
-	    /* Copy data */
-	    strcat(data, p);
-	    if (separator) {
-               strcat(data, ":");
-	    }
-	 }
+      /* Increase line lenght */
+      line_length += strlen(current);
+
+      /* Need separator? */
+      if (f->fd[i + 1].html != NULL) {
+         line_length++;
       }
-      /* Write new config line */
-      file_line_action(FILE_LINE_SET, line_index,
-                       "%s",
-                       data);
-      
-      /* Free line */
-      free(data);
+
+      /* Allocate space for line */
+      line = realloc(line, line_length + 1);
+      /* Enough space? */
+      if (line) {
+         /* First realloc? */
+         if (!i) {
+            /* Clear memory first */
+            memset(line, 0, line_length + 1);
+         }
+         strcat(line, current);
+         /* Need separator? */
+         if (f->fd[i + 1].html != NULL) {
+            strcat(line, f->separator);
+         }
+      }
+   }
+
+   /* Return result */
+   return line;
+}
+
+/* \fn proc_open(f, command)
+ * \param[in] f file structure for current file
+ * \param[in] command will be executed
+ */
+void proc_open(struct file_t *f, char *command) {
+   /* File handle */
+   FILE *fp = NULL;
+
+   /* Set name to null */
+   f->name = NULL;
+
+   if (f) {
+      /* Execute command */
+      fp = popen(command, "r");
+      /* Successful? */
+      if (fp) {
+         /* Read complete file into structure */
+         file_read(f, fp);
+         /* Close file now */
+         pclose(fp);
+      }
    }
 }
