@@ -1,5 +1,5 @@
 /* -*- mode: C; c-file-style: "gnu" -*- */
-/* lan.c Interface management
+/* interface.c Interface management
  *
  * Copyright (C) 2006 OpenMCT
  *
@@ -29,9 +29,6 @@
 #include "includes/owi.h"
 #include "includes/interface.h"
 
-extern int file_section_start;
-extern int file_section_stop;
-
 /* Define ini configuration tags */
 struct file_data_t interface_data[] = {
    {
@@ -45,7 +42,7 @@ struct file_data_t interface_data[] = {
      "address",
      0,
      "192.168.0.254",
-     FILE_DATA_FLAG_SKIP_EMPTY
+     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
    },
 
    {
@@ -59,7 +56,7 @@ struct file_data_t interface_data[] = {
      "netmask",
      0,
      "255.255.255.0",
-     FILE_DATA_FLAG_SKIP_EMPTY
+     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
    },
 
    {
@@ -73,7 +70,7 @@ struct file_data_t interface_data[] = {
      "broadcast",
      0,
      "192.168.0.255",
-     FILE_DATA_FLAG_SKIP_EMPTY
+     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
    },
 
    {
@@ -87,7 +84,7 @@ struct file_data_t interface_data[] = {
      "gateway",
      0,
      "192.168.0.1",
-     FILE_DATA_FLAG_SKIP_EMPTY
+     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
    },
 
    { 0,
@@ -113,115 +110,39 @@ struct file_data_t interface_data[] = {
 int lan_main(int argc, char **argv) {
    /* Get command for this module */        
    char *command = variable_get("command");
+   /* File structure */
+   struct file_t f;
+
+   /* Set correct type */
+   f.type = FILE_TYPE_SECTION;
+   /* Set config settings */
+   f.fd = interface_data;
+   /* Set separator */
+   f.separator = INTERFACE_SEPARATOR;
+   /* Read config into memory */
+   file_open(&f, INTERFACE_FILE);
  
    /* Print header information */
    owi_header(INTERFACE_LAN_HEADLINE);
 
-   /* Read file into memory */
-   if (file_open(INTERFACE_FILE) != -1) {
-      /* Get section */
-      interface_section_get(INTERFACE_LAN);
-
-      /* Read data from secion */
-      file_data_read(interface_data, " ");
-   
-      /* Command NULL or empty? */
-      if (!command || !strcmp(command, "")) {
-         /* Just print user list */
-         interface_list(INTERFACE_LAN);
-      } else if (!strcmp(command, OWI_BUTTON_UPDATE)) {
-         interface_update(INTERFACE_LAN);
-      }
-      /* Free file */
-      file_free();
-   } else {
-      /* Print error message */
-      owi_headline(1, INTERFACE_LAN_HEADLINE);
-      owi_headline(2, INTERFACE_FILE_FAILED);
+   /* Command NULL or empty? */
+   if (!command || !strcmp(command, "")) {
+      /* Just print user list */
+      owi_detail(&f);
+   } else if (!strcmp(command, OWI_BUTTON_UPDATE)) {
+      /* Update configuration failed */
+      owi_update(&f, INTERFACE_FILE_UPDATE, INTERFACE_FILE_ERROR);
+      /* Reload konfiguration */
+      // proc_open(INTERFACE_RESTART);
+      owi_detail(&f);
    }
+
+   /* Free file */
+   file_free(&f);
 
    /* Print footer information */
    owi_footer();
 
    /* Return success */
    return 0;
-}
-
-/* \fn interface_list(interface)
- * Show interface
- * \param[in] interface read interface from file
- */
-void interface_list(char *interface) {
-   /* Print info box if variable info is set */
-   owi_box_info();
-
-   /* Print error box if variable info is set */
-   owi_box_error();
-
-   /* Print outside table content */
-   owi_outside_open(OWI_DETAIL);
-
-   /* Display all settings in HTML */
-   owi_data_detail(interface_data);
-
-   /* Print Submit button */
-   owi_outside_close(OWI_DETAIL, OWI_BUTTON_UPDATE);
-}
-
-void interface_section_get(char *interface) {
-   /* Index counte r*/
-   int i = 0;
-
-   /* Get section for current interface */
-   i = 0;
-   /* Loop through all interfaces in interfaces file */
-   while (i <= file_line_counter) {
-      /* Parse entry */
-      char **entry = NULL;
-      /* Pseudo line not reached? */
-      if (i < file_line_counter) {
-         /* Get and parse line */
-         entry = argument_parse(file_line_get(i), ARGUMENT_SEPERATOR_STANDARD);
-      }
-      /* Auto line for LAN interface? */
-      if (entry && entry[0] && !strcasecmp(entry[0], "auto")) {
-         if (!strcmp(entry[1], interface)) {
-            file_section_start = i;
-         } else if (file_section_start != -1 &&
-	            file_section_stop == -1) {
-            file_section_stop = i;
-         }
-      }
-      /* End of interfaces file reached? */
-      if (i == file_line_counter) {
-         /* End not found? */
-         if (file_section_start >= 0 && file_section_stop == -1) {
-            file_section_stop = file_line_counter;
-         }
-      }
-      /* Increase counter */
-      i++;
-      /* Free argument */
-      free(entry);
-   }
-}
-
-void interface_update(char *interface) {
-   /* Update ini configuration */
-   file_data_update(interface_data, " ");
-
-   /* Errors during update? */
-   if (!strcmp(variable_get("error"), "")) {
-      /* Save result in ftp file */
-      file_save(INTERFACE_FILE);
-
-      /* Set info message box */
-      variable_set("info", INTERFACE_FILE_UPDATE);
-   } else {
-      /* Set error message box */
-      variable_set("error", INTERFACE_FILE_ERROR);
-   }
-
-   /* Display new configuration now*/
-   interface_list(interface);
 }

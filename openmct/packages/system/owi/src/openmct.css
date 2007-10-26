@@ -430,3 +430,20 @@ h4 {
    width: 250px;
 }
 
+/* Module: lan */
+.headline_lan {
+   background-image: url(/images/headline_lan.png);
+   background-repeat: no-repeat;
+   padding-left: 70px;
+   font-size: 25px;
+   font-weight: bold;
+   color: #666666;
+   height: 64px;
+   vertical-align: middle;
+}
+
+.icon_lan {
+   background-image: url(/images/icon_process.png);
+   background-repeat: no-repeat;
+   width: 16px;
+}

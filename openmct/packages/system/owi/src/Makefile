@@ -11,7 +11,8 @@ LDFLAGS=-lcrypt
 DESTDIR=/www
 CSS=openmct.css
 
-OBJECTS=ftp.o misc.o variable.o argument.o user.o group.o process.o file.o nfs.o owi.o
+OBJECTS=ftp.o misc.o variable.o argument.o user.o group.o \
+	process.o file.o nfs.o interface.o owi.o
 
 all:	$(OBJECTS)
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $(BINARY) $(OBJECTS)

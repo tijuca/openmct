@@ -36,6 +36,7 @@
 #include "includes/nfs.h"
 #include "includes/ftp.h"
 #include "includes/process.h"
+#include "includes/interface.h"
 #include "includes/modules.h"
 
 void owi_header(char *headline) {
@@ -281,7 +282,7 @@ void owi_data_value(struct file_data_t *ini, int flags) {
       printf("%s", ini->description);
    }
    } else {
-      printf("%s<br />\n", ini->current);
+      printf("%s<br />\n", ini->current ? ini->current : "");
    }
 }
 

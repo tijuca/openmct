@@ -433,16 +433,16 @@ void file_data_update(struct file_t *f) {
          /* Set current line */
          f->line_current = f->fd[j].line;
 
-         /* Get current valid value */
-         current = file_data_valid(&(f->fd[j]));
-
          /* Set current config for display too - this non validated value
 	  * will not be written to config file (only displayed) */
 	 f->fd[j].current = strdup(variable_get(f->fd[j].html));
 
          /* Remove empty variable? */
          if (f->fd[j].flags & FILE_DATA_FLAG_SKIP_EMPTY &&
-	     !strcmp(variable_get(f->fd[j].html), "")) {
+	     !strcmp(variable_get(f->fd[j].html), "") &&
+	     f->fd[j].line != -1) {
+	    /* Set current line */
+	    f->line_current = f->fd[j].line;
             /* Remove line */
             file_action(f, FILE_LINE_DEL, NULL);
             /* Update line index */
@@ -453,6 +453,8 @@ void file_data_update(struct file_t *f) {
             }
          /* Set current line? */
          } else if (f->fd[j].line != -1) {
+            /* Get current valid value */
+            current = file_data_valid(&(f->fd[j]));
 	    /* Update current line */
             file_action(f,
 	                FILE_LINE_SET,
@@ -461,7 +463,10 @@ void file_data_update(struct file_t *f) {
 			f->separator,
                         current);
          /* Not found in config file? */
-         } else {
+         } else if (!(f->fd[j].flags & FILE_DATA_FLAG_SKIP_EMPTY) &&
+	            strcmp(variable_get(f->fd[j].html), "")) {
+            /* Get current valid value */
+            current = file_data_valid(&(f->fd[j]));
             /* Add at last position */
             f->line_current = f->line_count;
 	    /* Add line line */
@@ -474,7 +479,6 @@ void file_data_update(struct file_t *f) {
          }
       }
    }
-
 }
 
 /* \fn file_data_update(f, id)
