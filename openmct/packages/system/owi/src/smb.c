@@ -1,5 +1,5 @@
 /* -*- mode: C; c-file-style: "gnu" -*- */
-/* interface.c Interface management
+/* smb.c Interface management
  *
  * Copyright (C) 2006 OpenMCT
  *
@@ -27,64 +27,23 @@
 #include "includes/variable.h"
 #include "includes/file.h"
 #include "includes/owi.h"
-#include "includes/interface.h"
+#include "includes/rc.h"
+#include "includes/smb.h"
 
 /* Define ini configuration tags */
-struct file_data_t interface_data[] = {
+struct file_data_t smb_data[] = {
    {
      FILE_DATA_TYPE_TEXT,
      -1,
-     "address",
-     INTERFACE_NAME_ADDRESS,
-     INTERFACE_DESCRIPTION_ADDRESS,
+     "workgroup",
+     SMB_NAME_WORKGROUP,
+     SMB_DESCRIPTION_WORKGROUP,
      NULL,
-     "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$",
-     "address",
+     "^[A-Z]{1,40}$",
+     "workgroup",
      0,
-     "192.168.0.254",
-     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
-   },
-
-   {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "netmask",
-     INTERFACE_NAME_NETMASK,
-     INTERFACE_DESCRIPTION_NETMASK,
-     NULL,
-     "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$",
-     "netmask",
-     0,
-     "255.255.255.0",
-     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
-   },
-
-   {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "broadcast",
-     INTERFACE_NAME_BROADCAST,
-     INTERFACE_DESCRIPTION_BROADCAST,
-     NULL,
-     "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$",
-     "broadcast",
-     0,
-     "192.168.0.255",
-     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
-   },
-
-   {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "gateway",
-     INTERFACE_NAME_GATEWAY,
-     INTERFACE_DESCRIPTION_GATEWAY,
-     NULL,
-     "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$",
-     "gateway",
-     0,
-     "192.168.0.1",
-     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
+     "OPENMCT",
+     FILE_DATA_FLAG_UPDATE
    },
 
    { 0,
@@ -101,41 +60,80 @@ struct file_data_t interface_data[] = {
    }
 };
 
-/* \fn lan_main(argc, argv)
+/* Define ini configuration tags */
+struct file_data_t smb_rc_data[] = {
+   {
+     FILE_DATA_TYPE_CHECKBOX,
+     -1,
+     "enable_smbd",
+     RC_NAME_START_SMBD,
+     RC_DESCRIPTION_START_SMBD,
+     NULL,
+     "yes|no",
+     "START_SAMBA",
+     0,
+     "yes",
+     FILE_DATA_FLAG_UPDATE
+   },
+
+   { 0,
+     -1,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     0,
+     NULL,
+     FILE_DATA_FLAG_UPDATE
+   }
+};
+
+/* \fn smb_main(argc, argv)
  * Show all users from system
  * \param[in] argc command line argument counter
  * \param[in] argv character pointer array (arguments)
  * \return zero on sucess
  */
-int lan_main(int argc, char **argv) {
+int smb_main(int argc, char **argv) {
    /* Get command for this module */        
    char *command = variable_get("command");
    /* File structure */
-   struct file_t f;
+   struct file_t f, f_rc;
 
    /* Set correct type */
    f.type = FILE_TYPE_SECTION;
    /* Set config settings */
-   f.fd = interface_data;
+   f.fd = smb_data;
    /* Set separator */
-   f.separator = INTERFACE_SEPARATOR;
+   f.separator = SMB_SEPARATOR;
    /* Read config into memory */
-   file_open(&f, INTERFACE_FILE);
+   file_open(&f, SMB_FILE);
+
+   /* Set correct type */
+   f_rc.type = FILE_TYPE_SECTION;
+   /* Set config settings */
+   f_rc.fd = smb_rc_data;
+   /* Set separator */
+   f_rc.separator = RC_SEPARATOR;
+   /* Read config into memory */
+   file_open(&f, RC_FILE);
  
    /* Print header information */
-   owi_header(INTERFACE_LAN_HEADLINE);
+   owi_header(SMB_HEADLINE);
 
    /* Command NULL or empty? */
    if (!command || !strcmp(command, "")) {
-      /* Just print interface option list */
-      owi_list(&f, NULL);
+      /* Just print user list */
+      owi_list(&f_rc, &f, NULL);
    } else if (!strcmp(command, OWI_BUTTON_UPDATE)) {
-      /* Update configuration failed */
-      owi_update(&f, INTERFACE_FILE_UPDATE, INTERFACE_FILE_ERROR);
-      /* Reload konfiguration */
-      // proc_open(INTERFACE_RESTART);
-      /* Just print interface option list */
-      owi_list(&f, NULL);
+      /* Update settings configuration */
+      owi_update(&f_rc, SMB_FILE_UPDATE, SMB_FILE_ERROR);
+      /* Update configuration */
+      owi_update(&f, SMB_FILE_UPDATE, SMB_FILE_ERROR);
+      /* Display configuration */
+      owi_list(&f_rc, &f, NULL);
    }
 
    /* Free file */

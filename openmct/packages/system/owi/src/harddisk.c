@@ -1,5 +1,5 @@
 /* -*- mode: C; c-file-style: "gnu" -*- */
-/* interface.c Interface management
+/* harddisk.c User management
  *
  * Copyright (C) 2006 OpenMCT
  *
@@ -10,7 +10,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MEHARDDISKHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -27,64 +27,92 @@
 #include "includes/variable.h"
 #include "includes/file.h"
 #include "includes/owi.h"
-#include "includes/interface.h"
+#include "includes/harddisk.h"
 
 /* Define ini configuration tags */
-struct file_data_t interface_data[] = {
+struct file_data_t harddisk_data[] = {
    {
      FILE_DATA_TYPE_TEXT,
      -1,
-     "address",
-     INTERFACE_NAME_ADDRESS,
-     INTERFACE_DESCRIPTION_ADDRESS,
+     "device",
+     HARDDISK_NAME_DEVICE,
      NULL,
-     "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$",
-     "address",
+     NULL,
+     "^[A-Za-z0-9/]{1,40}$",
+     "OPTIONS_HDPARM_DEVICE",
      0,
-     "192.168.0.254",
-     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
+     "/dev/discs/disc0/disc",
+     FILE_DATA_FLAG_UPDATE
+   },
+
+   {
+     FILE_DATA_TYPE_CHECKBOX,
+     -1,
+     "dma",
+     HARDDISK_NAME_DMA,
+     NULL,
+     NULL,
+     "1|0",
+     "OPTIONS_HDPARM_DMA",
+     0,
+     "1",
+     FILE_DATA_FLAG_UPDATE
+   },
+
+   {
+     FILE_DATA_TYPE_CHECKBOX,
+     -1,
+     "interrupt_unmask",
+     HARDDISK_NAME_INTERRUPT_UNMASK,
+     NULL,
+     NULL,
+     "1|0",
+     "OPTIONS_HDPARM_INTERRUPT_UNMASK",
+     0,
+     "1",
+     FILE_DATA_FLAG_UPDATE
+   },
+
+   {
+     FILE_DATA_TYPE_SELECT,
+     -1,
+     "sector_count",
+     HARDDISK_NAME_SECTOR_COUNT,
+     NULL,
+     NULL,
+     "2|4|8|16",
+     "OPTIONS_HDPARM_SECTOR_COUNT",
+     0,
+     "16",
+     FILE_DATA_FLAG_UPDATE
+   },
+
+   {
+     FILE_DATA_TYPE_CHECKBOX,
+     -1,
+     "32bit",
+     HARDDISK_NAME_32BIT,
+     NULL,
+     NULL,
+     "3|0",
+     "OPTIONS_HDPARM_32BIT",
+     0,
+     "3",
+     FILE_DATA_FLAG_UPDATE
    },
 
    {
      FILE_DATA_TYPE_TEXT,
      -1,
-     "netmask",
-     INTERFACE_NAME_NETMASK,
-     INTERFACE_DESCRIPTION_NETMASK,
+     "spindown_timeout",
+     HARDDISK_NAME_SPINDOWN_TIMEOUT,
      NULL,
-     "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$",
-     "netmask",
-     0,
-     "255.255.255.0",
-     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
-   },
-
-   {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "broadcast",
-     INTERFACE_NAME_BROADCAST,
-     INTERFACE_DESCRIPTION_BROADCAST,
      NULL,
-     "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$",
-     "broadcast",
+     "^[0-9]{1,3}$",
+     "OPTIONS_HDPARM_SPINDOWN_TIMEOUT",
      0,
-     "192.168.0.255",
-     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
-   },
-
-   {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "gateway",
-     INTERFACE_NAME_GATEWAY,
-     INTERFACE_DESCRIPTION_GATEWAY,
-     NULL,
-     "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$",
-     "gateway",
-     0,
-     "192.168.0.1",
-     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
+     "60",
+     FILE_DATA_FLAG_UPDATE
    },
 
    { 0,
@@ -101,13 +129,13 @@ struct file_data_t interface_data[] = {
    }
 };
 
-/* \fn lan_main(argc, argv)
- * Show all users from system
+/* \fn harddisk_main(argc, argv)
+ * Show all harddisks from system
  * \param[in] argc command line argument counter
  * \param[in] argv character pointer array (arguments)
  * \return zero on sucess
  */
-int lan_main(int argc, char **argv) {
+int harddisk_main(int argc, char **argv) {
    /* Get command for this module */        
    char *command = variable_get("command");
    /* File structure */
@@ -116,28 +144,25 @@ int lan_main(int argc, char **argv) {
    /* Set correct type */
    f.type = FILE_TYPE_SECTION;
    /* Set config settings */
-   f.fd = interface_data;
+   f.fd = harddisk_data;
    /* Set separator */
-   f.separator = INTERFACE_SEPARATOR;
+   f.separator = HARDDISK_SEPARATOR;
    /* Read config into memory */
-   file_open(&f, INTERFACE_FILE);
+   file_open(&f, HARDDISK_FILE);
  
    /* Print header information */
-   owi_header(INTERFACE_LAN_HEADLINE);
+   owi_header(HARDDISK_HEADLINE);
 
    /* Command NULL or empty? */
    if (!command || !strcmp(command, "")) {
-      /* Just print interface option list */
+      /* Just print harddisk list */
       owi_list(&f, NULL);
    } else if (!strcmp(command, OWI_BUTTON_UPDATE)) {
       /* Update configuration failed */
-      owi_update(&f, INTERFACE_FILE_UPDATE, INTERFACE_FILE_ERROR);
-      /* Reload konfiguration */
-      // proc_open(INTERFACE_RESTART);
-      /* Just print interface option list */
+      owi_update(&f, HARDDISK_FILE_UPDATE, HARDDISK_FILE_ERROR);
+      /* Display harddisk details again */
       owi_list(&f, NULL);
-   }
-
+   } 
    /* Free file */
    file_free(&f);
 

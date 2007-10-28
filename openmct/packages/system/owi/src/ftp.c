@@ -27,6 +27,7 @@
 #include "includes/variable.h"
 #include "includes/file.h"
 #include "includes/owi.h"
+#include "includes/rc.h"
 #include "includes/ftp.h"
 
 /* Define ini configuration tags */
@@ -171,6 +172,36 @@ struct file_data_t ftp_data[] = {
    }
 };
 
+/* Define ini configuration tags */
+struct file_data_t ftp_rc_data[] = {
+   {
+     FILE_DATA_TYPE_CHECKBOX,
+     -1,
+     "enable_ftpd",
+     RC_NAME_START_FTPD,
+     RC_DESCRIPTION_START_FTPD,
+     NULL,
+     "yes|no",
+     "START_FTPD",
+     0,
+     "yes",
+     FILE_DATA_FLAG_UPDATE
+   },
+
+   { 0,
+     -1,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     0,
+     NULL,
+     FILE_DATA_FLAG_UPDATE
+   }
+};
+
 /* \fn ftp_main(argc, argv)
  * Show all ftps from system
  * \param[in] argc command line argument counter
@@ -181,7 +212,7 @@ int ftp_main(int argc, char **argv) {
    /* Get command for this module */        
    char *command = variable_get("command");
    /* File structure */
-   struct file_t f;
+   struct file_t f, f_rc;
 
    /* Set correct type */
    f.type = FILE_TYPE_SECTION;
@@ -191,22 +222,37 @@ int ftp_main(int argc, char **argv) {
    f.separator = FTP_SEPARATOR;
    /* Read config into memory */
    file_open(&f, FTP_FILE);
- 
+
+   /* Set correct type */
+   f_rc.type = FILE_TYPE_SECTION;
+   /* Set config settings */
+   f_rc.fd = ftp_rc_data;
+   /* Set separator */
+   f_rc.separator = RC_SEPARATOR;
+   /* Read config into memory */
+   file_open(&f_rc, RC_FILE);
+
    /* Print header information */
    owi_header(FTP_HEADLINE);
 
    /* Command NULL or empty? */
    if (!command || !strcmp(command, "")) {
-      /* Just print ftp list */
-      owi_detail(&f);
+      /* Just print ftp option list */
+      owi_list(&f_rc, &f, NULL);
    } else if (!strcmp(command, OWI_BUTTON_UPDATE)) {
-      /* Update configuration failed */
+      /* Update rc configuration */
+      owi_update(&f_rc, FTP_FILE_UPDATE, FTP_FILE_ERROR);
+      /* Update configuration */
       owi_update(&f, FTP_FILE_UPDATE, FTP_FILE_ERROR);
       /* Reload konfiguration */
       // proc_open(FTP_RESTART);
-      owi_detail(&f);
+      /* Just print ftp option list */
+      owi_list(&f_rc, &f, NULL);
    } 
-   /* Free file */
+  
+   /* Free rc data file */
+   file_free(&f_rc);
+   /* Free data file */
    file_free(&f);
 
    /* Print footer information */

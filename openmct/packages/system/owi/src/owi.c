@@ -37,6 +37,9 @@
 #include "includes/ftp.h"
 #include "includes/process.h"
 #include "includes/interface.h"
+#include "includes/smb.h"
+#include "includes/rc.h"
+#include "includes/harddisk.h"
 #include "includes/modules.h"
 
 void owi_header(char *headline) {
@@ -129,18 +132,14 @@ void owi_headline(int size, char *headline) {
 	  size);
 }
 
-void owi_outside_open(int mode) {
+void owi_outside_open() {
    printf("<table class=\"outside\">\n"
           "<tr>\n"
           "<td>\n"
-          "<table class=\"%s\" width=\"100%%\">\n",
-          mode == OWI_DETAIL ? "detail": "list");
+          "<table class=\"data\" width=\"100%%\">\n");
 }
 
-void owi_outside_close(int mode, char *value) {
-   if (mode == OWI_LIST) {
-      printf("</tbody>\n");
-   }
+void owi_outside_close(char *value) {
    printf("</table>\n"
           "<table width=\"100%%\">\n"
 	  "<tr>\n"
@@ -178,24 +177,20 @@ void owi_table_header(struct file_t *f) {
    /* Loop */
    int i = 0;
 
-   printf("<thead>\n"
-          "<tr>\n");
- 
-   printf("<th></th>\n");
+   printf("<tr>\n"
+          "<td class=\"list_header\"></td>\n");
 
    for (i = 0; f->fd[i].html != NULL; i++) {
       if (f->fd[i].flags & FILE_DATA_FLAG_LIST) {
-         printf("<th class=\"header_%s_%s\">%s</th>\n",
+         printf("<td class=\"list_header header_%s_%s\">%s</td>\n",
 	        variable_get("module"), f->fd[i].html, f->fd[i].name);
       }
    }
-   printf("<th class=\"header_%s_action\">%s</th>\n",
+   printf("<td class=\"list_header header_%s_action\">%s</td>\n",
            variable_get("module"), "Action");
 
    /* Start form / external table / scroll area / internal table*/
-   printf("</tr>\n"
-          "</thead>\n"
-          "<tbody>");
+   printf("</tr>\n");
 }
 
 void owi_data_name(struct file_data_t *ini) {
@@ -294,14 +289,14 @@ void owi_data_detail(struct file_t *f, int flags) {
    for (i = 0; f->fd[i].html != NULL; i++) {
       if (f->fd[i].type != FILE_DATA_TYPE_INTERNAL) {
          printf("<tr>\n"
-                "<td class=\"name detail_name_%s_%s\">\n",
+                "<td class=\"detail_name detail_name_%s_%s\">\n",
                 variable_get("module"), f->fd[i].html);
 
          /* Display name */
          owi_data_name(&f->fd[i]);
 
          printf("</td>\n"
-                "<td class=\"value detail_value_%s_%s\">\n",
+                "<td class=\"detail_value detail_value_%s_%s\">\n",
 	        variable_get("module"), f->fd[i].html);
 
          /* Display value */
@@ -321,12 +316,12 @@ void owi_data_list(struct file_t *f) {
 
    printf("<tr onmouseover=\"this.className='mover';\" onmouseout=\"this.className='mout';\">\n");
 
-   printf("<td class=\"icon_%s\"></td>\n",
+   printf("<td class=\"list_data icon_%s\"></td>\n",
           variable_get("module"));
 
    for (j = 0; f->fd[j].html != NULL; j++) {
       if (f->fd[j].flags & FILE_DATA_FLAG_LIST) {
-         printf("<td class=\"list_%s_%s\">%s</td>\n",
+         printf("<td class=\"list_data list_%s_%s\">%s</td>\n",
 	        variable_get("module"), f->fd[j].html, f->fd[j].current ? f->fd[j].current : "");
       }
       if (f->fd[j].flags & FILE_DATA_FLAG_ID) {
@@ -334,7 +329,7 @@ void owi_data_list(struct file_t *f) {
       }
    }
 
-   printf("<td class=\"list_%s_%s\">\n"
+   printf("<td class=\"list_data list_%s_%s\">\n"
           "<a href=\"#\" class=\"details\" onClick=\"javascript:document.forms[0].command.value='%s';document.forms[0].id.value='%s';document.forms[0].submit();\">%s</a>\n"
           "<a href=\"#\" class=\"delete\" onClick=\"javascript:document.forms[0].command.value='%s';document.forms[0].id.value='%s';document.forms[0].submit();\">%s</a>\n"
 	  "</td>\n",
@@ -345,11 +340,16 @@ void owi_data_list(struct file_t *f) {
    printf("</tr>\n");
 }
 
-/* \fn owi_detail(f)
+/* \fn owi_list(f, ...)
  * Show all settings from system
  * \param[in] f file structure
  */
-void owi_detail(struct file_t *f) {
+void owi_list(struct file_t *f, ...) {
+   /* Dynamic number of arguments */
+   va_list list;
+   /* Current file structure */
+   struct file_t *current;
+
    /* Print info box if variable info is set */
    owi_box_info();
 
@@ -357,13 +357,38 @@ void owi_detail(struct file_t *f) {
    owi_box_error();
 
    /* Print outside table content */
-   owi_outside_open(OWI_DETAIL);
+   owi_outside_open();
 
-   /* Display all settings in HTML */
-   owi_data_detail(f, FILE_DATA_FLAG_UPDATE);
+   /* Start at first element */
+   va_start(list, f);
+
+   /* Loop through all parameter */
+   for (current = f;
+        current != NULL;
+	current = va_arg(list, struct file_t *)) {
+      if (current->type == FILE_TYPE_LINE) {
+         /* Display table header */
+         owi_table_header(current);
+
+         /* Reset line to zero */
+         current->line_current = 0;
+
+         /* Reset search */
+         current->line_search = 0;
+
+         /* Loop through all entries from file */
+         while (file_data_get_next(current)) {
+            /* Display */
+            owi_data_list(current);
+         }
+      } else if (current->type == FILE_TYPE_SECTION) {
+         /* Display all settings in HTML */
+         owi_data_detail(current, FILE_DATA_FLAG_UPDATE);
+      }
+   }
 
    /* Print Submit button */
-   owi_outside_close(OWI_DETAIL, OWI_BUTTON_UPDATE);
+   owi_outside_close(OWI_BUTTON_UPDATE);
 }
 
 /* \fn owi_detail(f, id)
@@ -380,43 +405,9 @@ void owi_detail_id(struct file_t *f, char *id) {
    /* User found? */
    if (file_data_find(f, id)) {
       /* Display details */
-      owi_detail(f);
+      owi_list(f, NULL);
    }
 }
-
-/* \fn owi_list(f)
- * Show all settings from system
- * \param[in] f file structore for ftp settings
- */
-void owi_list(struct file_t *f) {
-   /* Print info box if variable info is set */
-   owi_box_info();
-
-   /* Print error box if variable info is set */
-   owi_box_error();
-
-   /* Print outside table content */
-   owi_outside_open(OWI_LIST);
-
-   /* Display table header */
-   owi_table_header(f);
-
-   /* Reset line to zero */
-   f->line_current = 0;
-
-   /* Reset search */
-   f->line_search = 0;
-
-   /* Loop through all entries from file */
-   while (file_data_get_next(f)) {
-      /* Display */
-       owi_data_list(f);
-   }
-
-   /* Print Submit button */
-   owi_outside_close(OWI_DETAIL, OWI_BUTTON_NEW);
-}
-
 
 /* \fn owi_update()
  * Update FTP configuration file
@@ -456,10 +447,10 @@ void owi_update_id(struct file_t *f, char *id, char *info, char *error) {
       /* Error found? */
       if (strcmp(variable_get("error"), "")) {
          /* Display detail again */
-         owi_detail(f);
+         owi_list(f, NULL);
       } else {
          /* Display list view */
-         owi_list(f);
+         owi_list(f, NULL);
       }
    } else {
       /* Display list view */
@@ -501,13 +492,13 @@ void owi_new(struct file_t *f) {
    owi_box_error();
 
    /* Print outside table content */
-   owi_outside_open(OWI_DETAIL);
+   owi_outside_open();
 
    /* Display all settings in HTML */
    owi_data_detail(f, FILE_DATA_FLAG_ADD);
 
    /* Print Submit button */
-   owi_outside_close(OWI_DETAIL, OWI_BUTTON_ADD);
+   owi_outside_close(OWI_BUTTON_ADD);
 }
 
 void owi_add(struct file_t *f) {

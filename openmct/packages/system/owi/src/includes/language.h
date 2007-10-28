@@ -95,6 +95,49 @@
 
 #define  FTP_NAV_DESCRIPTION                 "FTP"
 
+/* smb */
+#define  SMB_HEADLINE                        "Services: SMB"
+
+#define  SMB_NAME_WORKGROUP                  "workgroup"
+
+#define  SMB_DESCRIPTION_WORKGROUP           "Workgroup."
+
+#define  SMB_FILE_UPDATE                     "SMB configuration has been changed"
+#define  SMB_FILE_ERROR                      "SMB configuration has not been changed"
+
+#define  SMB_NAV_DESCRIPTION                 "SMB"
+
+/* rc */
+#define  RC_HEADLINE                         "System: Settings"
+
+#define  RC_NAV_DESCRIPTION                  "Settings"
+
+#define  RC_NAME_START_FTPD                  "Enable FTP"
+#define  RC_NAME_START_NFSD                  "NFS"
+#define  RC_NAME_START_SMBD                  "Enable SMB"
+
+#define  RC_DESCRIPTION_START_FTPD           "Start FTP daemon during boot sequence"
+#define  RC_DESCRIPTION_START_SMBD           "Start SMB daemon during boot sequence"
+#define  RC_DESCRIPTION_START_NFSD           "Enable NFS"
+
+#define  RC_FILE_UPDATE                      "Settings has been changed -> Reboot required"
+#define  RC_FILE_ERROR                       "Settings has not been changed"
+
+/* harddisk */
+#define  HARDDISK_HEADLINE                   "System: Harddisk"
+
+#define  HARDDISK_NAV_DESCRIPTION            "Harddisk"
+
+#define  HARDDISK_NAME_DEVICE                "Device"
+#define  HARDDISK_NAME_DMA                   "Enable DMA"
+#define  HARDDISK_NAME_INTERRUPT_UNMASK      "Enable interrupt unmask"
+#define  HARDDISK_NAME_SECTOR_COUNT          "Sector count"
+#define  HARDDISK_NAME_32BIT                 "Enable 32Bit"
+#define  HARDDISK_NAME_SPINDOWN_TIMEOUT      "Spindown Timeout"
+
+#define  HARDDISK_FILE_UPDATE                "Harddisk settings has been changed -> Reboot required"
+#define  HARDDISK_FILE_ERROR                 "Harddisk settings has not been changed"
+
 /* shell */
 #define  SHELL_HEADLINE                      "Shell"
 #define  SHELL_TABLE_COMMAND                 "Command"
@@ -122,7 +165,7 @@
 #define  INTERFACE_LAN_NOT_FOUND             "Can't find LAN interface"
 #define  INTERFACE_LAN_NAV_DESCRIPTION       "LAN"
 
-#define  ACCESS_NAV_DESCRIPTION              "System"
+#define  SYSTEM_NAV_DESCRIPTION              "System"
 #define  SERVICES_NAV_DESCRIPTION            "Services"
 #define  INTERFACES_NAV_DESCRIPTION          "Interfaces"
 

@@ -28,6 +28,7 @@
 #include "includes/file.h"
 #include "includes/misc.h"
 #include "includes/owi.h"
+#include "includes/rc.h"
 #include "includes/nfs.h"
 
 struct file_data_t nfs_data[] = {
@@ -88,6 +89,36 @@ struct file_data_t nfs_data[] = {
    }
 };
 
+/* Define ini configuration tags */
+struct file_data_t nfs_rc_data[] = {
+   {
+     FILE_DATA_TYPE_CHECKBOX,
+     -1,
+     "enable_nfsd",
+     RC_NAME_START_NFSD,
+     RC_DESCRIPTION_START_NFSD,
+     NULL,
+     "yes|no",
+     "START_NFSD",
+     0,
+     "yes",
+     FILE_DATA_FLAG_UPDATE
+   },
+
+   { 0,
+     -1,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     0,
+     NULL,
+     FILE_DATA_FLAG_UPDATE
+   }
+};
+
 /* \fn nfs_main(argc, argv)
  * Show all nfss from system
  * \param[in] argc command line argument counter
@@ -98,7 +129,7 @@ int nfs_main(int argc, char **argv) {
    /* Get command for this module */        
    char *command = variable_get("command");
    /* File structure */
-   struct file_t f;
+   struct file_t f, f_rc;
 
    /* Set correct type */
    f.type = FILE_TYPE_LINE;
@@ -109,13 +140,22 @@ int nfs_main(int argc, char **argv) {
    /* Read config into memory */
    file_open(&f, NFS_FILE);
 
+   /* Set correct type */
+   f_rc.type = FILE_TYPE_SECTION;
+   /* Set config settings */
+   f_rc.fd = nfs_rc_data;
+   /* Set separator */
+   f_rc.separator = RC_SEPARATOR;
+   /* Read config into memory */
+   file_open(&f_rc, RC_FILE);
+
    /* Print header information */
    owi_header(NFS_HEADLINE);
 
    /* Command NULL or empty? */
    if (!command || !strcmp(command, "")) {
       /* Just print nfs list */
-      owi_list(&f);
+      owi_list(&f_rc, &f, NULL);
    } else if (!strcasecmp(command, OWI_BUTTON_DETAIL)) {
       owi_detail_id(&f, variable_get("id"));
    } else if (!strcasecmp(command, OWI_BUTTON_UPDATE)) {
@@ -128,6 +168,8 @@ int nfs_main(int argc, char **argv) {
       owi_add(&f);
    }
 
+   /* Free file */
+   file_free(&f_rc);
    /* Free file */
    file_free(&f);
 

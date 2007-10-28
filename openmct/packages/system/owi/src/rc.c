@@ -1,5 +1,5 @@
 /* -*- mode: C; c-file-style: "gnu" -*- */
-/* interface.c Interface management
+/* rc.c User management
  *
  * Copyright (C) 2006 OpenMCT
  *
@@ -27,64 +27,50 @@
 #include "includes/variable.h"
 #include "includes/file.h"
 #include "includes/owi.h"
-#include "includes/interface.h"
+#include "includes/rc.h"
 
 /* Define ini configuration tags */
-struct file_data_t interface_data[] = {
+struct file_data_t rc_data[] = {
    {
-     FILE_DATA_TYPE_TEXT,
+     FILE_DATA_TYPE_CHECKBOX,
      -1,
-     "address",
-     INTERFACE_NAME_ADDRESS,
-     INTERFACE_DESCRIPTION_ADDRESS,
+     "nfsd",
+     RC_NAME_START_NFSD,
      NULL,
-     "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$",
-     "address",
+     NULL,
+     "yes|no",
+     "START_NFSD",
      0,
-     "192.168.0.254",
-     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
+     "yes",
+     FILE_DATA_FLAG_UPDATE
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
+     FILE_DATA_TYPE_CHECKBOX,
      -1,
-     "netmask",
-     INTERFACE_NAME_NETMASK,
-     INTERFACE_DESCRIPTION_NETMASK,
+     "ftpd",
+     RC_NAME_START_FTPD,
      NULL,
-     "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$",
-     "netmask",
+     NULL,
+     "yes|no",
+     "START_FTPD",
      0,
-     "255.255.255.0",
-     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
+     "yes",
+     FILE_DATA_FLAG_UPDATE
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
+     FILE_DATA_TYPE_CHECKBOX,
      -1,
-     "broadcast",
-     INTERFACE_NAME_BROADCAST,
-     INTERFACE_DESCRIPTION_BROADCAST,
+     "smb",
+     RC_NAME_START_SMBD,
      NULL,
-     "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$",
-     "broadcast",
-     0,
-     "192.168.0.255",
-     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
-   },
-
-   {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "gateway",
-     INTERFACE_NAME_GATEWAY,
-     INTERFACE_DESCRIPTION_GATEWAY,
      NULL,
-     "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$",
-     "gateway",
+     "yes|no",
+     "START_SAMBA",
      0,
-     "192.168.0.1",
-     FILE_DATA_FLAG_SKIP_EMPTY | FILE_DATA_FLAG_UPDATE
+     "yes",
+     FILE_DATA_FLAG_UPDATE
    },
 
    { 0,
@@ -101,13 +87,13 @@ struct file_data_t interface_data[] = {
    }
 };
 
-/* \fn lan_main(argc, argv)
- * Show all users from system
+/* \fn rc_main(argc, argv)
+ * Show all rcs from system
  * \param[in] argc command line argument counter
  * \param[in] argv character pointer array (arguments)
  * \return zero on sucess
  */
-int lan_main(int argc, char **argv) {
+int rc_main(int argc, char **argv) {
    /* Get command for this module */        
    char *command = variable_get("command");
    /* File structure */
@@ -116,28 +102,25 @@ int lan_main(int argc, char **argv) {
    /* Set correct type */
    f.type = FILE_TYPE_SECTION;
    /* Set config settings */
-   f.fd = interface_data;
+   f.fd = rc_data;
    /* Set separator */
-   f.separator = INTERFACE_SEPARATOR;
+   f.separator = RC_SEPARATOR;
    /* Read config into memory */
-   file_open(&f, INTERFACE_FILE);
+   file_open(&f, RC_FILE);
  
    /* Print header information */
-   owi_header(INTERFACE_LAN_HEADLINE);
+   owi_header(RC_HEADLINE);
 
    /* Command NULL or empty? */
    if (!command || !strcmp(command, "")) {
-      /* Just print interface option list */
+      /* Just print rc option list */
       owi_list(&f, NULL);
    } else if (!strcmp(command, OWI_BUTTON_UPDATE)) {
       /* Update configuration failed */
-      owi_update(&f, INTERFACE_FILE_UPDATE, INTERFACE_FILE_ERROR);
-      /* Reload konfiguration */
-      // proc_open(INTERFACE_RESTART);
-      /* Just print interface option list */
+      owi_update(&f, RC_FILE_UPDATE, RC_FILE_ERROR);
+      /* Just print rc option list */
       owi_list(&f, NULL);
-   }
-
+   } 
    /* Free file */
    file_free(&f);
 

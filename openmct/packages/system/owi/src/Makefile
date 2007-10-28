@@ -9,10 +9,12 @@ LN=ln
 BINARY=index.cgi
 LDFLAGS=-lcrypt
 DESTDIR=/www
-CSS=openmct.css
+CSS=css/openmct.css
+IMAGES=images
 
 OBJECTS=ftp.o misc.o variable.o argument.o user.o group.o \
-	process.o file.o nfs.o interface.o owi.o
+	process.o file.o nfs.o interface.o smb.o rc.o harddisk.o \
+	owi.o
 
 all:	$(OBJECTS)
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $(BINARY) $(OBJECTS)
@@ -29,5 +31,6 @@ install:
 	$(CP) -a $(BINARY) $(DESTDIR)/cgi-bin
 	$(MKDIR) -p $(DESTDIR)/css
 	$(CP) -a $(CSS) $(DESTDIR)/css
+	$(CP) -a $(IMAGES) $(DESTDIR)/
 
 uninstall:

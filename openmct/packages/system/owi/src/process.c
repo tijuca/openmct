@@ -265,5 +265,5 @@ void process_list(struct file_t *f) {
    }
 
    /* Print Submit button */
-   owi_outside_close(OWI_DETAIL, OWI_BUTTON_NEW);
+   owi_outside_close(OWI_BUTTON_NEW);
 }
