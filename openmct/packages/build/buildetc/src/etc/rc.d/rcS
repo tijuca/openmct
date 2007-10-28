@@ -45,6 +45,26 @@ if [ "$ENABLE_IPFORWARDING" == "yes" ]; then
 fi
 /bin/echo ""
 
+# ethtool for eth0?
+if [ "$START_ETHTOOL_ETH0" == "yes" ]; then
+   /bin/echo -n "set hardware parameters for eth0"
+   /sbin/ethtool -S eth0 duplex $OPTIONS_ETHTOOL_ETH0_DUPLEX \
+                         autoneg $OPTIONS_ETHTOOL_ETH0_AUTONEG \
+                         speed $OPTIONS_ETHTOOL_ETH0_SPEED \
+                         wol $OPTIONS_ETHTOOL_ETH0_WAKEONLAN
+   /bin/echo ""
+fi
+
+# ethtool for eth1?
+if [ "$START_ETHTOOL_ETH1" == "yes" ]; then
+   /bin/echo -n "set hardware parameters for eth1"
+   /sbin/ethtool -S eth0 duplex $OPTIONS_ETHTOOL_ETH1_DUPLEX \
+                         autoneg $OPTIONS_ETHTOOL_ETH1_AUTONEG \
+                         speed $OPTIONS_ETHTOOL_ETH1_SPEED \
+                         wol $OPTIONS_ETHTOOL_ETH1_WAKEONLAN
+   /bin/echo ""
+fi
+
 # Web Server?
 if [ "$START_HTTPD" == "yes" ]; then
    /bin/echo -n "Starting Web Server ..."
@@ -75,20 +95,26 @@ fi
 # IDE Options
 if [ "$START_HDPARM" == "yes" ]; then
    /bin/echo -n "Enable IDE settings ... "
-   /sbin/hdparm $OPTIONS_HDPARM
+   /sbin/hdparm -X$OPTIONS_HDPARM_TRANSFER \
+                -d$OPTIONS_HDPARM_DMA \
+		-u$OPTIONS_HDPARM_INTERRUPT_UNMASK \
+		-m$OPTIONS_HDPARM_SECTOR_COUNT \
+		-c$OPTIONS_HDPARM_32BIT \
+		-s$OPTIONS_HDPARM_SPINDOWN_TIMEOUT \
+		$OPTIONS_HDPARM_DEVICE
    /bin/echo ""
 fi
 
 # SWAP Partitition
 if [ "$START_SWAP" == "yes" ]; then
    /bin/echo -n "Enable SWAP partition ... "
-   /sbin/swapon $OPTIONS_SWAP
+   /sbin/swapon $OPTIONS_SWAP_DEVICE
 fi
 
 # NTPDate Client
 if [ "$START_NTPDATE" == "yes" ]; then
    /bin/echo -n "Running ntp client ... "
-   /sbin/ntpdate $OPTIONS_NTPDATE
+   /sbin/ntpdate $OPTIONS_NTPDATE_SERVER
 fi
 
 # Syslog Daemon
@@ -102,8 +128,12 @@ fi
 if [ "$START_LEDS" == "yes" ]; then
    /bin/echo -n "Starting Led display ... "
    /bin/echo $OPTIONS_LEDS_HB > /proc/mct/led/hb
-   /bin/echo $OPTIONS_LEDS_IN > /proc/mct/led/in
-   /bin/echo $OPTIONS_LEDS_OUT > /proc/mct/led/out
+   /bin/echo $OPTIONS_LEDS_IN_DEVICE \
+             $OPTIONS_LEDS_IN_DIRECTION \
+	     $OPTIONS_LEDS_IN_INTERVAL > /proc/mct/led/in
+   /bin/echo $OPTIONS_LEDS_OUT_DEVICE \
+             $OPTIONS_LEDS_OUT_DIRECTION \
+	     $OPTIONS_LEDS_OUT_INTERVAL > /proc/mct/led/out
 fi
 
 # SSH Daemon (Dropbear)
