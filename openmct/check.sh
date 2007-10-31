@@ -59,7 +59,7 @@ test -f `which libtool` && LIBTOOL=`libtool --version | $GREP "libtool)" | $CUT 
 test -f `which make` && MAKE=`make --version | $GREP Make | $CUT -f3 -d " "` || MAKE=
 test -f `which perl` && PERL=`perl --version | $GREP "perl, " | $CUT -f4 -d " " | $CUT -c 2-` || PERL=
 test -f `which sed` && SED=`sed --version | $GREP "sed " | $CUT -f4 -d " "` || SED=
-#test -f `which tex` && TEX=`tex --version | $GREP "TeX " | head -n 1 | $CUT -f3 -d " " | $CUT -c -5` || TEX=
+test -f `which tex` && TEX=`tex --version | $GREP "TeX " | head -n 1 | $CUT -f4 -d " " | $CUT -c -5` || TEX=
 
 test -f `which bunzip2` && BUNZIP2=`bunzip2 --help 2> btmp; $GREP Version < btmp | $CUT -c 50-54; rm btmp` || BUNZIP2=
 test -f `which gunzip` && GUNZIP=`gunzip --version | $GREP gunzip | $CUT -f2 -d " "` || GUNZIP=
@@ -126,7 +126,6 @@ elif [ $AUTOMAKE -eq 3 ];then
 elif [ $AUTOMAKE -eq 8 ]; then
     echo -e "\033[1;31m \t\t<---- Attention!"
     echo "        With this version of automake it may be happen that varius side effects are possibile!"
-    echo -e "        Specialy later if you crosscompile plugins for the TD, better use a version like 1.7.x or 1.9.x!\033[0m"
 fi
 if [ $AUTOMAKEVERSION -eq 0 ]; then
     echo -e
@@ -368,32 +367,32 @@ fi
 TEXVERSION=0			# temp variable
 #TEX=7.0.9			# for testing this script
 
-#echo -n "tex      >=7.1.0     : "$TEX
+echo -n "tex      >=7.1.0     : "$TEX
 
-MAJOR=${TEX%.*.*}		# the majornumber from Sed
+MAJOR=${TEX%.*.*}		# the majornumber from tex
 TEX=${TEX##?.}
-MINOR=${TEX%%.*}		# the minornumber from Sed
-MICRO=${TEX##*.}		# the micronumber from Sed
+MINOR=${TEX%%.*}		# the minornumber from tex
+MICRO=${TEX##*.}		# the micronumber from tex
 
 
-#if [ -z $TEX ]; then
-#    echo -e " \t\t<---- \033[1;31mNo tex installed!\033[0m"
-#    TEXVERSION=1
-#    DIE=1
-#fi
+if [ -z $TEX ]; then
+    echo -e " \t\t<---- \033[1;31mNo tex installed!\033[0m"
+    TEXVERSION=1
+    DIE=1
+fi
 
 
-#if [ $TEXVERSION -eq 0 ]; then
-#    if [ $MAJOR -lt 7 ] || ([ $MAJOR -eq 7 ] && [ $MINOR -lt 1 ]); then			
-#        echo -e " \t\t<---- \033[1;31mtex is too OLD!\033[0m"
-#	TEXVERSION=1
-#        DIE=1
-#    fi
-#fi
+if [ $TEXVERSION -eq 0 ]; then
+    if [ $MAJOR -lt 7 ] || ([ $MAJOR -eq 7 ] && [ $MINOR -lt 1 ]); then			
+        echo -e " \t\t<---- \033[1;31mtex is too OLD!\033[0m"
+	TEXVERSION=1
+        DIE=1
+    fi
+fi
 
-#if [ $TEXVERSION -eq 0 ]; then
-#    echo -e
-#fi
+if [ $TEXVERSION -eq 0 ]; then
+    echo -e
+fi
 
 
 #                                    end of main applications                                    #
@@ -494,8 +493,16 @@ then
 else
     echo -e "\t\t\033[1;32mo.k.\033[0m No, run as user '$USER'"
 fi
-sleep 1
+#sleep 1
 echo
 check_hostapp
-sleep 1
+#sleep 1
+if [ $DIE -eq 0 ]; then
+    echo
+    echo -e "\033[1;32mAll checks passed! Thats fine!\033[0m"
+    echo -e "Now build your own Open\033[1;35mM\033[1;33mC\033[1;32mT\033[0m Image!"
+    echo
+    exit
+fi
+
 echo

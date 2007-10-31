@@ -24,7 +24,7 @@ all:	$(OBJECTS)
 	$(CC) -c $(CFLAGS) $<
 
 clean:
-	rm $(BINARY) $(OBJECTS) 2> /dev/null
+	rm -f $(BINARY) $(OBJECTS) 2> /dev/null
 
 install:
 	$(MKDIR) -p $(DESTDIR)/cgi-bin
