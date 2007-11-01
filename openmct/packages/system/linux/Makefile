@@ -7,5 +7,4 @@ INSTALL=	$(GZIP) -9 -c $(SRCDIR)/vmlinux.bin >$(OUTPUTDIR)/vmlinux.bin.gz && \
 		cd $(SRCDIR) && make DEPMOD=/bin/true INSTALL_MOD_PATH=$(NEWROOTDIR) modules_install && \
 		$(DEPMOD) -b $(NEWROOTDIR)/lib/modules/*/ -k vmlinux \
 
-		
 include		$(OPENMCT_DEVEL_PREFIX)Rules

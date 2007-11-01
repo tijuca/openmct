@@ -90,7 +90,7 @@ pkgdistclean:
 
 packages/system/linux/$(SRCDIR)/$(CONFIG):
 	@$(MAKE) -C packages/system/linux OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ $(SRCDIR)
-	@$(CP) packages/system/linux/configs/$(IMAGETARGET) packages/system/linux/configs/config
+	@$(CP) packages/system/linux/configs/$(IMAGEKERNELCONFIG) packages/system/linux/configs/config
 	@$(MAKE) -C packages/system/linux OPENMCT_DEVEL_PREFIX=$(OPENMCT_DEVEL_PREFIX)/ $(SRCDIR)/$(CONFIG)
 	@if [ ! -s $(OUTPUTDIR)/linux ]; then \
 		$(LN) -s $(ACTDIR)/packages/system/linux/$(SRCDIR) $(OUTPUTDIR)/linux ; \
