@@ -97,6 +97,7 @@ SUBSTITUTE=$(SCRIPTDIR)/substitute.sh
 REMOVESVN=$(SCRIPTDIR)/remove-svn.sh
 CLEANUPROOT=$(SCRIPTDIR)/cleanup-root.sh
 DEPMOD=$(SCRIPTDIR)/depmod.pl
+UNAME=$(SCRIPTDIR)/uname.sh
 
 # tar options
 TAROPT=--strip-components=1
