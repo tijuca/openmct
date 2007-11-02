@@ -3,7 +3,8 @@
 #
 
 # Base packages
-BASEPACKAGES=	packages/base/busybox \
+BASEPACKAGES=	packages/build/buildetc \
+		packages/base/busybox \
 		packages/lib/e2fsprogs \
 		packages/net/dropbear \
 		packages/net/nfsutils \
@@ -40,6 +41,7 @@ MAKE=/usr/bin/make
 GCC=/usr/bin/gcc
 CHMOD=/bin/chmod
 PERL=/usr/bin/perl
+SVN=/usr/bin/svn
 
 # Directories
 ACTDIR=$(shell /bin/pwd)
@@ -55,7 +57,7 @@ OUTPUTDIR=$(OPENMCT_DEVEL_PREFIX)/output
 TARGETDIR=$(OUTPUTDIR)/$(TARGET)
 ROOTDIR=$(OUTPUTDIR)/root
 NEWROOTDIR=$(OUTPUTDIR)/newroot
-NEWVARDIR=$(OUTPUTDIR)/newvar/var
+JFFS2DIR=$(OUTPUTDIR)/jffs2
 SCRIPTDIR=$(OPENMCT_DEVEL_PREFIX)/scripts
 SRCDIR=src
 INSTALLDIR=usr
@@ -81,7 +83,7 @@ INSTALLED=.installed
 VMLINUXBIN=vmlinux.bin
 KERNEL=$(VMLINUXBIN).gz
 ROOT=root.bin
-VAR=var.bin
+JFFS2=jffs2.bin
 MCT_MODIFY=mct_modify
 MKSQUASHFS=mksquashfs
 

@@ -48,7 +48,7 @@ fi
 # ethtool for eth0?
 if [ "$START_ETHTOOL_ETH0" == "yes" ]; then
    /bin/echo -n "set hardware parameters for eth0"
-   /sbin/ethtool -S eth0 duplex $OPTIONS_ETHTOOL_ETH0_DUPLEX \
+   /sbin/ethtool -s eth0 duplex $OPTIONS_ETHTOOL_ETH0_DUPLEX \
                          autoneg $OPTIONS_ETHTOOL_ETH0_AUTONEG \
                          speed $OPTIONS_ETHTOOL_ETH0_SPEED \
                          wol $OPTIONS_ETHTOOL_ETH0_WAKEONLAN
@@ -58,7 +58,7 @@ fi
 # ethtool for eth1?
 if [ "$START_ETHTOOL_ETH1" == "yes" ]; then
    /bin/echo -n "set hardware parameters for eth1"
-   /sbin/ethtool -S eth0 duplex $OPTIONS_ETHTOOL_ETH1_DUPLEX \
+   /sbin/ethtool -s eth1 duplex $OPTIONS_ETHTOOL_ETH1_DUPLEX \
                          autoneg $OPTIONS_ETHTOOL_ETH1_AUTONEG \
                          speed $OPTIONS_ETHTOOL_ETH1_SPEED \
                          wol $OPTIONS_ETHTOOL_ETH1_WAKEONLAN
@@ -95,12 +95,12 @@ fi
 # IDE Options
 if [ "$START_HDPARM" == "yes" ]; then
    /bin/echo -n "Enable IDE settings ... "
-   /sbin/hdparm -X$OPTIONS_HDPARM_TRANSFER \
-                -d$OPTIONS_HDPARM_DMA \
-		-u$OPTIONS_HDPARM_INTERRUPT_UNMASK \
-		-m$OPTIONS_HDPARM_SECTOR_COUNT \
-		-c$OPTIONS_HDPARM_32BIT \
-		-s$OPTIONS_HDPARM_SPINDOWN_TIMEOUT \
+   /sbin/hdparm -X $OPTIONS_HDPARM_TRANSFER \
+                -d $OPTIONS_HDPARM_DMA \
+		-u $OPTIONS_HDPARM_INTERRUPT_UNMASK \
+		-m $OPTIONS_HDPARM_SECTOR_COUNT \
+		-c $OPTIONS_HDPARM_32BIT \
+		-S $OPTIONS_HDPARM_SPINDOWN_TIMEOUT \
 		$OPTIONS_HDPARM_DEVICE
    /bin/echo ""
 fi

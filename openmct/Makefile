@@ -104,7 +104,7 @@ $(OUTPUTDIR):
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(OUTPUTDIR)\033[0m"
 	@$(MKDIR) $(OUTPUTDIR)
 
-$(OUTPUTDIR)/$(KERNEL):	packages/system/linux/$(SRCDIR)/$(CONFIG) $(NEWROOTDIR) $(NEWVARDIR)
+$(OUTPUTDIR)/$(KERNEL):	packages/system/linux/$(SRCDIR)/$(CONFIG) $(NEWROOTDIR)
 	@$(MAKE) -C packages/system/linux OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-build
 	@$(MAKE) -C packages/system/linux OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ do-install
 
@@ -126,67 +126,63 @@ else
 	fi
 endif
 
-$(NEWVARDIR):
-	@$(MAKE) -C packages/build/buildetc/src OPENMCT_DEVEL_PREFIX=$(ACTDIR)/ all
-	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/$(IMAGERELEASEFILENAME)\033[0m"
-	@$(ECHO) "OpenMCT $(IMAGETARGET) $(IMAGEVERSION) $(IMAGESUBVERSION) $(IMAGEPRODCODE)" > $(NEWROOTDIR)/etc/$(IMAGERELEASEFILENAME)
-	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/var/etc/hostname\033[0m"
-	@$(ECHO) $(IMAGETARGET) > $(NEWVARDIR)/etc/hostname
-	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/var/etc/issue\033[0m"
-	@$(ECHO) "Welcome on OpenMCT $(IMAGETARGET) $(IMAGEVERSION) - Kernel \r (\t)" > $(NEWVARDIR)/etc/issue
-ifdef ETH0IPADDR 
-	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth0\033[0m"
-	@$(ECHO) "auto eth0" >> $(NEWVARDIR)/etc/network/interfaces
-	@$(ECHO) "iface eth0 inet static" >> $(NEWVARDIR)/etc/network/interfaces
-	@$(ECHO) -e "\taddress $(ETH0IPADDR)" >> $(NEWVARDIR)/etc/network/interfaces
-ifdef ETH0NETMASK
-	@$(ECHO) -e "\tnetmask $(ETH0NETMASK)" >> $(NEWVARDIR)/etc/network/interfaces
-else
-	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWVARDIR)/etc/network/interfaces
-endif
-ifdef ETH0DEFAULTGW
-	@$(ECHO) -e "\tgateway $(ETH0DEFAULTGW)" >> $(NEWVARDIR)/etc/network/interfaces
-endif
-	@$(ECHO) "" >> $(NEWVARDIR)/etc/network/interfaces 
-	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hosts\033[0m"
-	@$(ECHO) $(ETH0IPADDR) $(IMAGETARGET) > $(NEWVARDIR)/etc/hosts
-endif
-ifdef ETH1IPADDR 
-	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth1\033[0m"
-	@$(ECHO) "auto eth1" >> $(NEWVARDIR)/etc/network/interfaces
-	@$(ECHO) "iface eth1 inet static" >> $(NEWVARDIR)/etc/network/interfaces
-	@$(ECHO) -e "\taddress $(ETH1IPADDR)" >> $(NEWVARDIR)/etc/network/interfaces
-ifdef ETH1NETMASK
-	@$(ECHO) -e "\tnetmask $(ETH1NETMASK)" >> $(NEWVARDIR)/etc/network/interfaces
-else
-	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWVARDIR)/etc/network/interfaces
-endif
-ifdef ETH1DEFAULTGW
-	@$(ECHO) -e "\tgateway $(ETH1DEFAULTGW)" >> $(NEWVARDIR)/etc/network/interfaces
-endif
-	@$(ECHO) "" >> $(NEWVARDIR)/etc/network/interfaces 
-endif
-	@$(CP) $(NEWVARDIR)/etc/network/interfaces $(NEWROOTDIR)/etc/default/interfaces
-
 $(OUTPUTDIR)/$(ROOT):
 	@$(ECHO) -e "\033[1;33mREMOVE .svn FROM $(NEWROOTDIR)" 
 	@$(REMOVESVN) $(NEWROOTDIR)
 	@$(ECHO) -e "\033[1;33mCALCULATE DEPENDENCIES FOR KERNEL MODULES"
 	@$(DEPMOD) -b $(NEWROOTDIR)/lib/modules/`$(UNAME) $(PACKAGEDIR)/system/linux/src` \
 	           -k $(PACKAGEDIR)/system/linux/src/vmlinux
+	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/$(IMAGERELEASEFILENAME)\033[0m"
+	@$(ECHO) "OpenMCT $(IMAGETARGET) $(IMAGEVERSION) $(IMAGESUBVERSION) $(IMAGEPRODCODE)" > $(NEWROOTDIR)/etc/$(IMAGERELEASEFILENAME)
+	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hostname\033[0m"
+	@$(ECHO) $(IMAGETARGET) > $(NEWROOTDIR)/etc/hostname
+	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/issue\033[0m"
+	@$(ECHO) "Welcome on OpenMCT $(IMAGETARGET) $(IMAGEVERSION) - Kernel \r (\t)" > $(NEWROOTDIR)/etc/issue
+ifdef ETH0IPADDR 
+	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth0\033[0m"
+	@$(ECHO) "auto eth0" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) "iface eth0 inet static" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\taddress $(ETH0IPADDR)" >> $(NEWROOTDIR)/etc/network/interfaces
+ifdef ETH0NETMASK
+	@$(ECHO) -e "\tnetmask $(ETH0NETMASK)" >> $(NEWROOTDIR)/etc/network/interfaces
+else
+	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWROOTDIR)/etc/network/interfaces
+endif
+ifdef ETH0DEFAULTGW
+	@$(ECHO) -e "\tgateway $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/etc/network/interfaces
+endif
+	@$(ECHO) "" >> $(NEWROOTDIR)/etc/network/interfaces 
+	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hosts\033[0m"
+	@$(ECHO) $(ETH0IPADDR) $(IMAGETARGET) > $(NEWROOTDIR)/etc/hosts
+endif
+ifdef ETH1IPADDR 
+	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth1\033[0m"
+	@$(ECHO) "auto eth1" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) "iface eth1 inet static" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\taddress $(ETH1IPADDR)" >> $(NEWROOTDIR)/etc/network/interfaces ifdef ETH1NETMASK
+	@$(ECHO) -e "\tnetmask $(ETH1NETMASK)" >> $(NEWROOTDIR)/etc/network/interfaces
+ifdef ETH1NETMASK
+	@$(ECHO) -e "\tnetmask $(ETH1NETMASK)" >> $(NEWROOTDIR)/etc/network/interfaces
+else
+	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWROOTDIR)/etc/network/interfaces
+endif
+ifdef ETH1DEFAULTGW
+	@$(ECHO) -e "\tgateway $(ETH1DEFAULTGW)" >> $(NEWROOTDIR)/etc/network/interfaces
+endif
+endif
+	@$(CP) $(NEWROOTDIR)/etc/network/interfaces $(NEWROOTDIR)/etc/default/interfaces
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"
 	@$(OUTPUTDIR)/$(MKSQUASHFS) $(NEWROOTDIR) $(OUTPUTDIR)/$(ROOT) $(ROOTOPTS)
 
-$(OUTPUTDIR)/$(VAR):
-	@$(ECHO) -e "\033[1;33mREMOVE .svn FROM $(NEWVARDIR)" 
-	@$(REMOVESVN) $(NEWVARDIR)
-	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(VAR)\033[0m"
-	@$(MKFSJFFS2) -d $(NEWVARDIR) $(VAROPTS) -o $(OUTPUTDIR)/$(VAR)
+$(OUTPUTDIR)/$(JFFS2):
+	@$(MKDIR) $(JFFS2DIR)
+	@$(TOUCH) $(JFFS2DIR)/.config
+	@$(MKFSJFFS2) -d $(JFFS2DIR) -o $(OUTPUTDIR)/$(JFFS2)
 
-$(IMAGEFILENAME):	$(OUTPUTDIR)/$(MCT_MODIFY) $(OUTPUTDIR)/$(MKSQUASHFS) $(OUTPUTDIR)/$(KERNEL) pkg $(OUTPUTDIR)/$(ROOT) $(OUTPUTDIR)/$(VAR)
+$(IMAGEFILENAME):	$(OUTPUTDIR)/$(MCT_MODIFY) $(OUTPUTDIR)/$(MKSQUASHFS) $(OUTPUTDIR)/$(KERNEL) pkg $(OUTPUTDIR)/$(ROOT) $(OUTPUTDIR)/$(JFFS2)
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(IMAGEFILENAME)\033[0m"
 	@$(OUTPUTDIR)/$(MCT_MODIFY) -w -i $(IMAGEFILENAME) -m $(IMAGEMODE) -p $(IMAGEPRODCODE) \
 		-v $(IMAGEVERSION) -n $(IMAGESUBVERSION) -k $(OUTPUTDIR)/$(KERNEL) \
-                -l $(OUTPUTDIR)/$(ROOT),$(OUTPUTDIR)/$(VAR) \
+                -l $(OUTPUTDIR)/$(ROOT),$(OUTPUTDIR)/$(JFFS2) \
                 -a $(IMAGEFLASHKERNELSIZE),$(shell expr $(IMAGEFLASHROOTSIZE) + $(IMAGEFLASHKERNELSIZE)) \
 		-z $(shell expr $(IMAGEFLASHROOTSIZE) + $(IMAGEFLASHETCSIZE))

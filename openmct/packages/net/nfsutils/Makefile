@@ -19,6 +19,7 @@ INSTALL=	$(CP) $(SRCDIR)/utils/exportfs/exportfs $(NEWROOTDIR)/sbin && \
 		$(CP) $(SRCDIR)/utils/mountd/mountd $(NEWROOTDIR)/sbin/rpc.mountd && \
 		$(STRIP) $(NEWROOTDIR)/sbin/rpc.mountd && \
 		$(CP) $(SRCDIR)/utils/showmount/showmount $(NEWROOTDIR)/sbin && \
-		$(STRIP) $(NEWROOTDIR)/sbin/showmount
+		$(STRIP) $(NEWROOTDIR)/sbin/showmount && \
+		$(ECHO) "/harddisk 192.168.1.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/etc/exports
 
 include		$(OPENMCT_DEVEL_PREFIX)Rules

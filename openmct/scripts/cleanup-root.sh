@@ -9,10 +9,8 @@ if [ "$1" != "" ]; then
 	rm -rf $1/etc
 	rm $1/lib/libstdc++.so*
 	mkdir $1/usr
-	mkdir $1/usr/home
-	mkdir $1/usr/var
-	mkdir $1/usr/vservers
 	mkdir $1/var
-	ln -s usr/home $1/home
-	ln -s usr/vservers $1/vservers
+	mkdir $1/jffs2
+	mkdir $1/rw
+	mkdir $1/harddisk
 fi

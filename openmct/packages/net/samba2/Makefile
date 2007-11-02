@@ -26,6 +26,8 @@ CONFIGUREARGS=	--host=$(TARGET) \
                 --with-tdbsam
 
 INSTALL=	$(CP) $(SRCDIR)/source/bin/{smbd,nmbd,smbpasswd} $(NEWROOTDIR)/sbin && \
-		$(STRIP) $(NEWROOTDIR)/sbin/{smbd,nmbd,smbpasswd}
+		$(STRIP) $(NEWROOTDIR)/sbin/{smbd,nmbd,smbpasswd} && \
+		$(MKDIR) $(NEWROOTDIR)/etc/samba && \
+		$(CP) $(SRCDIR)/examples/simple/smb.conf /etc/samba
 
 include		$(OPENMCT_DEVEL_PREFIX)Rules
