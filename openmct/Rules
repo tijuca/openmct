@@ -15,6 +15,7 @@ BASEPACKAGES=	packages/build/buildetc \
 		packages/system/fcp \
 		packages/system/ethtool \
 		packages/system/debootstrap \
+		packages/system/mtd-tools \
 		packages/system/owi
 
 # Filename for release

@@ -1,9 +1,9 @@
 # Busybox (Basic Shell Utils)
-DOWNLOAD=	http://busybox.net/downloads/busybox-1.7.2.tar.bz2
+DOWNLOAD=	http://busybox.net/downloads/busybox-1.7.1.tar.bz2
 
-MAKEARGS=	CROSS_COMPILE=$(OPENMCT_CROSS_COMPILE)
+MAKEARGS=	CROSS_COMPILE=$(OPENMCT_CROSS_COMPILE) ARCH=mipsel
 
-INSTALL= 	cd $(SRCDIR) && make CROSS_COMPILE=$(OPENMCT_CROSS_COMPILE) \
+INSTALL= 	cd $(SRCDIR) && make CROSS_COMPILE=$(OPENMCT_CROSS_COMPILE) ARCH=mipsel \
 		CONFIG_PREFIX=$(NEWROOTDIR) install && cd ..
 
 include		$(OPENMCT_DEVEL_PREFIX)Rules

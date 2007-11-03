@@ -11,6 +11,7 @@ if [ "$1" != "" ]; then
 	mkdir $1/usr
 	mkdir $1/var
 	mkdir $1/jffs2
-	mkdir $1/rw
+	mkdir $1/squashfs
+	mkdir $1/mnt
 	mkdir $1/harddisk
 fi

@@ -28,6 +28,6 @@ CONFIGUREARGS=	--host=$(TARGET) \
 INSTALL=	$(CP) $(SRCDIR)/source/bin/{smbd,nmbd,smbpasswd} $(NEWROOTDIR)/sbin && \
 		$(STRIP) $(NEWROOTDIR)/sbin/{smbd,nmbd,smbpasswd} && \
 		$(MKDIR) $(NEWROOTDIR)/etc/samba && \
-		$(CP) $(SRCDIR)/examples/simple/smb.conf /etc/samba
+		$(CP) $(SRCDIR)/examples/simple/smb.conf $(NEWROOTDIR)/etc/samba
 
 include		$(OPENMCT_DEVEL_PREFIX)Rules

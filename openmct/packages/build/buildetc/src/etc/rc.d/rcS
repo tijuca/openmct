@@ -1,6 +1,20 @@
 #!/bin/sh
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin
 
+# Prepare root with mini_fo
+/bin/mount -t proc none /proc
+/bin/mount -t jffs2 /dev/mtdblock/3 /jffs2
+if [ ! -f /jffs2/.reset ]; then
+   /bin/mount -t mini_fo -o base=/,sto=/jffs2 mini_fo:/jffs2 /mnt
+   /sbin/pivot_root /mnt /mnt/squashfs
+   /bin/mount -o move /squashfs/dev /dev
+   /bin/mount -o move /squashfs/jffs2 /jffs2
+else
+   /bin/mount -t ramfs /var
+   /bin/mkdir -p /var/run
+fi
+
+# Mount all entries from /etc/fstab
 /bin/echo -n "Mounting Data ... "
 /bin/mount -a
 /bin/echo ""
@@ -18,7 +32,7 @@ done
 
 if [ -d /usr/lib ]; then
    /bin/echo -n "Added /usr/lib directory ... "
-   /sbin/ldconfig -C /var/etc/ld.so.cache -f /var/etc/ld.so.conf -X /usr/lib
+   /sbin/ldconfig -C /etc/ld.so.cache -f /etc/ld.so.conf -X /usr/lib
    /bin/echo ""
 fi
 
@@ -95,12 +109,12 @@ fi
 # IDE Options
 if [ "$START_HDPARM" == "yes" ]; then
    /bin/echo -n "Enable IDE settings ... "
-   /sbin/hdparm -X $OPTIONS_HDPARM_TRANSFER \
-                -d $OPTIONS_HDPARM_DMA \
-		-u $OPTIONS_HDPARM_INTERRUPT_UNMASK \
-		-m $OPTIONS_HDPARM_SECTOR_COUNT \
-		-c $OPTIONS_HDPARM_32BIT \
-		-S $OPTIONS_HDPARM_SPINDOWN_TIMEOUT \
+   /sbin/hdparm -X$OPTIONS_HDPARM_TRANSFER_MODE \
+                -d$OPTIONS_HDPARM_DMA \
+		-u$OPTIONS_HDPARM_INTERRUPT_UNMASK \
+		-m$OPTIONS_HDPARM_SECTOR_COUNT \
+		-c$OPTIONS_HDPARM_32BIT \
+		-S$OPTIONS_HDPARM_SPINDOWN_TIMEOUT \
 		$OPTIONS_HDPARM_DEVICE
    /bin/echo ""
 fi
