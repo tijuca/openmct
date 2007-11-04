@@ -79,6 +79,7 @@ PATCHED=.patched
 CONFIG=.config
 DEPEND=.depend
 INSTALLED=.installed
+SOFTWAREVERSION=$(shell $(SVN) log -rHEAD |grep "|"| cut -c1-5)
 
 # Output Files
 VMLINUXBIN=vmlinux.bin
