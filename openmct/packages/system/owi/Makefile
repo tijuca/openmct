@@ -2,7 +2,7 @@
 MAKEARGS=	CROSS=$(OPENMCT_CROSS_COMPILE)
 
 INSTALL=	cd $(SRCDIR) && \
-		make install DESTDIR=$(NEWVARDIR)/www
+		make install DESTDIR=$(NEWROOTDIR)/var/www
 
 CLEAN=		cd $(SRCDIR) && make clean
 

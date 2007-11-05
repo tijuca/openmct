@@ -1,6 +1,9 @@
 #!/bin/sh
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin
 
+# Load recovery module
+/sbin/insmod recovery
+
 # Prepare root with mini_fo
 /bin/mount -t proc none /proc
 /bin/mount -t jffs2 /dev/mtdblock/3 /jffs2
@@ -8,9 +11,8 @@ if [ ! -f /jffs2/.reset ]; then
    /bin/mount -t mini_fo -o base=/,sto=/jffs2 mini_fo:/jffs2 /mnt
    /sbin/pivot_root /mnt /mnt/squashfs
    /bin/mount -o move /squashfs/dev /dev
-   /bin/mount -o move /squashfs/jffs2 /jffs2
 else
-   /bin/mount -t ramfs /var
+   /bin/mount -t ramfs varfs /var
    /bin/mkdir -p /var/run
 fi
 
@@ -46,8 +48,10 @@ fi
 /bin/hostname `cat /etc/hostname`
 /bin/echo ""
 
-/bin/echo -n "Starting Network ..."
+/sbin/ifconfig eth0 down
+/sbin/ifconfig lo down
 /sbin/ifdown -a
+/bin/echo -n "Starting Network ..."
 /sbin/ifup -a
 if [ $? -ne 0 ]; then
    /bin/cp /etc/default/interfaces /etc/network/interfaces

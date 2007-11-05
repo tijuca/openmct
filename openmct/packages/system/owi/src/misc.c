@@ -19,6 +19,7 @@
  *
  */
 #include <string.h>
+#include <stdio.h>
 #include <regex.h>
 
 /* \fn hex2byte(string, pos)
@@ -85,4 +86,17 @@ int match(char *string, char *pattern) {
       return 0; 
    }
    return 1;
+}
+
+void trim(char **p) {
+   char *q = *p + strlen(*p) - 1;
+   while (*q == ' ' || *q == '\t') {
+      q--;
+   }
+   if (*q > 0) {
+      *(q + 1) = 0;
+   }
+   while (**p == ' ' || **p == '\t') {
+     (*p)++;
+   }
 }

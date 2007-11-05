@@ -142,22 +142,28 @@ void file_free(struct file_t *f) {
    /* Loop */
    int i = 0;
 
+   /* First free current data settings */
    file_data_free(f);
 
+   /* Data lines available? */
    if (f->line) {
+      /* Loop through all lines */
       for (i = 0; i < f->line_count; i++) {
-         if (f->line[i]) {
-            free(f->line[i]);
-            f->line[i] = NULL;
-         }
+         /* Free line */
+         free(f->line[i]);
+	 /* and set to zero */
+         f->line[i] = NULL;
       }
+      /* Free array pointer for lines */
       free(f->line);
+      /* Set array pointer to zero */
       f->line = NULL;
    }
 
+   /* Free space for filename */
    free(f->name);
+   /* Set to zero */
    f->name = NULL;
-
 }
 
 /* \fn file_data_read(f, fp)
@@ -189,10 +195,16 @@ void file_data_read(struct file_t *f, char **entry) {
    } else {
       /* Loop through all config settings */
       for (j = 0; f->fd[j].html != NULL; j++) {
+         /* Get pointer for variable name */
+         char *name = argument_get_part(entry, 0);
+	 trim(&name);
+	 char *value = argument_get_part(entry, 1);
+	 trim(&value);
+	 //printf("LAST CHARACTER [%c]<br /><br />\n", *q > 31 ? *q : '.');
          /* Directive found? */
-         if (!strcmp(f->fd[j].directive, argument_get_part(entry, 0))) {
+         if (!strcmp(f->fd[j].directive, name)) {
             /* Copy value */
-            f->fd[j].current = strdup(argument_get_part(entry, 1));
+            f->fd[j].current = strdup(value);
 	    /* Set line */
 	    f->fd[j].line = f->line_current;
          }
@@ -463,8 +475,7 @@ void file_data_update(struct file_t *f) {
 			f->separator,
                         current);
          /* Not found in config file? */
-         } else if (!(f->fd[j].flags & FILE_DATA_FLAG_SKIP_EMPTY) &&
-	            strcmp(variable_get(f->fd[j].html), "")) {
+	 } else {
             /* Get current valid value */
             current = file_data_valid(&(f->fd[j]));
             /* Add at last position */

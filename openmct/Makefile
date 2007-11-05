@@ -159,8 +159,7 @@ ifdef ETH1IPADDR
 	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth1\033[0m"
 	@$(ECHO) "auto eth1" >> $(NEWROOTDIR)/etc/network/interfaces
 	@$(ECHO) "iface eth1 inet static" >> $(NEWROOTDIR)/etc/network/interfaces
-	@$(ECHO) -e "\taddress $(ETH1IPADDR)" >> $(NEWROOTDIR)/etc/network/interfaces ifdef ETH1NETMASK
-	@$(ECHO) -e "\tnetmask $(ETH1NETMASK)" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\taddress $(ETH1IPADDR)" >> $(NEWROOTDIR)/etc/network/interfaces
 ifdef ETH1NETMASK
 	@$(ECHO) -e "\tnetmask $(ETH1NETMASK)" >> $(NEWROOTDIR)/etc/network/interfaces
 else

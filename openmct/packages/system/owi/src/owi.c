@@ -47,10 +47,10 @@ void owi_header(char *headline) {
    int i = 0;
    int j = 0;
 
-   printf("Content-Type: text/html\n\n");
-   fflush(stdout);
- 
-   printf("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
+   /* Print main content for every page */
+   printf("Content-Type: text/html\n\n"
+          "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" "
+	  "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
           "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
           "<head>\n"
           "<title>%s</title>\n"
@@ -67,11 +67,13 @@ void owi_header(char *headline) {
 	  "<td class=\"navigation\">\n"
 	  "<table>\n",
 	  headline);
+   /* Display all enabled modules in navigation content */	  
    for (i = 0; modules[i].description != NULL; i++) {
       printf("<tr><td>\n");
       for (j = 0; j < modules[i].level * 5; j++) {
          printf("&nbsp;");
       }
+      /* Link available for module? */
       if (modules[i].main) {
          printf("<a href=\"%s?module=%s\">%s</a>\n",
                 getenv("SCRIPT_NAME"),
@@ -89,7 +91,7 @@ void owi_header(char *headline) {
           "<table width=\"100%%\">\n"
 	  "<tr>\n"
 	  "<td class=\"headline_%s\">%s</td>\n"
-	  "<td align=\"right\"><a class=\"reload\" href=\"%s?module=%s&amp;command=%s&amp;id=%s\">Reload</a>\n"
+	  "<td align=\"right\"><a class=\"reload\" href=\"%s?module=%s&amp;id=%s\">Reload</a>\n"
 	  "</tr>\n"
 	  "</table>\n"
 	  "<br />\n"
@@ -100,12 +102,25 @@ void owi_header(char *headline) {
           variable_get("module"), headline ? headline: "",
 	  getenv("SCRIPT_NAME"),
 	  variable_get("module"),
-	  variable_get("command"),
 	  variable_get("id"),
           getenv("SCRIPT_NAME"),
           variable_get("module"),
 	  variable_get("command"),
 	  variable_get("id"));
+
+   if (strcmp(variable_get("error"), "")) {
+      printf("<div class=\"boxerror\">%s</div>\n",
+             variable_get("error"));
+   } else if (strcmp(variable_get("info"), "")) {
+      printf("<div class=\"boxinfo\">%s</div>\n",
+             variable_get("info"));
+   }
+
+   printf("<table class=\"outside\">\n"
+          "<tr>\n"
+          "<td>\n"
+          "<table class=\"data\" width=\"100%%\">\n");
+
 }
 
 void owi_footer() {
@@ -132,13 +147,6 @@ void owi_headline(int size, char *headline) {
 	  size);
 }
 
-void owi_outside_open() {
-   printf("<table class=\"outside\">\n"
-          "<tr>\n"
-          "<td>\n"
-          "<table class=\"data\" width=\"100%%\">\n");
-}
-
 void owi_outside_close(char *value) {
    printf("</table>\n"
           "<table width=\"100%%\">\n"
@@ -159,15 +167,11 @@ void owi_error(char *value) {
    }
 }
 
-void owi_box_error() {
+void owi_box() {
    if (strcmp(variable_get("error"), "")) {
       printf("<div class=\"boxerror\">%s</div>\n",
              variable_get("error"));
-   }
-}
-
-void owi_box_info() {
-   if (strcmp(variable_get("info"), "")) {
+   } else if (strcmp(variable_get("info"), "")) {
       printf("<div class=\"boxinfo\">%s</div>\n",
              variable_get("info"));
    }
@@ -350,15 +354,6 @@ void owi_list(struct file_t *f, ...) {
    /* Current file structure */
    struct file_t *current;
 
-   /* Print info box if variable info is set */
-   owi_box_info();
-
-   /* Print error box if variable info is set */
-   owi_box_error();
-
-   /* Print outside table content */
-   owi_outside_open();
-
    /* Start at first element */
    va_start(list, f);
 
@@ -404,9 +399,12 @@ void owi_detail_id(struct file_t *f, char *id) {
 
    /* User found? */
    if (file_data_find(f, id)) {
-      /* Display details */
-      owi_list(f, NULL);
+      /* Display all settings in HTML */
+      owi_data_detail(f, FILE_DATA_FLAG_UPDATE);
    }
+
+   /* Print Submit button */
+   owi_outside_close(OWI_BUTTON_UPDATE);
 }
 
 /* \fn owi_update()
@@ -454,7 +452,7 @@ void owi_update_id(struct file_t *f, char *id, char *info, char *error) {
       }
    } else {
       /* Display list view */
-      owi_list(f);
+      owi_list(f, NULL);
    }
 }
 
@@ -477,7 +475,7 @@ void owi_delete_id(struct file_t *f, char *id) {
       file_save(f);
    }
    /* Display */
-   owi_list(f);
+   owi_list(f, NULL);
 }
 
 /* \fn owi_new(f)
@@ -485,15 +483,6 @@ void owi_delete_id(struct file_t *f, char *id) {
  * \param[in] f file structure
  */
 void owi_new(struct file_t *f) {
-   /* Print info box if variable info is set */
-   owi_box_info();
-
-   /* Print error box if variable info is set */
-   owi_box_error();
-
-   /* Print outside table content */
-   owi_outside_open();
-
    /* Display all settings in HTML */
    owi_data_detail(f, FILE_DATA_FLAG_ADD);
 

@@ -46,6 +46,20 @@ struct file_data_t smb_data[] = {
      FILE_DATA_FLAG_UPDATE
    },
 
+   {
+     FILE_DATA_TYPE_TEXT,
+     -1,
+     "server_string",
+     SMB_NAME_SERVER_STRING,
+     SMB_DESCRIPTION_SERVER_STRING,
+     NULL,
+     "^[A-Za-z0-9 ]{1,40}$",
+     "server string",
+     0,
+     "OpenMCT Windows Share Server",
+     FILE_DATA_FLAG_UPDATE
+   },
+
    { 0,
      -1,
      NULL,
@@ -118,7 +132,7 @@ int smb_main(int argc, char **argv) {
    /* Set separator */
    f_rc.separator = RC_SEPARATOR;
    /* Read config into memory */
-   file_open(&f, RC_FILE);
+   file_open(&f_rc, RC_FILE);
  
    /* Print header information */
    owi_header(SMB_HEADLINE);

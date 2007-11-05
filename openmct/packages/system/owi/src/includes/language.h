@@ -98,9 +98,11 @@
 /* smb */
 #define  SMB_HEADLINE                        "Services: SMB"
 
-#define  SMB_NAME_WORKGROUP                  "workgroup"
+#define  SMB_NAME_WORKGROUP                  "Workgroup"
+#define  SMB_NAME_SERVER_STRING              "Server String"
 
 #define  SMB_DESCRIPTION_WORKGROUP           "Workgroup."
+#define  SMB_DESCRIPTION_SERVER_STRING       "Server description that will be displayed in network settings"
 
 #define  SMB_FILE_UPDATE                     "SMB configuration has been changed"
 #define  SMB_FILE_ERROR                      "SMB configuration has not been changed"
@@ -108,10 +110,6 @@
 #define  SMB_NAV_DESCRIPTION                 "SMB"
 
 /* rc */
-#define  RC_HEADLINE                         "System: Settings"
-
-#define  RC_NAV_DESCRIPTION                  "Settings"
-
 #define  RC_NAME_START_FTPD                  "Enable FTP"
 #define  RC_NAME_START_NFSD                  "NFS"
 #define  RC_NAME_START_SMBD                  "Enable SMB"

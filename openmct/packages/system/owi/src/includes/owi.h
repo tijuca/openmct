@@ -5,11 +5,9 @@ void owi_header(char *title);
 void owi_footer();
 void owi_headline(int size, char *headline);
 void owi_request();
-void owi_outside_open();
 void owi_outside_close(char *value);
 void owi_error(char *variable);
-void owi_box_error();
-void owi_box_info();
+void owi_box();
 
 void owi_data_detail(struct file_t *f, int flags);
 void owi_data_list(struct file_t *f);

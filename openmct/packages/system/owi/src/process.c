@@ -246,9 +246,6 @@ int process_main(int argc, char **argv) {
  * Show process
  */
 void process_list(struct file_t *f) {
-   /* Print outside table content */
-   owi_outside_open(OWI_LIST);
-
    /* Display table header */
    owi_table_header(f);
 
