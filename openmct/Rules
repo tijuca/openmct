@@ -15,8 +15,8 @@ BASEPACKAGES=	packages/build/buildetc \
 		packages/system/ethtool \
 		packages/system/debootstrap \
 		packages/system/mtd-tools \
-		packages/system/recovery \
-		packages/system/owi
+		packages/system/recovery
+#		packages/system/owi
 
 # Filename for release
 IMAGERELEASEFILENAME=openmct-release

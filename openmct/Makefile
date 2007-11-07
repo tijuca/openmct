@@ -126,28 +126,50 @@ else
 	fi
 endif
 
-$(OUTPUTDIR)/$(ROOT):
+#$(OUTPUTDIR)/$(ROOT):
+newroot:
 	@$(ECHO) -e "\033[1;33mREMOVE .svn FROM $(NEWROOTDIR)" 
 	@$(REMOVESVN) $(NEWROOTDIR)
 	@$(ECHO) -e "\033[1;33mCALCULATE DEPENDENCIES FOR KERNEL MODULES"
 	@$(DEPMOD) -b $(NEWROOTDIR)/lib/modules/`$(UNAME) $(PACKAGEDIR)/system/linux/src` \
 	           -k $(PACKAGEDIR)/system/linux/src/vmlinux
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/$(IMAGERELEASEFILENAME)\033[0m"
-	@$(ECHO) "OpenMCT $(IMAGETARGET) $(IMAGEVERSION) $(IMAGESUBVERSION) $(IMAGEPRODCODE) $(SOFTWAREVERSION)" > $(NEWROOTDIR)/etc/$(IMAGERELEASEFILENAME)
+	@$(ECHO) "OpenMCT $(IMAGETARGET) $(IMAGEVERSION) $(IMAGESUBVERSION) $(IMAGEPRODCODE)" > $(NEWROOTDIR)/etc/$(IMAGERELEASEFILENAME)
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hostname\033[0m"
 	@$(ECHO) $(IMAGETARGET) > $(NEWROOTDIR)/etc/hostname
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/issue\033[0m"
-	@$(ECHO) "Welcome on OpenMCT $(IMAGETARGET) $(IMAGEVERSION) $(SOFTWAREVERSION) - Kernel \r (\t)" > $(NEWROOTDIR)/etc/issue
+	@$(ECHO) "Welcome on OpenMCT $(IMAGETARGET) $(IMAGEVERSION) - Kernel \r (\t)" > $(NEWROOTDIR)/etc/issue
+	
 ifdef ETH0IPADDR 
 	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth0\033[0m"
+	
+	@$(ECHO) "auto lo" > $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) "" > $(NEWROOTDIR)/etc/network/interfaces
+	
+	@$(ECHO) -e "\tiface lo inet loopback" >> $(NEWROOTDIR)/etc/network/interfaces
+	
 	@$(ECHO) "auto eth0" >> $(NEWROOTDIR)/etc/network/interfaces
 	@$(ECHO) "iface eth0 inet static" >> $(NEWROOTDIR)/etc/network/interfaces
 	@$(ECHO) -e "\taddress $(ETH0IPADDR)" >> $(NEWROOTDIR)/etc/network/interfaces
+	
 ifdef ETH0NETMASK
 	@$(ECHO) -e "\tnetmask $(ETH0NETMASK)" >> $(NEWROOTDIR)/etc/network/interfaces
 else
 	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWROOTDIR)/etc/network/interfaces
 endif
+	
+ifdef ETH0NETWORK
+	@$(ECHO) -e "\tnetwork $(ETH0NETWORK)" >> $(NEWROOTDIR)/etc/network/interfaces
+else
+	@$(ECHO) -e "\tnetwork 192.168.1.0" >> $(NEWROOTDIR)/etc/network/interfaces
+endif
+	
+ifdef ETH0BROADCAST
+	@$(ECHO) -e "\tbroadcast $(ETH0BROADCAST)" >> $(NEWROOTDIR)/etc/network/interfaces
+else
+	@$(ECHO) -e "\tbroadcast 192.168.1.255" >> $(NEWROOTDIR)/etc/network/interfaces
+endif
+	
 ifdef ETH0DEFAULTGW
 	@$(ECHO) -e "\tgateway $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/etc/network/interfaces
 endif
