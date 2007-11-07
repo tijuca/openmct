@@ -144,7 +144,7 @@ ifdef ETH0IPADDR
 	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth0\033[0m"
 	
 	@$(ECHO) "auto lo" > $(NEWROOTDIR)/etc/network/interfaces
-	@$(ECHO) "" > $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) "" >> $(NEWROOTDIR)/etc/network/interfaces
 	
 	@$(ECHO) -e "\tiface lo inet loopback" >> $(NEWROOTDIR)/etc/network/interfaces
 	
