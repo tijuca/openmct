@@ -9,4 +9,4 @@ all:
 install:
 
 clean:
-	rm $(OBJECT)
+	rm -rf $(OBJECT)
