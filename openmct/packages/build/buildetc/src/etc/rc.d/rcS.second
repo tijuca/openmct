@@ -1,0 +1,249 @@
+#!/bin/sh
+# rcS.second
+# second stage of rc.S but writable
+
+# Mount all entries from /etc/fstab
+/bin/echo -n "Mounting Data ... "
+/bin/mount -a
+/bin/echo ""
+
+# checking for directorys, else no login via FTP or use of Samba, NFS is possibile
+# we create the directory with '-p' option on mkdir, so every directory ahead the named directory is builded automaticly
+
+DIRECTORY="/var/empty /var/log/samba /var/run/samba /var/lib/samba /var/lib/nfs"
+# FIXME! /var is on the flash! no check for hardisk is needed!?
+#if [ ! -d /dev/discs/disc0 ]; then
+    for i in $DIRECTORY; do
+	/bin/echo -n "looking up for $i ... "
+	if [ ! -d $i ]; then
+	    /bin/mkdir -p $i;
+	    /bin/echo "created"
+	else
+	    /bin/echo "o.k."
+	fi
+    done
+#fi
+
+# ok, and now checking for some files needed for NFS
+FILES="/var/lib/nfs/rmtab /var/lib/nfs/etab /var/lib/nfs/xtab"
+
+for i in $FILES; do
+    /bin/echo -n "looking up for $i ... "
+    if [ ! -f $i ]; then
+       touch $i;
+       /bin/echo "created"
+    else
+	/bin/echo "o.k."
+    fi
+done
+
+if [ -d /usr/lib ]; then
+   /bin/echo -n "Added /usr/lib directory ... "
+   /sbin/ldconfig -C /etc/ld.so.cache -f /etc/ld.so.conf -X /usr/lib
+   /bin/echo "done"
+fi
+
+/bin/sh /etc/rc.conf
+if [ $? -ne 0 ]; then
+   /bin/cp /etc/default/rc.conf /etc/rc.conf
+fi
+. /etc/rc.conf
+
+/bin/echo -n "Setting Hostname ... "
+/bin/hostname `cat /etc/hostname`
+/bin/echo "done"
+
+
+# ethtool for eth0?
+if [ "$START_ETHTOOL_ETH0" == "yes" ]; then
+   /bin/echo -n "set hardware parameters for eth0 ... "
+   /sbin/ethtool -s eth0 duplex $OPTIONS_ETHTOOL_ETH0_DUPLEX \
+                         autoneg $OPTIONS_ETHTOOL_ETH0_AUTONEG \
+                         speed $OPTIONS_ETHTOOL_ETH0_SPEED \
+                         wol $OPTIONS_ETHTOOL_ETH0_WAKEONLAN
+   /bin/echo "done"
+fi
+
+# ethtool for eth1?
+if [ "$START_ETHTOOL_ETH1" == "yes" ]; then
+   /bin/echo -n "set hardware parameters for eth1 ... "
+   /sbin/ethtool -s eth1 duplex $OPTIONS_ETHTOOL_ETH1_DUPLEX \
+                         autoneg $OPTIONS_ETHTOOL_ETH1_AUTONEG \
+                         speed $OPTIONS_ETHTOOL_ETH1_SPEED \
+                         wol $OPTIONS_ETHTOOL_ETH1_WAKEONLAN
+   /bin/echo "done"
+fi
+
+# starting the network
+/sbin/ifconfig eth0 down
+/sbin/ifconfig lo down
+/sbin/ifdown -a
+/bin/echo -n "Starting Network ... "
+/sbin/ifup -a
+if [ $? -ne 0 ]; then
+   /bin/cp /etc/default/interfaces /etc/network/interfaces
+   /sbin/ifup -a
+fi
+if [ "$ENABLE_IPFORWARDING" == "yes" ]; then
+   /bin/echo -n "Enable ip-forwarding"
+   /bin/echo 1 > /proc/sys/net/ipv4/ip_forward
+fi
+/bin/echo "done"
+
+# Web Server?
+if [ "$START_HTTPD" == "yes" ]; then
+    if [ -d /usr/var/www ] || [ -d /var/www ]; then
+	/bin/echo -n "Starting Web Server ... "
+	if [ -d /usr/var/www ]; then
+    	    /sbin/httpd -h /usr/var/www
+	    /bin/echo "with document root from hardisk (/usr/var/www) "
+	else
+    	    /sbin/httpd -h /var/www
+	    /bin/echo "with document root from flash (/var/www/) "
+	fi
+    else 
+	/bin/echo "Could't start Web Server, no valid root directory found!"
+    fi
+fi
+
+
+# Telnetd for Remote Access
+if [ "$START_TELNETD" == "yes" ]; then
+   /bin/echo -n "Starting telnet daemon ... "
+   /sbin/telnetd
+   /bin/echo "done"
+fi
+
+# IDE Options
+if [ "$START_HDPARM" == "yes" ]; then
+    if [ -d /dev/discs/disc0 ]; then
+	/bin/echo -n "Enable IDE settings ... "
+	/sbin/hdparm -X$OPTIONS_HDPARM_TRANSFER_MODE \
+            	     -d$OPTIONS_HDPARM_DMA \
+		     -u$OPTIONS_HDPARM_INTERRUPT_UNMASK \
+		     -m$OPTIONS_HDPARM_SECTOR_COUNT \
+		     -c$OPTIONS_HDPARM_32BIT \
+		     -S$OPTIONS_HDPARM_SPINDOWN_TIMEOUT \
+		       $OPTIONS_HDPARM_DEVICE
+	/bin/echo "done"
+    fi
+fi
+
+# SWAP Partitition
+if [ "$START_SWAP" == "yes" ]; then
+   /bin/echo -n "Enable SWAP partition ... "
+   /sbin/swapon $OPTIONS_SWAP_DEVICE
+   /bin/echo "done"
+fi
+
+# NTPDate Client
+if [ "$START_NTPDATE" == "yes" ]; then
+   /bin/echo -n "Running ntp client ... "
+   /sbin/ntpdate $OPTIONS_NTPDATE_SERVER
+   /bin/echo "done"
+fi
+
+# Syslog Daemon
+if [ "$START_SYSLOGD" == "yes" ]; then
+   /bin/echo -n "Starting Syslog daemon ... "
+   [ ! -d /var/log ] && mkdir -p /tmp/log
+   /sbin/syslogd
+   /bin/echo "done"
+fi
+
+# LED Display
+if [ "$START_LEDS" == "yes" ]; then
+    /bin/echo -n "Starting Led display ... "
+    /bin/echo $OPTIONS_LEDS_HB > /proc/mct/led/hb
+    /bin/echo $OPTIONS_LEDS_IN_DEVICE \
+              $OPTIONS_LEDS_IN_DIRECTION \
+	      $OPTIONS_LEDS_IN_INTERVAL > /proc/mct/led/in
+    /bin/echo $OPTIONS_LEDS_OUT_DEVICE \
+              $OPTIONS_LEDS_OUT_DIRECTION \
+	      $OPTIONS_LEDS_OUT_INTERVAL > /proc/mct/led/out
+    /bin/echo "done"
+fi
+
+# SSH Daemon (Dropbear)
+if [ "$START_SSHD" == "yes" ]; then
+   if [ ! -d /etc/dropbear ]; then
+      /bin/mkdir /etc/dropbear
+   fi
+   if [ ! -f /etc/dropbear/dropbear_dss_host_key ]; then
+      /sbin/dropbearkey -f /etc/dropbear/dropbear_dss_host_key -t dss
+   fi
+   /bin/echo -n "Starting SSH daemon ... "
+   /sbin/dropbear
+   /bin/echo "done"
+fi
+
+# Portmap (RPC)
+if [ "$START_PORTMAP" == "yes" ]; then
+   /bin/echo -n "Starting Portmap daemon ... "
+   /sbin/portmap
+   /bin/echo "done"
+fi
+
+# FTP Daemon (VSFTPD)
+if [ "$START_FTPD" == "yes" ]; then
+   /bin/echo -n "Starting FTP daemon ... "
+   /sbin/vsftpd &
+   /bin/echo "done"
+fi
+
+# Harddisk Monitoring (SMARTD)
+if [ "$START_SMARTD" == "yes" ]; then
+    if [ -d /dev/discs/disc0 ]; then
+	/bin/echo -n "Starting S.M.A.R.T. daemon ... "
+	/sbin/smartd
+	/bin/echo "done"
+    fi
+fi
+
+# Network File System Daemons (NFS)
+if [ "$START_NFS" == "yes" ]; then
+   /sbin/rpc.mountd
+   /sbin/rpc.nfsd
+   /sbin/exportfs -rfa
+   /bin/echo -n "Starting NFS daemons ... "
+   /bin/echo "done"
+fi
+
+# Virtual Servers
+if [ "$START_VSERVERS" == "yes" ]; then
+   /bin/echo -n "Starting Vservers ... "
+   if [ ! -d /usr/vservers ]; then
+      /bin/mkdir /usr/vservers
+   fi
+   for i in /etc/vservers/*.conf ; do
+      . $i
+      if [ $ONBOOT="yes" ] ; then
+         /sbin/vserver $S_HOSTNAME start
+      fi
+      ONBOOT=
+      S_HOSTNAME=
+   done
+   /bin/echo "done"
+fi
+
+# Crond
+if [ "$START_CROND" == "yes" ]; then
+   /bin/echo -n "Starting Crond ... "
+   /sbin/crond
+   /bin/echo "done"
+fi
+
+# Samba
+if [ "$START_SAMBA" == "yes" ]; then
+   /bin/echo -n "Starting Samba ... "
+   /sbin/nmbd -D
+   /sbin/smbd -D
+   /bin/echo "done "
+fi
+
+# Starting user defined startup commands
+if [ -x /etc/rc.d/rcS.local ]; then
+   /bin/echo -n "Starting rcS.local ... "
+   /bin/sh /etc/rc.d/rcS.local
+   /bin/echo ""
+fi
