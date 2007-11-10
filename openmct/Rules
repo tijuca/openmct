@@ -12,6 +12,7 @@ BASEPACKAGES=	packages/build/buildetc \
 		packages/net/portmap \
 		packages/net/samba2 \
 		packages/net/vsftpd \
+		packages/net/ntp \
 		packages/system/ethtool \
 		packages/system/debootstrap \
 		packages/system/mtd-tools \

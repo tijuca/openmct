@@ -137,7 +137,7 @@ $(OUTPUTDIR)/$(ROOT):
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hostname\033[0m"
 	@$(ECHO) $(IMAGETARGET) > $(NEWROOTDIR)/etc/hostname
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/issue\033[0m"
-	@$(ECHO) "Welcome on OpenMCT $(IMAGETARGET) $(IMAGEVERSION) $(SOFTWAREVERSION) - Kernel \r (\t)" > $(NEWROOTDIR)/etc/issue
+	@$(ECHO) "Welcome on OpenMCT $(IMAGETARGET) $(IMAGEVERSION) $(SOFTWAREVERSION) - Kernel \r \m (\d \t)" > $(NEWROOTDIR)/etc/issue
 	
 ifdef ETH0IPADDR 
 	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth0\033[0m"
@@ -190,6 +190,7 @@ ifdef ETH1DEFAULTGW
 	@$(ECHO) -e "\tgateway $(ETH1DEFAULTGW)" >> $(NEWROOTDIR)/etc/network/interfaces
 endif
 endif
+	@$(ECHO) "nameserver $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/etc/resolv.conf
 	@$(CP) $(NEWROOTDIR)/etc/network/interfaces $(NEWROOTDIR)/etc/default/interfaces
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"
 	@$(OUTPUTDIR)/$(MKSQUASHFS) $(NEWROOTDIR) $(OUTPUTDIR)/$(ROOT) $(ROOTOPTS)
