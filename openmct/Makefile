@@ -159,8 +159,12 @@ endif
 	
 ifdef ETH0NETWORK
 	@$(ECHO) -e "\tnetwork $(ETH0NETWORK)" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) "# default nfs release for eth0" > $(NEWROOTDIR)/etc/exports
+	@$(ECHO) "/harddisk $(ETH0NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/etc/exports
 else
 	@$(ECHO) -e "\tnetwork 192.168.1.0" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) "# default nfs release for eth0" > $(NEWROOTDIR)/etc/exports
+	@$(ECHO) "/harddisk 192.168.1.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/etc/exports
 endif
 	
 ifdef ETH0BROADCAST
@@ -186,11 +190,32 @@ ifdef ETH1NETMASK
 else
 	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWROOTDIR)/etc/network/interfaces
 endif
+ifdef ETH1NETWORK
+	@$(ECHO) -e "\tnetwork $(ETH0NETWORK)" >> $(NEWROOTDIR)/etc/network/interfaces
+	@if [ -f $(NEWROOTDIR)/etc/exports ]; then \
+	    @$(ECHO) "# default nfs release for eth1" >> $(NEWROOTDIR)/etc/exports
+	    $(ECHO) "/harddisk $(ETH1NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/etc/exports; \
+	else \
+	    @$(ECHO) "# default nfs release for eth1" > $(NEWROOTDIR)/etc/exports
+	    $(ECHO) "/harddisk $(ETH1NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/etc/exports; \
+	fi
+else
+	@$(ECHO) -e "\tnetwork 172.16.0.0" >> $(NEWROOTDIR)/etc/network/interfaces
+	@if [ -f $(NEWROOTDIR)/etc/exports ]; then \
+	    $(ECHO) "# default nfs release for eth1" >> $(NEWROOTDIR)/etc/exports; \
+	    $(ECHO) "/harddisk 172.16.0.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/etc/exports; \
+	else \
+	    $(ECHO) "# default nfs release for eth1" > $(NEWROOTDIR)/etc/exports; \
+	    $(ECHO) "/harddisk 172.16.0.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/etc/exports; \
+	fi
+endif
+
 ifdef ETH1DEFAULTGW
 	@$(ECHO) -e "\tgateway $(ETH1DEFAULTGW)" >> $(NEWROOTDIR)/etc/network/interfaces
 endif
 endif
 	@$(ECHO) "nameserver $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/etc/resolv.conf
+
 	@$(CP) $(NEWROOTDIR)/etc/network/interfaces $(NEWROOTDIR)/etc/default/interfaces
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"
 	@$(OUTPUTDIR)/$(MKSQUASHFS) $(NEWROOTDIR) $(OUTPUTDIR)/$(ROOT) $(ROOTOPTS)
