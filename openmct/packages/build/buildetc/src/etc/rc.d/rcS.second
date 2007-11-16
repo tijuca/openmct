@@ -7,6 +7,19 @@
 /bin/mount -a
 /bin/echo ""
 
+/bin/sh /etc/rc.conf
+if [ $? -ne 0 ]; then
+   /bin/cp /etc/default/rc.conf /etc/rc.conf
+fi
+. /etc/rc.conf
+
+# Syslog Daemon (we start it first so we can log all errors)
+if [ "$START_SYSLOGD" == "yes" ]; then
+   /bin/echo -n "Starting Syslog daemon ... "
+   /sbin/syslogd -O /tmp/messages
+   /bin/echo -e "\033[1;32mdone\033[0m"
+fi
+
 # checking for directorys, else no login via FTP or use of Samba, NFS is possibile
 # we create the directory with '-p' option on mkdir, so every directory ahead the named directory is builded automaticly
 
@@ -17,9 +30,9 @@ DIRECTORY="/var/empty /var/log/samba /var/run/samba /var/lib/samba /var/lib/nfs"
 	/bin/echo -n "looking up for $i ... "
 	if [ ! -d $i ]; then
 	    /bin/mkdir -p $i;
-	    /bin/echo "created"
+	    /bin/echo -e "\033[1;33mcreated\033[0m"
 	else
-	    /bin/echo "o.k."
+	    /bin/echo -e "\033[1;32mo.k.\033[0m"
 	fi
     done
 #fi
@@ -31,47 +44,59 @@ for i in $FILES; do
     /bin/echo -n "looking up for $i ... "
     if [ ! -f $i ]; then
        touch $i;
-       /bin/echo "created"
+       /bin/echo -e "\033[1;33mcreated\033[0m"
     else
-	/bin/echo "o.k."
+       /bin/echo -e "\033[1;32mo.k.\033[0m"
     fi
 done
 
+# LED Display
+if [ "$START_LEDS" == "yes" ]; then
+    /bin/echo -n "Starting LED display ... "
+    /bin/echo $OPTIONS_LEDS_HB > /proc/mct/led/hb
+    /bin/echo $OPTIONS_LEDS_IN_DEVICE \
+              $OPTIONS_LEDS_IN_DIRECTION \
+	      $OPTIONS_LEDS_IN_INTERVAL > /proc/mct/led/in
+    /bin/echo $OPTIONS_LEDS_OUT_DEVICE \
+              $OPTIONS_LEDS_OUT_DIRECTION \
+	      $OPTIONS_LEDS_OUT_INTERVAL > /proc/mct/led/out
+    /bin/echo -e "\033[1;32mdone\033[0m"
+fi
+
+# ldconfig
 if [ -d /usr/lib ]; then
    /bin/echo -n "Added /usr/lib directory ... "
    /sbin/ldconfig -C /etc/ld.so.cache -f /etc/ld.so.conf -X /usr/lib
-   /bin/echo "done"
+   /bin/echo -e "\033[1;32mdone\033[0m"
 fi
 
-/bin/sh /etc/rc.conf
-if [ $? -ne 0 ]; then
-   /bin/cp /etc/default/rc.conf /etc/rc.conf
-fi
-. /etc/rc.conf
-
+# hostname
 /bin/echo -n "Setting Hostname ... "
 /bin/hostname `cat /etc/hostname`
-/bin/echo "done"
-
+/bin/echo -e "\033[1;32mdone\033[0m"
 
 # ethtool for eth0?
+/bin/echo -n "set ethool parameters for eth0 ... "
 if [ "$START_ETHTOOL_ETH0" == "yes" ]; then
-   /bin/echo -n "set hardware parameters for eth0 ... "
    /sbin/ethtool -s eth0 duplex $OPTIONS_ETHTOOL_ETH0_DUPLEX \
                          autoneg $OPTIONS_ETHTOOL_ETH0_AUTONEG \
                          speed $OPTIONS_ETHTOOL_ETH0_SPEED \
                          wol $OPTIONS_ETHTOOL_ETH0_WAKEONLAN
-   /bin/echo "done"
+   /bin/echo -e "\033[1;32mdone\033[0m"
+else
+   /bin/echo -e "\033[1;33mnot set\033[0m"
 fi
 
 # ethtool for eth1?
+/bin/echo -n "set ethool parameters for eth1 ... "
 if [ "$START_ETHTOOL_ETH1" == "yes" ]; then
-   /bin/echo -n "set hardware parameters for eth1 ... "
    /sbin/ethtool -s eth1 duplex $OPTIONS_ETHTOOL_ETH1_DUPLEX \
                          autoneg $OPTIONS_ETHTOOL_ETH1_AUTONEG \
                          speed $OPTIONS_ETHTOOL_ETH1_SPEED \
                          wol $OPTIONS_ETHTOOL_ETH1_WAKEONLAN
-   /bin/echo "done"
+   /bin/echo -e "\033[1;32mdone\033[0m"
+else
+   /bin/echo -e "\033[1;33mnot set\033[0m"
 fi
 
 # starting the network
@@ -88,7 +113,6 @@ if [ "$ENABLE_IPFORWARDING" == "yes" ]; then
    /bin/echo -n "Enable ip-forwarding"
    /bin/echo 1 > /proc/sys/net/ipv4/ip_forward
 fi
-/bin/echo "done"
 
 # Web Server?
 if [ "$START_HTTPD" == "yes" ]; then
@@ -106,18 +130,16 @@ if [ "$START_HTTPD" == "yes" ]; then
     fi
 fi
 
-
 # Telnetd for Remote Access
 if [ "$START_TELNETD" == "yes" ]; then
    /bin/echo -n "Starting telnet daemon ... "
    /sbin/telnetd
-   /bin/echo "done"
+   /bin/echo -e "\033[1;32mdone\033[0m"
 fi
 
 # IDE Options
 if [ "$START_HDPARM" == "yes" ]; then
     if [ -d /dev/discs/disc0 ]; then
-	/bin/echo -n "Enable IDE settings ... "
 	/sbin/hdparm -X$OPTIONS_HDPARM_TRANSFER_MODE \
             	     -d$OPTIONS_HDPARM_DMA \
 		     -u$OPTIONS_HDPARM_INTERRUPT_UNMASK \
@@ -125,7 +147,8 @@ if [ "$START_HDPARM" == "yes" ]; then
 		     -c$OPTIONS_HDPARM_32BIT \
 		     -S$OPTIONS_HDPARM_SPINDOWN_TIMEOUT \
 		       $OPTIONS_HDPARM_DEVICE
-	/bin/echo "done"
+	/bin/echo -n "Enable IDE settings ... "
+	/bin/echo -e "\033[1;32mdone\033[0m"
     fi
 fi
 
@@ -133,35 +156,14 @@ fi
 if [ "$START_SWAP" == "yes" ]; then
    /bin/echo -n "Enable SWAP partition ... "
    /sbin/swapon $OPTIONS_SWAP_DEVICE
-   /bin/echo "done"
+   /bin/echo -e "\033[1;32mdone\033[0m"
 fi
 
 # NTPDate Client
 if [ "$START_NTPDATE" == "yes" ]; then
-   /bin/echo -n "Running ntp client ... "
    /sbin/ntpdate $OPTIONS_NTPDATE_SERVER
-   /bin/echo "done"
-fi
-
-# Syslog Daemon
-if [ "$START_SYSLOGD" == "yes" ]; then
-   /bin/echo -n "Starting Syslog daemon ... "
-   [ ! -d /var/log ] && mkdir -p /tmp/log
-   /sbin/syslogd
-   /bin/echo "done"
-fi
-
-# LED Display
-if [ "$START_LEDS" == "yes" ]; then
-    /bin/echo -n "Starting Led display ... "
-    /bin/echo $OPTIONS_LEDS_HB > /proc/mct/led/hb
-    /bin/echo $OPTIONS_LEDS_IN_DEVICE \
-              $OPTIONS_LEDS_IN_DIRECTION \
-	      $OPTIONS_LEDS_IN_INTERVAL > /proc/mct/led/in
-    /bin/echo $OPTIONS_LEDS_OUT_DEVICE \
-              $OPTIONS_LEDS_OUT_DIRECTION \
-	      $OPTIONS_LEDS_OUT_INTERVAL > /proc/mct/led/out
-    /bin/echo "done"
+   /bin/echo -n "Running ntp client ... "   
+   /bin/echo -e "\033[1;32mdone\033[0m"
 fi
 
 # SSH Daemon (Dropbear)
@@ -170,25 +172,30 @@ if [ "$START_SSHD" == "yes" ]; then
       /bin/mkdir /etc/dropbear
    fi
    if [ ! -f /etc/dropbear/dropbear_dss_host_key ]; then
-      /sbin/dropbearkey -f /etc/dropbear/dropbear_dss_host_key -t dss
+      /bin/echo -e "\033[05;31mno secret key for `/bin/cat /etc/hostname` found, generate new one!\033[0m"
+      /sbin/dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key
+   fi
+   if [ ! -f /etc/dropbear/dropbear_rsa_host_key ]; then
+      /bin/echo -e "\033[05;31mno public key for `/bin/cat /etc/hostname` found, generate new one!\033[0m"
+      /sbin/dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key
    fi
    /bin/echo -n "Starting SSH daemon ... "
    /sbin/dropbear
-   /bin/echo "done"
+   /bin/echo -e "\033[1;32mdone\033[0m"
 fi
 
 # Portmap (RPC)
 if [ "$START_PORTMAP" == "yes" ]; then
    /bin/echo -n "Starting Portmap daemon ... "
    /sbin/portmap
-   /bin/echo "done"
+   /bin/echo -e "\033[1;32mdone\033[0m"
 fi
 
 # FTP Daemon (VSFTPD)
 if [ "$START_FTPD" == "yes" ]; then
    /bin/echo -n "Starting FTP daemon ... "
    /sbin/vsftpd &
-   /bin/echo "done"
+   /bin/echo -e "\033[1;32mdone\033[0m"
 fi
 
 # Harddisk Monitoring (SMARTD)
@@ -196,7 +203,7 @@ if [ "$START_SMARTD" == "yes" ]; then
     if [ -d /dev/discs/disc0 ]; then
 	/bin/echo -n "Starting S.M.A.R.T. daemon ... "
 	/sbin/smartd
-	/bin/echo "done"
+	/bin/echo -e "\033[1;32mdone\033[0m"
     fi
 fi
 
@@ -206,7 +213,7 @@ if [ "$START_NFS" == "yes" ]; then
    /sbin/rpc.nfsd
    /sbin/exportfs -rfa
    /bin/echo -n "Starting NFS daemons ... "
-   /bin/echo "done"
+   /bin/echo -e "\033[1;32mdone\033[0m"
 fi
 
 # Virtual Servers
@@ -223,14 +230,14 @@ if [ "$START_VSERVERS" == "yes" ]; then
       ONBOOT=
       S_HOSTNAME=
    done
-   /bin/echo "done"
+   /bin/echo -e "\033[1;32mdone\033[0m"
 fi
 
 # Crond
 if [ "$START_CROND" == "yes" ]; then
    /bin/echo -n "Starting Crond ... "
    /sbin/crond
-   /bin/echo "done"
+   /bin/echo -e "\033[1;32mdone\033[0m"
 fi
 
 # Samba
@@ -238,7 +245,7 @@ if [ "$START_SAMBA" == "yes" ]; then
    /bin/echo -n "Starting Samba ... "
    /sbin/nmbd -D
    /sbin/smbd -D
-   /bin/echo "done "
+   /bin/echo -e "\033[1;32mdone\033[0m"
 fi
 
 # Starting user defined startup commands
