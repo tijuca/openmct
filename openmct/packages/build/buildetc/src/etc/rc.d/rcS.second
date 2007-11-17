@@ -14,6 +14,7 @@ fi
 . /etc/rc.conf
 
 # Syslog Daemon (we start it first so we can log all errors)
+/bin/mkdir /tmp/run
 if [ "$START_SYSLOGD" == "yes" ]; then
    /bin/echo -n "Starting Syslog daemon ... "
    /sbin/syslogd -O /tmp/messages
@@ -180,7 +181,7 @@ if [ "$START_SSHD" == "yes" ]; then
       /sbin/dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key
    fi
    /bin/echo -n "Starting SSH daemon ... "
-   /sbin/dropbear
+   /sbin/dropbear -P /tmp/run/dropbear.pid
    /bin/echo -e "\033[1;32mdone\033[0m"
 fi
 
