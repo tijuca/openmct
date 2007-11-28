@@ -24,12 +24,14 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <stdarg.h>
+#include <crypt.h>
 #include <sys/resource.h>
 #include "includes/language.h"
 #include "includes/argument.h"
 #include "includes/variable.h"
 #include "includes/misc.h"
 #include "includes/file.h"
+#include "includes/data.h"
 #include "includes/owi.h"
 #include "includes/user.h"
 #include "includes/group.h"
@@ -42,7 +44,11 @@
 #include "includes/harddisk.h"
 #include "includes/modules.h"
 
-void owi_header(char *headline) {
+/* \fn owi_header(owi)
+ * Display header (the same for every page)
+ * \param[in] owi owi settings
+ */
+void owi_header(struct owi_t *owi) {
    /* Loop counter */
    int i = 0;
    int j = 0;
@@ -66,7 +72,7 @@ void owi_header(char *headline) {
 	  "<tr>\n"
 	  "<td class=\"navigation\">\n"
 	  "<table>\n",
-	  headline);
+	  owi->headline);
    /* Display all enabled modules in navigation content */	  
    for (i = 0; modules[i].description != NULL; i++) {
       printf("<tr><td>\n");
@@ -99,7 +105,7 @@ void owi_header(char *headline) {
           "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
 	  "<input type=\"hidden\" name=\"command\" value=\"%s\" />\n"
 	  "<input type=\"hidden\" name=\"id\" value=\"%s\" />\n",
-          variable_get("module"), headline ? headline: "",
+          variable_get("module"), owi->headline ? owi->headline: "",
 	  getenv("SCRIPT_NAME"),
 	  variable_get("module"),
 	  variable_get("id"),
@@ -120,379 +126,387 @@ void owi_header(char *headline) {
           "<tr>\n"
           "<td>\n"
           "<table class=\"data\" width=\"100%%\">\n");
-
 }
 
-void owi_footer() {
-   printf("</td>\n"
-          "</tr>\n"
-	  "</table>\n"
-          "</form>\n"
+/* \fn owi_footer(owi)
+ * Display the footer (the same for every page)
+ * \param[in] owi owi settings
+ */
+void owi_footer(struct owi_t *owi, char *button, ...) {
+   /* Dynamic number of arguments */
+   va_list list;
+   /* Current button */
+   char *current;
+
+   printf("</table>\n"
+          "<table width=\"100%%\">\n"
+          "<tr>\n"
+          "<td width=\"100%%\" align=\"right\">");
+
+   /* Start at first element */
+   va_start(list, button);
+
+   /* Loop through all parameter */
+   for (current = button; current != NULL; current = va_arg(list, char *)) {
+      printf("<input type=\"button\" class=\"button\" "
+             "onClick=\"javascript:document.forms[0].command.value='%s';"
+             "document.forms[0].submit()\" value=\"%s\" />\n",
+             current, current);
+   }
+
+   printf("</td></tr>\n"
+          "</table>\n"
           "</td>\n"
           "</tr>\n"
 	  "</table>\n"
-	  "<br />\n"
+	  "</form>\n"
+	  "</td>\n"
+	  "</tr>\n"
+	  "</table>\n"
 	  "<table class=\"footer\">\n"
 	  "<tr>\n"
-	  "<td>OpenMCT. All rights reserved.</td>\n"
+	  "<td>OpenMCT is &copy; 2005 by OpenMCT. All rights reserved.<br />"
+	  "<a href=\"http://www.openmct.org\" target=\"_blank\">http://www.openmct.org</a></td>\n"
 	  "</tr>\n"
 	  "</table>\n"
           "</html>\n");
 }
 
-void owi_headline(int size, char *headline) {
-   printf("<h%d>%s</h%d>\n",
-          size,
-	  headline,
-	  size);
-}
-
-void owi_outside_close(char *value) {
-   printf("</table>\n"
-          "<table width=\"100%%\">\n"
-	  "<tr>\n"
-          "<td width=\"100%%\" align=\"right\"><input type=\"button\" class=\"button\" onClick=\"javascript:document.forms[0].command.value='%s';document.forms[0].submit()\" value=\"%s\" /></td>\n"
-          "</tr>\n"
-	  "</table>\n",
-	  value, value);
-}
-
+/* \fn owi_error(variable) 
+ * Display image if error is set
+ * \param[in] variable
+ */
 void owi_error(char *value) {
-   if (!value) {
-      value = variable_get("error");
-   }
-   if (strcmp(value, "")) {
+   if (value) {
       printf("<img class=\"error\" src=\"/images/icon_warning.png\" alt=\"%s\" title=\"%s\"/>\n",
              value, value);
    }
 }
 
-void owi_box() {
-   if (strcmp(variable_get("error"), "")) {
-      printf("<div class=\"boxerror\">%s</div>\n",
-             variable_get("error"));
-   } else if (strcmp(variable_get("info"), "")) {
-      printf("<div class=\"boxinfo\">%s</div>\n",
-             variable_get("info"));
-   }
-}
-
-void owi_table_header(struct file_t *f) {
+/* \fn owi_table_header(owi)
+ * Print table header for current data defintion 
+ * \param[in] owi owi settings
+ */
+void owi_table_header(struct owi_t *owi) {
    /* Loop */
    int i = 0;
 
-   printf("<tr>\n"
-          "<td class=\"list_header\"></td>\n");
-
-   for (i = 0; f->fd[i].html != NULL; i++) {
-      if (f->fd[i].flags & FILE_DATA_FLAG_LIST) {
-         printf("<td class=\"list_header header_%s_%s\">%s</td>\n",
-	        variable_get("module"), f->fd[i].html, f->fd[i].name);
+   printf("<tr>\n");
+   /* Print all header values for table */
+   for (i = 0; owi->data[i].type; i++) {
+      if (owi->data[i].flags & DATA_FLAG_LIST) {
+          printf("<td class=\"list_header header_%s_%s\">%s</td>\n",
+                 variable_get("module"), owi->data[i].html, owi->data[i].name);
       }
    }
-   printf("<td class=\"list_header header_%s_action\">%s</td>\n",
-           variable_get("module"), "Action");
-
+   /* Display action column? */
+   if (owi->flags & OWI_FLAG_ACTION) {
+      printf("<td class=\"list_header header_%s_action\">%s</td>\n",
+             variable_get("module"), "Action");
+   }	     
    /* Start form / external table / scroll area / internal table*/
    printf("</tr>\n");
 }
 
-void owi_data_name(struct file_data_t *ini) {
-   printf("%s\n", ini->name);
-}
-
-void owi_data_value(struct file_data_t *ini, int flags) {
+/* \fn owi_data_display(owi, current, flags)
+ * Display one value in html (depending on type, flags)
+ * \param[in] data current entry
+ * \param[in] current current data value
+ * \param[in] flags flags for display behavior
+ */
+void owi_data_display(struct data_t *data, char *current, int flags) {
    /* Loop */
    int i = 0;
    /* Valid values for html elements */
    char **valid_values;
 
-   if (ini->flags & flags) {
-   /* Checkbox? */
-   if (ini->type == FILE_DATA_TYPE_CHECKBOX) {
-      /* Parse valid values from string */
-      valid_values = argument_parse(ini->valid, "|");
-      /* Print checkbox */
-      printf("<input type=\"checkbox\" class=\"checkbox\" name=\"%s\" value=\"%s\" %s /> ",
-             ini->html,
-	     valid_values[0],
-             ini->current && !strcmp(ini->current, valid_values[0]) ?  "checked" : "");
-      /* Free valid values */
-      free(valid_values);
-   /* Selectbox? */
-   } else if (ini->type == FILE_DATA_TYPE_SELECT) {
-      /* Parse valid values from string */
-      valid_values = argument_parse(ini->valid, "|");
-
-      /* Print selectbox */
-      printf("<select name=\"%s\">\n", ini->html);
-      /* Loop through values */
-      for (i = 0; valid_values[i] != NULL; i++) {
-         /* Flag for current value */
-         int current_value = 0;
-	 /* Current value? */
-	 if (ini->current && ini->current &&
-	    strcmp(ini->current, valid_values[i])) {
-            current_value = 1;
-	 }
-         /* Print on stdout */
-         printf("<option value=\"%s\" %s>%s</option>\n",
-                valid_values[i],
-		current_value == 0 ? " selected" : "",
-		valid_values[i]);
-      }
-      printf("</select><br />\n");
-      /* Free valid values */
-      argument_free(valid_values);
-         
-   } else if (ini->type == FILE_DATA_TYPE_TEXT) {
-      printf("<input type=\"text\" class=\"%s\" name=\"%s\" value=\"%s\" />",
-	     strcmp(variable_error_get(ini->html), "") ? "errortext" : "text",
-             ini->html,
-	     ini->flags & FILE_DATA_FLAG_DONTFILL ? "" : ini->current ? ini->current : "");
-      if (strcmp(variable_error_get(ini->html), "")) {
-         printf("&nbsp;");
-	 owi_error(variable_error_get(ini->html));
-      } 
-      printf("<br />\n");
-   } else if (ini->type == FILE_DATA_TYPE_PASSWORD) {
-      printf("<input type=\"password\" class=\"%s\" name=\"%s\" value=\"%s\" />",
-             strcmp(variable_error_get(ini->html), "") ? "errortext" : "text",
-             ini->html,
-             ini->flags & FILE_DATA_FLAG_DONTFILL ? "" : ini->current ? ini->current : "");
-      if (strcmp(variable_error_get(ini->html), "")) {
-         printf("&nbsp;");
-         owi_error(variable_error_get(ini->html));
-      }
-      printf("<br />\n");
-      
-   } else if (ini->type == FILE_DATA_TYPE_TEXTAREA) {
-      printf("<textarea name=\"%s\" class=\"%s\" rows=\"4\" cols=\"55\">%s</textarea>",
-	     strcmp(variable_error_get(ini->html), "") ? "errortext" : "text",
-             ini->html,
-	     ini->current ? ini->current : "");
-      if (strcmp(variable_error_get(ini->html), "")) {
+   /* Flags set so its not just display values? */
+   if (data->flags & flags) {
+      /* Checkbox? */
+      if (data->type == DATA_TYPE_CHECKBOX) {
+         /* Parse valid values from string */
+         valid_values = argument_parse(data->valid, "|");
+         /* Print checkbox */
+         printf("<input type=\"checkbox\" class=\"checkbox\" "
+	        "name=\"%s\" value=\"%s\" %s /> ",
+                data->html,
+                valid_values[0],
+                current && !strcmp(current, valid_values[0]) ?  "checked" : "");
+         /* Free valid values */
+         free(valid_values);
+      /* Selectbox? */
+      } else if (data->type == DATA_TYPE_SELECT) {
+         /* Parse valid values from string */
+         valid_values = argument_parse(data->valid, "|");
+   
+         /* Print selectbox */
+         printf("<select name=\"%s\">\n", data->html);
+         /* Loop through values */
+         for (i = 0; valid_values[i] != NULL; i++) {
+            /* Flag for current value */
+            int current_value = 0;
+   	 /* Current value? */
+   	 if (current && current &&
+   	    strcmp(current, valid_values[i])) {
+               current_value = 1;
+   	 }
+            /* Print on stdout */
+            printf("<option value=\"%s\" %s>%s</option>\n",
+                   valid_values[i],
+   		current_value == 0 ? " selected" : "",
+   		valid_values[i]);
+         }
+         printf("</select><br />\n");
+         /* Free valid values */
+         argument_free(valid_values);
+            
+      } else if (data->type == DATA_TYPE_TEXT) {
+         printf("<input type=\"text\" class=\"%s\" name=\"%s\" value=\"%s\" />",
+   	     strcmp(variable_error_get(data->html), "") ? "errortext" : "text",
+                data->html,
+   	     data->flags & DATA_FLAG_DONT_FILL ? "" : current ? current : "");
+         if (strcmp(variable_error_get(data->html), "")) {
+            printf("&nbsp;");
+   	    owi_error(variable_error_get(data->html));
+         } 
          printf("<br />\n");
-         owi_error(variable_error_get(ini->html));
+      } else if (data->type == DATA_TYPE_PASSWORD) {
+         printf("<input type=\"password\" class=\"%s\" name=\"%s\" "
+	        "value=\"%s\" />",
+                strcmp(variable_error_get(data->html), "") ? "errortext" : "text",
+                data->html,
+                data->flags & DATA_FLAG_DONT_FILL ? "" : current ? current : "");
+         if (strcmp(variable_error_get(data->html), "")) {
+            printf("&nbsp;");
+            owi_error(variable_error_get(data->html));
+         }
+         printf("<br />\n");
+         
+      } else if (data->type == DATA_TYPE_TEXTAREA) {
+         printf("<textarea name=\"%s\" class=\"%s\" rows=\"4\" cols=\"55\">%s"
+	        "</textarea>",
+   	        strcmp(variable_error_get(data->html), "") ? "errortext" : "text",
+                data->html,
+   	     current ? current : "");
+         if (strcmp(variable_error_get(data->html), "")) {
+            printf("<br />\n");
+            owi_error(variable_error_get(data->html));
+         }
+         printf("<br />\n");
       }
-      printf("<br />\n");
-   }
-   if (ini->description) {
-      printf("%s", ini->description);
-   }
+      if (data->description) {
+         printf("%s", data->description);
+      }
    } else {
-      printf("%s<br />\n", ini->current ? ini->current : "");
+      printf("%s<br />\n", current ? current : "");
    }
 }
 
-void owi_data_detail(struct file_t *f, int flags) {
+/* \fn owi_detail(owi)
+ * Print detail screen for current entry
+ * \param[in] owi owi settings
+ */
+void owi_detail(struct owi_t *owi) {
    /* Loop */
-   int i = 0;
+   int i;
+   /* Current value */
+   char *current = NULL;
+   /* Index for unique column */
+   int index_id = 0;
 
-   /* Loop through all configs */
-   for (i = 0; f->fd[i].html != NULL; i++) {
-      if (f->fd[i].type != FILE_DATA_TYPE_INTERNAL) {
-         printf("<tr>\n"
-                "<td class=\"detail_name detail_name_%s_%s\">\n",
-                variable_get("module"), f->fd[i].html);
+   if (owi->flags & OWI_FLAG_ROW) {
+      /* Loop through all settings */
+      for (i = 0; owi->data[i].type; i++) {
+         if (owi->data[i].flags & DATA_FLAG_ID) {
+            index_id = i;
+	 }
+      }
+   }
 
-         /* Display name */
-         owi_data_name(&f->fd[i]);
 
-         printf("</td>\n"
-                "<td class=\"detail_value detail_value_%s_%s\">\n",
-	        variable_get("module"), f->fd[i].html);
-
-         /* Display value */
-         owi_data_value(&f->fd[i], flags);
-
-         printf("</td>\n"
-                "</tr>\n");
-      }	    
+   /* Loop through all settings */
+   for (i = 0; owi->data[i].type; i++) {
+      /* Display value? */
+      if (owi->data[i].type != DATA_TYPE_INTERNAL) {
+         printf("<tr>"
+                "<td class=\"detail_name\">%s</td>"
+                "<td class=\"detail_value detail_value\">",
+                owi->data[i].name);
+         if (owi->flags & OWI_FLAG_CONFIG) {
+            current = FILE_CONFIG_GET(owi->file, owi->data[i].directive);
+         } else {
+            current = file_value_get(owi->file, index_id, variable_get("id"), i); 
+         }
+         owi_data_display(&owi->data[i], current, DATA_FLAG_UPDATE);
+         printf("</tr>\n");
+      }	 
    }
 }
 
-void owi_data_list(struct file_t *f) {
+
+void owi_list(struct owi_t *owi) {
    /* Loop */
-   int j = 0;
+   int j, i;
    /* id */
    char *id = NULL;
 
-   printf("<tr onmouseover=\"this.className='mover';\" onmouseout=\"this.className='mout';\">\n");
+   /* Loop through all lines */
+   for (i = 0; i < owi->file->line_count; i++) {
 
-   printf("<td class=\"list_data icon_%s\"></td>\n",
-          variable_get("module"));
+      /* Comment? */
+      if (owi->file->line[i]->data[0] == '#')
+         continue;
+ 
+      printf("<tr>\n");
 
-   for (j = 0; f->fd[j].html != NULL; j++) {
-      if (f->fd[j].flags & FILE_DATA_FLAG_LIST) {
-         printf("<td class=\"list_data list_%s_%s\">%s</td>\n",
-	        variable_get("module"), f->fd[j].html, f->fd[j].current ? f->fd[j].current : "");
-      }
-      if (f->fd[j].flags & FILE_DATA_FLAG_ID) {
-         id = f->fd[j].current;
-      }
-   }
-
-   printf("<td class=\"list_data list_%s_%s\">\n"
-          "<a href=\"#\" class=\"details\" onClick=\"javascript:document.forms[0].command.value='%s';document.forms[0].id.value='%s';document.forms[0].submit();\">%s</a>\n"
-          "<a href=\"#\" class=\"delete\" onClick=\"javascript:document.forms[0].command.value='%s';document.forms[0].id.value='%s';document.forms[0].submit();\">%s</a>\n"
-	  "</td>\n",
-	  variable_get("module"), "action",
-	  OWI_BUTTON_DETAIL, id, OWI_BUTTON_DETAIL,
-	  OWI_BUTTON_DELETE, id, OWI_BUTTON_DELETE);
-
-   printf("</tr>\n");
-}
-
-/* \fn owi_list(f, ...)
- * Show all settings from system
- * \param[in] f file structure
- */
-void owi_list(struct file_t *f, ...) {
-   /* Dynamic number of arguments */
-   va_list list;
-   /* Current file structure */
-   struct file_t *current;
-
-   /* Start at first element */
-   va_start(list, f);
-
-   /* Loop through all parameter */
-   for (current = f;
-        current != NULL;
-	current = va_arg(list, struct file_t *)) {
-      if (current->type == FILE_TYPE_LINE) {
-         /* Display table header */
-         owi_table_header(current);
-
-         /* Reset line to zero */
-         current->line_current = 0;
-
-         /* Reset search */
-         current->line_search = 0;
-
-         /* Loop through all entries from file */
-         while (file_data_get_next(current)) {
-            /* Display */
-            owi_data_list(current);
+      for (j = 0; owi->data[j].type; j++) {
+         if (owi->data[j].flags & DATA_FLAG_LIST) {
+            printf("<td class=\"list_data list_%s_%s\">%s</td>\n",
+	           variable_get("module"), owi->data[j].html, owi->file->line[i]->current[j] ? owi->file->line[i]->current[j] : "");
          }
-      } else if (current->type == FILE_TYPE_SECTION) {
-         /* Display all settings in HTML */
-         owi_data_detail(current, FILE_DATA_FLAG_UPDATE);
+         if (owi->data[j].flags & DATA_FLAG_ID) {
+            id = owi->file->line[i]->current[j];
+         }
+      }
+
+      /* Print action buttons? */
+      if (owi->flags & OWI_FLAG_ACTION) {
+         printf("<td class=\"list_data list_%s_%s\">\n"
+                "<a href=\"#\" class=\"details\" "
+		"onClick=\"javascript:document.forms[0].command.value='%s';"
+		"document.forms[0].id.value='%s';document.forms[0].submit();\">%s</a>\n"
+                "<a href=\"#\" class=\"delete\" "
+		"onClick=\"javascript:document.forms[0].command.value='%s';"
+		"document.forms[0].id.value='%s';document.forms[0].submit();\">%s</a>\n"
+                "</td>\n"
+	        "</tr>\n",
+	        variable_get("module"), "action",
+                OWI_BUTTON_DETAIL, id, OWI_BUTTON_DETAIL,
+                OWI_BUTTON_DELETE, id, OWI_BUTTON_DELETE);
+      }		
+   }	  
+}
+
+/* \fn owi_update(owi)
+ * Update settings
+ * \param[in] owi owi module
+ */
+void owi_update(struct owi_t *owi) {
+   /* Loop */
+   int i;
+   /* html value */
+   char *html = NULL;
+   /* Current value */
+   char *current = NULL;
+   /* Update in file too? */
+   int update = 0;
+   /* Index id */
+   int index_id = -1;
+
+   /* Row based source? */
+   if (owi->flags & OWI_FLAG_ROW) {
+      /* Lookup index id */
+      for (i = 0; owi->data[i].type; i++) {
+         /* Primary key found? */
+         if (owi->data[i].flags & DATA_FLAG_ID) {
+	    /* Set this index for lookup */
+            index_id = i;
+	 }
       }
    }
 
-   /* Print Submit button */
-   owi_outside_close(OWI_BUTTON_UPDATE);
-}
+   printf("Content-Type: text/html\n\n");
 
-/* \fn owi_detail(f, id)
- * Show one line with settings from file structure
- * \param[in] f file structure
- * \param[in] id 
- */
-void owi_detail_id(struct file_t *f, char *id) {
-   /* Reset current line */
-   f->line_current = 0;
-   /* Reset line search */
-   f->line_search = 0;
+   /* Per default update line */
+   update = 1;
 
-   /* User found? */
-   if (file_data_find(f, id)) {
-      /* Display all settings in HTML */
-      owi_data_detail(f, FILE_DATA_FLAG_UPDATE);
-   }
+   /* Loop through all settings */
+   for (i = 0; owi->data[i].type; i++) {
+      /* Allow update for this flag? */
+      if (owi->data[i].flags & DATA_FLAG_UPDATE) {
+         /* Get value from html request */
+	 html = variable_get(owi->data[i].html);
+	 /* Get curernt value */
+	 current = FILE_CONFIG_GET(owi->file, owi->data[i].directive);
 
-   /* Print Submit button */
-   owi_outside_close(OWI_BUTTON_UPDATE);
-}
+         /* Valid value? */
+         if (data_valid(&owi->data[i], html)) {
+	    /* Only update non empty values */
+	    if (strcmp(html, "")) {
+               /* Crypt data? */
+	       if (owi->data[i].flags & DATA_FLAG_CRYPT) {
+                  html = crypt(html, "OM");
+	       }
+	    } else {
+               html = current;
+	    }
+	 } else {
+	    /* If we get on error we don't update anymore */
+            update = 0;
+            /* Set error for this variable */
+	    variable_error_set(owi->data[i].html, OWI_SYNTAX_INVALID);
+	 }
 
-/* \fn owi_update()
- * Update FTP configuration file
- * \param[in] f file structore for ftp settings
- */
-void owi_update(struct file_t *f, char *info, char *error) {
-   /* Update ini configuration */
-   file_data_update(f);
-
-   /* Errors during update? */
-   if (!strcmp(variable_get("error"), "")) {
-      /* Save result in ftp file */
-      file_save(f);
-
-      /* Set info message box */
-      variable_set("info", info);
-   } else {
-      /* Set error message box */
-      variable_set("error", error);
+         if (owi->flags & OWI_FLAG_CONFIG) {
+	    /* Set this new value only for display */
+	    FILE_CONFIG_SET(owi->file, owi->data[i].directive, html, update);
+	 } else {
+	   /* Update line */
+	   file_value_set(owi->file, index_id, variable_get("id"), i, html, update);
+	 }
+      }
    }
 }
 
-/* \fn owi_update()
- * Update FTP configuration file
- * \param[in] f file structore for ftp settings
+/* \fn owi_main(owi)
+ * Main entry point for modules
+ * \param[in] owi owi module
  */
-void owi_update_id(struct file_t *f, char *id, char *info, char *error) {
-   /* Reset current line */
-   f->line_current = 0;
-   /* Reset line search */
-   f->line_search = 0;
+void owi_main(struct owi_t *owi) {
+   /* Command */
+   char *command = variable_get("command");
 
-   /* User found? */
-   if (file_data_find(f, id)) {
-      /* Display details */
-      owi_update(f, info, error);
-      /* Error found? */
-      if (strcmp(variable_get("error"), "")) {
-         /* Display detail again */
-         owi_list(f, NULL);
+   /* Update? */
+   if (!strcmp(command, OWI_BUTTON_UPDATE)) {
+      owi_update(owi);
+   }
+
+   /* Display header */
+   owi_header(owi);
+
+   /* Display list? */
+   if (!command || !strcmp(command, "") || !strcmp(command, "list")) {
+      if (owi->flags & OWI_FLAG_CONFIG) {
+         owi_detail(owi);
+         owi_footer(owi, OWI_BUTTON_UPDATE, NULL);
       } else {
-         /* Display list view */
-         owi_list(f, NULL);
+         owi_table_header(owi);
+	 owi_list(owi);
+	 if (owi->flags & OWI_FLAG_HIDE_NEW) {
+            /* Display footer */
+            owi_footer(owi, NULL);
+	 } else {
+            /* Display footer */
+            owi_footer(owi, OWI_BUTTON_NEW, NULL);
+	 }
       }
-   } else {
-      /* Display list view */
-      owi_list(f, NULL);
+   /* Show detail screen? */      
+   } else if (!strcmp(command, OWI_BUTTON_DETAIL) ||
+              !strcmp(command, OWI_BUTTON_UPDATE)) {
+      owi_detail(owi);
+      /* Display footer */
+      owi_footer(owi, OWI_BUTTON_UPDATE, NULL);
    }
+
+   /* File save */
+   file_save(owi->file);
 }
 
-/* \fn owi_delete_id(f, id)
- * Show one line with settings from file structure
- * \param[in] f file structure
- * \param[in] id
+/* \fn main(argc, argv)
+ * Main entry point
+ * \param[in] argc number of arguments
+ * \param[in] arvv array of arguments
  */
-void owi_delete_id(struct file_t *f, char *id) {
-   /* Reset current line */
-   f->line_current = 0;
-   /* Reset line search */
-   f->line_search = 0;
-
-   /* User found? */
-   if (file_data_find(f, id)) {
-      /* Delete entry */
-      file_action(f, FILE_LINE_DEL, NULL);
-      /* Save */
-      file_save(f);
-   }
-   /* Display */
-   owi_list(f, NULL);
-}
-
-/* \fn owi_new(f)
- * Show all settings for add
- * \param[in] f file structure
- */
-void owi_new(struct file_t *f) {
-   /* Display all settings in HTML */
-   owi_data_detail(f, FILE_DATA_FLAG_ADD);
-
-   /* Print Submit button */
-   owi_outside_close(OWI_BUTTON_ADD);
-}
-
-void owi_add(struct file_t *f) {
-}
-
 int main(int argc, char **argv) {
    int i;
    char *module = NULL;
@@ -502,7 +516,7 @@ int main(int argc, char **argv) {
    module = variable_get("module");
 
    if (!strcmp(module, "")) {
-      variable_set("module", "user");
+      variable_set("module", "ftp");
       module =  variable_get("module");
    }
 

@@ -25,97 +25,81 @@
 #include "includes/argument.h"
 #include "includes/language.h"
 #include "includes/variable.h"
+#include "includes/data.h"
 #include "includes/file.h"
 #include "includes/misc.h"
 #include "includes/owi.h"
 #include "includes/rc.h"
 #include "includes/nfs.h"
 
-struct file_data_t nfs_data[] = {
+struct data_t nfs_data[] = {
    { 
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "directory",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_ADD | DATA_FLAG_LIST | DATA_FLAG_ID,
      NFS_NAME_DIRECTORY,
      NFS_DESCRIPTION_DIRECTORY,
-     NULL,
+     "directory",
+     "directory",
      "^[A-Za-z0-9_]{3,8}$",
      NULL,
-     0,
-     NULL,
-     FILE_DATA_FLAG_ADD | FILE_DATA_FLAG_LIST | FILE_DATA_FLAG_ID
    },
 
    { 
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "source",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_ADD | DATA_FLAG_UPDATE | DATA_FLAG_LIST,
      NFS_NAME_SOURCE,
      NFS_DESCRIPTION_SOURCE, 
-     NULL,
-     "^[A-Za-z0-9]{4,40}$",
-     NULL,
-     4,
-     NULL,
-     FILE_DATA_FLAG_ADD | FILE_DATA_FLAG_UPDATE | FILE_DATA_FLAG_LIST
-   },
-
-   { 
-     FILE_DATA_TYPE_TEXT,
-     -1,
      "source",
-     NFS_NAME_OPTIONS,
-     NFS_DESCRIPTION_OPTIONS, 
-     NULL,
+     "source",
      "^[A-Za-z0-9]{4,40}$",
      NULL,
-     4,
+   },
+
+   { 
+     DATA_TYPE_TEXT,
+     DATA_FLAG_ADD | DATA_FLAG_UPDATE | DATA_FLAG_LIST,
+     NFS_NAME_SOURCE,
+     NFS_DESCRIPTION_SOURCE, 
+     "source",
+     "source",
+     "^[A-Za-z0-9]{4,40}$",
      NULL,
-     FILE_DATA_FLAG_ADD | FILE_DATA_FLAG_UPDATE | FILE_DATA_FLAG_LIST
    },
 
    { 
       0,
-      -1,
-      NULL,
-      NULL,
-      NULL,
-      NULL,
-      NULL,
-      NULL,
       0,
       NULL,
-      0,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
    }
 };
 
 /* Define ini configuration tags */
-struct file_data_t nfs_rc_data[] = {
+struct data_t nfs_rc_data[] = {
    {
-     FILE_DATA_TYPE_CHECKBOX,
-     -1,
-     "enable_nfsd",
+     DATA_TYPE_CHECKBOX,
+     DATA_FLAG_UPDATE,
      RC_NAME_START_NFSD,
      RC_DESCRIPTION_START_NFSD,
-     NULL,
+     "enable_nfs",
+     "START_NFS",
      "yes|no",
-     "START_NFSD",
-     0,
      "yes",
-     FILE_DATA_FLAG_UPDATE
    },
 
-   { 0,
-     -1,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
+   {
+     0,
      0,
      NULL,
-     FILE_DATA_FLAG_UPDATE
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
    }
 };
 
@@ -126,55 +110,30 @@ struct file_data_t nfs_rc_data[] = {
  * \return zero on sucess
  */
 int nfs_main(int argc, char **argv) {
-   /* Get command for this module */        
-   char *command = variable_get("command");
    /* File structure */
-   struct file_t f, f_rc;
+   struct file_t file;
+   /* owi structure */
+   struct owi_t owi;
 
-   /* Set correct type */
-   f.type = FILE_TYPE_LINE;
-   /* Set config settings */
-   f.fd = nfs_data;
    /* Set separator */
-   f.separator = NFS_SEPARATOR;
+   file.separator = NFS_SEPARATOR;
    /* Read config into memory */
-   file_open(&f, NFS_FILE);
+   file_open(&file, NFS_FILE);
 
-   /* Set correct type */
-   f_rc.type = FILE_TYPE_SECTION;
-   /* Set config settings */
-   f_rc.fd = nfs_rc_data;
-   /* Set separator */
-   f_rc.separator = RC_SEPARATOR;
-   /* Read config into memory */
-   file_open(&f_rc, RC_FILE);
+   /* Set owi properties for display */
+   owi.headline = NFS_HEADLINE;
+   owi.file = &file;
+   owi.file_init = NULL;
+   owi.data = nfs_data;
+   owi.data_init = NULL;
+   owi.button = NULL;
+   owi.flags = OWI_FLAG_ACTION | OWI_FLAG_ROW;
 
-   /* Print header information */
-   owi_header(NFS_HEADLINE);
+   /* Start main */
+   owi_main(&owi);
 
-   /* Command NULL or empty? */
-   if (!command || !strcmp(command, "")) {
-      /* Just print nfs list */
-      owi_list(&f_rc, &f, NULL);
-   } else if (!strcasecmp(command, OWI_BUTTON_DETAIL)) {
-      owi_detail_id(&f, variable_get("id"));
-   } else if (!strcasecmp(command, OWI_BUTTON_UPDATE)) {
-      owi_update_id(&f, variable_get("id"), NFS_FILE_UPDATE, NFS_FILE_ERROR);
-   } else if (!strcasecmp(command, OWI_BUTTON_DELETE)) {
-      owi_delete_id(&f, variable_get("id"));
-   } else if (!strcasecmp(command, OWI_BUTTON_NEW)) {
-      owi_new(&f);
-   } else if (!strcasecmp(command, OWI_BUTTON_ADD)) {
-      owi_add(&f);
-   }
-
-   /* Free file */
-   file_free(&f_rc);
-   /* Free file */
-   file_free(&f);
-
-   /* Print footer information */
-   owi_footer();
+   /* Free data file */
+   file_free(&file);
 
    /* Return success */
    return 0;

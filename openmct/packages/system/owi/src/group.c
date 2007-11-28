@@ -25,80 +25,66 @@
 #include "includes/argument.h"
 #include "includes/language.h"
 #include "includes/variable.h"
+#include "includes/data.h"
 #include "includes/file.h"
 #include "includes/misc.h"
 #include "includes/owi.h"
 #include "includes/group.h"
 
-struct file_data_t group_data[] = {
+struct data_t group_data[] = {
    { 
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "login",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_ADD | DATA_FLAG_LIST | DATA_FLAG_ID,
      GROUP_NAME_LOGIN,
      GROUP_DESCRIPTION_LOGIN,
-     NULL,
+     "login",
+     "login",
      "^[A-Za-z0-9_]{3,8}$",
      NULL,
-     0,
-     NULL,
-     FILE_DATA_FLAG_ADD | FILE_DATA_FLAG_LIST | FILE_DATA_FLAG_ID
    },
 
    {
-     FILE_DATA_TYPE_INTERNAL,
-     -1,
+     DATA_TYPE_INTERNAL,
+     0,
+     "password",
+     "password",
+     "password",
      "password",
      NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     1,
-     NULL,
-     0
+     NULL
    },
 
    {
-     FILE_DATA_TYPE_INTERNAL,
-     -1,
+     DATA_TYPE_INTERNAL,
+     0,
      "gid",
-     NULL,
-     NULL,
-     NULL,
+     "gid",
+     "gid",
+     "gid",
      "^[0-9]{1,5}$",
      NULL,
-     2,
-     NULL,
-     0
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "members",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_ADD | DATA_FLAG_UPDATE | DATA_FLAG_LIST,
      GROUP_NAME_MEMBERS,
      GROUP_DESCRIPTION_MEMBERS, 
-     NULL,
+     "members",
+     "members",
      "^[A-Za-z0-9,]{4,40}$",
      NULL,
-     3,
-     NULL,
-     FILE_DATA_FLAG_ADD | FILE_DATA_FLAG_UPDATE | FILE_DATA_FLAG_LIST
    },
 
    { 
       0,
-      -1,
-      NULL,
-      NULL,
-      NULL,
-      NULL,
-      NULL,
-      NULL,
       0,
       NULL,
-      0,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL
    }
 };
 
@@ -109,44 +95,30 @@ struct file_data_t group_data[] = {
  * \return zero on sucess
  */
 int group_main(int argc, char **argv) {
-   /* Get command for this module */        
-   char *command = variable_get("command");
    /* File structure */
-   struct file_t f;
+   struct file_t file;
+   /* owi structure */
+   struct owi_t owi;
 
-   /* Set correct type */
-   f.type = FILE_TYPE_LINE;
-   /* Set config settings */
-   f.fd = group_data;
    /* Set separator */
-   f.separator = GROUP_SEPARATOR;
+   file.separator = GROUP_SEPARATOR;
    /* Read config into memory */
-   file_open(&f, GROUP_FILE);
+   file_open(&file, GROUP_FILE);
 
-   /* Print header information */
-   owi_header(GROUP_HEADLINE);
+   /* Set owi properties for display */
+   owi.headline = GROUP_HEADLINE;
+   owi.file = &file;
+   owi.file_init = NULL;
+   owi.data = group_data;
+   owi.data_init = NULL;
+   owi.button = NULL;
+   owi.flags = OWI_FLAG_ACTION | OWI_FLAG_ROW;
 
-   /* Command NULL or empty? */
-   if (!command || !strcmp(command, "")) {
-      /* Just print group list */
-      owi_list(&f);
-   } else if (!strcasecmp(command, OWI_BUTTON_DETAIL)) {
-      owi_detail_id(&f, variable_get("id"));
-   } else if (!strcasecmp(command, OWI_BUTTON_UPDATE)) {
-      owi_update_id(&f, variable_get("id"), GROUP_FILE_UPDATE, GROUP_FILE_ERROR);
-   } else if (!strcasecmp(command, OWI_BUTTON_DELETE)) {
-      owi_delete_id(&f, variable_get("id"));
-   } else if (!strcasecmp(command, OWI_BUTTON_NEW)) {
-      owi_new(&f);
-   } else if (!strcasecmp(command, OWI_BUTTON_ADD)) {
-      owi_add(&f);
-   }
+   /* Start main */
+   owi_main(&owi);
 
-   /* Free file */
-   file_free(&f);
-
-   /* Print footer information */
-   owi_footer();
+   /* Free data file */
+   file_free(&file);
 
    /* Return success */
    return 0;

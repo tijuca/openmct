@@ -26,179 +26,146 @@
 #include "includes/language.h"
 #include "includes/variable.h"
 #include "includes/file.h"
+#include "includes/data.h"
 #include "includes/owi.h"
 #include "includes/rc.h"
 #include "includes/ftp.h"
 
 /* Define ini configuration tags */
-struct file_data_t ftp_data[] = {
+struct data_t ftp_data[] = {
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "port",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_UPDATE,
      FTP_NAME_LISTEN_PORT,
      NULL,
-     NULL,
-     "^[0-9]{2,5}$",
+     "port",
      "listen_port",
-     0,
+     "^[0-9]{2,5}$",
      "21",
-     FILE_DATA_FLAG_UPDATE
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "maxclients",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_UPDATE,
      FTP_NAME_MAX_CLIENTS,
      FTP_DESCRIPTION_MAX_CLIENTS,
-     NULL,
-     "^[0-9]{1,3}$",
+     "maxclients",
      "max_clients",
-     0,
+     "^[0-9]{1,3}$",
      "5",
-     FILE_DATA_FLAG_UPDATE
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "maxperip",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_UPDATE,
      FTP_NAME_MAX_PER_IP,
      FTP_DESCRIPTION_MAX_PER_IP,
-     NULL,
-     "^[0-9]{1,3}$",
+     "maxperip",
      "max_per_ip",
-     0,
+     "^[0-9]{1,3}$",
      "2",
-     FILE_DATA_FLAG_UPDATE
    },
 
    { 
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "idletimeout",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_UPDATE,
      FTP_NAME_IDLE_SESSION_TIMEOUT,
      FTP_DESCRIPTION_IDLE_SESSION_TIMEOUT,
-     NULL,
-     "^[0-9]{1,3}$",
+     "idletimeout",
      "idle_session_timeout",
-     0,
+     "^[0-9]{1,3}$",
      "300",
-     FILE_DATA_FLAG_UPDATE
    },
 
    {
-     FILE_DATA_TYPE_CHECKBOX,
-     -1,
-     "anonymous",
+     DATA_TYPE_CHECKBOX,
+     DATA_FLAG_UPDATE,
      FTP_NAME_ANONYMOUS_ENABLE,
      FTP_DESCRIPTION_ANONYMOUS_ENABLE,
-     NULL,
-     "yes|no",
+     "anonymous",
      "anonymous_enable",
-     0,
+     "yes|no",
      "no",
-     FILE_DATA_FLAG_UPDATE
    },
 
    { 
-     FILE_DATA_TYPE_CHECKBOX,
-     -1,
-     "local",
+     DATA_TYPE_CHECKBOX,
+     DATA_FLAG_UPDATE,
      FTP_NAME_LOCAL_ENABLE,
      FTP_DESCRIPTION_LOCAL_ENABLE,
-     NULL,
-     "yes|no",
+     "local",
      "local_enable",
-     0,
+     "yes|no",
      "yes",
-     FILE_DATA_FLAG_UPDATE
    },
 
    {
-     FILE_DATA_TYPE_TEXTAREA,
-     -1,
-     "banner",
+     DATA_TYPE_TEXTAREA,
+     DATA_FLAG_UPDATE,
      FTP_NAME_BANNER,
      FTP_DESCRIPTION_BANNER,
-     NULL,
-     "^[0-9A-Za-z .]{0,255}$",
+     "banner",
      "ftpd_banner",
-     0,
+     "^[0-9A-Za-z .]{0,255}$",
      NULL,
-     FILE_DATA_FLAG_UPDATE
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "createmask",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_UPDATE,
      FTP_NAME_FILE_OPEN_MODE,
      FTP_DESCRIPTION_FILE_OPEN_MODE,
-     NULL,
-     "^[0-7]{3}$",
+     "createmask",
      "file_open_mode",
-     0,
+     "^[0-7]{3}$",
      NULL,
-     FILE_DATA_FLAG_UPDATE
    },
 
    { 
-     FILE_DATA_TYPE_CHECKBOX,
-     -1,
-     "fxp",
+     DATA_TYPE_CHECKBOX,
+     DATA_FLAG_UPDATE,
      FTP_NAME_PASV_PROMISCUOUS,
      FTP_DESCRIPTION_PASV_PROMISCUOUS,
-     NULL,
-     "yes|no",
+     "fxp",
      "pasv_promiscuous",
-     0,
-     "yes",
-     FILE_DATA_FLAG_UPDATE
+     "yes|no",
+     NULL,
    },
 
-   { 0,
-     -1,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
+   { 
+     0,
      0,
      NULL,
-     FILE_DATA_FLAG_UPDATE
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
    }
 };
 
 /* Define ini configuration tags */
-struct file_data_t ftp_rc_data[] = {
+struct data_t ftp_rc_data[] = {
    {
-     FILE_DATA_TYPE_CHECKBOX,
-     -1,
-     "enable_ftpd",
+     DATA_TYPE_CHECKBOX,
+     DATA_FLAG_UPDATE,
      RC_NAME_START_FTPD,
      RC_DESCRIPTION_START_FTPD,
-     NULL,
-     "yes|no",
+     "enable_ftpd",
      "START_FTPD",
-     0,
+     "yes|no",
      "yes",
-     FILE_DATA_FLAG_UPDATE
    },
 
-   { 0,
-     -1,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
+   {
+     0,
      0,
      NULL,
-     FILE_DATA_FLAG_UPDATE
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
    }
 };
 
@@ -209,54 +176,37 @@ struct file_data_t ftp_rc_data[] = {
  * \return zero on sucess
  */
 int ftp_main(int argc, char **argv) {
-   /* Get command for this module */        
-   char *command = variable_get("command");
    /* File structure */
-   struct file_t f, f_rc;
+   struct file_t file, file_rc;
+   /* owi structure */
+   struct owi_t owi;
 
-   /* Set correct type */
-   f.type = FILE_TYPE_SECTION;
-   /* Set config settings */
-   f.fd = ftp_data;
    /* Set separator */
-   f.separator = FTP_SEPARATOR;
+   file.separator = FTP_SEPARATOR;
    /* Read config into memory */
-   file_open(&f, FTP_FILE);
+   file_open(&file, FTP_FILE);
 
-   /* Set correct type */
-   f_rc.type = FILE_TYPE_SECTION;
-   /* Set config settings */
-   f_rc.fd = ftp_rc_data;
    /* Set separator */
-   f_rc.separator = RC_SEPARATOR;
+   file_rc.separator = RC_SEPARATOR;
    /* Read config into memory */
-   file_open(&f_rc, RC_FILE);
+   file_open(&file_rc, RC_FILE);
 
-   /* Print header information */
-   owi_header(FTP_HEADLINE);
+   /* Set owi properties for display */
+   owi.headline = FTP_HEADLINE;
+   owi.file = &file;
+   owi.file_init = &file_rc;
+   owi.data = ftp_data;
+   owi.data_init = ftp_rc_data;
+   owi.button = NULL;
+   owi.flags = OWI_FLAG_CONFIG;
 
-   /* Command NULL or empty? */
-   if (!command || !strcmp(command, "")) {
-      /* Just print ftp option list */
-      owi_list(&f_rc, &f, NULL);
-   } else if (!strcmp(command, OWI_BUTTON_UPDATE)) {
-      /* Update rc configuration */
-      owi_update(&f_rc, FTP_FILE_UPDATE, FTP_FILE_ERROR);
-      /* Update configuration */
-      owi_update(&f, FTP_FILE_UPDATE, FTP_FILE_ERROR);
-      /* Reload konfiguration */
-      // proc_open(FTP_RESTART);
-      /* Just print ftp option list */
-      owi_list(&f_rc, &f, NULL);
-   } 
-  
+   /* Start main */
+   owi_main(&owi);
+
    /* Free rc data file */
-   file_free(&f_rc);
+   file_free(&file_rc);
    /* Free data file */
-   file_free(&f);
-
-   /* Print footer information */
-   owi_footer();
+   file_free(&file);
 
    /* Return success */
    return 0;

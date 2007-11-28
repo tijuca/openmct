@@ -2,4 +2,3 @@
 #define PROCESS_SEPARATOR ";"
 
 int process_main(int argc, char **);
-void process_list(struct file_t *f);

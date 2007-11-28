@@ -23,178 +23,143 @@
 #include <stdlib.h>
 #include "includes/argument.h"
 #include "includes/file.h"
+#include "includes/data.h"
 #include "includes/language.h"
 #include "includes/variable.h"
 #include "includes/owi.h"
 #include "includes/process.h"
 
-struct file_data_t process_data[] = {
+struct data_t process_data[] = {
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "user",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_LIST,
      "User",
      "Process owner",
+     "user",
+     "user",
      NULL,
      NULL,
-     NULL,
-     0,
-     NULL,
-     FILE_DATA_FLAG_LIST 
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "pid",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_LIST | DATA_FLAG_ID,
      "Process ID",
      "Process owner",
+     "pid",
+     "pid",
      NULL,
-     NULL,
-     NULL,
-     1,
-     NULL,
-     FILE_DATA_FLAG_LIST | FILE_DATA_FLAG_ID
+     NULL
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "cpu",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_LIST,
      "CPU",
      "CPU usage",
+     "cpu",
+     "cpu",
      NULL,
      NULL,
-     NULL,
-     2,
-     NULL,
-     FILE_DATA_FLAG_LIST
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "mem",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_LIST,
      "MEM",
      "Memory usage",
+     "mem",
+     "mem",
      NULL,
-     NULL,
-     NULL,
-     3,
-     NULL,
-     FILE_DATA_FLAG_LIST
+     NULL
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "VSZ",
-     "VSZ",
-     "VSZ",
-     NULL,
-     NULL,
-     NULL,
-     4,
-     NULL,
+     DATA_TYPE_TEXT,
      0,
+     "VSZ",
+     "VSZ",
+     "VSZ",
+     "VSZ",
+     NULL,
+     NULL,
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "RSS",
-     "RSS",
-     "RSS",
-     NULL,
-     NULL,
-     NULL,
-     5,
-     NULL,
+     DATA_TYPE_TEXT,
      0,
+     "RSS",
+     "RSS",
+     "RSS",
+     "RSS",
+     NULL,
+     NULL
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
+     DATA_TYPE_TEXT,
+     0,
      "TTY",
      "TTY",
      "TTY",
+     "TTY",
      NULL,
      NULL,
-     NULL,
-     6,
-     NULL,
-     0 
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
+     DATA_TYPE_TEXT,
+     0,
      "stat",
      "Stat",
      "Stat",
+     "stat",
      NULL,
      NULL,
-     NULL,
-     7,
-     NULL,
-     0
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
+     DATA_TYPE_TEXT,
+     0,
      "start",
      "Start",
      "Start",
+     "start",
      NULL,
      NULL,
-     NULL,
-     8,
-     NULL,
-     0
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
+     DATA_TYPE_TEXT,
+     0,
      "Time",
      "Time",
      "Time",
+     "Time",
      NULL,
-     NULL,
-     NULL,
-     9,
-     NULL,
-     0
+     NULL
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "login",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_LIST,
      "Process",
      "Process name",
+     "login",
+     "login",
      NULL,
-     NULL,
-     NULL,
-     10,
-     NULL,
-     FILE_DATA_FLAG_LIST
+     NULL
    },
 
    {
      0,
-     -1,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
      0,
      NULL,
-     0,
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL
    }
 
 };
@@ -206,61 +171,31 @@ struct file_data_t process_data[] = {
  * \return zero on sucess
  */
 int process_main(int argc, char **argv) {
-   /* Get command for this module */        
-   char *command = variable_get("command");
    /* File structure */
-   struct file_t f;
+   struct file_t file;
+   /* owi structure */
+   struct owi_t owi;
 
-   /* Set correct type */
-   f.type = FILE_TYPE_LINE;
-   /* Set config settings */
-   f.fd = process_data;
    /* Set separator */
-   f.separator = PROCESS_SEPARATOR;
+   file.separator = PROCESS_SEPARATOR;
    /* Read config into memory */
-   proc_open(&f, PROCESS_COMMAND);
+   proc_open(&file, PROCESS_COMMAND);
 
-   /* Print header information */
-   owi_header(PROCESS_HEADLINE);
-   
-   /* Command NULL or empty? */
-   if (!command || !strcmp(command, "")) {
-      /* Just print user list */
-      process_list(&f);
-   /* Show all process details */
-   } else if (!strcmp(command, OWI_BUTTON_DETAIL)) {
-      owi_detail_id(&f, variable_get("id"));
-   }
+   /* Set owi properties for display */
+   owi.headline = PROCESS_HEADLINE;
+   owi.file = &file;
+   owi.file_init = NULL;
+   owi.data = process_data;
+   owi.data_init = NULL;
+   owi.button = NULL;
+   owi.flags = OWI_FLAG_ACTION | OWI_FLAG_ROW | OWI_FLAG_HIDE_NEW;
 
-   /* Free process list */
-   file_free(&f);
+   /* Start main */
+   owi_main(&owi);
 
-   /* Print footer information */
-   owi_footer();
+   /* Free data file */
+   file_free(&file);
 
    /* Return success */
    return 0;
-}
-
-/* \fn process_list()
- * Show process
- */
-void process_list(struct file_t *f) {
-   /* Display table header */
-   owi_table_header(f);
-
-   /* Reset line to zero */
-   f->line_current = 1;
-
-   /* Reset search */
-   f->line_search = 0;
-
-   /* Loop through all entries from file */
-   while (file_data_get_next(f)) {
-      /* Display */
-      owi_data_list(f);
-   }
-
-   /* Print Submit button */
-   owi_outside_close(OWI_BUTTON_NEW);
 }

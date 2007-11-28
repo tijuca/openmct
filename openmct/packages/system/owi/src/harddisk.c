@@ -25,107 +25,88 @@
 #include "includes/argument.h"
 #include "includes/language.h"
 #include "includes/variable.h"
+#include "includes/data.h"
 #include "includes/file.h"
 #include "includes/owi.h"
 #include "includes/harddisk.h"
 
 /* Define ini configuration tags */
-struct file_data_t harddisk_data[] = {
+struct data_t harddisk_data[] = {
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "device",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_UPDATE,
      HARDDISK_NAME_DEVICE,
      NULL,
-     NULL,
-     "^[A-Za-z0-9/]{1,40}$",
+     "device",
      "OPTIONS_HDPARM_DEVICE",
-     0,
-     "/dev/discs/disc0/disc",
-     FILE_DATA_FLAG_UPDATE
+     "^[A-Za-z0-9/]{1,40}$",
+     "/dev/discs/disc0/disc"
    },
 
    {
-     FILE_DATA_TYPE_CHECKBOX,
-     -1,
-     "dma",
+     DATA_TYPE_CHECKBOX,
+     DATA_FLAG_UPDATE,
      HARDDISK_NAME_DMA,
      NULL,
-     NULL,
-     "1|0",
+     "dma",
      "OPTIONS_HDPARM_DMA",
-     0,
-     "1",
-     FILE_DATA_FLAG_UPDATE
+     "1|0",
+     "1"
    },
 
    {
-     FILE_DATA_TYPE_CHECKBOX,
-     -1,
-     "interrupt_unmask",
+     DATA_TYPE_CHECKBOX,
+     DATA_FLAG_UPDATE,
      HARDDISK_NAME_INTERRUPT_UNMASK,
      NULL,
-     NULL,
-     "1|0",
+     "interrupt_unmask",
      "OPTIONS_HDPARM_INTERRUPT_UNMASK",
-     0,
-     "1",
-     FILE_DATA_FLAG_UPDATE
+     "1|0",
+     "1"
    },
 
    {
-     FILE_DATA_TYPE_SELECT,
-     -1,
-     "sector_count",
+     DATA_TYPE_SELECT,
+     DATA_FLAG_UPDATE,
      HARDDISK_NAME_SECTOR_COUNT,
      NULL,
-     NULL,
-     "2|4|8|16",
+     "sector_count",
      "OPTIONS_HDPARM_SECTOR_COUNT",
-     0,
-     "16",
-     FILE_DATA_FLAG_UPDATE
+     "2|4|8|16",
+     "16"
    },
 
    {
-     FILE_DATA_TYPE_CHECKBOX,
-     -1,
-     "32bit",
+     DATA_TYPE_CHECKBOX,
+     DATA_FLAG_UPDATE,
      HARDDISK_NAME_32BIT,
      NULL,
-     NULL,
-     "3|0",
+     "32bit",
      "OPTIONS_HDPARM_32BIT",
-     0,
-     "3",
-     FILE_DATA_FLAG_UPDATE
+     "3|0",
+     "3"
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "spindown_timeout",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_UPDATE,
      HARDDISK_NAME_SPINDOWN_TIMEOUT,
      NULL,
-     NULL,
-     "^[0-9]{1,3}$",
+     "spindown_timeout",
      "OPTIONS_HDPARM_SPINDOWN_TIMEOUT",
-     0,
-     "60",
-     FILE_DATA_FLAG_UPDATE
+     "^[0-9]{1,3}$",
+     "60"
    },
 
-   { 0,
-     -1,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
+   {
+     0,
      0,
      NULL,
-     0
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL
    }
 };
 
@@ -136,38 +117,30 @@ struct file_data_t harddisk_data[] = {
  * \return zero on sucess
  */
 int harddisk_main(int argc, char **argv) {
-   /* Get command for this module */        
-   char *command = variable_get("command");
    /* File structure */
-   struct file_t f;
+   struct file_t file;
+   /* owi structure */
+   struct owi_t owi;
 
-   /* Set correct type */
-   f.type = FILE_TYPE_SECTION;
-   /* Set config settings */
-   f.fd = harddisk_data;
    /* Set separator */
-   f.separator = HARDDISK_SEPARATOR;
+   file.separator = HARDDISK_SEPARATOR;
    /* Read config into memory */
-   file_open(&f, HARDDISK_FILE);
- 
-   /* Print header information */
-   owi_header(HARDDISK_HEADLINE);
+   file_open(&file, HARDDISK_FILE);
 
-   /* Command NULL or empty? */
-   if (!command || !strcmp(command, "")) {
-      /* Just print harddisk list */
-      owi_list(&f, NULL);
-   } else if (!strcmp(command, OWI_BUTTON_UPDATE)) {
-      /* Update configuration failed */
-      owi_update(&f, HARDDISK_FILE_UPDATE, HARDDISK_FILE_ERROR);
-      /* Display harddisk details again */
-      owi_list(&f, NULL);
-   } 
-   /* Free file */
-   file_free(&f);
+   /* Set owi properties for display */
+   owi.headline = HARDDISK_HEADLINE;
+   owi.file = &file;
+   owi.file_init = NULL;
+   owi.data = harddisk_data;
+   owi.data_init = NULL;
+   owi.button = NULL;
+   owi.flags = OWI_FLAG_CONFIG;
 
-   /* Print footer information */
-   owi_footer();
+   /* Start main */
+   owi_main(&owi);
+
+   /* Free data file */
+   file_free(&file);
 
    /* Return success */
    return 0;

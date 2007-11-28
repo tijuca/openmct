@@ -25,82 +25,70 @@
 #include "includes/argument.h"
 #include "includes/language.h"
 #include "includes/variable.h"
+#include "includes/data.h"
 #include "includes/file.h"
 #include "includes/owi.h"
 #include "includes/rc.h"
 #include "includes/smb.h"
 
 /* Define ini configuration tags */
-struct file_data_t smb_data[] = {
+struct data_t smb_data[] = {
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "workgroup",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_UPDATE,
      SMB_NAME_WORKGROUP,
      SMB_DESCRIPTION_WORKGROUP,
-     NULL,
-     "^[A-Z]{1,40}$",
      "workgroup",
-     0,
-     "OPENMCT",
-     FILE_DATA_FLAG_UPDATE
+     "workgroup",
+     "^[A-Z]{1,40}$",
+     "workgroup"
    },
 
    {
-     FILE_DATA_TYPE_TEXT,
-     -1,
-     "server_string",
+     DATA_TYPE_TEXT,
+     DATA_FLAG_UPDATE,
      SMB_NAME_SERVER_STRING,
      SMB_DESCRIPTION_SERVER_STRING,
-     NULL,
+     "server_string",
+     "server_string",
      "^[A-Za-z0-9 ]{1,40}$",
-     "server string",
-     0,
-     "OpenMCT Windows Share Server",
-     FILE_DATA_FLAG_UPDATE
+     "OpenMCT Windows Share Server"
    },
 
-   { 0,
-     -1,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
+   { 
+     0,
      0,
      NULL,
-     0
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL
    }
 };
 
 /* Define ini configuration tags */
-struct file_data_t smb_rc_data[] = {
+struct data_t smb_rc_data[] = {
    {
-     FILE_DATA_TYPE_CHECKBOX,
-     -1,
-     "enable_smbd",
+     DATA_TYPE_CHECKBOX,
+     DATA_FLAG_UPDATE,
      RC_NAME_START_SMBD,
      RC_DESCRIPTION_START_SMBD,
-     NULL,
-     "yes|no",
+     "enable_smbd",
      "START_SAMBA",
-     0,
-     "yes",
-     FILE_DATA_FLAG_UPDATE
+     "yes|no",
+     "yes"
    },
 
-   { 0,
-     -1,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
+   {
+     0,
      0,
      NULL,
-     FILE_DATA_FLAG_UPDATE
+     NULL,
+     NULL,
+     NULL,
+     NULL,
+     NULL
    }
 };
 
@@ -111,50 +99,37 @@ struct file_data_t smb_rc_data[] = {
  * \return zero on sucess
  */
 int smb_main(int argc, char **argv) {
-   /* Get command for this module */        
-   char *command = variable_get("command");
    /* File structure */
-   struct file_t f, f_rc;
+   struct file_t file, file_rc;
+   /* owi structure */
+   struct owi_t owi;
 
-   /* Set correct type */
-   f.type = FILE_TYPE_SECTION;
-   /* Set config settings */
-   f.fd = smb_data;
    /* Set separator */
-   f.separator = SMB_SEPARATOR;
+   file.separator = SMB_SEPARATOR;
    /* Read config into memory */
-   file_open(&f, SMB_FILE);
+   file_open(&file, SMB_FILE);
 
-   /* Set correct type */
-   f_rc.type = FILE_TYPE_SECTION;
-   /* Set config settings */
-   f_rc.fd = smb_rc_data;
    /* Set separator */
-   f_rc.separator = RC_SEPARATOR;
+   file_rc.separator = RC_SEPARATOR;
    /* Read config into memory */
-   file_open(&f_rc, RC_FILE);
- 
-   /* Print header information */
-   owi_header(SMB_HEADLINE);
+   file_open(&file_rc, RC_FILE);
 
-   /* Command NULL or empty? */
-   if (!command || !strcmp(command, "")) {
-      /* Just print user list */
-      owi_list(&f_rc, &f, NULL);
-   } else if (!strcmp(command, OWI_BUTTON_UPDATE)) {
-      /* Update settings configuration */
-      owi_update(&f_rc, SMB_FILE_UPDATE, SMB_FILE_ERROR);
-      /* Update configuration */
-      owi_update(&f, SMB_FILE_UPDATE, SMB_FILE_ERROR);
-      /* Display configuration */
-      owi_list(&f_rc, &f, NULL);
-   }
+   /* Set owi properties for display */
+   owi.headline = SMB_HEADLINE;
+   owi.file = &file;
+   owi.file_init = &file_rc;
+   owi.data = smb_data;
+   owi.data_init = smb_rc_data;
+   owi.button = NULL;
+   owi.flags = OWI_FLAG_CONFIG;
 
-   /* Free file */
-   file_free(&f);
+   /* Start main */
+   owi_main(&owi);
 
-   /* Print footer information */
-   owi_footer();
+   /* Free rc data file */
+   file_free(&file_rc);
+   /* Free data file */
+   file_free(&file);
 
    /* Return success */
    return 0;

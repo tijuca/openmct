@@ -1,6 +1,6 @@
 LANGUAGE=LANG_GERMAN
-CFLAGS=-D$(LANGUAGE) -Os -Wall -DFILE_BASE='""'
-#CFLAGS=-D$(LANGUAGE) -Os -Wall -DFILE_BASE='"../examples"'
+#CFLAGS=-D$(LANGUAGE) -Os -Wall -DFILE_BASE='""'
+CFLAGS=-D$(LANGUAGE) -Os -Wall -DFILE_BASE='"../examples"'
 CC=$(CROSS)gcc
 STRIP=$(CROSS)strip
 OUTPUT=../www
@@ -14,11 +14,11 @@ DESTDIR=/www
 CSS=css/openmct.css
 IMAGES=images
 
-OBJECTS=misc.o variable.o argument.o file.o owi.o \
+OBJECTS=misc.o variable.o argument.o data.o file.o owi.o \
         ftp.o nfs.o smb.o interface.o process.o harddisk.o user.o group.o
 
 all:	$(OBJECTS)
-	$(CC) $(LDFLAGS) $(CFLAGS) -o $(BINARY) $(OBJECTS)
+	$(CC) $(LDFLAGS) -o $(BINARY) $(OBJECTS)
 	$(STRIP) -s $(BINARY)
 
 %.o:	%.c
