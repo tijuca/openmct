@@ -188,7 +188,8 @@ int process_main(int argc, char **argv) {
    owi.data = process_data;
    owi.data_init = NULL;
    owi.button = NULL;
-   owi.flags = OWI_FLAG_ACTION | OWI_FLAG_ROW | OWI_FLAG_HIDE_NEW;
+   owi.flags = OWI_FLAG_ACTION | OWI_FLAG_ACTION_KILL |
+               OWI_FLAG_ROW | OWI_FLAG_HIDE_NEW;
 
    /* Start main */
    owi_main(&owi);

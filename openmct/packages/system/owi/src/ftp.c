@@ -96,7 +96,7 @@ struct data_t ftp_data[] = {
      "local",
      "local_enable",
      "yes|no",
-     "yes",
+     "no",
    },
 
    {
@@ -129,7 +129,7 @@ struct data_t ftp_data[] = {
      "fxp",
      "pasv_promiscuous",
      "yes|no",
-     NULL,
+     "no",
    },
 
    { 
@@ -154,7 +154,7 @@ struct data_t ftp_rc_data[] = {
      "enable_ftpd",
      "START_FTPD",
      "yes|no",
-     "yes",
+     "no",
    },
 
    {
@@ -198,7 +198,7 @@ int ftp_main(int argc, char **argv) {
    owi.data = ftp_data;
    owi.data_init = ftp_rc_data;
    owi.button = NULL;
-   owi.flags = OWI_FLAG_CONFIG;
+   owi.flags = OWI_FLAG_CONFIG | OWI_FLAG_ACTION_UPDATE;
 
    /* Start main */
    owi_main(&owi);

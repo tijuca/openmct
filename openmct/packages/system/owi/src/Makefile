@@ -15,7 +15,8 @@ CSS=css/openmct.css
 IMAGES=images
 
 OBJECTS=misc.o variable.o argument.o data.o file.o owi.o \
-        ftp.o nfs.o smb.o interface.o process.o harddisk.o user.o group.o
+        ftp.o nfs.o smb.o interface.o process.o harddisk.o user.o group.o \
+	shell.o
 
 all:	$(OBJECTS)
 	$(CC) $(LDFLAGS) -o $(BINARY) $(OBJECTS)

@@ -74,7 +74,7 @@ void file_open(struct file_t *f, char *filename) {
 void file_read(struct file_t *f, FILE *fp) {
    /* Each line from file */
    char line[FILE_MAXLINE];
-
+   
    /* Loop through file */
    while (fgets(line, sizeof(line), fp)) {
       /* Strip \n from line */
@@ -92,12 +92,15 @@ void file_read(struct file_t *f, FILE *fp) {
          if (f->line[f->line_count]) {
             /* Copy line to data */
             f->line[f->line_count]->data = strdup(line);
-	    /* Parse data */
-	    f->line[f->line_count]->current =
-	        argument_parse(f->line[f->line_count]->data,
-		               f->separator);
-            /* Not changed per default */
-	    f->line[f->line_count]->changed = 0;
+	    /* Separator defined? */
+	    if (f->separator) {
+	       /* Parse data */
+	       f->line[f->line_count]->current =
+	           argument_parse(f->line[f->line_count]->data,
+		                  f->separator);
+            } else {
+	       f->line[f->line_count]->current = NULL;
+	    }
             /* Increase line counter */
             f->line_count++;
          }
@@ -145,32 +148,20 @@ void file_save(struct file_t *f) {
    FILE *fp = NULL;
    /* Loop */
    int i = 0;
-   /* Changed lines */
-   int change = 0;
 
-   /* Look for file changes */
-   for  (i = 0; i < f->line_count; i++) {
-      if (f->line[i]->changed) {
-         change++;
+   /* Update raw lines for writing */
+   file_data_update(f);
+
+   /* Try to open file for writing */
+   fp = fopen(f->name, "w");
+   /* Successful? */
+   if (fp) {
+      /* Loop through all lines */
+      for (i = 0; i < f->line_count; i++) {
+         fprintf(fp, "%s\n", f->line[i]->data ? f->line[i]->data : "");
       }
-   }
-
-   /* Changed lines found? */
-   if (change) {
-      /* Update raw lines for writing */
-      file_data_update(f);
-
-      /* Try to open file for writing */
-      fp = fopen(f->name, "w");
-      /* Successful? */
-      if (fp) {
-         /* Loop through all lines */
-         for (i = 0; i < f->line_count; i++) {
-            fprintf(fp, "%s\n", f->line[i]->data);
-         }
-         /* Close file */
-         fclose(fp);
-      }
+      /* Close file */
+      fclose(fp);
    }
 }
 
@@ -244,8 +235,6 @@ void file_action(struct file_t *f, int mode, char *format, ...) {
       f->line[f->line_current]->data = strdup(line);
       /* Parse data */
       f->line[f->line_current]->current = argument_parse(line, f->separator);
-      /* Not changed per default */
-      f->line[f->line_count]->changed = 0;
    } 
 }
 
@@ -260,10 +249,6 @@ void file_data_update(struct file_t *f) {
 
    /* Loop through whole file */
    for (j = 0; j < f->line_count; j++) {
-      /* No change in this line? */
-      if (!f->line[j]->changed)
-         continue;
-
       /* Free current raw line */
       free(f->line[j]->data);
       /* Set to zero */
@@ -306,7 +291,7 @@ void file_data_update(struct file_t *f) {
  * \param[in] value_index current index for value
  * \param[in] value variable value
  */
-void file_value_set(struct file_t *f, int name_index, char *name, int value_index, char *value, int changed) {
+void file_value_set(struct file_t *f, int name_index, char *name, int value_index, char *value) {
    /* Loop */
    int i;
 
@@ -322,8 +307,6 @@ void file_value_set(struct file_t *f, int name_index, char *name, int value_inde
                free(f->line[i]->current[value_index]);
                /* And copy new value */
                f->line[i]->current[value_index] = strdup(value);
-	       /* Set change modus */
-	       f->line[i]->changed = changed;
 	    }
 	 }
       }
@@ -335,6 +318,7 @@ void file_value_set(struct file_t *f, int name_index, char *name, int value_inde
  * \param[in] name_index current index for name lookup
  * \param[in] name variable name
  * \param[in] value_index current index for value
+ * \return current value or null if not found
  */
 char *file_value_get(struct file_t *f, int name_index, char *name, int value_index) {
    /* Loop */
@@ -346,15 +330,43 @@ char *file_value_get(struct file_t *f, int name_index, char *name, int value_ind
    for (i = 0; i < f->line_count; i++) {
       /* Pattern found? */
       if (f->line[i]->current[name_index] &&
-          !strcasecmp(f->line[i]->current[name_index], name) &&
-          f->line[i]->current[value_index] != NULL) {
-         current =  f->line[i]->current[value_index];
+          !strcasecmp(f->line[i]->current[name_index], name)) {
+         if (f->line[i]->current[value_index] != NULL) {
+            current =  f->line[i]->current[value_index];
+	 } else {
+            current = strdup("");
+	 }
       }
    }
 
    /* Return current value */
    return current;
 }
+
+/* \fn file_value_del(f, name_index, name)
+ * \param[in] f file structure for current file
+ * \param[in] name_index current index for name lookup
+ * \param[in] name variable name
+ */
+void file_value_del(struct file_t *f, int name_index, char *name) {
+   /* Loop */
+   int i;
+
+   /* Loop through all lines in file */
+   for (i = 0; i < f->line_count; i++) {
+      /* Pattern found? */
+      if (f->line[i]->current[name_index] &&
+          !strcasecmp(f->line[i]->current[name_index], name)) {
+	  /* Set current line for file operation */
+	  f->line_current = i;
+	  /* Remove Line */
+          file_action(f, FILE_LINE_DEL, NULL);
+          /* Decrease counter */
+	  i--;
+      }
+   }
+}
+
 
 /* \fn proc_open(f, command)
  * \param[in] f file structure for current file

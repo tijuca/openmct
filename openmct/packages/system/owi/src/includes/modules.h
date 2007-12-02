@@ -16,5 +16,6 @@ struct modules_t {
    { "harddisk", harddisk_main, HARDDISK_NAV_DESCRIPTION, 1 },
    { "user", user_main, USER_NAV_DESCRIPTION, 1 },
    { "group", group_main, GROUP_NAV_DESCRIPTION, 1 },
+   { "shell", shell_main, SHELL_NAV_DESCRIPTION, 1 },
    { NULL, NULL, NULL, 0 }
 };

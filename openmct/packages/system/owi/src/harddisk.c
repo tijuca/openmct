@@ -51,7 +51,7 @@ struct data_t harddisk_data[] = {
      "dma",
      "OPTIONS_HDPARM_DMA",
      "1|0",
-     "1"
+     "0"
    },
 
    {
@@ -62,7 +62,7 @@ struct data_t harddisk_data[] = {
      "interrupt_unmask",
      "OPTIONS_HDPARM_INTERRUPT_UNMASK",
      "1|0",
-     "1"
+     "0"
    },
 
    {
@@ -84,7 +84,7 @@ struct data_t harddisk_data[] = {
      "32bit",
      "OPTIONS_HDPARM_32BIT",
      "3|0",
-     "3"
+     "0"
    },
 
    {
@@ -134,7 +134,7 @@ int harddisk_main(int argc, char **argv) {
    owi.data = harddisk_data;
    owi.data_init = NULL;
    owi.button = NULL;
-   owi.flags = OWI_FLAG_CONFIG;
+   owi.flags = OWI_FLAG_CONFIG | OWI_FLAG_ACTION_UPDATE;
 
    /* Start main */
    owi_main(&owi);

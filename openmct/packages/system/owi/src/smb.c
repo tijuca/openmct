@@ -77,7 +77,7 @@ struct data_t smb_rc_data[] = {
      "enable_smbd",
      "START_SAMBA",
      "yes|no",
-     "yes"
+     "no"
    },
 
    {
@@ -121,7 +121,7 @@ int smb_main(int argc, char **argv) {
    owi.data = smb_data;
    owi.data_init = smb_rc_data;
    owi.button = NULL;
-   owi.flags = OWI_FLAG_CONFIG;
+   owi.flags = OWI_FLAG_CONFIG | OWI_FLAG_ACTION_UPDATE;
 
    /* Start main */
    owi_main(&owi);

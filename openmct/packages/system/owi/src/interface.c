@@ -112,7 +112,7 @@ int lan_main(int argc, char **argv) {
    owi.data = interface_data;
    owi.data_init = NULL;
    owi.button = NULL;
-   owi.flags = OWI_FLAG_CONFIG;
+   owi.flags = OWI_FLAG_CONFIG | OWI_FLAG_ACTION_UPDATE;
 
    /* Start main */
    owi_main(&owi);

@@ -37,86 +37,28 @@
  * \return zero on sucess
  */
 int shell_main(int argc, char **argv) {
-   /* Index counter */
-   int i;
+   /* File structure */
+   struct file_t file;
+   /* owi structure */
+   struct owi_t owi;
 
-   owi_header(SHELL_HEADLINE);
+   /* Set owi properties for display */
+   owi.headline = SHELL_HEADLINE;
+   owi.file = &file;
+   owi.file_init = NULL;
+   owi.data = NULL;
+   owi.data_init = NULL;
+   owi.button = NULL;
+   owi.flags = OWI_FLAG_CONFIG;
 
-   /* Print external table for design */
-   printf("<table width=\"%s\">\n"
-          "<tr>\n"
-          "<td>\n",
-          CONTENT_TABLE_CLASS);
+   /* Read config into memory */
+   proc_open(&file, variable_get("execute"));
 
-   /* Print headline information */
-   owi_headline(1, SHELL_HEADLINE);
+   /* Start main */
+   owi_main(&owi);
 
-   /* Print table head */
-   printf("<form action=\"%s\" method=\"post\">\n"
-          "<input type=\"hidden\" name=\"module\" value=\"%s\" />\n"
-          "<input type=\"hidden\" name=\"command\" value=\"execute\" />\n"
-          "<table class=\"%s\" width=\"100%%\">\n"
-	  "<tr>\n"
-	  "<td>\n",
-          getenv("SCRIPT_NAME"),
-	  variable_get("module"),
-          CONTENT_TABLE_CLASS);
-
-   /* No directory set? */
-   if (!strcasecmp(variable_get("directory"), "")) {
-      /* Set root directory as default */
-      variable_set("directory", "/");
-   }
-
-   /* Change to directory before execting command */
-   chdir(variable_get("directory"));
-
-   printf("<textarea rows=20 cols=90 background=#000000>\n");
-   /* Command NULL or empty? */
-   if (!strcasecmp(variable_get("command"), "execute")) {
-      char **cmd_argv = argument_parse(variable_get("value"), " 	");
-      char curdir[1024];
-
-      printf("%s # %s\n", variable_get("directory"), variable_get("value"));
-
-      if (!strcasecmp(cmd_argv[0], "cd")) {
-         chdir(cmd_argv[1]);
-      } else {
-         /* Execute command now */
-         proc_open(variable_get("value"));
-	 /* Loop through results */
-         for (i = 0; i < file_line_counter; i++) {
-            printf("%s\n", file_line_get(i));
-         }
-      }
-      /* Get directory after executing command */
-      getcwd(curdir, sizeof(curdir));
-      /* Set new directory */
-      variable_set("directory", curdir);
-      printf("%s # ", variable_get("directory"));
-   }
-   printf("</textarea>\n");
-
-   printf("</td>\n"
-          "</tr>\n"
-	  "<tr>\n"
-	  "<tr>\n"
-	  "<td>\n"
-	  "<input type=\"hidden\" name=\"directory\" value=\"%s\" />\n"
-	  "%s # <input type=\"text\" name=\"value\" size=\"100\"/>\n"
-	  "</td>\n"
-	  "</tr>\n"
-	  "</table>\n"
-	  "</form>\n",
-	  variable_get("directory"),
-	  variable_get("directory"));
-
-   printf("<script type=\"text/javascript\">\n"
-	  "document.forms[0].value.focus();\n"
-	  "</script>\n");
-
-   /* Print footer information */
-   owi_footer();
+   /* Free data file */
+   file_free(&file);
 
    /* Return success */
    return 0;

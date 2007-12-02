@@ -112,7 +112,9 @@ int group_main(int argc, char **argv) {
    owi.data = group_data;
    owi.data_init = NULL;
    owi.button = NULL;
-   owi.flags = OWI_FLAG_ACTION | OWI_FLAG_ROW;
+   owi.flags = OWI_FLAG_ACTION | OWI_FLAG_ACTION_DETAIL |
+               OWI_FLAG_ACTION_DELETE | OWI_FLAG_ACTION_UPDATE |
+	       OWI_FLAG_ROW;
 
    /* Start main */
    owi_main(&owi);

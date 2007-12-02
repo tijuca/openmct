@@ -173,6 +173,7 @@
 #define  OWI_BUTTON_UPDATE                   "Save"
 #define  OWI_BUTTON_DELETE                   "Delete"
 #define  OWI_BUTTON_LIST                     "List"
+#define  OWI_BUTTON_KILL                     "Kill"
 
 #define  OWI_SYNTAX_INVALID                  "Invalid syntax"
 #define  OWI_ERROR_INVALID                   "Error"
