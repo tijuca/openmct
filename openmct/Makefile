@@ -209,9 +209,15 @@ else
 	    $(ECHO) "/harddisk 172.16.0.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/etc/exports; \
 	fi
 endif
-
+ifdef ETH1BROADCAST
+	@$(ECHO) -e "\tbroadcast $(ETH1BROADCAST)" >> $(NEWROOTDIR)/etc/network/interfaces
+else
+	@$(ECHO) -e "\tbroadcast 172.16.0.255" >> $(NEWROOTDIR)/etc/network/interfaces
+endif
 ifdef ETH1DEFAULTGW
 	@$(ECHO) -e "\tgateway $(ETH1DEFAULTGW)" >> $(NEWROOTDIR)/etc/network/interfaces
+else
+	@$(ECHO) -e "\tgateway 172.16.0.1" >> $(NEWROOTDIR)/etc/network/interfaces
 endif
 endif
 	@$(ECHO) "nameserver $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/etc/resolv.conf

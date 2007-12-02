@@ -163,7 +163,8 @@ fi
 # NTPDate Client
 if [ "$START_NTPDATE" == "yes" ]; then
    /sbin/ntpdate $OPTIONS_NTPDATE_SERVER
-   /bin/echo -n "Running ntp client ... "   
+   /sbin/hwclock -w -u
+   /bin/echo -n "Running ntp client ... "
    /bin/echo -e "\033[1;32mdone\033[0m"
 fi
 
