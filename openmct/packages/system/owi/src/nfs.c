@@ -110,8 +110,6 @@ struct data_t nfs_rc_data[] = {
 int nfs_main(struct owi_t *owi) {
    /* Set separator */
    owi->file->separator = string_copy_value(NFS_SEPARATOR);
-   /* Skip comment lines */
-   owi->file->flags = FILE_FLAG_SKIP_COMMENT;
    /* Set filename */
    owi->file->name = string_copy_value(NFS_FILE);
    /* Set owi properties for display */

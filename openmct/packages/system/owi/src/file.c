@@ -288,11 +288,11 @@ void file_iterator(struct file_t *f, unsigned int mode, unsigned int *index) {
    if (mode == FILE_ITERATOR_NEXT) {
       (*index)++;
    }
-   
+
    /* Filter flags */
-   if (f->flags & FILE_FLAG_SKIP_COMMENT) {
+   if (!(f->flags & FILE_FLAG_DONT_SKIP_COMMENT)) {
       /* While lines are available */
-      while ( *index + 1 < file_length(f)) {
+      while ( *index < file_length(f)) {
          /* Get next line */
          line = file_line(f, *index);
 	 /* No comment line? */

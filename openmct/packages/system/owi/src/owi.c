@@ -632,6 +632,14 @@ int main(int argc, char **argv) {
          }
       }
 
+      if (owi->file->name) {
+         file_save(owi->file);
+      }
+
+      if (owi->file_init->name) {
+         file_save(owi->file_init);
+      }
+
       /* Free memory */
       owi_free(owi);
    }

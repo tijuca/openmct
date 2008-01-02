@@ -177,8 +177,6 @@ struct data_t ftp_rc_data[] = {
 int ftp_main(struct owi_t *owi) {
    /* Set separator */
    owi->file->separator = string_copy_value(FTP_SEPARATOR);
-   /* Skip comment lines */
-   owi->file->flags = FILE_FLAG_SKIP_COMMENT;
    /* Set filename */
    owi->file->name = string_copy_value(FTP_FILE);
    /* Set separator */

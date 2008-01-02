@@ -5,7 +5,7 @@
 
 #define  FILE_OPEN_OK(x)             (x)->line
 
-#define  FILE_FLAG_SKIP_COMMENT      1
+#define  FILE_FLAG_DONT_SKIP_COMMENT 1
 
 #define  FILE_ITERATOR_START         1
 #define  FILE_ITERATOR_NEXT          2
