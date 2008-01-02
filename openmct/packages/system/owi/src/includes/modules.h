@@ -1,6 +1,10 @@
+#define	MODULE_USER	"user"
+
+#define MODULE_DEFAULT	MODULE_USER
+
 struct modules_t {
    char *name;
-   int (*main)(int, char **);
+   int (*main)(struct owi_t *owi);
    char *description;
    int  level;
 } modules[] = {
@@ -9,7 +13,7 @@ struct modules_t {
    { "nfs", nfs_main, NFS_NAV_DESCRIPTION, 1 },
    { "smb", smb_main, SMB_NAV_DESCRIPTION, 1 },
    { "interfaces", NULL, INTERFACES_NAV_DESCRIPTION, 0 },
-   { "lan", lan_main, INTERFACE_LAN_NAV_DESCRIPTION, 1 },
+   { "lan", interface_main, INTERFACE_LAN_NAV_DESCRIPTION, 1 },
    { "status", NULL, STATUS_NAV_DESCRIPTION, 0 },
    { "process", process_main, PROCESS_NAV_DESCRIPTION, 1 },
    { "system", NULL, SYSTEM_NAV_DESCRIPTION, 0 },

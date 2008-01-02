@@ -22,12 +22,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "includes/argument.h"
 #include "includes/language.h"
-#include "includes/variable.h"
+#include "includes/string.h"
+#include "includes/array.h"
 #include "includes/data.h"
 #include "includes/file.h"
-#include "includes/misc.h"
 #include "includes/owi.h"
 #include "includes/group.h"
 
@@ -46,23 +45,23 @@ struct data_t group_data[] = {
    {
      DATA_TYPE_INTERNAL,
      0,
-     "password",
-     "password",
-     "password",
+     NULL,
+     NULL,
+     NULL,
      "password",
      NULL,
-     NULL
+     GROUP_PASSWORD_STANDARD
    },
 
    {
      DATA_TYPE_INTERNAL,
      0,
-     "gid",
-     "gid",
-     "gid",
+     NULL,
+     NULL,
+     NULL,
      "gid",
      "^[0-9]{1,5}$",
-     NULL,
+     GROUP_GID_STANDARD,
    },
 
    {
@@ -88,40 +87,34 @@ struct data_t group_data[] = {
    }
 };
 
-/* \fn group_main(argc, argv)
+/* \fn group_main(owi)
  * Show all groups from system
  * \param[in] argc command line argument counter
  * \param[in] argv character pointer array (arguments)
  * \return zero on sucess
  */
-int group_main(int argc, char **argv) {
-   /* File structure */
-   struct file_t file;
-   /* owi structure */
-   struct owi_t owi;
-
+int group_main(struct owi_t *owi) {
    /* Set separator */
-   file.separator = GROUP_SEPARATOR;
-   /* Read config into memory */
-   file_open(&file, GROUP_FILE);
-
+   owi->file->separator = string_copy_value(GROUP_SEPARATOR);
+   /* Set filename */
+   owi->file->name = string_copy_value(GROUP_FILE);
    /* Set owi properties for display */
-   owi.headline = GROUP_HEADLINE;
-   owi.file = &file;
-   owi.file_init = NULL;
-   owi.data = group_data;
-   owi.data_init = NULL;
-   owi.button = NULL;
-   owi.flags = OWI_FLAG_ACTION | OWI_FLAG_ACTION_DETAIL |
-               OWI_FLAG_ACTION_DELETE | OWI_FLAG_ACTION_UPDATE |
-	       OWI_FLAG_ROW;
-
+   owi->headline = string_copy_value(GROUP_HEADLINE);
+   owi->data = group_data;
+   owi->flags = OWI_FLAG_ACTION | OWI_FLAG_ACTION_DETAIL |
+                OWI_FLAG_ACTION_DELETE | OWI_FLAG_ACTION_UPDATE |
+	        OWI_FLAG_ROW;
    /* Start main */
-   owi_main(&owi);
-
-   /* Free data file */
-   file_free(&file);
-
+   owi_main(owi);
    /* Return success */
    return 0;
+}
+
+/* \fn group_callback(owi, action)
+ * Callback function for owi actions
+ * \param[in] owi OWI structure
+ * \param[in] action action that will be executed after no errors
+ */
+struct string_t *group_callback(struct owi_t *owi, struct string_t *command) {
+   return NULL;
 }

@@ -2,5 +2,4 @@
 #define INTERFACE_LAN   "eth0"
 #define INTERFACE_SEPARATOR " "
 
-int interface_main(int argc, char **arv);
-int lan_main(int argc, char **arv);
+int interface_main(struct owi_t *owi);

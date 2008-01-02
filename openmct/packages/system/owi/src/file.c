@@ -27,42 +27,38 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "includes/file.h"
-#include "includes/argument.h"
-#include "includes/variable.h"
-#include "includes/misc.h"
 #include "includes/language.h"
+#include "includes/string.h"
+#include "includes/array.h"
+#include "includes/file.h"
 
 /* \fn file_open(f, filename)
  * \param[in] f file structure for current file
  * \param[in] filename text file that will be read
  */
-void file_open(struct file_t *f, char *filename) {
+void file_open(struct file_t *f) {
    /* File handle */
    FILE *fp = NULL;
-
-   /* Set initial line counter to zero */
-   f->line_count = 0;
-   /* Set line to zero */
-   f->line = NULL;
-
-   /* Allocate memory for filename */
-   f->name = (char*)malloc(strlen(filename) + strlen(FILE_BASE) + 1);
+   /* Real filename */
+   struct string_t *real_filename = NULL;
 
    if (f) {
-      /* Malloc ok? */
-      if (f->name) {
-         /* Write real filename into variable */
-         sprintf(f->name, "%s%s", FILE_BASE, filename);
-         /* Try to open file */
-         fp = fopen(f->name, "r");
-         /* Successful? */
-         if (fp) {
-            /* Read complete file into structure */
-            file_read(f, fp);
-            /* Close file now */
-            fclose(fp);
-         }
+      /* Set line array to null */
+      f->line = NULL;
+      /* Allocate memory for filename */
+      real_filename = string_format("%s%s", FILE_BASE, string_value(f->name));
+      /* Free current filename */
+      string_free(&(f->name));
+      /* Set new filename */
+      f->name = real_filename;
+      /* Try to open file */
+      fp = fopen(string_value(f->name), "r");
+      /* Successful? */
+      if (fp) {
+         /* Read complete file into structure */
+         file_read(f, fp);
+         /* Close file now */
+         fclose(fp);
       }
    }
 }
@@ -74,37 +70,21 @@ void file_open(struct file_t *f, char *filename) {
 void file_read(struct file_t *f, FILE *fp) {
    /* Each line from file */
    char line[FILE_MAXLINE];
-   
+   /* String */
+   struct string_t *string = NULL;
+
    /* Loop through file */
    while (fgets(line, sizeof(line), fp)) {
       /* Strip \n from line */
       line[strlen(line) - 1] = 0;
-      /* Reallocate array */
-      f->line = (struct file_line_t**)
-                realloc(f->line,
-                       sizeof(struct file_line_t *) * (f->line_count + 1));
-      /* Enough memory? */
-      if (f->line) {
-         /* Allocate memory for line */
-         f->line[f->line_count] = (struct file_line_t *)
-	                          malloc(sizeof(struct file_line_t));
-         /* Enough memory? */
-         if (f->line[f->line_count]) {
-            /* Copy line to data */
-            f->line[f->line_count]->data = strdup(line);
-	    /* Separator defined? */
-	    if (f->separator) {
-	       /* Parse data */
-	       f->line[f->line_count]->current =
-	           argument_parse(f->line[f->line_count]->data,
-		                  f->separator);
-            } else {
-	       f->line[f->line_count]->current = NULL;
-	    }
-            /* Increase line counter */
-            f->line_count++;
-         }
-      }
+      /* Allocate memory for line */
+      string = string_copy_value(line);
+      /* Add to array */
+      array_add(&(f->line), string);
+      /* Reset to zero so next string_set will allocate a new object 
+       * don't use string_free here because only a reference will be added 
+       * to the array */
+      string = NULL;
    }
 }
 
@@ -113,30 +93,14 @@ void file_read(struct file_t *f, FILE *fp) {
  * \param[in] f file structure for current file
  */
 void file_free(struct file_t *f) {
-   /* Loop */
-   int i = 0;
-
-   /* Data lines available? */
-   if (f->line) {
-      /* Loop through all lines */
-      for (i = 0; i < f->line_count; i++) {
-         /* Free raw line */
-         free(f->line[i]->data);
-	 /* Free current values */
-	 argument_free(f->line[i]->current);
-	 /* and set to zero */
-         f->line[i] = NULL;
-      }
-      /* Free array pointer for lines */
-      free(f->line);
-      /* Set array pointer to zero */
-      f->line = NULL;
-   }
-
    /* Free space for filename */
-   free(f->name);
-   /* Set to zero */
-   f->name = NULL;
+   string_free(&(f->name));
+   /* Free separator */
+   string_free(&(f->separator));
+   /* Free space for array */
+   array_free(&(f->line));
+   /* Free space for current parsed line in memory */
+   array_free(&(f->current));
 }
 
 /* \fn file_save(f)
@@ -147,18 +111,16 @@ void file_save(struct file_t *f) {
    /* File handle */
    FILE *fp = NULL;
    /* Loop */
-   int i = 0;
-
-   /* Update raw lines for writing */
-   file_data_update(f);
+   unsigned int i = 0;
 
    /* Try to open file for writing */
-   fp = fopen(f->name, "w");
+   fp = fopen(string_value(f->name), "w");
    /* Successful? */
    if (fp) {
       /* Loop through all lines */
-      for (i = 0; i < f->line_count; i++) {
-         fprintf(fp, "%s\n", f->line[i]->data ? f->line[i]->data : "");
+      for (i = 0; i < array_length(f->line); i++) {
+         fprintf(fp, "%s\n", file_line(f, i) ?
+	                     string_value(file_line(f, i)) : "");
       }
       /* Close file */
       fclose(fp);
@@ -176,9 +138,9 @@ void file_action(struct file_t *f, int mode, char *format, ...) {
    /* Variable argument handling */
    va_list va;
    /* Buffer for this line */
-   char line[FILE_MAXLINE];
-   /* Index counter */
-   int i;
+   char line[FILE_MAXLINE] = "";
+   /* String buffer */
+   struct string_t *string = NULL;
 
    /* Format is not null? */
    if (format != NULL) {
@@ -187,101 +149,22 @@ void file_action(struct file_t *f, int mode, char *format, ...) {
       /* And write them to line */
       vsnprintf(line, FILE_MAXLINE, format, va);
       /* Clean up for argument handling */
-      va_end(va);
+     va_end(va);
    }
+   string = string_copy_value(line);
  
    /* Set line? */
    if (mode == FILE_LINE_SET) {
-      /* Free old data */
-      free(f->line[f->line_current]->data);
-      /* Allocate data for new line and copy it */
-      f->line[f->line_current]->data = strdup(line);
+      /* Set new element */
+      array_index_set(f->line, f->line_current, string);
    /* Del line? */        
    } else if (mode == FILE_LINE_DEL) {
-      /* Free current line */
-      free(f->line[f->line_current]->data);
-      /* Free current line */
-      argument_free(f->line[f->line_current]->current);
-      /* Free space for array index */
-      free(f->line[f->line_current]);
-      /* Copy every element after del index to its previous position */
-      for (i = f->line_current; i < f->line_count - 1; i++) {
-         /* Just set pointer */              
-         f->line[i] = f->line[i + 1];
-      }
-      /* Decrease line counter */
-      f->line_count--;
-      /* Reallocate new index array */
-      f->line = (struct file_line_t **)realloc(f->line,
-                                       sizeof(struct file_line_t *) *
-                                       (f->line_count + 1));
+      array_index_del(&(f->line), f->line_current);
    /* Add line? */         
    } else if (mode == FILE_LINE_ADD) {
-      /* Increase line counter */
-      f->line_count++;
-      /* Reallocate new index array */
-      f->line = (struct file_line_t **)realloc(f->line,
-                                       sizeof(struct file_line_t *) *
-                                       (f->line_count + 1));
-      /* Move pointers */
-      for (i = f->line_count - 1; i > f->line_current; i--) {
-         f->line[i] = f->line[i - 1];
-      }
-
-      /* Allocate space for new index */
-      f->line[f->line_current] = (struct file_line_t *)
-                                 malloc(sizeof(struct file_line_t));
-      /* Copy data */
-      f->line[f->line_current]->data = strdup(line);
-      /* Parse data */
-      f->line[f->line_current]->current = argument_parse(line, f->separator);
+      array_add(&(f->line), string);
+      string = NULL;
    } 
-}
-
-/* \fn file_data_update(f)
- * Convert from current data storage to raw line
- */
-void file_data_update(struct file_t *f) {
-   /* Index */
-   int i, j;
-   /* Line length */
-   int line_length = 0;
-
-   /* Loop through whole file */
-   for (j = 0; j < f->line_count; j++) {
-      /* Free current raw line */
-      free(f->line[j]->data);
-      /* Set to zero */
-      f->line[j]->data = NULL;
-
-      /* Loop through all settings */
-      for (i = 0; f->line[j]->current[i] != NULL; i++) {
-         /* Increase line lenght */
-         line_length += strlen(f->line[j]->current[i]);
-
-         /* Need separator? */
-         if (f->line[j]->current[i + 1] != NULL) {
-            line_length += strlen(f->separator);
-         }
-
-         /* Allocate space for line */
-         f->line[j]->data = realloc(f->line[j]->data,
-                                    line_length + 1);
-         /* Enough space? */
-         if (f->line[j]->data) {
-            /* First realloc? */
-            if (!i) {
-               /* Clear memory first */
-               memset(f->line[j]->data, 0, line_length + 1);
-            }
-            strcat(f->line[j]->data, f->line[j]->current[i]);
-            /* Need separator? */
-            if (f->line[j]->current[i + 1] != NULL) {
-               strcat(f->line[j]->data, f->separator);
-            }
-         }
-      }
-   }
 }
 
 /* \fn file_value_set(f, name_index, name, value_index, value)
@@ -291,24 +174,45 @@ void file_data_update(struct file_t *f) {
  * \param[in] value_index current index for value
  * \param[in] value variable value
  */
-void file_value_set(struct file_t *f, int name_index, char *name, int value_index, char *value) {
+void file_value_set(
+   struct file_t *f,
+   unsigned int name_index,
+   struct string_t *name,
+   unsigned int value_index,
+   struct string_t *value) {
+
    /* Loop */
    int i;
+   /* Current values */
+   struct array_t *current = NULL;
+   /* New string */
+   struct string_t *string = NULL;
 
    /* Only update if both values are valid */
    if (name && value) {
       /* Loop through all lines in file */
-      for (i = 0; i < f->line_count; i++) {
-         /* Pattern found? */
-         if (!strcasecmp(f->line[i]->current[name_index], name)) {
-            /* Value already set and not the same? */
-            if (f->line[i]->current[value_index] != NULL) {
-               /* Only free old value */
-               free(f->line[i]->current[value_index]);
-               /* And copy new value */
-               f->line[i]->current[value_index] = strdup(value);
-	    }
-	 }
+      for (i = 0; i < array_length(f->line); i++) {
+         struct string_t *line = file_line(f, i);
+         /* Parse elements */
+         current = string_split(line, f->separator);
+
+         /* Copy string from array to target "string" */
+         if (current &&
+	     name_index < array_length(current) &&
+	     value_index < array_length(current) &&
+	     !string_compare(array_value(current, name_index), name)) {
+            /* Free current line */
+            string_free(&array_value(current, value_index));
+	    /* Set new value in current array - we dont want a reference
+	     * so we copy the whole string in memory */
+	    array_index_set(current, value_index, string_copy(value));
+	    /* Set new value in line array */
+	    array_index_set(f->line, i, string_join(current, f->separator));
+	    string = NULL;
+         }
+
+         /* Free string array */
+         array_free(&current);
       }
    }
 }
@@ -320,27 +224,44 @@ void file_value_set(struct file_t *f, int name_index, char *name, int value_inde
  * \param[in] value_index current index for value
  * \return current value or null if not found
  */
-char *file_value_get(struct file_t *f, int name_index, char *name, int value_index) {
-   /* Loop */
-   int i;
-   /* Current value */
-   char *current = NULL;
+struct string_t *file_value_get(
+   struct file_t *f,
+   unsigned int name_index,
+   struct string_t *name,
+   unsigned int value_index) {
 
-   /* Loop through all lines in file */
-   for (i = 0; i < f->line_count; i++) {
-      /* Pattern found? */
-      if (f->line[i]->current[name_index] &&
-          !strcasecmp(f->line[i]->current[name_index], name)) {
-         if (f->line[i]->current[value_index] != NULL) {
-            current =  f->line[i]->current[value_index];
-	 } else {
-            current = strdup("");
-	 }
+   /* Loop */
+   unsigned int i = 0;
+   /* Current values */
+   struct array_t *current = NULL;
+   /* String for return */
+   struct string_t *string = NULL;
+   /* Current line */
+   struct string_t *line = NULL;
+
+   /* Only update if both values are valid */
+   if (name) {
+      /* Loop through all lines */
+      for (file_iterator_start(f, &i) ;
+           i < file_length(f);
+           file_iterator_next(f, &i)) {
+         /* Set current line */
+         line = file_line(f, i);
+         /* Parse elements */
+         current = string_split(line, f->separator);
+         /* Copy string from array to target "string" */
+         if (current &&
+	     name_index < array_length(current) && 
+	     value_index < array_length(current) &&
+	     !string_compare(array_value(current, name_index), name)) {
+            string = string_copy(array_value(current, value_index));
+         } 
+         /* Free string array */
+         array_free(&current);
       }
    }
 
-   /* Return current value */
-   return current;
+   return string;
 }
 
 /* \fn file_value_del(f, name_index, name)
@@ -348,51 +269,39 @@ char *file_value_get(struct file_t *f, int name_index, char *name, int value_ind
  * \param[in] name_index current index for name lookup
  * \param[in] name variable name
  */
-void file_value_del(struct file_t *f, int name_index, char *name) {
-   /* Loop */
-   int i;
-
-   /* Loop through all lines in file */
-   for (i = 0; i < f->line_count; i++) {
-      /* Pattern found? */
-      if (f->line[i]->current[name_index] &&
-          !strcasecmp(f->line[i]->current[name_index], name)) {
-	  /* Set current line for file operation */
-	  f->line_current = i;
-	  /* Remove Line */
-          file_action(f, FILE_LINE_DEL, NULL);
-          /* Decrease counter */
-	  i--;
-      }
-   }
+void file_value_del(
+   struct file_t *f,
+   int name_index,
+   struct string_t *name) {
 }
 
-
-/* \fn proc_open(f, command)
+/* \fn file_next(f, index)
+ * Get index for next line (here you can skip special lines)
  * \param[in] f file structure for current file
- * \param[in] command will be executed
+ * \param[in] index current index
  */
-void proc_open(struct file_t *f, char *command) {
-   /* File handle */
-   FILE *fp = NULL;
+void file_iterator(struct file_t *f, unsigned int mode, unsigned int *index) {
+   /* Store current line in this variable */
+   struct string_t *line;
 
-   /* Set initial line counter to zero */
-   f->line_count = 0;
-   /* Set line to zero */
-   f->line = NULL;
-
-   /* Set name to null */
-   f->name = NULL;
-
-   if (f) {
-      /* Execute command */
-      fp = popen(command, "r");
-      /* Successful? */
-      if (fp) {
-         /* Read complete file into structure */
-         file_read(f, fp);
-         /* Close file now */
-         pclose(fp);
+   /* During first line we are not allowed to increase */
+   if (mode == FILE_ITERATOR_NEXT) {
+      (*index)++;
+   }
+   
+   /* Filter flags */
+   if (f->flags & FILE_FLAG_SKIP_COMMENT) {
+      /* While lines are available */
+      while ( *index + 1 < file_length(f)) {
+         /* Get next line */
+         line = file_line(f, *index);
+	 /* No comment line? */
+         if (string_char_at(line, 0) != '#') {
+	    /* Quit loop */
+            break;
+         }
+	 /* Get next line */
+         (*index)++;
       }
    }
 }

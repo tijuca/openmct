@@ -21,36 +21,37 @@
 #include <string.h>
 #include <stdio.h>
 #include <crypt.h>
-#include "includes/argument.h"
-#include "includes/variable.h"
-#include "includes/data.h"
-#include "includes/misc.h"
 #include "includes/language.h"
+#include "includes/string.h"
+#include "includes/array.h"
+#include "includes/data.h"
 
 /* \fn data_valid(data, value)
  * Valid entry for variable?
  */
-int data_valid(struct data_t *data, char *value) {
+int data_valid(struct data_t *data, struct string_t *value) {
    /* Valid values for checkbox */
-   char **valid_values = NULL;
+   struct array_t *valid_values = NULL;
+   /* Valid data */
+   struct string_t *valid = string_copy_value(data->valid);
    /* Return value */
    int retval = 0;
 
    if (data->type == DATA_TYPE_CHECKBOX) {
       /* Valid values */
-      valid_values = argument_parse(data->valid, "|");
+      valid_values = string_split_value(valid, "|");
       /* Valid? */
-      if (!strcmp(valid_values[0], value) |
-          !strcmp(valid_values[1], value)) {
+      if (!string_compare(array_value(valid_values, 0), valid) |
+          !string_compare(array_value(valid_values, 1), valid)) {
          retval = 1;
       }
       /* Free values */
-      argument_free(valid_values);
-   } else if (data->type != DATA_TYPE_INTERNAL) {
+      array_free(&valid_values);
+   } else {
       if (data->flags & DATA_FLAG_DONT_FILL &&
-          (!value || !strcmp(value, ""))) {
+          (!value || !string_compare_value(value, ""))) {
          retval = 1;
-      } else if ( (data->valid && value && match(value, data->valid)) ||
+      } else if ( (data->valid && value && string_match_value(value, data->valid)) ||
                   !data->valid) {
          retval = 1;
       }

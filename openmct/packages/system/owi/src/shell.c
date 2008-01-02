@@ -23,9 +23,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <crypt.h>
-#include "includes/argument.h"
 #include "includes/language.h"
-#include "includes/variable.h"
+#include "includes/string.h"
+#include "includes/array.h"
 #include "includes/file.h"
 #include "includes/owi.h"
 #include "includes/shell.h"
@@ -36,30 +36,15 @@
  * \param[in] argv character pointer array (arguments)
  * \return zero on sucess
  */
-int shell_main(int argc, char **argv) {
-   /* File structure */
-   struct file_t file;
-   /* owi structure */
-   struct owi_t owi;
-
-   /* Set owi properties for display */
-   owi.headline = SHELL_HEADLINE;
-   owi.file = &file;
-   owi.file_init = NULL;
-   owi.data = NULL;
-   owi.data_init = NULL;
-   owi.button = NULL;
-   owi.flags = OWI_FLAG_CONFIG;
-
+int shell_main(struct owi_t *owi) {
+   owi->file->separator = string_copy_value("	");
    /* Read config into memory */
-   proc_open(&file, variable_get("execute"));
-
+   owi->file->name = owi_get("execute");
+   /* Set owi properties for display */
+   owi->headline = string_copy_value(SHELL_HEADLINE);
+   owi->flags = OWI_FLAG_CONFIG;
    /* Start main */
-   owi_main(&owi);
-
-   /* Free data file */
-   file_free(&file);
-
+   owi_main(owi);
    /* Return success */
    return 0;
 }

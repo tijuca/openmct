@@ -22,9 +22,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "includes/argument.h"
 #include "includes/language.h"
-#include "includes/variable.h"
+#include "includes/string.h"
+#include "includes/array.h"
 #include "includes/file.h"
 #include "includes/data.h"
 #include "includes/owi.h"
@@ -41,7 +41,7 @@ struct data_t ftp_data[] = {
      "port",
      "listen_port",
      "^[0-9]{2,5}$",
-     "21",
+     "21"
    },
 
    {
@@ -52,7 +52,7 @@ struct data_t ftp_data[] = {
      "maxclients",
      "max_clients",
      "^[0-9]{1,3}$",
-     "5",
+     "5"
    },
 
    {
@@ -63,7 +63,7 @@ struct data_t ftp_data[] = {
      "maxperip",
      "max_per_ip",
      "^[0-9]{1,3}$",
-     "2",
+     "2"
    },
 
    { 
@@ -74,7 +74,7 @@ struct data_t ftp_data[] = {
      "idletimeout",
      "idle_session_timeout",
      "^[0-9]{1,3}$",
-     "300",
+     "300"
    },
 
    {
@@ -85,7 +85,7 @@ struct data_t ftp_data[] = {
      "anonymous",
      "anonymous_enable",
      "yes|no",
-     "no",
+     "no"
    },
 
    { 
@@ -96,7 +96,7 @@ struct data_t ftp_data[] = {
      "local",
      "local_enable",
      "yes|no",
-     "no",
+     "no"
    },
 
    {
@@ -107,7 +107,7 @@ struct data_t ftp_data[] = {
      "banner",
      "ftpd_banner",
      "^[0-9A-Za-z .]{0,255}$",
-     NULL,
+     NULL
    },
 
    {
@@ -118,7 +118,7 @@ struct data_t ftp_data[] = {
      "createmask",
      "file_open_mode",
      "^[0-7]{3}$",
-     NULL,
+     NULL
    },
 
    { 
@@ -129,7 +129,7 @@ struct data_t ftp_data[] = {
      "fxp",
      "pasv_promiscuous",
      "yes|no",
-     "no",
+     "no"
    },
 
    { 
@@ -140,7 +140,7 @@ struct data_t ftp_data[] = {
      NULL,
      NULL,
      NULL,
-     NULL,
+     NULL
    }
 };
 
@@ -169,45 +169,29 @@ struct data_t ftp_rc_data[] = {
    }
 };
 
-/* \fn ftp_main(argc, argv)
+/* \fn ftp_main(owi)
  * Show all ftps from system
- * \param[in] argc command line argument counter
- * \param[in] argv character pointer array (arguments)
+ * \param[in] owi handler
  * \return zero on sucess
  */
-int ftp_main(int argc, char **argv) {
-   /* File structure */
-   struct file_t file, file_rc;
-   /* owi structure */
-   struct owi_t owi;
-
+int ftp_main(struct owi_t *owi) {
    /* Set separator */
-   file.separator = FTP_SEPARATOR;
-   /* Read config into memory */
-   file_open(&file, FTP_FILE);
-
+   owi->file->separator = string_copy_value(FTP_SEPARATOR);
+   /* Skip comment lines */
+   owi->file->flags = FILE_FLAG_SKIP_COMMENT;
+   /* Set filename */
+   owi->file->name = string_copy_value(FTP_FILE);
    /* Set separator */
-   file_rc.separator = RC_SEPARATOR;
-   /* Read config into memory */
-   file_open(&file_rc, RC_FILE);
-
+   owi->file_init->separator = string_copy_value(RC_SEPARATOR);
+   /* Set filename */
+   owi->file_init->name = string_copy_value(RC_FILE);
    /* Set owi properties for display */
-   owi.headline = FTP_HEADLINE;
-   owi.file = &file;
-   owi.file_init = &file_rc;
-   owi.data = ftp_data;
-   owi.data_init = ftp_rc_data;
-   owi.button = NULL;
-   owi.flags = OWI_FLAG_CONFIG | OWI_FLAG_ACTION_UPDATE;
-
+   owi->headline = string_copy_value(FTP_HEADLINE);
+   owi->data = ftp_data;
+   owi->data_init = ftp_rc_data;
+   owi->flags = OWI_FLAG_CONFIG | OWI_FLAG_ACTION_UPDATE;
    /* Start main */
-   owi_main(&owi);
-
-   /* Free rc data file */
-   file_free(&file_rc);
-   /* Free data file */
-   file_free(&file);
-
+   owi_main(owi);
    /* Return success */
    return 0;
 }

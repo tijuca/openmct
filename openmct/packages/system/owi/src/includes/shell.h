@@ -1,1 +1,1 @@
-int shell_main(int argc, char **arv);
+int shell_main(struct owi_t *owi);

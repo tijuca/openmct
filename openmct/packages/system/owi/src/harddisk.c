@@ -22,9 +22,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "includes/argument.h"
 #include "includes/language.h"
-#include "includes/variable.h"
+#include "includes/string.h"
+#include "includes/array.h"
 #include "includes/data.h"
 #include "includes/file.h"
 #include "includes/owi.h"
@@ -116,32 +116,17 @@ struct data_t harddisk_data[] = {
  * \param[in] argv character pointer array (arguments)
  * \return zero on sucess
  */
-int harddisk_main(int argc, char **argv) {
-   /* File structure */
-   struct file_t file;
-   /* owi structure */
-   struct owi_t owi;
-
+int harddisk_main(struct owi_t *owi) {
    /* Set separator */
-   file.separator = HARDDISK_SEPARATOR;
-   /* Read config into memory */
-   file_open(&file, HARDDISK_FILE);
-
+   owi->file->separator = string_copy_value(HARDDISK_SEPARATOR);
+   /* Set filename */
+   owi->file->name = string_copy_value(HARDDISK_FILE);
    /* Set owi properties for display */
-   owi.headline = HARDDISK_HEADLINE;
-   owi.file = &file;
-   owi.file_init = NULL;
-   owi.data = harddisk_data;
-   owi.data_init = NULL;
-   owi.button = NULL;
-   owi.flags = OWI_FLAG_CONFIG | OWI_FLAG_ACTION_UPDATE;
-
+   owi->headline = string_copy_value(HARDDISK_HEADLINE);
+   owi->data = harddisk_data;
+   owi->flags = OWI_FLAG_CONFIG | OWI_FLAG_ACTION_UPDATE;
    /* Start main */
-   owi_main(&owi);
-
-   /* Free data file */
-   file_free(&file);
-
+   owi_main(owi);
    /* Return success */
    return 0;
 }

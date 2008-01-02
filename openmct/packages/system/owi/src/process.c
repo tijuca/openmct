@@ -21,11 +21,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "includes/argument.h"
-#include "includes/file.h"
-#include "includes/data.h"
 #include "includes/language.h"
-#include "includes/variable.h"
+#include "includes/string.h"
+#include "includes/array.h"
+#include "includes/data.h"
+#include "includes/file.h"
 #include "includes/owi.h"
 #include "includes/process.h"
 
@@ -164,39 +164,23 @@ struct data_t process_data[] = {
 
 };
 
-/* \fn process_main(argc, argv)
+/* \fn process_main(owi)
  * Process information
- * \param[in] argc command line argument counter
- * \param[in] argv character pointer array (arguments)
+ * \param[in] owi handler
  * \return zero on sucess
  */
-int process_main(int argc, char **argv) {
-   /* File structure */
-   struct file_t file;
-   /* owi structure */
-   struct owi_t owi;
-
+int process_main(struct owi_t *owi) {
    /* Set separator */
-   file.separator = PROCESS_SEPARATOR;
-   /* Read config into memory */
-   proc_open(&file, PROCESS_COMMAND);
-
+   owi->file->separator = string_copy_value(PROCESS_SEPARATOR);
+   /* Set filename */
+   owi->file->name = string_copy_value(PROCESS_COMMAND);
    /* Set owi properties for display */
-   owi.headline = PROCESS_HEADLINE;
-   owi.file = &file;
-   owi.file_init = NULL;
-   owi.data = process_data;
-   owi.data_init = NULL;
-   owi.button = NULL;
-   owi.flags = OWI_FLAG_ACTION | OWI_FLAG_ACTION_KILL |
-               OWI_FLAG_ROW | OWI_FLAG_HIDE_NEW;
-
+   owi->headline = string_copy_value(PROCESS_HEADLINE);
+   owi->data = process_data;
+   owi->flags = OWI_FLAG_ACTION | OWI_FLAG_ACTION_KILL |
+                OWI_FLAG_ROW | OWI_FLAG_HIDE_NEW;
    /* Start main */
-   owi_main(&owi);
-
-   /* Free data file */
-   file_free(&file);
-
+   owi_main(owi);
    /* Return success */
    return 0;
 }

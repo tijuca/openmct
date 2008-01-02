@@ -14,9 +14,11 @@ DESTDIR=/www
 CSS=css/openmct.css
 IMAGES=images
 
-OBJECTS=misc.o variable.o argument.o data.o file.o owi.o \
-        ftp.o nfs.o smb.o interface.o process.o harddisk.o user.o group.o \
-	shell.o
+OBJECTS=string.o array.o data.o file.o \
+        ftp.o nfs.o smb.o interface.o \
+	shell.o process.o harddisk.o \
+	user.o group.o \
+	owi.o 
 
 all:	$(OBJECTS)
 	$(CC) $(LDFLAGS) -o $(BINARY) $(OBJECTS)

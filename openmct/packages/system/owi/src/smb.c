@@ -22,9 +22,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "includes/argument.h"
 #include "includes/language.h"
-#include "includes/variable.h"
+#include "includes/string.h"
+#include "includes/array.h"
 #include "includes/data.h"
 #include "includes/file.h"
 #include "includes/owi.h"
@@ -92,45 +92,28 @@ struct data_t smb_rc_data[] = {
    }
 };
 
-/* \fn smb_main(argc, argv)
+/* \fn smb_main(owi)
  * Show all users from system
- * \param[in] argc command line argument counter
- * \param[in] argv character pointer array (arguments)
+ * \param[in] owi handler
  * \return zero on sucess
  */
-int smb_main(int argc, char **argv) {
-   /* File structure */
-   struct file_t file, file_rc;
-   /* owi structure */
-   struct owi_t owi;
-
+int smb_main(struct owi_t *owi) {
    /* Set separator */
-   file.separator = SMB_SEPARATOR;
-   /* Read config into memory */
-   file_open(&file, SMB_FILE);
-
+   owi->file->separator = string_copy_value(SMB_SEPARATOR);
+   /* Set filename */
+   owi->file->name = string_copy_value(SMB_FILE);
    /* Set separator */
-   file_rc.separator = RC_SEPARATOR;
-   /* Read config into memory */
-   file_open(&file_rc, RC_FILE);
-
+   owi->file_init->separator = string_copy_value(RC_SEPARATOR);
+   /* Set filename */
+   owi->file_init->name = string_copy_value(RC_FILE);
    /* Set owi properties for display */
-   owi.headline = SMB_HEADLINE;
-   owi.file = &file;
-   owi.file_init = &file_rc;
-   owi.data = smb_data;
-   owi.data_init = smb_rc_data;
-   owi.button = NULL;
-   owi.flags = OWI_FLAG_CONFIG | OWI_FLAG_ACTION_UPDATE;
-
+   owi->headline = string_copy_value(SMB_HEADLINE);
+   owi->data = smb_data;
+   owi->data_init = smb_rc_data;
+   owi->flags = OWI_FLAG_CONFIG | OWI_FLAG_ACTION_UPDATE;
+   owi->callback = NULL;
    /* Start main */
-   owi_main(&owi);
-
-   /* Free rc data file */
-   file_free(&file_rc);
-   /* Free data file */
-   file_free(&file);
-
+   owi_main(owi);
    /* Return success */
    return 0;
 }

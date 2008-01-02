@@ -22,12 +22,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "includes/argument.h"
 #include "includes/language.h"
-#include "includes/variable.h"
-#include "includes/file.h"
+#include "includes/string.h"
+#include "includes/array.h"
 #include "includes/data.h"
-#include "includes/misc.h"
+#include "includes/file.h"
 #include "includes/owi.h"
 #include "includes/user.h"
 
@@ -60,8 +59,9 @@ struct data_t user_data[] = {
      NULL,
      NULL,
      "uid",
+     "uid",
      "^[0-9]{1,5}$",
-     "100"
+     USER_UID_STANDARD
    },
 
    {
@@ -69,10 +69,10 @@ struct data_t user_data[] = {
      0,
      NULL,
      NULL,
-     NULL,
+     "gid",
      "gid",
      "^[0-9]{1,5}$",
-     "100"
+     USER_GID_STANDARD
    },
 
    { 
@@ -91,7 +91,7 @@ struct data_t user_data[] = {
      0,
      NULL,
      NULL,
-     NULL,
+     "homedirectory",
      "homedirectory",
      "^[A-Za-z0-9/]{4,40}$",
      NULL,
@@ -120,40 +120,34 @@ struct data_t user_data[] = {
    }
 };
 
-/* \fn user_main(argc, argv)
+/* \fn user_main(owi)
  * Show all users from system
- * \param[in] argc command line argument counter
- * \param[in] argv character pointer array (arguments)
+ * \param[in] owi handler
  * \return zero on sucess
  */
-int user_main(int argc, char **argv) {
-   /* File structure */
-   struct file_t file;
-   /* owi structure */
-   struct owi_t owi;
-
+int user_main(struct owi_t *owi) {
    /* Set separator */
-   file.separator = USER_SEPARATOR;
-   /* Read config into memory */
-   file_open(&file, USER_FILE);
-
+   owi->file->separator = string_copy_value(USER_SEPARATOR);
+   /* Set filename */
+   owi->file->name = string_copy_value(USER_FILE);
    /* Set owi properties for display */
-   owi.headline = USER_HEADLINE;
-   owi.file = &file;
-   owi.file_init = NULL;
-   owi.data = user_data;
-   owi.data_init = NULL;
-   owi.button = NULL;
-   owi.flags = OWI_FLAG_ACTION | OWI_FLAG_ACTION_DETAIL |
-               OWI_FLAG_ACTION_DELETE | OWI_FLAG_ACTION_UPDATE |
-	       OWI_FLAG_ROW;
-
+   owi->headline = string_copy_value(USER_HEADLINE);
+   owi->data = user_data;
+   owi->flags = OWI_FLAG_ACTION | OWI_FLAG_ACTION_DETAIL |
+                OWI_FLAG_ACTION_DELETE | OWI_FLAG_ACTION_UPDATE |
+                OWI_FLAG_ROW;
+   owi->callback = user_callback;
    /* Start main */
-   owi_main(&owi);
-
-   /* Free data file */
-   file_free(&file);
-
+   owi_main(owi);
    /* Return success */
    return 0;
+}
+
+/* \fn user_callback(owi)
+ * Callback function for owi actions
+ * \param[in] owi OWI structure
+ * \param[in] command module command
+ */
+struct string_t *user_callback(struct owi_t *owi, struct string_t *command) {
+   return NULL;
 }

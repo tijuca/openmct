@@ -22,9 +22,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "includes/argument.h"
 #include "includes/language.h"
-#include "includes/variable.h"
+#include "includes/string.h"
+#include "includes/array.h"
 #include "includes/data.h"
 #include "includes/file.h"
 #include "includes/owi.h"
@@ -88,38 +88,23 @@ struct data_t interface_data[] = {
    }
 };
 
-/* \fn lan_main(argc, argv)
+/* \fn interface_main(argc, argv)
  * Show all users from system
  * \param[in] argc command line argument counter
  * \param[in] argv character pointer array (arguments)
  * \return zero on sucess
  */
-int lan_main(int argc, char **argv) {
-   /* File structure */
-   struct file_t file;
-   /* owi structure */
-   struct owi_t owi;
-
+int interface_main(struct owi_t *owi) {
    /* Set separator */
-   file.separator = INTERFACE_SEPARATOR;
-   /* Read config into memory */
-   file_open(&file, INTERFACE_FILE);
-
+   owi->file->separator = string_copy_value(INTERFACE_SEPARATOR);
+   /* Set filename */
+   owi->file->name = string_copy_value(INTERFACE_FILE);
    /* Set owi properties for display */
-   owi.headline = INTERFACE_LAN_HEADLINE;
-   owi.file = &file;
-   owi.file_init = NULL;
-   owi.data = interface_data;
-   owi.data_init = NULL;
-   owi.button = NULL;
-   owi.flags = OWI_FLAG_CONFIG | OWI_FLAG_ACTION_UPDATE;
-
+   owi->headline = string_copy_value(INTERFACE_LAN_HEADLINE);
+   owi->data = interface_data;
+   owi->flags = OWI_FLAG_CONFIG | OWI_FLAG_ACTION_UPDATE;
    /* Start main */
-   owi_main(&owi);
-
-   /* Free data file */
-   file_free(&file);
-
+   owi_main(owi);
    /* Return success */
    return 0;
 }

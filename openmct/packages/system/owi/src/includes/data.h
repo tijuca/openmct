@@ -25,4 +25,4 @@ struct data_t {
    char *standard;
 };
 
-int data_valid(struct data_t *data, char *value);
+int data_valid(struct data_t *data, struct string_t *value);

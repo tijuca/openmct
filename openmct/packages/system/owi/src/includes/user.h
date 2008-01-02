@@ -7,4 +7,10 @@
 #define USER_SHELL_FALSE    "/bin/false"
 #define USER_SHELL_DEFAULT  "/bin/sh"
 
-int user_main(int argc, char **arv);
+#define USER_HOMEDIRECTORY_PREFIX	"/home/"
+
+#define USER_INDEX_UID      2
+#define USER_INDEX_HOMEDIRECTORY	5
+
+int user_main(struct owi_t *owi);
+struct string_t *user_callback(struct owi_t *owi, struct string_t *command);
