@@ -1,0 +1,17 @@
+diff -Naru ushare-1.1a/configure ushare-1.1a-openmct/configure
+--- ushare-1.1a/configure	2007-12-09 14:03:36.000000000 +0100
++++ ushare-1.1a-openmct/configure	2008-01-13 17:28:24.000000000 +0100
+@@ -645,9 +645,10 @@
+ libupnp_min_version="1.4.2"
+ echolog "Checking for libupnp >= $libupnp_min_version ..."
+ check_lib upnp/upnp.h UpnpSetMaxContentLength -lupnp || die "Error, can't find libupnp !"
+-check_lib_version libupnp $libupnp_min_version || die "Error, libupnp < $libupnp_min_version !"
+-add_cflags `pkg-config libupnp --cflags`
+-add_extralibs `pkg-config libupnp --libs`
++#check_lib_version libupnp $libupnp_min_version || die "Error, libupnp < $libupnp_min_version !"
++#add_cflags `pkg-config libupnp --cflags`
++#add_extralibs `pkg-config libupnp --libs`
++add_extralibs -lgettextlib
+ 
+ #################################################
+ #   check for libdlna (mandatory if enabled)
