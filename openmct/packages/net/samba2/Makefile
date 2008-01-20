@@ -1,5 +1,5 @@
 # Samba 2.x
-DOWNLOAD=	http://us4.samba.org/samba/ftp/stable/samba-2.2.12.tar.gz
+DOWNLOAD=	http://samba.org/samba/ftp/stable/samba-2.2.12.tar.gz
 
 SRCDIRSUFFIX=	/source
 
