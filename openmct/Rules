@@ -14,10 +14,11 @@ BASEPACKAGES=	packages/build/buildetc \
 		packages/net/vsftpd \
 		packages/net/ntp \
 		packages/system/ethtool \
-		packages/system/debootstrap \
 		packages/system/mtd-tools \
 		packages/system/recovery \
 		packages/system/owi
+#		packages/system/debootstrap \
+
 
 # Filename for release
 IMAGERELEASEFILENAME=openmct-release
@@ -80,7 +81,7 @@ PATCHED=.patched
 CONFIG=.config
 DEPEND=.depend
 INSTALLED=.installed
-SOFTWAREVERSION=$(shell $(SVN) log -rHEAD |grep "|"| cut -c1-5)
+SOFTWAREVERSION=r$(shell $(SVN) info | grep "Revision" | cut -c11-)
 
 # Output Files
 VMLINUXBIN=vmlinux.bin
