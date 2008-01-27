@@ -27,6 +27,11 @@
 #include <stdlib.h>
 #include "includes/string.h"
 
+/* \fn string_format(format, ...)
+ * \param[in] format format string for new string
+ * \param[in] ... arugments for format string
+ * \return new string object with content
+ */
 struct string_t *string_format(
    char *format,
    ...) {
@@ -76,13 +81,23 @@ struct string_t *string_format(
    /* Loop until we've got the correct string size */
    } while (!correctsize);
 
+   /* Allocate object for new string */
    destination = string_copy_value(temp);
 
+   /* Free temporary format string */
    free(temp);
 
+   /* Return new string object */
    return destination;
 }
 
+/* \fn string_move(old, destination_offset, source_offset, length, value)
+ * \param[in] old old string object with content (if required)
+ * \param[in] destination_offset index from target
+ * \param[in] source_offset index from source
+ * \param[in] value string value that will be written
+ * \return new string object with content
+ */
 struct string_t *string_move(
    struct string_t *old, 
    unsigned int destination_offset,
@@ -143,16 +158,31 @@ struct string_t *string_move(
    return destination;
 }
 
+/* \fn string_free(string)
+ * Free memory that is allocated by this object
+ * \param[in|out] string string object that will be free'd
+ */
 void string_free(struct string_t **string) {
+   /* String? */
    if (*string) {
+      /* Clear memory and set write zero bytes */
       memset((*string)->value, 0, (*string)->length);
+      /* Free content */
       free((*string)->value);
+      /* and sets to zero */
       (*string)->value = NULL;
+      /* Reset length to zero */
       (*string)->length = 0;
+      /* Set pointer to zero */
       *string = NULL;
    }
 }
 
+/* \fn string_decode(string)
+ * Decode string object from http request (with %XX encoding)
+ * \param[in] string string object that will be decoded
+ * \return new string object
+ */
 struct string_t *string_decode(struct string_t *string) {
    /* Index for loop */
    unsigned int index;
@@ -207,17 +237,31 @@ struct string_t *string_decode(struct string_t *string) {
    return result;
 }
 
+/* \fn string_match_value(string, pattern)
+ * \param[in] string string object that will be checked against pattern
+ * \param[in] pattern regular expression
+ * \return 1 if regular expression matched or 0 if not
+ */
 unsigned int string_match_value(struct string_t *string, char *pattern) {
+   /* Status for regular expression */
    int status;
+   /* Regular expression */
    regex_t re;
 
+   /* Compile regular expression */
    if (regcomp(&re, pattern, REG_EXTENDED|REG_NOSUB)) {
       return 0;
    }
+ 
+   /* Verify regular expression */
    status = regexec(&re, string_value(string), 0, NULL, 0);
+
+   /* Free structure for regular expression */
    regfree(&re);
+
    if (status) {
       return 0; 
    }
+
    return 1;
 }
