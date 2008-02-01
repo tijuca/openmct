@@ -1,0 +1,9 @@
+#!/bin/sh
+
+export TZ=`cat /etc/TZ`
+
+dmesg -n1
+
+for i in /etc/init.d/S??* ; do
+    $i start
+done

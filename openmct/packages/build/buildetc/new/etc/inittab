@@ -1,0 +1,8 @@
+# main rc script
+::sysinit:/etc/init.d/rcS
+
+# Put a getty on the serial port
+::respawn:/sbin/getty -L tts/0 115200 vt100
+
+# Stuff to do before rebooting
+null::shutdown:/bin/umount -a -r

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ ! -f /var/httpd/cgi-bin/control-cgi ]; then 
+    echo "creating httpd default data..."
+    gunzip -c /httpd.tar.gz | tar xf -
+else
+    echo "using existing httpd files..."
+fi;
+
+/bin/httpd

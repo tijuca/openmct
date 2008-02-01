@@ -1,0 +1,8 @@
+PATH=/bin:/sbin:/usr/bin:/usr/sbin
+
+alias l='ls -al'
+alias ll='ls -l'
+alias dir='ls -lA'
+alias ..='cd ..'
+
+echo "Welcome to ???"

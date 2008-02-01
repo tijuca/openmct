@@ -126,7 +126,7 @@ else
 	fi
 endif
 
-$(OUTPUTDIR)/$(ROOT):
+$(OUTPUTDIR)/$(ROOT): etc
 	@$(ECHO) -e "\033[1;33mREMOVE .svn FROM $(NEWROOTDIR)" 
 	@$(REMOVESVN) $(NEWROOTDIR)
 	@$(ECHO) -e "\033[1;33mCALCULATE DEPENDENCIES FOR KERNEL MODULES"
@@ -134,97 +134,98 @@ $(OUTPUTDIR)/$(ROOT):
 	           -k $(PACKAGEDIR)/system/linux/src/vmlinux
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/$(IMAGERELEASEFILENAME)\033[0m"
 	@$(ECHO) "OpenMCT $(IMAGETARGET) $(IMAGEVERSION) $(IMAGESUBVERSION) $(IMAGEPRODCODE) $(SOFTWAREVERSION)" > $(NEWROOTDIR)/etc/$(IMAGERELEASEFILENAME)
+	
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hostname\033[0m"
-	@$(ECHO) $(IMAGETARGET) > $(NEWROOTDIR)/etc/hostname
+	@$(ECHO) $(IMAGETARGET) > $(NEWROOTDIR)/var/etc/hostname
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/issue\033[0m"
 	@$(ECHO) "Welcome on OpenMCT $(IMAGETARGET) $(IMAGEVERSION) $(SOFTWAREVERSION) - Kernel \r \m (\d \t)" > $(NEWROOTDIR)/etc/issue
 	
 ifdef ETH0IPADDR 
 	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth0\033[0m"
 	
-	@$(ECHO) "auto lo" > $(NEWROOTDIR)/etc/network/interfaces
-	@$(ECHO) "" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) "auto lo" > $(NEWROOTDIR)/var/etc/network/interfaces
+	@$(ECHO) "" >> $(NEWROOTDIR)/var/etc/network/interfaces
 	
-	@$(ECHO) -e "\tiface lo inet loopback" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tiface lo inet loopback" >> $(NEWROOTDIR)/var/etc/network/interfaces
 	
-	@$(ECHO) "auto eth0" >> $(NEWROOTDIR)/etc/network/interfaces
-	@$(ECHO) "iface eth0 inet static" >> $(NEWROOTDIR)/etc/network/interfaces
-	@$(ECHO) -e "\taddress $(ETH0IPADDR)" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) "auto eth0" >> $(NEWROOTDIR)/var/etc/network/interfaces
+	@$(ECHO) "iface eth0 inet static" >> $(NEWROOTDIR)/var/etc/network/interfaces
+	@$(ECHO) -e "\taddress $(ETH0IPADDR)" >> $(NEWROOTDIR)/var/etc/network/interfaces
 	
 ifdef ETH0NETMASK
-	@$(ECHO) -e "\tnetmask $(ETH0NETMASK)" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tnetmask $(ETH0NETMASK)" >> $(NEWROOTDIR)/var/etc/network/interfaces
 else
-	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWROOTDIR)/var/etc/network/interfaces
 endif
 	
 ifdef ETH0NETWORK
-	@$(ECHO) -e "\tnetwork $(ETH0NETWORK)" >> $(NEWROOTDIR)/etc/network/interfaces
-	@$(ECHO) "# default nfs release for eth0" > $(NEWROOTDIR)/etc/exports
-	@$(ECHO) "/harddisk $(ETH0NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/etc/exports
+	@$(ECHO) -e "\tnetwork $(ETH0NETWORK)" >> $(NEWROOTDIR)/var/etc/network/interfaces
+	@$(ECHO) "# default nfs release for eth0" > $(NEWROOTDIR)/var/etc/exports
+	@$(ECHO) "/harddisk $(ETH0NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports
 else
-	@$(ECHO) -e "\tnetwork 192.168.1.0" >> $(NEWROOTDIR)/etc/network/interfaces
-	@$(ECHO) "# default nfs release for eth0" > $(NEWROOTDIR)/etc/exports
-	@$(ECHO) "/harddisk 192.168.1.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/etc/exports
+	@$(ECHO) -e "\tnetwork 192.168.1.0" >> $(NEWROOTDIR)/var/etc/network/interfaces
+	@$(ECHO) "# default nfs release for eth0" > $(NEWROOTDIR)/var/etc/exports
+	@$(ECHO) "/harddisk 192.168.1.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports
 endif
 	
 ifdef ETH0BROADCAST
-	@$(ECHO) -e "\tbroadcast $(ETH0BROADCAST)" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tbroadcast $(ETH0BROADCAST)" >> $(NEWROOTDIR)/var/etc/network/interfaces
 else
-	@$(ECHO) -e "\tbroadcast 192.168.1.255" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tbroadcast 192.168.1.255" >> $(NEWROOTDIR)/var/etc/network/interfaces
 endif
 	
 ifdef ETH0DEFAULTGW
-	@$(ECHO) -e "\tgateway $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tgateway $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/network/interfaces
 endif
-	@$(ECHO) "" >> $(NEWROOTDIR)/etc/network/interfaces 
+	@$(ECHO) "" >> $(NEWROOTDIR)/var/etc/network/interfaces 
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hosts\033[0m"
-	@$(ECHO) $(ETH0IPADDR) $(IMAGETARGET) > $(NEWROOTDIR)/etc/hosts
+	@$(ECHO) $(ETH0IPADDR) $(IMAGETARGET) > $(NEWROOTDIR)/var/etc/hosts
 endif
 ifdef ETH1IPADDR 
 	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth1\033[0m"
-	@$(ECHO) "auto eth1" >> $(NEWROOTDIR)/etc/network/interfaces
-	@$(ECHO) "iface eth1 inet static" >> $(NEWROOTDIR)/etc/network/interfaces
-	@$(ECHO) -e "\taddress $(ETH1IPADDR)" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) "auto eth1" >> $(NEWROOTDIR)/var/etc/network/interfaces
+	@$(ECHO) "iface eth1 inet static" >> $(NEWROOTDIR)/var/etc/network/interfaces
+	@$(ECHO) -e "\taddress $(ETH1IPADDR)" >> $(NEWROOTDIR)/var/etc/network/interfaces
 ifdef ETH1NETMASK
-	@$(ECHO) -e "\tnetmask $(ETH1NETMASK)" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tnetmask $(ETH1NETMASK)" >> $(NEWROOTDIR)/var/etc/network/interfaces
 else
-	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWROOTDIR)/var/etc/network/interfaces
 endif
 ifdef ETH1NETWORK
-	@$(ECHO) -e "\tnetwork $(ETH0NETWORK)" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tnetwork $(ETH0NETWORK)" >> $(NEWROOTDIR)/var/etc/network/interfaces
 	@if [ -f $(NEWROOTDIR)/etc/exports ]; then \
-	    @$(ECHO) "# default nfs release for eth1" >> $(NEWROOTDIR)/etc/exports
-	    $(ECHO) "/harddisk $(ETH1NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/etc/exports; \
+	    @$(ECHO) "# default nfs release for eth1" >> $(NEWROOTDIR)/var/etc/exports
+	    $(ECHO) "/harddisk $(ETH1NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
 	else \
-	    @$(ECHO) "# default nfs release for eth1" > $(NEWROOTDIR)/etc/exports
-	    $(ECHO) "/harddisk $(ETH1NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/etc/exports; \
+	    @$(ECHO) "# default nfs release for eth1" > $(NEWROOTDIR)/var/etc/exports
+	    $(ECHO) "/harddisk $(ETH1NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
 	fi
 else
-	@$(ECHO) -e "\tnetwork 172.16.0.0" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tnetwork 172.16.0.0" >> $(NEWROOTDIR)/var/etc/network/interfaces
 	@if [ -f $(NEWROOTDIR)/etc/exports ]; then \
-	    $(ECHO) "# default nfs release for eth1" >> $(NEWROOTDIR)/etc/exports; \
-	    $(ECHO) "/harddisk 172.16.0.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/etc/exports; \
+	    $(ECHO) "# default nfs release for eth1" >> $(NEWROOTDIR)/var/etc/exports; \
+	    $(ECHO) "/harddisk 172.16.0.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
 	else \
-	    $(ECHO) "# default nfs release for eth1" > $(NEWROOTDIR)/etc/exports; \
-	    $(ECHO) "/harddisk 172.16.0.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/etc/exports; \
+	    $(ECHO) "# default nfs release for eth1" > $(NEWROOTDIR)/var/etc/exports; \
+	    $(ECHO) "/harddisk 172.16.0.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
 	fi
 endif
 ifdef ETH1BROADCAST
-	@$(ECHO) -e "\tbroadcast $(ETH1BROADCAST)" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tbroadcast $(ETH1BROADCAST)" >> $(NEWROOTDIR)/var/etc/network/interfaces
 else
-	@$(ECHO) -e "\tbroadcast 172.16.0.255" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tbroadcast 172.16.0.255" >> $(NEWROOTDIR)/var/etc/network/interfaces
 endif
 ifdef ETH1DEFAULTGW
-	@$(ECHO) -e "\tgateway $(ETH1DEFAULTGW)" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tgateway $(ETH1DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/network/interfaces
 else
-	@$(ECHO) -e "\tgateway 172.16.0.1" >> $(NEWROOTDIR)/etc/network/interfaces
+	@$(ECHO) -e "\tgateway 172.16.0.1" >> $(NEWROOTDIR)/var/etc/network/interfaces
 endif
 endif
-	@$(ECHO) "nameserver $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/etc/resolv.conf
+	@$(ECHO) "nameserver $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/resolv.conf
 
-	@$(CP) $(NEWROOTDIR)/etc/network/interfaces $(NEWROOTDIR)/etc/default/interfaces
-	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"
-	@$(OUTPUTDIR)/$(MKSQUASHFS) $(NEWROOTDIR) $(OUTPUTDIR)/$(ROOT) $(ROOTOPTS)
+#	@$(CP) $(NEWROOTDIR)/var/etc/network/interfaces $(NEWROOTDIR)/var/etc/default/interfaces
+#	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"
+#	@$(OUTPUTDIR)/$(MKSQUASHFS) $(NEWROOTDIR) $(OUTPUTDIR)/$(ROOT) $(ROOTOPTS)
 
 $(OUTPUTDIR)/$(JFFS2):
 	@$(MKDIR) $(JFFS2DIR)
@@ -248,3 +249,7 @@ rebuild:
                 -l $(OUTPUTDIR)/$(ROOT),$(OUTPUTDIR)/$(JFFS2) \
                 -a $(IMAGEFLASHKERNELSIZE),$(shell expr $(IMAGEFLASHROOTSIZE) + $(IMAGEFLASHKERNELSIZE)) \
 		-z $(shell expr $(IMAGEFLASHROOTSIZE) + $(IMAGEFLASHETCSIZE))
+
+etc:
+	@rm -rf $(NEWROOTDIR)/etc $(NEWROOTDIR)/var
+	@svn export --force packages/build/buildetc/new $(NEWROOTDIR)

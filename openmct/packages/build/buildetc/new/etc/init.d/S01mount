@@ -1,0 +1,25 @@
+#!/bin/sh
+
+#create the classic hda4 device-node, because in other cases the mount -F will fail
+#/bin/mknod /dev/hda4 block 3 4
+
+# mount proc
+/bin/mount -t proc	proc	/proc
+/bin/mount -t tmpfs	tmpfs	/tmp
+
+# find var partition:
+#VAR=`cat /proc/mtd | grep etc | cut -b 4`
+#cat /etc/fstab.in | sed -e "s/REALVAR/$VAR/g" > /etc/fstab
+
+echo "Enable Swap space (if exist)..."
+/sbin/swapon -a > /dev/null 2>&1
+
+echo "Mounting filesystems..."
+/bin/mount -a > /dev/null 2>&1
+
+#create some paths
+#/bin/mkdir /dev/shm/root
+#/bin/mkdir /dev/shm/home
+#/bin/mkdir /dev/shm/network
+
+exit 0
