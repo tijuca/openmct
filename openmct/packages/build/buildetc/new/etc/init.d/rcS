@@ -3,7 +3,10 @@
 export TZ=`cat /etc/TZ`
 
 dmesg -n1
+/bin/echo "Starting Scripts ..."
 
 for i in /etc/init.d/S??* ; do
     $i start
 done
+
+/bin/echo "All Scripts from /etc/init.d started!"

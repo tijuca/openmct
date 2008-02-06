@@ -224,8 +224,8 @@ endif
 	@$(ECHO) "nameserver $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/resolv.conf
 
 #	@$(CP) $(NEWROOTDIR)/var/etc/network/interfaces $(NEWROOTDIR)/var/etc/default/interfaces
-#	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"
-#	@$(OUTPUTDIR)/$(MKSQUASHFS) $(NEWROOTDIR) $(OUTPUTDIR)/$(ROOT) $(ROOTOPTS)
+	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"
+	@$(OUTPUTDIR)/$(MKSQUASHFS) $(NEWROOTDIR) $(OUTPUTDIR)/$(ROOT) $(ROOTOPTS)
 
 $(OUTPUTDIR)/$(JFFS2):
 	@$(MKDIR) $(JFFS2DIR)

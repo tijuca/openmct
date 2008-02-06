@@ -2,12 +2,12 @@
 
 # extract var.tar.gz in case that's neccessary
 
-echo -n "Checking /var partition: "
+#echo -n "Checking /var partition: "
 #if [ ! -f /var/etc/passwd ] ; then
 #	echo -n "factory boot, gonna initialise. Please wait... "
 #	cd /
 #	gunzip -c /var.tar.gz | tar xf -
-fi
-echo "done."
+#fi
+#echo "done."
 
 exit 0

@@ -1,3 +1,1 @@
-proc    /proc           proc    defaults         0 0
-tmpfs   /tmp            ramfs   defaults         0 0
-/dev/discs/disc0/part1  /harddisk ext3    defaults 0 0
+/tmp/fstab
