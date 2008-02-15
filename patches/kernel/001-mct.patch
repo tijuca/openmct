@@ -1,126 +1,6 @@
-diff -Naru linux-2.4.32/Makefile linux-2.4.32-mct/Makefile
---- linux-2.4.32/Makefile	2005-11-16 20:12:54.000000000 +0100
-+++ linux-2.4.32-mct/Makefile	2006-12-02 15:08:43.000000000 +0100
-@@ -1,11 +1,11 @@
- VERSION = 2
- PATCHLEVEL = 4
- SUBLEVEL = 34
--EXTRAVERSION = .1
-+EXTRAVERSION = .1-mct
- 
- KERNELRELEASE=$(VERSION).$(PATCHLEVEL).$(SUBLEVEL)$(EXTRAVERSION)
- 
--ARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ -e s/arm.*/arm/ -e s/sa110/arm/)
-+ARCH := mips
- KERNELPATH=kernel-$(shell echo $(KERNELRELEASE) | sed -e "s/-//g")
- 
- CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
-@@ -17,7 +17,7 @@
- FINDHPATH	= $(HPATH)/asm $(HPATH)/linux $(HPATH)/scsi $(HPATH)/net $(HPATH)/math-emu
- 
- HOSTCC  	= gcc
--HOSTCFLAGS	= -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer
-+HOSTCFLAGS	= -Wall -Wstrict-prototypes -Os -fomit-frame-pointer
- 
- CROSS_COMPILE 	=
- 
-@@ -91,7 +91,7 @@
- 
- CPPFLAGS := -D__KERNEL__ -I$(HPATH)
- 
--CFLAGS := $(CPPFLAGS) -Wall -Wstrict-prototypes -Wno-trigraphs -O2 \
-+CFLAGS := $(CPPFLAGS) -Wall -Wstrict-prototypes -Wno-trigraphs -Os \
- 	  -fno-strict-aliasing -fno-common
- ifndef CONFIG_FRAME_POINTER
- CFLAGS += -fomit-frame-pointer
-@@ -201,7 +201,7 @@
- # files removed with 'make clean'
- CLEAN_FILES = \
- 	kernel/ksyms.lst include/linux/compile.h \
--	vmlinux System.map \
-+	vmlinux vmlinux.bin System.map \
- 	.tmp* \
- 	drivers/char/consolemap_deftbl.c drivers/video/promcon_tbl.c \
- 	drivers/char/conmakehash \
-@@ -294,6 +294,7 @@
- 		$(LIBS) \
- 		--end-group \
- 		-o vmlinux
-+	$(OBJCOPY) -g -O binary vmlinux vmlinux.bin
- 	$(NM) vmlinux | grep -v '\(compiled\)\|\(\.o$$\)\|\( [aUw] \)\|\(\.\.ng$$\)\|\(LASH[RL]DI\)' | sort > System.map
- 
- symlinks:
-diff -Naru linux-2.4.32/arch/mips/Makefile linux-2.4.32-mct/arch/mips/Makefile
---- linux-2.4.32/arch/mips/Makefile	2005-01-19 15:09:26.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/Makefile	2006-12-02 15:08:43.000000000 +0100
-@@ -46,8 +46,8 @@
- GCCFLAGS	:= -I $(TOPDIR)/include/asm/gcc
- GCCFLAGS	+= -G 0 -mno-abicalls -fno-pic -pipe
- GCCFLAGS	+= $(call check_gcc, -finline-limit=100000,)
--LINKFLAGS	+= -G 0 -static -n
--MODFLAGS	+= -mlong-calls
-+LINKFLAGS	+= -G 0 -static -n -nostdlib
-+MODFLAGS	+= -mlong-calls -fno-common
- 
- ifdef CONFIG_DEBUG_INFO
- GCCFLAGS	+= -g
-@@ -714,6 +714,44 @@
- LOADADDR      += 0x80020000
- endif
- 
-+ifdef CONFIG_MCT_BOARDS
-+LIBS            += arch/mips/mct-boards/generic/mctboards.a
-+SUBDIRS         += arch/mips/mct-boards/generic
-+CORE_FILES	+= arch/mips/mct-boards/generic/proc.o
-+LOADADDR        += 0x80020000
-+
-+ifdef CONFIG_MCT_SG100
-+CORE_FILES      += arch/mips/mct-boards/sgx00/sgx00.o
-+SUBDIRS         += arch/mips/mct-boards/sgx00
-+FLASHSIZE       = 0x400000
-+endif
-+ifdef CONFIG_MCT_SG600
-+CORE_FILES      += arch/mips/mct-boards/sgx00/sgx00.o
-+SUBDIRS         += arch/mips/mct-boards/sgx00
-+FLASHSIZE       = 0x400000
-+endif
-+ifdef CONFIG_MCT_SA100
-+CORE_FILES      += arch/mips/mct-boards/sgx00/sgx00.o
-+SUBDIRS         += arch/mips/mct-boards/sgx00
-+FLASHSIZE       = 0x400000
-+endif
-+ifdef CONFIG_MCT_SG4100
-+CORE_FILES      += arch/mips/mct-boards/sg4x00/sg4x00.o
-+SUBDIRS         += arch/mips/mct-boards/sg4x00
-+FLASHSIZE       = 0x200000
-+endif
-+ifdef CONFIG_MCT_SA200
-+CORE_FILES      += arch/mips/mct-boards/sg4x00/sg4x00.o
-+SUBDIRS         += arch/mips/mct-boards/sg4x00
-+ifdef CONFIG_MCT_FLASH_8MB
-+FLASHSIZE       = 0x800000
-+else
-+FLASHSIZE       = 0x400000
-+endif
-+endif
-+endif
-+
-+
- #
- # Choosing incompatible machines durings configuration will result in
- # error messages during linking.  Select a default linkscript if
-@@ -722,7 +760,7 @@
- vmlinux: arch/$(ARCH)/ld.script
- 
- arch/$(ARCH)/ld.script: arch/$(ARCH)/ld.script.in arch/$(ARCH)/Makefile
--	sed -e 's/@@LOADADDR@@/$(LOADADDR)/' <$< >$@
-+	sed -e 's/@@LOADADDR@@/$(LOADADDR)/' -e 's/@@FLASHSIZE@@/$(FLASHSIZE)/' <$< >$@
- LINKFLAGS	+= -T arch/$(ARCH)/ld.script
- 
- HEAD := arch/mips/kernel/head.o arch/mips/kernel/init_task.o
-diff -Naru linux-2.4.32/arch/mips/config-shared.in linux-2.4.32-mct/arch/mips/config-shared.in
---- linux-2.4.32/arch/mips/config-shared.in	2005-01-19 15:09:27.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/config-shared.in	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/config-shared.in linux-2.4.35.3-mct/arch/mips/config-shared.in
+--- linux-2.4.35.3/arch/mips/config-shared.in	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/arch/mips/config-shared.in	2007-11-04 14:10:45.000000000 +0100
 @@ -214,6 +214,31 @@
  
  dep_bool 'Support for Toshiba JMR-TX3927 board' CONFIG_TOSHIBA_JMR3927 $CONFIG_MIPS32
@@ -191,9 +71,9 @@ diff -Naru linux-2.4.32/arch/mips/config-shared.in linux-2.4.32-mct/arch/mips/co
     fi
  fi
  if [ "$CONFIG_SIBYTE_SB1250" = "y" -o \
-diff -Naru linux-2.4.32/arch/mips/kernel/head.S linux-2.4.32-mct/arch/mips/kernel/head.S
---- linux-2.4.32/arch/mips/kernel/head.S	2005-01-19 15:09:29.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/kernel/head.S	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/kernel/head.S linux-2.4.35.3-mct/arch/mips/kernel/head.S
+--- linux-2.4.35.3/arch/mips/kernel/head.S	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/arch/mips/kernel/head.S	2007-11-04 14:10:45.000000000 +0100
 @@ -21,25 +21,57 @@
  #include <asm/asm.h>
  #include <asm/current.h>
@@ -464,9 +344,9 @@ diff -Naru linux-2.4.32/arch/mips/kernel/head.S linux-2.4.32-mct/arch/mips/kerne
 + * .text segment.
 + */
 +		.align	13
-diff -Naru linux-2.4.32/arch/mips/kernel/setup.c linux-2.4.32-mct/arch/mips/kernel/setup.c
---- linux-2.4.32/arch/mips/kernel/setup.c	2005-01-19 15:09:29.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/kernel/setup.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/kernel/setup.c linux-2.4.35.3-mct/arch/mips/kernel/setup.c
+--- linux-2.4.35.3/arch/mips/kernel/setup.c	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/arch/mips/kernel/setup.c	2007-11-04 14:10:45.000000000 +0100
 @@ -678,6 +678,11 @@
                 tx4927_setup();
                 break;
@@ -479,9 +359,9 @@ diff -Naru linux-2.4.32/arch/mips/kernel/setup.c linux-2.4.32-mct/arch/mips/kern
  #ifdef CONFIG_SIBYTE_BOARD
  	case MACH_GROUP_SIBYTE:
  		swarm_setup();
-diff -Naru linux-2.4.32/arch/mips/ld.script.in linux-2.4.32-mct/arch/mips/ld.script.in
---- linux-2.4.32/arch/mips/ld.script.in	2005-01-19 15:09:29.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/ld.script.in	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/ld.script.in linux-2.4.35.3-mct/arch/mips/ld.script.in
+--- linux-2.4.35.3/arch/mips/ld.script.in	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/arch/mips/ld.script.in	2007-11-04 14:10:45.000000000 +0100
 @@ -9,6 +9,7 @@
    {
      _ftext = . ;
@@ -521,45 +401,77 @@ diff -Naru linux-2.4.32/arch/mips/ld.script.in linux-2.4.32-mct/arch/mips/ld.scr
    _end = . ;
    PROVIDE (end = .);
    }
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/Makefile linux-2.4.32-mct/arch/mips/mct-boards/generic/Makefile
---- linux-2.4.32/arch/mips/mct-boards/generic/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/Makefile	2006-12-02 15:08:43.000000000 +0100
-@@ -0,0 +1,32 @@
-+#
-+# Makefile for the Toshiba TX-RISC board generic parts of the kernel
-+#
-+# Note! Dependencies are done automagically by 'make dep', which also
-+# removes any old dependencies. DON'T put your own dependencies here
-+# unless it's something special (ie not a .c file).
-+#
-+# This file is subject to the terms and conditions of the GNU General Public
-+# License.  See the file "COPYING" in the main directory of this archive
-+# for more details.
-+#
-+# Copyright (C) 1999-2001 Toshiba Corporation
-+#
+diff -Naru linux-2.4.35.3/arch/mips/Makefile linux-2.4.35.3-mct/arch/mips/Makefile
+--- linux-2.4.35.3/arch/mips/Makefile	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/arch/mips/Makefile	2007-11-04 14:10:45.000000000 +0100
+@@ -44,8 +44,8 @@
+ GCCFLAGS	:= -I $(TOPDIR)/include/asm/gcc
+ GCCFLAGS	+= -G 0 -mno-abicalls -fno-pic -pipe
+ GCCFLAGS	+= $(call check_gcc, -finline-limit=100000,)
+-LINKFLAGS	+= -G 0 -static -n
+-MODFLAGS	+= -mlong-calls
++LINKFLAGS	+= -G 0 -static -n -nostdlib
++MODFLAGS	+= -mlong-calls -fno-common
+ 
+ ifdef CONFIG_DEBUG_INFO
+ GCCFLAGS	+= -g
+@@ -712,6 +712,44 @@
+ LOADADDR      += 0x80020000
+ endif
+ 
++ifdef CONFIG_MCT_BOARDS
++LIBS            += arch/mips/mct-boards/generic/mctboards.a
++SUBDIRS         += arch/mips/mct-boards/generic
++CORE_FILES	+= arch/mips/mct-boards/generic/proc.o
++LOADADDR        += 0x80020000
 +
-+.S.s:
-+	$(CPP) $(AFLAGS) $< -o $@
-+.S.o:
-+	$(CC) $(AFLAGS) -c $< -o $@
++ifdef CONFIG_MCT_SG100
++CORE_FILES      += arch/mips/mct-boards/sgx00/sgx00.o
++SUBDIRS         += arch/mips/mct-boards/sgx00
++FLASHSIZE       = 0x400000
++endif
++ifdef CONFIG_MCT_SG600
++CORE_FILES      += arch/mips/mct-boards/sgx00/sgx00.o
++SUBDIRS         += arch/mips/mct-boards/sgx00
++FLASHSIZE       = 0x400000
++endif
++ifdef CONFIG_MCT_SA100
++CORE_FILES      += arch/mips/mct-boards/sgx00/sgx00.o
++SUBDIRS         += arch/mips/mct-boards/sgx00
++FLASHSIZE       = 0x400000
++endif
++ifdef CONFIG_MCT_SG4100
++CORE_FILES      += arch/mips/mct-boards/sg4x00/sg4x00.o
++SUBDIRS         += arch/mips/mct-boards/sg4x00
++FLASHSIZE       = 0x200000
++endif
++ifdef CONFIG_MCT_SA200
++CORE_FILES      += arch/mips/mct-boards/sg4x00/sg4x00.o
++SUBDIRS         += arch/mips/mct-boards/sg4x00
++ifdef CONFIG_MCT_FLASH_8MB
++FLASHSIZE       = 0x800000
++else
++FLASHSIZE       = 0x400000
++endif
++endif
++endif
 +
-+all: mctboards.a
-+L_TARGET := mctboards.a
 +
-+export-objs = setup.o irq_tx3927.o irq_tx4927.o irq_tx4925.o dma.o
-+
-+obj-y	:= setup.o pmon.o pmon-low.o prom.o pci.o proc.o \
-+	irq.o irq_tx3927.o irq_tx4927.o irq_tx4925.o int-handler.o \
-+	dma.o wbflush.o \
-+	irq_jmi39io2isac.o ide-jmi39io2.o kbd-jmi39io2.o basic_io.o \
-+	dump_tx3927.o dump_tx4927.o dump_tx4925.o rtl8305.o
-+obj-$(CONFIG_REMOTE_DEBUG)	+= gdb_hook.o
-+
-+include $(TOPDIR)/Rules.make
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/basic_io.c linux-2.4.32-mct/arch/mips/mct-boards/generic/basic_io.c
---- linux-2.4.32/arch/mips/mct-boards/generic/basic_io.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/basic_io.c	2006-12-02 15:08:43.000000000 +0100
+ #
+ # Choosing incompatible machines durings configuration will result in
+ # error messages during linking.  Select a default linkscript if
+@@ -720,7 +758,7 @@
+ vmlinux: arch/$(ARCH)/ld.script
+ 
+ arch/$(ARCH)/ld.script: arch/$(ARCH)/ld.script.in arch/$(ARCH)/Makefile
+-	sed -e 's/@@LOADADDR@@/$(LOADADDR)/' <$< >$@
++	sed -e 's/@@LOADADDR@@/$(LOADADDR)/' -e 's/@@FLASHSIZE@@/$(FLASHSIZE)/' <$< >$@
+ LINKFLAGS	+= -T arch/$(ARCH)/ld.script
+ 
+ HEAD := arch/mips/kernel/head.o arch/mips/kernel/init_task.o
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/basic_io.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/basic_io.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/basic_io.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/basic_io.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,317 @@
 +#include <linux/config.h>
 +#include <linux/init.h>
@@ -788,8 +700,8 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/basic_io.c linux-2.4.32-mct
 +
 +
 +static struct timer_list	conf_reset_timer;
-+static int	conf_reset_detecting;
-+static int	conf_reset_tick_count;
++extern int	conf_reset_detecting;
++extern int	conf_reset_tick_count;
 +extern int	conf_reset_in_progress;
 +extern wait_queue_head_t	flash_wq;
 +
@@ -878,9 +790,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/basic_io.c linux-2.4.32-mct
 +	add_timer(&conf_reset_timer);
 +}
 +
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/dma.c linux-2.4.32-mct/arch/mips/mct-boards/generic/dma.c
---- linux-2.4.32/arch/mips/mct-boards/generic/dma.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/dma.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/dma.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/dma.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/dma.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/dma.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,888 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/dma.c
@@ -1770,9 +1682,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/dma.c linux-2.4.32-mct/arch
 +		break;
 +	}
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/dump_tx3927.c linux-2.4.32-mct/arch/mips/mct-boards/generic/dump_tx3927.c
---- linux-2.4.32/arch/mips/mct-boards/generic/dump_tx3927.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/dump_tx3927.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/dump_tx3927.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/dump_tx3927.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/dump_tx3927.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/dump_tx3927.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,38 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/dump_tx3927.c
@@ -1812,9 +1724,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/dump_tx3927.c linux-2.4.32-
 +		printk("\n");
 +	}
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/dump_tx4925.c linux-2.4.32-mct/arch/mips/mct-boards/generic/dump_tx4925.c
---- linux-2.4.32/arch/mips/mct-boards/generic/dump_tx4925.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/dump_tx4925.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/dump_tx4925.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/dump_tx4925.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/dump_tx4925.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/dump_tx4925.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,120 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/dump_tx4925.c
@@ -1936,9 +1848,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/dump_tx4925.c linux-2.4.32-
 +		printk("SERR ");
 +	printk(")\n");
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/dump_tx4927.c linux-2.4.32-mct/arch/mips/mct-boards/generic/dump_tx4927.c
---- linux-2.4.32/arch/mips/mct-boards/generic/dump_tx4927.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/dump_tx4927.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/dump_tx4927.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/dump_tx4927.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/dump_tx4927.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/dump_tx4927.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,130 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/dump_tx4927.c
@@ -2070,9 +1982,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/dump_tx4927.c linux-2.4.32-
 +		printk("IWB ");
 +	printk(")\n");
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/gdb_hook.c linux-2.4.32-mct/arch/mips/mct-boards/generic/gdb_hook.c
---- linux-2.4.32/arch/mips/mct-boards/generic/gdb_hook.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/gdb_hook.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/gdb_hook.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/gdb_hook.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/gdb_hook.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/gdb_hook.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,451 @@
 +/*
 + * Carsten Langgaard, carstenl@mips.com
@@ -2525,9 +2437,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/gdb_hook.c linux-2.4.32-mct
 +}
 +
 +#endif
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/ide-jmi39io2.c linux-2.4.32-mct/arch/mips/mct-boards/generic/ide-jmi39io2.c
---- linux-2.4.32/arch/mips/mct-boards/generic/ide-jmi39io2.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/ide-jmi39io2.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/ide-jmi39io2.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/ide-jmi39io2.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/ide-jmi39io2.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/ide-jmi39io2.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,64 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -2593,9 +2505,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/ide-jmi39io2.c linux-2.4.32
 +	jmi39io2_ide_ops.ide_init_hwif_ports = jmi39io2_ide_init_hwif_ports,
 +	ide_ops = &jmi39io2_ide_ops;
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/int-handler.S linux-2.4.32-mct/arch/mips/mct-boards/generic/int-handler.S
---- linux-2.4.32/arch/mips/mct-boards/generic/int-handler.S	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/int-handler.S	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/int-handler.S linux-2.4.35.3-mct/arch/mips/mct-boards/generic/int-handler.S
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/int-handler.S	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/int-handler.S	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,165 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/int-handler.S
@@ -2762,9 +2674,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/int-handler.S linux-2.4.32-
 +	.set	at
 +	.set	noreorder
 +#endif /* EXCEPTION_DEBUG */
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/irq.c linux-2.4.32-mct/arch/mips/mct-boards/generic/irq.c
---- linux-2.4.32/arch/mips/mct-boards/generic/irq.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/irq.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/irq.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/irq.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/irq.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/irq.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,336 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/irq.c
@@ -3102,9 +3014,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/irq.c linux-2.4.32-mct/arch
 +	set_pmon_debug_traps();
 +#endif /* CONFIG_REMOTE_DEBUG */
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/irq_jmi39io2isac.c linux-2.4.32-mct/arch/mips/mct-boards/generic/irq_jmi39io2isac.c
---- linux-2.4.32/arch/mips/mct-boards/generic/irq_jmi39io2isac.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/irq_jmi39io2isac.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/irq_jmi39io2isac.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/irq_jmi39io2isac.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/irq_jmi39io2isac.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/irq_jmi39io2isac.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,183 @@
 +/*
 + * linux/arch/mips/toshiba-boards/generic/irq_jmi39io2isac.c
@@ -3289,9 +3201,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/irq_jmi39io2isac.c linux-2.
 +		return irqrmap[irq];
 +	return jmi39io2_isac_irq_base + irq;
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/irq_tx3927.c linux-2.4.32-mct/arch/mips/mct-boards/generic/irq_tx3927.c
---- linux-2.4.32/arch/mips/mct-boards/generic/irq_tx3927.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/irq_tx3927.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/irq_tx3927.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/irq_tx3927.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/irq_tx3927.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/irq_tx3927.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,125 @@
 +/*
 + * linux/arch/mips/toshiba-boards/generic/irq_tx3927.c
@@ -3418,9 +3330,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/irq_tx3927.c linux-2.4.32-m
 +}
 +
 +EXPORT_SYMBOL(tx3927_irq_to_irq);
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/irq_tx4925.c linux-2.4.32-mct/arch/mips/mct-boards/generic/irq_tx4925.c
---- linux-2.4.32/arch/mips/mct-boards/generic/irq_tx4925.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/irq_tx4925.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/irq_tx4925.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/irq_tx4925.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/irq_tx4925.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/irq_tx4925.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,140 @@
 +/*
 + * linux/arch/mips/toshiba-boards/generic/irq_tx4925.c
@@ -3562,9 +3474,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/irq_tx4925.c linux-2.4.32-m
 +}
 +
 +EXPORT_SYMBOL(tx4925_irq_to_irq);
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/irq_tx4927.c linux-2.4.32-mct/arch/mips/mct-boards/generic/irq_tx4927.c
---- linux-2.4.32/arch/mips/mct-boards/generic/irq_tx4927.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/irq_tx4927.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/irq_tx4927.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/irq_tx4927.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/irq_tx4927.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/irq_tx4927.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,120 @@
 +/*
 + * linux/arch/mips/toshiba-boards/generic/irq_tx4927.c
@@ -3686,9 +3598,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/irq_tx4927.c linux-2.4.32-m
 +}
 +
 +EXPORT_SYMBOL(tx4927_irq_to_irq);
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/kbd-jmi39io2.c linux-2.4.32-mct/arch/mips/mct-boards/generic/kbd-jmi39io2.c
---- linux-2.4.32/arch/mips/mct-boards/generic/kbd-jmi39io2.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/kbd-jmi39io2.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/kbd-jmi39io2.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/kbd-jmi39io2.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/kbd-jmi39io2.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/kbd-jmi39io2.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,101 @@
 +/* $Id: linux-2.4.31-mct.diff,v 1.1.1.1 2005/10/04 20:57:53 andi Exp $
 + *
@@ -3791,9 +3703,46 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/kbd-jmi39io2.c linux-2.4.32
 +	jmi39io2_aux_irq = jmi39io2_isac_irq_base + JMI39IO2_ISAC_INTB_IRQMOUSE;
 +	kbd_ops = &jmi39io2_kbd_ops;
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/pci.c linux-2.4.32-mct/arch/mips/mct-boards/generic/pci.c
---- linux-2.4.32/arch/mips/mct-boards/generic/pci.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/pci.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/Makefile linux-2.4.35.3-mct/arch/mips/mct-boards/generic/Makefile
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/Makefile	2007-11-04 14:10:45.000000000 +0100
+@@ -0,0 +1,33 @@
++#
++# Makefile for the Toshiba TX-RISC board generic parts of the kernel
++#
++# Note! Dependencies are done automagically by 'make dep', which also
++# removes any old dependencies. DON'T put your own dependencies here
++# unless it's something special (ie not a .c file).
++#
++# This file is subject to the terms and conditions of the GNU General Public
++# License.  See the file "COPYING" in the main directory of this archive
++# for more details.
++#
++# Copyright (C) 1999-2001 Toshiba Corporation
++#
++
++.S.s:
++	$(CPP) $(AFLAGS) $< -o $@
++.S.o:
++	$(CC) $(AFLAGS) -c $< -o $@
++
++all: mctboards.a
++L_TARGET := mctboards.a
++
++export-objs = 	setup.o irq_tx3927.o irq_tx4927.o irq_tx4925.o dma.o \
++		wbflush.o
++
++obj-y	:= setup.o pmon.o pmon-low.o prom.o pci.o proc.o \
++	irq.o irq_tx3927.o irq_tx4927.o irq_tx4925.o int-handler.o \
++	dma.o wbflush.o \
++	irq_jmi39io2isac.o ide-jmi39io2.o kbd-jmi39io2.o basic_io.o \
++	dump_tx3927.o dump_tx4927.o dump_tx4925.o rtl8305.o
++obj-$(CONFIG_REMOTE_DEBUG)	+= gdb_hook.o
++
++include $(TOPDIR)/Rules.make
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/pci.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/pci.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/pci.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/pci.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,351 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/pci.c
@@ -4146,63 +4095,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/pci.c linux-2.4.32-mct/arch
 +		}
 +	}
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/pmon-low.S linux-2.4.32-mct/arch/mips/mct-boards/generic/pmon-low.S
---- linux-2.4.32/arch/mips/mct-boards/generic/pmon-low.S	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/pmon-low.S	2006-12-02 15:08:43.000000000 +0100
-@@ -0,0 +1,50 @@
-+/*
-+ *  linux/arch/mips/toshiba-boards/generic/pmon-low.S
-+ *
-+ * This file is subject to the terms and conditions of the GNU General Public
-+ * License.  See the file "COPYING" in the main directory of this archive
-+ * for more details.
-+ *
-+ * Copyright (C) 2000-2001 Toshiba Corporation
-+ *
-+ * $Id: linux-2.4.31-mct.diff,v 1.1.1.1 2005/10/04 20:57:53 andi Exp $
-+ */
-+
-+#include <asm/asm.h>
-+#include <asm/mipsregs.h>
-+#include <asm/regdef.h>
-+#include <asm/addrspace.h>
-+#include <asm/stackframe.h>
-+#include <asm/isadep.h>
-+
-+	.align 5
-+	NESTED(pmon_trap_low, PT_SIZE, sp)
-+	.set	noat
-+	.set	noreorder
-+	mfc0	k0,CP0_STATUS
-+	andi	k0,KU_MASK     		/* extract K/U bit */
-+	xori	k0,KU_KERN
-+	beqz	k0,1f
-+	 nop
-+	/*
-+	 * Trap from user mode - invoke user exception handler
-+	 * set up in pmon.c
-+	 */
-+	mfc0	k1,CP0_CAUSE
-+	andi	k1,k1,0x7c
-+	la	k0,pmon_user_exception_handler
-+	addu	k0,k0,k1
-+	lw	k0,0(k0)
-+	nop
-+	jr	k0
-+	nop
-+1:
-+	/* jump into PMON */
-+	la	k0, pmon_vector
-+	lw	k0, (k0)
-+	lw	k0, 48(k0)	/* 12:_exception */
-+	jr	k0
-+	 nop
-+	.set	at
-+	.set	reorder
-+	END(pmon_trap_low)
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/pmon.c linux-2.4.32-mct/arch/mips/mct-boards/generic/pmon.c
---- linux-2.4.32/arch/mips/mct-boards/generic/pmon.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/pmon.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/pmon.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/pmon.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/pmon.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/pmon.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,59 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/pmon.c
@@ -4263,9 +4158,63 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/pmon.c linux-2.4.32-mct/arc
 +	set_except_vector(tt, pmon_trap_low);
 +	restore_flags(flags);
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/proc.c linux-2.4.32-mct/arch/mips/mct-boards/generic/proc.c
---- linux-2.4.32/arch/mips/mct-boards/generic/proc.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/proc.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/pmon-low.S linux-2.4.35.3-mct/arch/mips/mct-boards/generic/pmon-low.S
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/pmon-low.S	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/pmon-low.S	2007-11-04 14:10:45.000000000 +0100
+@@ -0,0 +1,50 @@
++/*
++ *  linux/arch/mips/toshiba-boards/generic/pmon-low.S
++ *
++ * This file is subject to the terms and conditions of the GNU General Public
++ * License.  See the file "COPYING" in the main directory of this archive
++ * for more details.
++ *
++ * Copyright (C) 2000-2001 Toshiba Corporation
++ *
++ * $Id: linux-2.4.31-mct.diff,v 1.1.1.1 2005/10/04 20:57:53 andi Exp $
++ */
++
++#include <asm/asm.h>
++#include <asm/mipsregs.h>
++#include <asm/regdef.h>
++#include <asm/addrspace.h>
++#include <asm/stackframe.h>
++#include <asm/isadep.h>
++
++	.align 5
++	NESTED(pmon_trap_low, PT_SIZE, sp)
++	.set	noat
++	.set	noreorder
++	mfc0	k0,CP0_STATUS
++	andi	k0,KU_MASK     		/* extract K/U bit */
++	xori	k0,KU_KERN
++	beqz	k0,1f
++	 nop
++	/*
++	 * Trap from user mode - invoke user exception handler
++	 * set up in pmon.c
++	 */
++	mfc0	k1,CP0_CAUSE
++	andi	k1,k1,0x7c
++	la	k0,pmon_user_exception_handler
++	addu	k0,k0,k1
++	lw	k0,0(k0)
++	nop
++	jr	k0
++	nop
++1:
++	/* jump into PMON */
++	la	k0, pmon_vector
++	lw	k0, (k0)
++	lw	k0, 48(k0)	/* 12:_exception */
++	jr	k0
++	 nop
++	.set	at
++	.set	reorder
++	END(pmon_trap_low)
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/proc.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/proc.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/proc.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/proc.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,429 @@
 +#include <linux/module.h>
 +#include <linux/kernel.h>
@@ -4697,9 +4646,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/proc.c linux-2.4.32-mct/arc
 +MODULE_DESCRIPTION("Mct proc support");
 +EXPORT_NO_SYMBOLS;
 \ No newline at end of file
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/prom.c linux-2.4.32-mct/arch/mips/mct-boards/generic/prom.c
---- linux-2.4.32/arch/mips/mct-boards/generic/prom.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/prom.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/prom.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/prom.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/prom.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/prom.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,387 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/prom.c
@@ -5088,9 +5037,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/prom.c linux-2.4.32-mct/arc
 +
 +	return system;
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/rtl8305.c linux-2.4.32-mct/arch/mips/mct-boards/generic/rtl8305.c
---- linux-2.4.32/arch/mips/mct-boards/generic/rtl8305.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/rtl8305.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/rtl8305.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/rtl8305.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/rtl8305.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/rtl8305.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,175 @@
 +#include <linux/config.h>
 +#include <asm/delay.h>
@@ -5267,9 +5216,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/rtl8305.c linux-2.4.32-mct/
 +	}
 +}
 +
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/setup.c linux-2.4.32-mct/arch/mips/mct-boards/generic/setup.c
---- linux-2.4.32/arch/mips/mct-boards/generic/setup.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/setup.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/setup.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/setup.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/setup.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/setup.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,613 @@
 +/*
 + * linux/arch/mips/toshiba-boards/generic/setup.c
@@ -5884,10 +5833,10 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/setup.c linux-2.4.32-mct/ar
 +#endif
 +	toshibaboards_cache_report();
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/wbflush.c linux-2.4.32-mct/arch/mips/mct-boards/generic/wbflush.c
---- linux-2.4.32/arch/mips/mct-boards/generic/wbflush.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/generic/wbflush.c	2006-12-02 15:08:43.000000000 +0100
-@@ -0,0 +1,70 @@
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/generic/wbflush.c linux-2.4.35.3-mct/arch/mips/mct-boards/generic/wbflush.c
+--- linux-2.4.35.3/arch/mips/mct-boards/generic/wbflush.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/generic/wbflush.c	2007-11-04 14:10:45.000000000 +0100
+@@ -0,0 +1,72 @@
 +/*
 + * Setup the right wbflush routine for TOSHIBA TX-RISC.
 + *
@@ -5899,6 +5848,7 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/wbflush.c linux-2.4.32-mct/
 + */
 +
 +#include <linux/init.h>
++#include <linux/module.h>
 +#include <asm/addrspace.h>
 +#include <asm/bootinfo.h>
 +#include <asm/cpu.h>
@@ -5958,37 +5908,10 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/generic/wbflush.c linux-2.4.32-mct/
 +	}
 +}
 +
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/Makefile linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/Makefile
---- linux-2.4.32/arch/mips/mct-boards/sg4x00/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/Makefile	2006-12-02 15:08:43.000000000 +0100
-@@ -0,0 +1,24 @@
-+#
-+# Makefile for the TOSHIBA RBTX4925 board specific parts of the kernel
-+#
-+# Note! Dependencies are done automagically by 'make dep', which also
-+# removes any old dependencies. DON'T put your own dependencies here
-+# unless it's something special (ie not a .c file).
-+#
-+# This file is subject to the terms and conditions of the GNU General Public
-+# License.  See the file "COPYING" in the main directory of this archive
-+# for more details.
-+#
-+# Copyright (C) 2001 Toshiba Corporation
-+#
-+
-+.S.s:
-+	$(CPP) $(AFLAGS) $< -o $@
-+.S.o:
-+	$(CC) $(AFLAGS) -c $< -o $@
-+
-+all: sg4x00.o
-+O_TARGET := sg4x00.o
-+obj-y	 := irq.o time.o setup.o pci.o prom.o s3511a.o power.o wdtmr.o
-+
-+include $(TOPDIR)/Rules.make
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/irq.c linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/irq.c
---- linux-2.4.32/arch/mips/mct-boards/sg4x00/irq.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/irq.c	2006-12-02 15:08:43.000000000 +0100
++EXPORT_SYMBOL(__wbflush);
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sg4x00/irq.c linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/irq.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sg4x00/irq.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/irq.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,461 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/rbtx4925/irq.c
@@ -6451,9 +6374,37 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/irq.c linux-2.4.32-mct/arch/
 +
 +	rbtx4925_setup_be_board_handler();
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/pci.c linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/pci.c
---- linux-2.4.32/arch/mips/mct-boards/sg4x00/pci.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/pci.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sg4x00/Makefile linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/Makefile
+--- linux-2.4.35.3/arch/mips/mct-boards/sg4x00/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/Makefile	2007-11-04 14:10:45.000000000 +0100
+@@ -0,0 +1,24 @@
++#
++# Makefile for the TOSHIBA RBTX4925 board specific parts of the kernel
++#
++# Note! Dependencies are done automagically by 'make dep', which also
++# removes any old dependencies. DON'T put your own dependencies here
++# unless it's something special (ie not a .c file).
++#
++# This file is subject to the terms and conditions of the GNU General Public
++# License.  See the file "COPYING" in the main directory of this archive
++# for more details.
++#
++# Copyright (C) 2001 Toshiba Corporation
++#
++
++.S.s:
++	$(CPP) $(AFLAGS) $< -o $@
++.S.o:
++	$(CC) $(AFLAGS) -c $< -o $@
++
++all: sg4x00.o
++O_TARGET := sg4x00.o
++obj-y	 := irq.o time.o setup.o pci.o prom.o s3511a.o power.o wdtmr.o
++
++include $(TOPDIR)/Rules.make
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sg4x00/pci.c linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/pci.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sg4x00/pci.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/pci.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,210 @@
 +/* $Id: linux-2.4.31-mct.diff,v 1.1.1.1 2005/10/04 20:57:53 andi Exp $
 + *
@@ -6665,9 +6616,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/pci.c linux-2.4.32-mct/arch/
 +};
 +
 +#endif /* CONFIG_PCI */
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/power.c linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/power.c
---- linux-2.4.32/arch/mips/mct-boards/sg4x00/power.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/power.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sg4x00/power.c linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/power.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sg4x00/power.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/power.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,157 @@
 +
 +#include <linux/kernel.h>
@@ -6826,9 +6777,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/power.c linux-2.4.32-mct/arc
 +__initcall(power_init);
 +#endif
 +
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/prom.c linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/prom.c
---- linux-2.4.32/arch/mips/mct-boards/sg4x00/prom.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/prom.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sg4x00/prom.c linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/prom.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sg4x00/prom.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/prom.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,37 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/rbtx4925/prom.c
@@ -6867,9 +6818,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/prom.c linux-2.4.32-mct/arch
 +
 +	return 0;
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/s3511a.c linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/s3511a.c
---- linux-2.4.32/arch/mips/mct-boards/sg4x00/s3511a.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/s3511a.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sg4x00/s3511a.c linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/s3511a.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sg4x00/s3511a.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/s3511a.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,324 @@
 +#include <linux/config.h>
 +#include <linux/init.h>
@@ -7195,9 +7146,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/s3511a.c linux-2.4.32-mct/ar
 +#endif 
 +}
 +
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/setup.c linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/setup.c
---- linux-2.4.32/arch/mips/mct-boards/sg4x00/setup.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/setup.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sg4x00/setup.c linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/setup.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sg4x00/setup.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/setup.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,721 @@
 +/*
 + * linux/arch/mips/toshiba-boards/rbtx4925/setup.c
@@ -7920,9 +7871,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/setup.c linux-2.4.32-mct/arc
 +	}
 +#endif
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/time.c linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/time.c
---- linux-2.4.32/arch/mips/mct-boards/sg4x00/time.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/time.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sg4x00/time.c linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/time.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sg4x00/time.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/time.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,105 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/rbtx4925/time.c
@@ -8029,9 +7980,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/time.c linux-2.4.32-mct/arch
 +//	printk("%08x(%d)\n", mips_counter_frequency, mips_counter_frequency); // wg. SA200 - udo
 +	printk("%08x(%d)\n", mips_hpt_frequency, mips_hpt_frequency);
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/wdtmr.c linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/wdtmr.c
---- linux-2.4.32/arch/mips/mct-boards/sg4x00/wdtmr.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sg4x00/wdtmr.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sg4x00/wdtmr.c linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/wdtmr.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sg4x00/wdtmr.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sg4x00/wdtmr.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,65 @@
 +
 +#include <linux/init.h>
@@ -8098,45 +8049,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sg4x00/wdtmr.c linux-2.4.32-mct/arc
 +	add_timer(&wdog_timer);
 +}
 +
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/Makefile linux-2.4.32-mct/arch/mips/mct-boards/sgx00/Makefile
---- linux-2.4.32/arch/mips/mct-boards/sgx00/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sgx00/Makefile	2006-12-02 15:08:43.000000000 +0100
-@@ -0,0 +1,32 @@
-+#
-+# Makefile for the TJSYS JMR-TX3927 board specific parts of the kernel
-+#
-+# Note! Dependencies are done automagically by 'make dep', which also
-+# removes any old dependencies. DON'T put your own dependencies here
-+# unless it's something special (ie not a .c file).
-+#
-+# This file is subject to the terms and conditions of the GNU General Public
-+# License.  See the file "COPYING" in the main directory of this archive
-+# for more details.
-+#
-+# Copyright (C) 2000-2001 Toshiba Corporation
-+#
-+
-+.S.s:
-+	$(CPP) $(AFLAGS) $< -o $@
-+.S.o:
-+	$(CC) $(AFLAGS) -c $< -o $@
-+
-+all: sgx00.o
-+O_TARGET := sgx00.o
-+obj-y	 := irq.o time.o setup.o pci.o prom.o s3511a.o wdtmr.o 
-+
-+ifeq ($(CONFIG_MCT_SG600),y) 
-+obj-y	+= power.o
-+endif
-+
-+ifeq ($(CONFIG_MCT_SA100),y) 
-+obj-y	+= power.o
-+endif
-+
-+include $(TOPDIR)/Rules.make
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/irq.c linux-2.4.32-mct/arch/mips/mct-boards/sgx00/irq.c
---- linux-2.4.32/arch/mips/mct-boards/sgx00/irq.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sgx00/irq.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sgx00/irq.c linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/irq.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sgx00/irq.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/irq.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,327 @@
 +/*
 + *  linux/arch/mips/mct-boards/jmr3927/irq.c
@@ -8465,9 +8380,45 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/irq.c linux-2.4.32-mct/arch/m
 +	toshibaboards_gen_iack = jmr3927_gen_iack;
 +#endif	/* Modified by Ethan */
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/pci.c linux-2.4.32-mct/arch/mips/mct-boards/sgx00/pci.c
---- linux-2.4.32/arch/mips/mct-boards/sgx00/pci.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sgx00/pci.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sgx00/Makefile linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/Makefile
+--- linux-2.4.35.3/arch/mips/mct-boards/sgx00/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/Makefile	2007-11-04 14:10:45.000000000 +0100
+@@ -0,0 +1,32 @@
++#
++# Makefile for the TJSYS JMR-TX3927 board specific parts of the kernel
++#
++# Note! Dependencies are done automagically by 'make dep', which also
++# removes any old dependencies. DON'T put your own dependencies here
++# unless it's something special (ie not a .c file).
++#
++# This file is subject to the terms and conditions of the GNU General Public
++# License.  See the file "COPYING" in the main directory of this archive
++# for more details.
++#
++# Copyright (C) 2000-2001 Toshiba Corporation
++#
++
++.S.s:
++	$(CPP) $(AFLAGS) $< -o $@
++.S.o:
++	$(CC) $(AFLAGS) -c $< -o $@
++
++all: sgx00.o
++O_TARGET := sgx00.o
++obj-y	 := irq.o time.o setup.o pci.o prom.o s3511a.o wdtmr.o 
++
++ifeq ($(CONFIG_MCT_SG600),y) 
++obj-y	+= power.o
++endif
++
++ifeq ($(CONFIG_MCT_SA100),y) 
++obj-y	+= power.o
++endif
++
++include $(TOPDIR)/Rules.make
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sgx00/pci.c linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/pci.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sgx00/pci.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/pci.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,202 @@
 +/* $Id: linux-2.4.31-mct.diff,v 1.1.1.1 2005/10/04 20:57:53 andi Exp $
 + *
@@ -8671,9 +8622,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/pci.c linux-2.4.32-mct/arch/m
 +};
 +
 +#endif /* CONFIG_PCI */
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/power.c linux-2.4.32-mct/arch/mips/mct-boards/sgx00/power.c
---- linux-2.4.32/arch/mips/mct-boards/sgx00/power.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sgx00/power.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sgx00/power.c linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/power.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sgx00/power.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/power.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,175 @@
 +
 +#include <linux/kernel.h>
@@ -8850,9 +8801,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/power.c linux-2.4.32-mct/arch
 +	return 0;
 +}
 +__initcall(power_init);
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/prom.c linux-2.4.32-mct/arch/mips/mct-boards/sgx00/prom.c
---- linux-2.4.32/arch/mips/mct-boards/sgx00/prom.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sgx00/prom.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sgx00/prom.c linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/prom.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sgx00/prom.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/prom.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,38 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/jmr3927/prom.c
@@ -8892,9 +8843,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/prom.c linux-2.4.32-mct/arch/
 +
 +	return 0;
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/rtc.c linux-2.4.32-mct/arch/mips/mct-boards/sgx00/rtc.c
---- linux-2.4.32/arch/mips/mct-boards/sgx00/rtc.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sgx00/rtc.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sgx00/rtc.c linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/rtc.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sgx00/rtc.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/rtc.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,35 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/jmr3927/rtc.c
@@ -8931,9 +8882,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/rtc.c linux-2.4.32-mct/arch/m
 +	&jmr3927_rtc_write_data,
 +	&jmr3927_rtc_bcd_mode
 +};
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/s3511a.c linux-2.4.32-mct/arch/mips/mct-boards/sgx00/s3511a.c
---- linux-2.4.32/arch/mips/mct-boards/sgx00/s3511a.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sgx00/s3511a.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sgx00/s3511a.c linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/s3511a.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sgx00/s3511a.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/s3511a.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,353 @@
 +#include <linux/config.h>
 +#include <linux/init.h>
@@ -9288,9 +9239,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/s3511a.c linux-2.4.32-mct/arc
 +#endif
 +}
 +
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/setup.c linux-2.4.32-mct/arch/mips/mct-boards/sgx00/setup.c
---- linux-2.4.32/arch/mips/mct-boards/sgx00/setup.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sgx00/setup.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sgx00/setup.c linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/setup.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sgx00/setup.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/setup.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,449 @@
 +/*
 + * linux/arch/mips/toshiba-boards/jmr3927/setup.c
@@ -9741,9 +9692,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/setup.c linux-2.4.32-mct/arch
 +	}
 +#endif
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/time.c linux-2.4.32-mct/arch/mips/mct-boards/sgx00/time.c
---- linux-2.4.32/arch/mips/mct-boards/sgx00/time.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sgx00/time.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sgx00/time.c linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/time.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sgx00/time.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/time.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,98 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/jmr3927/time.c
@@ -9843,9 +9794,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/time.c linux-2.4.32-mct/arch/
 +	/* enable timer interrupt */
 +	setup_irq(JMR3927_IRQ_TICK, irq);
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/wdtmr.c linux-2.4.32-mct/arch/mips/mct-boards/sgx00/wdtmr.c
---- linux-2.4.32/arch/mips/mct-boards/sgx00/wdtmr.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/sgx00/wdtmr.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/sgx00/wdtmr.c linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/wdtmr.c
+--- linux-2.4.35.3/arch/mips/mct-boards/sgx00/wdtmr.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/sgx00/wdtmr.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,64 @@
 +
 +#include <linux/init.h>
@@ -9911,37 +9862,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/sgx00/wdtmr.c linux-2.4.32-mct/arch
 +	add_timer(&wdog_timer);
 +}
 +
-diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/Makefile linux-2.4.32-mct/arch/mips/mct-boards/tsdb/Makefile
---- linux-2.4.32/arch/mips/mct-boards/tsdb/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/tsdb/Makefile	2006-12-02 15:08:43.000000000 +0100
-@@ -0,0 +1,24 @@
-+#
-+# Makefile for the Toshiba SDB CPU board specific parts of the kernel
-+#
-+# Note! Dependencies are done automagically by 'make dep', which also
-+# removes any old dependencies. DON'T put your own dependencies here
-+# unless it's something special (ie not a .c file).
-+#
-+# This file is subject to the terms and conditions of the GNU General Public
-+# License.  See the file "COPYING" in the main directory of this archive
-+# for more details.
-+#
-+# Copyright (C) 1999-2001 Toshiba Corporation
-+#
-+
-+.S.s:
-+	$(CPP) $(AFLAGS) $< -o $@
-+.S.o:
-+	$(CC) $(AFLAGS) -c $< -o $@
-+
-+all: tsdb.o
-+O_TARGET := tsdb.o
-+obj-y	 := int-handler.o irq.o time.o rtc.o setup.o pci.o prom.o
-+
-+include $(TOPDIR)/Rules.make
-diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/int-handler.S linux-2.4.32-mct/arch/mips/mct-boards/tsdb/int-handler.S
---- linux-2.4.32/arch/mips/mct-boards/tsdb/int-handler.S	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/tsdb/int-handler.S	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/tsdb/int-handler.S linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/int-handler.S
+--- linux-2.4.35.3/arch/mips/mct-boards/tsdb/int-handler.S	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/int-handler.S	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,114 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/tsdb/int-handler.S
@@ -10057,9 +9980,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/int-handler.S linux-2.4.32-mct
 +	j	spurious_interrupt
 +	 nop
 +	END(tsdb_IRQ)
-diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/irq.c linux-2.4.32-mct/arch/mips/mct-boards/tsdb/irq.c
---- linux-2.4.32/arch/mips/mct-boards/tsdb/irq.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/tsdb/irq.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/tsdb/irq.c linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/irq.c
+--- linux-2.4.35.3/arch/mips/mct-boards/tsdb/irq.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/irq.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,456 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/tsdb/irq.c
@@ -10517,9 +10440,37 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/irq.c linux-2.4.32-mct/arch/mi
 +	toshibaboards_gen_iack = tsdb_gen_iack;
 +#endif
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/pci.c linux-2.4.32-mct/arch/mips/mct-boards/tsdb/pci.c
---- linux-2.4.32/arch/mips/mct-boards/tsdb/pci.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/tsdb/pci.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/tsdb/Makefile linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/Makefile
+--- linux-2.4.35.3/arch/mips/mct-boards/tsdb/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/Makefile	2007-11-04 14:10:45.000000000 +0100
+@@ -0,0 +1,24 @@
++#
++# Makefile for the Toshiba SDB CPU board specific parts of the kernel
++#
++# Note! Dependencies are done automagically by 'make dep', which also
++# removes any old dependencies. DON'T put your own dependencies here
++# unless it's something special (ie not a .c file).
++#
++# This file is subject to the terms and conditions of the GNU General Public
++# License.  See the file "COPYING" in the main directory of this archive
++# for more details.
++#
++# Copyright (C) 1999-2001 Toshiba Corporation
++#
++
++.S.s:
++	$(CPP) $(AFLAGS) $< -o $@
++.S.o:
++	$(CC) $(AFLAGS) -c $< -o $@
++
++all: tsdb.o
++O_TARGET := tsdb.o
++obj-y	 := int-handler.o irq.o time.o rtc.o setup.o pci.o prom.o
++
++include $(TOPDIR)/Rules.make
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/tsdb/pci.c linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/pci.c
+--- linux-2.4.35.3/arch/mips/mct-boards/tsdb/pci.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/pci.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,210 @@
 +/* $Id: linux-2.4.31-mct.diff,v 1.1.1.1 2005/10/04 20:57:53 andi Exp $
 + *
@@ -10731,9 +10682,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/pci.c linux-2.4.32-mct/arch/mi
 +};
 +
 +#endif /* CONFIG_PCI */
-diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/prom.c linux-2.4.32-mct/arch/mips/mct-boards/tsdb/prom.c
---- linux-2.4.32/arch/mips/mct-boards/tsdb/prom.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/tsdb/prom.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/tsdb/prom.c linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/prom.c
+--- linux-2.4.35.3/arch/mips/mct-boards/tsdb/prom.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/prom.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,40 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/tsdb/prom.c
@@ -10775,9 +10726,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/prom.c linux-2.4.32-mct/arch/m
 +
 +	return 0;
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/rtc.c linux-2.4.32-mct/arch/mips/mct-boards/tsdb/rtc.c
---- linux-2.4.32/arch/mips/mct-boards/tsdb/rtc.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/tsdb/rtc.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/tsdb/rtc.c linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/rtc.c
+--- linux-2.4.35.3/arch/mips/mct-boards/tsdb/rtc.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/rtc.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,45 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/tsdb/rtc.c
@@ -10824,9 +10775,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/rtc.c linux-2.4.32-mct/arch/mi
 +	&tsdb_rtc_write_data,
 +	&tsdb_rtc_bcd_mode
 +};
-diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/setup.c linux-2.4.32-mct/arch/mips/mct-boards/tsdb/setup.c
---- linux-2.4.32/arch/mips/mct-boards/tsdb/setup.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/tsdb/setup.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/tsdb/setup.c linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/setup.c
+--- linux-2.4.35.3/arch/mips/mct-boards/tsdb/setup.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/setup.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,464 @@
 +/*
 + * linux/arch/mips/toshiba-boards/tsdb/setup.c
@@ -11292,9 +11243,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/setup.c linux-2.4.32-mct/arch/
 +		ns87338_writeb(spio_config, FCR, tmp);
 +	}
 +}
-diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/time.c linux-2.4.32-mct/arch/mips/mct-boards/tsdb/time.c
---- linux-2.4.32/arch/mips/mct-boards/tsdb/time.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/mct-boards/tsdb/time.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/mct-boards/tsdb/time.c linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/time.c
+--- linux-2.4.35.3/arch/mips/mct-boards/tsdb/time.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/arch/mips/mct-boards/tsdb/time.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,105 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/tsdb/time.c
@@ -11401,9 +11352,9 @@ diff -Naru linux-2.4.32/arch/mips/mct-boards/tsdb/time.c linux-2.4.32-mct/arch/m
 +	}
 +	printk("%08x(%d)\n", mips_counter_frequency, mips_counter_frequency);
 +}
-diff -Naru linux-2.4.32/arch/mips/pci/pci.c linux-2.4.32-mct/arch/mips/pci/pci.c
---- linux-2.4.32/arch/mips/pci/pci.c	2005-01-19 15:09:29.000000000 +0100
-+++ linux-2.4.32-mct/arch/mips/pci/pci.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/arch/mips/pci/pci.c linux-2.4.35.3-mct/arch/mips/pci/pci.c
+--- linux-2.4.35.3/arch/mips/pci/pci.c	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/arch/mips/pci/pci.c	2007-11-04 14:10:45.000000000 +0100
 @@ -12,6 +12,7 @@
  
  #include <asm/pci_channel.h>
@@ -11446,9 +11397,9 @@ diff -Naru linux-2.4.32/arch/mips/pci/pci.c linux-2.4.32-mct/arch/mips/pci/pci.c
  
  #ifdef CONFIG_PCI_NEW
  /*
-diff -Naru linux-2.4.32/drivers/char/Config.in linux-2.4.32-mct/drivers/char/Config.in
---- linux-2.4.32/drivers/char/Config.in	2004-08-08 01:26:04.000000000 +0200
-+++ linux-2.4.32-mct/drivers/char/Config.in	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/drivers/char/Config.in linux-2.4.35.3-mct/drivers/char/Config.in
+--- linux-2.4.35.3/drivers/char/Config.in	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/drivers/char/Config.in	2007-11-04 14:10:45.000000000 +0100
 @@ -104,6 +104,8 @@
        if [ "$CONFIG_TXX927_SERIAL" = "y" ]; then
           bool '    TXx927 SIO Console support' CONFIG_TXX927_SERIAL_CONSOLE  
@@ -11458,9 +11409,9 @@ diff -Naru linux-2.4.32/drivers/char/Config.in linux-2.4.32-mct/drivers/char/Con
        if [ "$CONFIG_SIBYTE_SB1xxx_SOC" = "y" ]; then
           bool '  Support for BCM1xxx onchip DUART' CONFIG_SIBYTE_SB1250_DUART
           if [ "$CONFIG_SIBYTE_SB1250_DUART" = "y" ]; then
-diff -Naru linux-2.4.32/drivers/char/Makefile linux-2.4.32-mct/drivers/char/Makefile
---- linux-2.4.32/drivers/char/Makefile	2004-08-08 01:26:04.000000000 +0200
-+++ linux-2.4.32-mct/drivers/char/Makefile	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/drivers/char/Makefile linux-2.4.35.3-mct/drivers/char/Makefile
+--- linux-2.4.35.3/drivers/char/Makefile	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/drivers/char/Makefile	2007-11-04 14:10:45.000000000 +0100
 @@ -217,6 +217,7 @@
  obj-$(CONFIG_HVC_CONSOLE) += hvc_console.o
  obj-$(CONFIG_SERIAL_TX3912) += generic_serial.o serial_tx3912.o
@@ -11469,9 +11420,9 @@ diff -Naru linux-2.4.32/drivers/char/Makefile linux-2.4.32-mct/drivers/char/Make
  obj-$(CONFIG_SERIAL_TXX9) += generic_serial.o serial_txx9.o
  obj-$(CONFIG_IP22_SERIAL) += sgiserial.o
  obj-$(CONFIG_AU1X00_UART) += au1x00-serial.o
-diff -Naru linux-2.4.32/drivers/char/serial_mct_txx927.c linux-2.4.32-mct/drivers/char/serial_mct_txx927.c
---- linux-2.4.32/drivers/char/serial_mct_txx927.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/char/serial_mct_txx927.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/drivers/char/serial_mct_txx927.c linux-2.4.35.3-mct/drivers/char/serial_mct_txx927.c
+--- linux-2.4.35.3/drivers/char/serial_mct_txx927.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/char/serial_mct_txx927.c	2007-11-04 14:10:45.000000000 +0100
 @@ -0,0 +1,1349 @@
 +/*
 + *  drivers/char/serial_txx927.c
@@ -12822,9 +12773,9 @@ diff -Naru linux-2.4.32/drivers/char/serial_mct_txx927.c linux-2.4.32-mct/driver
 +}
 +
 +#endif
-diff -Naru linux-2.4.32/drivers/char/tty_io.c linux-2.4.32-mct/drivers/char/tty_io.c
---- linux-2.4.32/drivers/char/tty_io.c	2005-01-19 15:09:53.000000000 +0100
-+++ linux-2.4.32-mct/drivers/char/tty_io.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/drivers/char/tty_io.c linux-2.4.35.3-mct/drivers/char/tty_io.c
+--- linux-2.4.35.3/drivers/char/tty_io.c	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/drivers/char/tty_io.c	2007-11-04 14:10:45.000000000 +0100
 @@ -164,6 +164,9 @@
  extern void sb1250_serial_console_init(void);
  extern void arc_console_init(void);
@@ -12845,9 +12796,9 @@ diff -Naru linux-2.4.32/drivers/char/tty_io.c linux-2.4.32-mct/drivers/char/tty_
  #ifdef CONFIG_SERIAL_TXX9_CONSOLE
  	txx9_serial_console_init();
  #endif
-diff -Naru linux-2.4.32/drivers/ide/Config.in linux-2.4.32-mct/drivers/ide/Config.in
---- linux-2.4.32/drivers/ide/Config.in	2004-11-17 12:54:21.000000000 +0100
-+++ linux-2.4.32-mct/drivers/ide/Config.in	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/drivers/ide/Config.in linux-2.4.35.3-mct/drivers/ide/Config.in
+--- linux-2.4.35.3/drivers/ide/Config.in	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/drivers/ide/Config.in	2007-11-04 14:10:46.000000000 +0100
 @@ -60,6 +60,7 @@
  	    dep_mbool    '      HPT34X AUTODMA support (WIP)' CONFIG_HPT34X_AUTODMA $CONFIG_BLK_DEV_HPT34X $CONFIG_IDEDMA_PCI_WIP
  	    dep_tristate '    HPT36X/37X chipset support' CONFIG_BLK_DEV_HPT366 $CONFIG_BLK_DEV_IDEDMA_PCI
@@ -12856,9 +12807,9 @@ diff -Naru linux-2.4.32/drivers/ide/Config.in linux-2.4.32-mct/drivers/ide/Confi
  	    if [ "$CONFIG_MIPS_ITE8172" = "y" -o "$CONFIG_MIPS_IVR" = "y" ]; then
  	       dep_mbool '    IT8172 IDE support' CONFIG_BLK_DEV_IT8172 $CONFIG_BLK_DEV_IDEDMA_PCI
  	    fi
-diff -Naru linux-2.4.32/drivers/ide/ide-iops.c linux-2.4.32-mct/drivers/ide/ide-iops.c
---- linux-2.4.32/drivers/ide/ide-iops.c	2004-02-18 14:36:31.000000000 +0100
-+++ linux-2.4.32-mct/drivers/ide/ide-iops.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/drivers/ide/ide-iops.c linux-2.4.35.3-mct/drivers/ide/ide-iops.c
+--- linux-2.4.35.3/drivers/ide/ide-iops.c	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/drivers/ide/ide-iops.c	2007-11-04 14:10:46.000000000 +0100
 @@ -1099,7 +1099,7 @@
  	   use. When they take an IRQ they check STS but also that
  	   the DMA count is not zero (see hpt's own driver)
@@ -12868,9 +12819,9 @@ diff -Naru linux-2.4.32/drivers/ide/ide-iops.c linux-2.4.32-mct/drivers/ide/ide-
  	spin_unlock_irqrestore(&io_request_lock, flags);
  }
  
-diff -Naru linux-2.4.32/drivers/ide/ide-probe.c linux-2.4.32-mct/drivers/ide/ide-probe.c
---- linux-2.4.32/drivers/ide/ide-probe.c	2004-04-14 15:05:29.000000000 +0200
-+++ linux-2.4.32-mct/drivers/ide/ide-probe.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/drivers/ide/ide-probe.c linux-2.4.35.3-mct/drivers/ide/ide-probe.c
+--- linux-2.4.35.3/drivers/ide/ide-probe.c	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/drivers/ide/ide-probe.c	2007-11-04 14:10:46.000000000 +0100
 @@ -460,6 +460,19 @@
  	ide_delay_50ms();
  	SELECT_DRIVE(drive);
@@ -12891,20 +12842,9 @@ diff -Naru linux-2.4.32/drivers/ide/ide-probe.c linux-2.4.32-mct/drivers/ide/ide
  	if (hwif->INB(IDE_SELECT_REG) != drive->select.all && !drive->present) {
  		if (drive->select.b.unit != 0) {
  			/* exit with drive0 selected */
-diff -Naru linux-2.4.32/drivers/ide/pci/Makefile linux-2.4.32-mct/drivers/ide/pci/Makefile
---- linux-2.4.32/drivers/ide/pci/Makefile	2004-11-17 12:54:21.000000000 +0100
-+++ linux-2.4.32-mct/drivers/ide/pci/Makefile	2006-12-02 15:08:43.000000000 +0100
-@@ -23,6 +23,7 @@
- obj-$(CONFIG_BLK_DEV_PDC202XX_OLD)	+= pdc202xx_old.o
- obj-$(CONFIG_BLK_DEV_PDC202XX_NEW)	+= pdc202xx_new.o
- obj-$(CONFIG_BLK_DEV_PIIX)		+= piix.o
-+obj-$(CONFIG_BLK_DEV_ITE821X)	+= it821x.o
- obj-$(CONFIG_BLK_DEV_RZ1000)		+= rz1000.o
- obj-$(CONFIG_BLK_DEV_SVWKS)		+= serverworks.o
- obj-$(CONFIG_BLK_DEV_SC1200)		+= sc1200.o
-diff -Naru linux-2.4.32/drivers/ide/pci/it821x.c linux-2.4.32-mct/drivers/ide/pci/it821x.c
---- linux-2.4.32/drivers/ide/pci/it821x.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/ide/pci/it821x.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/drivers/ide/pci/it821x.c linux-2.4.35.3-mct/drivers/ide/pci/it821x.c
+--- linux-2.4.35.3/drivers/ide/pci/it821x.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/ide/pci/it821x.c	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,850 @@
 +
 +/*
@@ -13756,9 +13696,20 @@ diff -Naru linux-2.4.32/drivers/ide/pci/it821x.c linux-2.4.32-mct/drivers/ide/pc
 +MODULE_AUTHOR("Alan Cox");
 +MODULE_DESCRIPTION("PCI driver module for the ITE 821x (Backport to 2.4.31 by Udo Hegel <udo@email.com>)");
 +MODULE_LICENSE("GPL");
-diff -Naru linux-2.4.32/drivers/mtd/maps/Config.in linux-2.4.32-mct/drivers/mtd/maps/Config.in
---- linux-2.4.32/drivers/mtd/maps/Config.in	2003-06-13 16:51:34.000000000 +0200
-+++ linux-2.4.32-mct/drivers/mtd/maps/Config.in	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/drivers/ide/pci/Makefile linux-2.4.35.3-mct/drivers/ide/pci/Makefile
+--- linux-2.4.35.3/drivers/ide/pci/Makefile	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/drivers/ide/pci/Makefile	2007-11-04 14:10:46.000000000 +0100
+@@ -23,6 +23,7 @@
+ obj-$(CONFIG_BLK_DEV_PDC202XX_OLD)	+= pdc202xx_old.o
+ obj-$(CONFIG_BLK_DEV_PDC202XX_NEW)	+= pdc202xx_new.o
+ obj-$(CONFIG_BLK_DEV_PIIX)		+= piix.o
++obj-$(CONFIG_BLK_DEV_ITE821X)	+= it821x.o
+ obj-$(CONFIG_BLK_DEV_RZ1000)		+= rz1000.o
+ obj-$(CONFIG_BLK_DEV_SVWKS)		+= serverworks.o
+ obj-$(CONFIG_BLK_DEV_SC1200)		+= sc1200.o
+diff -Naru linux-2.4.35.3/drivers/mtd/maps/Config.in linux-2.4.35.3-mct/drivers/mtd/maps/Config.in
+--- linux-2.4.35.3/drivers/mtd/maps/Config.in	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/drivers/mtd/maps/Config.in	2007-11-04 14:10:46.000000000 +0100
 @@ -63,6 +63,7 @@
        int '    Bus width in octets' CONFIG_MTD_CSTM_MIPS_IXX_BUSWIDTH 2
     fi
@@ -13767,9 +13718,9 @@ diff -Naru linux-2.4.32/drivers/mtd/maps/Config.in linux-2.4.32-mct/drivers/mtd/
     dep_tristate '  LASAT flash device' CONFIG_MTD_LASAT $CONFIG_MTD_CFI $CONFIG_LASAT
  fi
  
-diff -Naru linux-2.4.32/drivers/mtd/maps/Makefile linux-2.4.32-mct/drivers/mtd/maps/Makefile
---- linux-2.4.32/drivers/mtd/maps/Makefile	2003-06-13 16:51:34.000000000 +0200
-+++ linux-2.4.32-mct/drivers/mtd/maps/Makefile	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/drivers/mtd/maps/Makefile linux-2.4.35.3-mct/drivers/mtd/maps/Makefile
+--- linux-2.4.35.3/drivers/mtd/maps/Makefile	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/drivers/mtd/maps/Makefile	2007-11-04 14:10:46.000000000 +0100
 @@ -61,5 +61,7 @@
  obj-$(CONFIG_MTD_UCLINUX)	+= uclinux.o
  obj-$(CONFIG_MTD_NETtel)	+= nettel.o
@@ -13778,9 +13729,9 @@ diff -Naru linux-2.4.32/drivers/mtd/maps/Makefile linux-2.4.32-mct/drivers/mtd/m
 +
  
  include $(TOPDIR)/Rules.make
-diff -Naru linux-2.4.32/drivers/mtd/maps/mct.c linux-2.4.32-mct/drivers/mtd/maps/mct.c
---- linux-2.4.32/drivers/mtd/maps/mct.c	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/drivers/mtd/maps/mct.c	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/drivers/mtd/maps/mct.c linux-2.4.35.3-mct/drivers/mtd/maps/mct.c
+--- linux-2.4.35.3/drivers/mtd/maps/mct.c	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/drivers/mtd/maps/mct.c	2007-11-04 14:11:33.000000000 +0100
 @@ -0,0 +1,249 @@
 +/*
 + * MCT flash driver
@@ -13995,7 +13946,7 @@ diff -Naru linux-2.4.32/drivers/mtd/maps/mct.c linux-2.4.32-mct/drivers/mtd/maps
 +
 +                /* Create MTD devices for each partition. */
 +	        add_mtd_partitions(mymtd, partition_info, NUM_PARTITIONS);
-+		
++
 +		return 0;
 +	}
 +
@@ -14031,9 +13982,9 @@ diff -Naru linux-2.4.32/drivers/mtd/maps/mct.c linux-2.4.32-mct/drivers/mtd/maps
 +MODULE_LICENSE("GPL");
 +MODULE_AUTHOR("Andi <andi@void.at>");
 +MODULE_DESCRIPTION("MTD map driver for MCT boards");
-diff -Naru linux-2.4.32/drivers/pci/Makefile linux-2.4.32-mct/drivers/pci/Makefile
---- linux-2.4.32/drivers/pci/Makefile	2003-08-25 13:44:42.000000000 +0200
-+++ linux-2.4.32-mct/drivers/pci/Makefile	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/drivers/pci/Makefile linux-2.4.35.3-mct/drivers/pci/Makefile
+--- linux-2.4.35.3/drivers/pci/Makefile	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/drivers/pci/Makefile	2007-11-04 14:10:46.000000000 +0100
 @@ -29,6 +29,7 @@
  obj-$(CONFIG_SUPERH) += setup-bus.o setup-irq.o
  obj-$(CONFIG_PPC32) += setup-irq.o
@@ -14042,9 +13993,9 @@ diff -Naru linux-2.4.32/drivers/pci/Makefile linux-2.4.32-mct/drivers/pci/Makefi
  
  ifndef CONFIG_X86
  obj-y += syscall.o
-diff -Naru linux-2.4.32/include/asm-mips/bootinfo.h linux-2.4.32-mct/include/asm-mips/bootinfo.h
---- linux-2.4.32/include/asm-mips/bootinfo.h	2004-02-18 14:36:32.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/bootinfo.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/bootinfo.h linux-2.4.35.3-mct/include/asm-mips/bootinfo.h
+--- linux-2.4.35.3/include/asm-mips/bootinfo.h	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/include/asm-mips/bootinfo.h	2007-11-04 14:10:46.000000000 +0100
 @@ -36,6 +36,7 @@
  #define MACH_GROUP_NEC_VR41XX  19 /* NEC Vr41xx based boards/gadgets        */
  #define MACH_GROUP_HP_LJ       20 /* Hewlett Packard LaserJet               */
@@ -14078,9 +14029,9 @@ diff -Naru linux-2.4.32/include/asm-mips/bootinfo.h linux-2.4.32-mct/include/asm
   * Valid machtype for group LASAT
   */
  #define MACH_LASAT_100		0	/* Masquerade II/SP100/SP50/SP25 */
-diff -Naru linux-2.4.32/include/asm-mips/cpu.h linux-2.4.32-mct/include/asm-mips/cpu.h
---- linux-2.4.32/include/asm-mips/cpu.h	2005-01-19 15:10:11.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/cpu.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/cpu.h linux-2.4.35.3-mct/include/asm-mips/cpu.h
+--- linux-2.4.35.3/include/asm-mips/cpu.h	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/include/asm-mips/cpu.h	2007-11-04 14:10:46.000000000 +0100
 @@ -158,6 +158,7 @@
  #define CPU_VR41XX		41
  #define CPU_R5500		42
@@ -14089,9 +14040,9 @@ diff -Naru linux-2.4.32/include/asm-mips/cpu.h linux-2.4.32-mct/include/asm-mips
  #define CPU_AU1500		44
  #define CPU_20KC		45
  #define CPU_VR4111		46
-diff -Naru linux-2.4.32/include/asm-mips/delay.h linux-2.4.32-mct/include/asm-mips/delay.h
---- linux-2.4.32/include/asm-mips/delay.h	2005-01-19 15:10:11.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/delay.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/delay.h linux-2.4.35.3-mct/include/asm-mips/delay.h
+--- linux-2.4.35.3/include/asm-mips/delay.h	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/include/asm-mips/delay.h	2007-11-04 14:10:46.000000000 +0100
 @@ -10,13 +10,11 @@
  #define _ASM_DELAY_H
  
@@ -14167,9 +14118,9 @@ diff -Naru linux-2.4.32/include/asm-mips/delay.h linux-2.4.32-mct/include/asm-mi
 -#define ndelay(nsecs) __ndelay((nsecs),__udelay_val)
  
  #endif /* _ASM_DELAY_H */
-diff -Naru linux-2.4.32/include/asm-mips/dma.h linux-2.4.32-mct/include/asm-mips/dma.h
---- linux-2.4.32/include/asm-mips/dma.h	2003-08-25 13:44:43.000000000 +0200
-+++ linux-2.4.32-mct/include/asm-mips/dma.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/dma.h linux-2.4.35.3-mct/include/asm-mips/dma.h
+--- linux-2.4.35.3/include/asm-mips/dma.h	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/include/asm-mips/dma.h	2007-11-04 14:10:46.000000000 +0100
 @@ -75,7 +75,14 @@
   *
   */
@@ -14186,9 +14137,9 @@ diff -Naru linux-2.4.32/include/asm-mips/dma.h linux-2.4.32-mct/include/asm-mips
  
  /*
   * The maximum address in KSEG0 that we can perform a DMA transfer to on this
-diff -Naru linux-2.4.32/include/asm-mips/fdc37m81x.h linux-2.4.32-mct/include/asm-mips/fdc37m81x.h
---- linux-2.4.32/include/asm-mips/fdc37m81x.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/fdc37m81x.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/fdc37m81x.h linux-2.4.35.3-mct/include/asm-mips/fdc37m81x.h
+--- linux-2.4.35.3/include/asm-mips/fdc37m81x.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/fdc37m81x.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,71 @@
 +/*
 + * fdc37m81x.h: Configuration Register Description for the
@@ -14261,9 +14212,9 @@ diff -Naru linux-2.4.32/include/asm-mips/fdc37m81x.h linux-2.4.32-mct/include/as
 +#endif
 +
 +#endif
-diff -Naru linux-2.4.32/include/asm-mips/mconfig.h linux-2.4.32-mct/include/asm-mips/mconfig.h
---- linux-2.4.32/include/asm-mips/mconfig.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/mconfig.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/mconfig.h linux-2.4.35.3-mct/include/asm-mips/mconfig.h
+--- linux-2.4.35.3/include/asm-mips/mconfig.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/mconfig.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,800 @@
 +/********************************************************************************
 +*
@@ -15065,9 +15016,9 @@ diff -Naru linux-2.4.32/include/asm-mips/mconfig.h linux-2.4.32-mct/include/asm-
 +
 +
 +#endif	// __ASM_MCONFIG_H__
-diff -Naru linux-2.4.32/include/asm-mips/mct-boards/dma.h linux-2.4.32-mct/include/asm-mips/mct-boards/dma.h
---- linux-2.4.32/include/asm-mips/mct-boards/dma.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/mct-boards/dma.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/mct-boards/dma.h linux-2.4.35.3-mct/include/asm-mips/mct-boards/dma.h
+--- linux-2.4.35.3/include/asm-mips/mct-boards/dma.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/mct-boards/dma.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,150 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/dma.c
@@ -15219,9 +15170,9 @@ diff -Naru linux-2.4.32/include/asm-mips/mct-boards/dma.h linux-2.4.32-mct/inclu
 +	(*txx927_dma_ops->free_chdma_cmd)(desc)
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_DMA_H */
-diff -Naru linux-2.4.32/include/asm-mips/mct-boards/irq.h linux-2.4.32-mct/include/asm-mips/mct-boards/irq.h
---- linux-2.4.32/include/asm-mips/mct-boards/irq.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/mct-boards/irq.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/mct-boards/irq.h linux-2.4.35.3-mct/include/asm-mips/mct-boards/irq.h
+--- linux-2.4.35.3/include/asm-mips/mct-boards/irq.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/mct-boards/irq.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,46 @@
 +/*
 + *  linux/include/asm-mips/toshiba-boards/irq.h
@@ -15269,9 +15220,9 @@ diff -Naru linux-2.4.32/include/asm-mips/mct-boards/irq.h linux-2.4.32-mct/inclu
 +#define NR_ISA_IRQS 16
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_IRQ_H */
-diff -Naru linux-2.4.32/include/asm-mips/mct-boards/jmi39io2.h linux-2.4.32-mct/include/asm-mips/mct-boards/jmi39io2.h
---- linux-2.4.32/include/asm-mips/mct-boards/jmi39io2.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/mct-boards/jmi39io2.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/mct-boards/jmi39io2.h linux-2.4.35.3-mct/include/asm-mips/mct-boards/jmi39io2.h
+--- linux-2.4.35.3/include/asm-mips/mct-boards/jmi39io2.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/mct-boards/jmi39io2.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,106 @@
 +/*
 + * Defines for the TJSYS JMI-3927IO2.
@@ -15379,9 +15330,9 @@ diff -Naru linux-2.4.32/include/asm-mips/mct-boards/jmi39io2.h linux-2.4.32-mct/
 +#endif /* _LANGUAGE_ASSEMBLY */
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_JMI39IO2_H */
-diff -Naru linux-2.4.32/include/asm-mips/mct-boards/jmr3927.h linux-2.4.32-mct/include/asm-mips/mct-boards/jmr3927.h
---- linux-2.4.32/include/asm-mips/mct-boards/jmr3927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/mct-boards/jmr3927.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/mct-boards/jmr3927.h linux-2.4.35.3-mct/include/asm-mips/mct-boards/jmr3927.h
+--- linux-2.4.35.3/include/asm-mips/mct-boards/jmr3927.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/mct-boards/jmr3927.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,206 @@
 +/*
 + * Defines for the TJSYS JMR-TX3927
@@ -15589,9 +15540,9 @@ diff -Naru linux-2.4.32/include/asm-mips/mct-boards/jmr3927.h linux-2.4.32-mct/i
 + */
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_JMR3927_H */
-diff -Naru linux-2.4.32/include/asm-mips/mct-boards/pci.h linux-2.4.32-mct/include/asm-mips/mct-boards/pci.h
---- linux-2.4.32/include/asm-mips/mct-boards/pci.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/mct-boards/pci.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/mct-boards/pci.h linux-2.4.35.3-mct/include/asm-mips/mct-boards/pci.h
+--- linux-2.4.35.3/include/asm-mips/mct-boards/pci.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/mct-boards/pci.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,23 @@
 +/*
 + *  linux/include/asm-mips/toshiba-boards/pci.h
@@ -15616,9 +15567,9 @@ diff -Naru linux-2.4.32/include/asm-mips/mct-boards/pci.h linux-2.4.32-mct/inclu
 +extern struct pci_ops *toshibaboards_pci_ops;
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_PCI_H */
-diff -Naru linux-2.4.32/include/asm-mips/mct-boards/pmon.h linux-2.4.32-mct/include/asm-mips/mct-boards/pmon.h
---- linux-2.4.32/include/asm-mips/mct-boards/pmon.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/mct-boards/pmon.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/mct-boards/pmon.h linux-2.4.35.3-mct/include/asm-mips/mct-boards/pmon.h
+--- linux-2.4.35.3/include/asm-mips/mct-boards/pmon.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/mct-boards/pmon.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,49 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -15669,9 +15620,9 @@ diff -Naru linux-2.4.32/include/asm-mips/mct-boards/pmon.h linux-2.4.32-mct/incl
 +#define PMON_VECTOR_TX39	0xbfc00500 /* with TX39_DEBUG_EXCEPTIONS */
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_PMON_H */
-diff -Naru linux-2.4.32/include/asm-mips/mct-boards/rbtx4925.h linux-2.4.32-mct/include/asm-mips/mct-boards/rbtx4925.h
---- linux-2.4.32/include/asm-mips/mct-boards/rbtx4925.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/mct-boards/rbtx4925.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/mct-boards/rbtx4925.h linux-2.4.35.3-mct/include/asm-mips/mct-boards/rbtx4925.h
+--- linux-2.4.35.3/include/asm-mips/mct-boards/rbtx4925.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/mct-boards/rbtx4925.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,277 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -15950,9 +15901,9 @@ diff -Naru linux-2.4.32/include/asm-mips/mct-boards/rbtx4925.h linux-2.4.32-mct/
 +#define L1121_outb(val, reg)  (*(volatile unsigned char *)(RBTX4925_PCMCIA_BASE + (reg)) = (val))
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_RBTX4925_H */
-diff -Naru linux-2.4.32/include/asm-mips/mct-boards/rbtx4927.h linux-2.4.32-mct/include/asm-mips/mct-boards/rbtx4927.h
---- linux-2.4.32/include/asm-mips/mct-boards/rbtx4927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/mct-boards/rbtx4927.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/mct-boards/rbtx4927.h linux-2.4.35.3-mct/include/asm-mips/mct-boards/rbtx4927.h
+--- linux-2.4.35.3/include/asm-mips/mct-boards/rbtx4927.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/mct-boards/rbtx4927.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,181 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -16135,9 +16086,9 @@ diff -Naru linux-2.4.32/include/asm-mips/mct-boards/rbtx4927.h linux-2.4.32-mct/
 +#define RBTX4927_IRQ_PREMIER3	RBTX4927_IRQ_IRC_INT(0)
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_RBTX4927_H */
-diff -Naru linux-2.4.32/include/asm-mips/mct-boards/tsdb.h linux-2.4.32-mct/include/asm-mips/mct-boards/tsdb.h
---- linux-2.4.32/include/asm-mips/mct-boards/tsdb.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/mct-boards/tsdb.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/mct-boards/tsdb.h linux-2.4.35.3-mct/include/asm-mips/mct-boards/tsdb.h
+--- linux-2.4.35.3/include/asm-mips/mct-boards/tsdb.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/mct-boards/tsdb.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,275 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -16414,9 +16365,9 @@ diff -Naru linux-2.4.32/include/asm-mips/mct-boards/tsdb.h linux-2.4.32-mct/incl
 +#define TSDB_IRQ_USC_DRAM_PI	(TSDB_IRQ_USC + USC_INTB_DRAM_PI)
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_TSDB_H */
-diff -Naru linux-2.4.32/include/asm-mips/mct-boards/tx4927evb.h linux-2.4.32-mct/include/asm-mips/mct-boards/tx4927evb.h
---- linux-2.4.32/include/asm-mips/mct-boards/tx4927evb.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/mct-boards/tx4927evb.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/mct-boards/tx4927evb.h linux-2.4.35.3-mct/include/asm-mips/mct-boards/tx4927evb.h
+--- linux-2.4.35.3/include/asm-mips/mct-boards/tx4927evb.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/mct-boards/tx4927evb.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,275 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -16693,9 +16644,9 @@ diff -Naru linux-2.4.32/include/asm-mips/mct-boards/tx4927evb.h linux-2.4.32-mct
 +#define TX4927EVB_IRQ_PREMIER3	TX4927EVB_IRQ_IOC_EXBINT(0)
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_TX4927EVB_H */
-diff -Naru linux-2.4.32/include/asm-mips/mipsregs.h linux-2.4.32-mct/include/asm-mips/mipsregs.h
---- linux-2.4.32/include/asm-mips/mipsregs.h	2005-01-19 15:10:12.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/mipsregs.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/mipsregs.h linux-2.4.35.3-mct/include/asm-mips/mipsregs.h
+--- linux-2.4.35.3/include/asm-mips/mipsregs.h	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/include/asm-mips/mipsregs.h	2007-11-04 14:10:46.000000000 +0100
 @@ -553,6 +553,62 @@
          : : "r" (val));
  
@@ -16759,9 +16710,9 @@ diff -Naru linux-2.4.32/include/asm-mips/mipsregs.h linux-2.4.32-mct/include/asm
   * Macros to access the system control coprocessor
   */
  
-diff -Naru linux-2.4.32/include/asm-mips/parport.h linux-2.4.32-mct/include/asm-mips/parport.h
---- linux-2.4.32/include/asm-mips/parport.h	2002-08-03 02:39:45.000000000 +0200
-+++ linux-2.4.32-mct/include/asm-mips/parport.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/parport.h linux-2.4.35.3-mct/include/asm-mips/parport.h
+--- linux-2.4.35.3/include/asm-mips/parport.h	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/include/asm-mips/parport.h	2007-11-04 14:10:46.000000000 +0100
 @@ -6,10 +6,26 @@
  #ifndef _ASM_PARPORT_H
  #define _ASM_PARPORT_H
@@ -16789,9 +16740,9 @@ diff -Naru linux-2.4.32/include/asm-mips/parport.h linux-2.4.32-mct/include/asm-
 +#endif
  
  #endif /* _ASM_PARPORT_H */
-diff -Naru linux-2.4.32/include/asm-mips/pci.h linux-2.4.32-mct/include/asm-mips/pci.h
---- linux-2.4.32/include/asm-mips/pci.h	2003-11-28 19:26:21.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/pci.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/pci.h linux-2.4.35.3-mct/include/asm-mips/pci.h
+--- linux-2.4.35.3/include/asm-mips/pci.h	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/include/asm-mips/pci.h	2007-11-04 14:10:46.000000000 +0100
 @@ -49,6 +49,13 @@
  #define PCIBIOS_MIN_MEM		0x1000000
  #endif
@@ -16806,9 +16757,9 @@ diff -Naru linux-2.4.32/include/asm-mips/pci.h linux-2.4.32-mct/include/asm-mips
  struct pci_dev;
  
  /*
-diff -Naru linux-2.4.32/include/asm-mips/ptrace.h linux-2.4.32-mct/include/asm-mips/ptrace.h
---- linux-2.4.32/include/asm-mips/ptrace.h	2004-02-18 14:36:32.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/ptrace.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/ptrace.h linux-2.4.35.3-mct/include/asm-mips/ptrace.h
+--- linux-2.4.35.3/include/asm-mips/ptrace.h	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/include/asm-mips/ptrace.h	2007-11-04 14:10:46.000000000 +0100
 @@ -73,12 +73,12 @@
  #endif /* !__ASSEMBLY__ */
  
@@ -16828,9 +16779,9 @@ diff -Naru linux-2.4.32/include/asm-mips/ptrace.h linux-2.4.32-mct/include/asm-m
  
  #define PTRACE_SETOPTIONS	21
  
-diff -Naru linux-2.4.32/include/asm-mips/serial_txx927.h linux-2.4.32-mct/include/asm-mips/serial_txx927.h
---- linux-2.4.32/include/asm-mips/serial_txx927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/serial_txx927.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/serial_txx927.h linux-2.4.35.3-mct/include/asm-mips/serial_txx927.h
+--- linux-2.4.35.3/include/asm-mips/serial_txx927.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/serial_txx927.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,17 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -16849,9 +16800,9 @@ diff -Naru linux-2.4.32/include/asm-mips/serial_txx927.h linux-2.4.32-mct/includ
 +extern int early_serial_txx927_setup(int line, unsigned long base, int irq, int baud_base, int flags) __init;
 +
 +#endif /* __ASM_SERIAL_TXX927_H */
-diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/dma.h linux-2.4.32-mct/include/asm-mips/toshiba-boards/dma.h
---- linux-2.4.32/include/asm-mips/toshiba-boards/dma.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/toshiba-boards/dma.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/toshiba-boards/dma.h linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/dma.h
+--- linux-2.4.35.3/include/asm-mips/toshiba-boards/dma.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/dma.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,150 @@
 +/*
 + *  linux/arch/mips/toshiba-boards/generic/dma.c
@@ -17003,9 +16954,9 @@ diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/dma.h linux-2.4.32-mct/i
 +	(*txx927_dma_ops->free_chdma_cmd)(desc)
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_DMA_H */
-diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/irq.h linux-2.4.32-mct/include/asm-mips/toshiba-boards/irq.h
---- linux-2.4.32/include/asm-mips/toshiba-boards/irq.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/toshiba-boards/irq.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/toshiba-boards/irq.h linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/irq.h
+--- linux-2.4.35.3/include/asm-mips/toshiba-boards/irq.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/irq.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,46 @@
 +/*
 + *  linux/include/asm-mips/toshiba-boards/irq.h
@@ -17053,9 +17004,9 @@ diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/irq.h linux-2.4.32-mct/i
 +#define NR_ISA_IRQS 16
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_IRQ_H */
-diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/jmi39io2.h linux-2.4.32-mct/include/asm-mips/toshiba-boards/jmi39io2.h
---- linux-2.4.32/include/asm-mips/toshiba-boards/jmi39io2.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/toshiba-boards/jmi39io2.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/toshiba-boards/jmi39io2.h linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/jmi39io2.h
+--- linux-2.4.35.3/include/asm-mips/toshiba-boards/jmi39io2.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/jmi39io2.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,106 @@
 +/*
 + * Defines for the TJSYS JMI-3927IO2.
@@ -17163,9 +17114,9 @@ diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/jmi39io2.h linux-2.4.32-
 +#endif /* _LANGUAGE_ASSEMBLY */
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_JMI39IO2_H */
-diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/jmr3927.h linux-2.4.32-mct/include/asm-mips/toshiba-boards/jmr3927.h
---- linux-2.4.32/include/asm-mips/toshiba-boards/jmr3927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/toshiba-boards/jmr3927.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/toshiba-boards/jmr3927.h linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/jmr3927.h
+--- linux-2.4.35.3/include/asm-mips/toshiba-boards/jmr3927.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/jmr3927.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,206 @@
 +/*
 + * Defines for the TJSYS JMR-TX3927
@@ -17373,9 +17324,9 @@ diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/jmr3927.h linux-2.4.32-m
 + */
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_JMR3927_H */
-diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/pci.h linux-2.4.32-mct/include/asm-mips/toshiba-boards/pci.h
---- linux-2.4.32/include/asm-mips/toshiba-boards/pci.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/toshiba-boards/pci.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/toshiba-boards/pci.h linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/pci.h
+--- linux-2.4.35.3/include/asm-mips/toshiba-boards/pci.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/pci.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,23 @@
 +/*
 + *  linux/include/asm-mips/toshiba-boards/pci.h
@@ -17400,9 +17351,9 @@ diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/pci.h linux-2.4.32-mct/i
 +extern struct pci_ops *toshibaboards_pci_ops;
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_PCI_H */
-diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/pmon.h linux-2.4.32-mct/include/asm-mips/toshiba-boards/pmon.h
---- linux-2.4.32/include/asm-mips/toshiba-boards/pmon.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/toshiba-boards/pmon.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/toshiba-boards/pmon.h linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/pmon.h
+--- linux-2.4.35.3/include/asm-mips/toshiba-boards/pmon.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/pmon.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,49 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -17453,9 +17404,9 @@ diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/pmon.h linux-2.4.32-mct/
 +#define PMON_VECTOR_TX39	0xbfc00500 /* with TX39_DEBUG_EXCEPTIONS */
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_PMON_H */
-diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/rbtx4925.h linux-2.4.32-mct/include/asm-mips/toshiba-boards/rbtx4925.h
---- linux-2.4.32/include/asm-mips/toshiba-boards/rbtx4925.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/toshiba-boards/rbtx4925.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/toshiba-boards/rbtx4925.h linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/rbtx4925.h
+--- linux-2.4.35.3/include/asm-mips/toshiba-boards/rbtx4925.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/rbtx4925.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,279 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -17736,9 +17687,9 @@ diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/rbtx4925.h linux-2.4.32-
 +#define L1121_outb(val, reg)  (*(volatile unsigned char *)(RBTX4925_PCMCIA_BASE + (reg)) = (val))
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_RBTX4925_H */
-diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/rbtx4927.h linux-2.4.32-mct/include/asm-mips/toshiba-boards/rbtx4927.h
---- linux-2.4.32/include/asm-mips/toshiba-boards/rbtx4927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/toshiba-boards/rbtx4927.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/toshiba-boards/rbtx4927.h linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/rbtx4927.h
+--- linux-2.4.35.3/include/asm-mips/toshiba-boards/rbtx4927.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/rbtx4927.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,181 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -17921,9 +17872,9 @@ diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/rbtx4927.h linux-2.4.32-
 +#define RBTX4927_IRQ_PREMIER3	RBTX4927_IRQ_IRC_INT(0)
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_RBTX4927_H */
-diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/tsdb.h linux-2.4.32-mct/include/asm-mips/toshiba-boards/tsdb.h
---- linux-2.4.32/include/asm-mips/toshiba-boards/tsdb.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/toshiba-boards/tsdb.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/toshiba-boards/tsdb.h linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/tsdb.h
+--- linux-2.4.35.3/include/asm-mips/toshiba-boards/tsdb.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/tsdb.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,275 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -18200,9 +18151,9 @@ diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/tsdb.h linux-2.4.32-mct/
 +#define TSDB_IRQ_USC_DRAM_PI	(TSDB_IRQ_USC + USC_INTB_DRAM_PI)
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_TSDB_H */
-diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/tx4927evb.h linux-2.4.32-mct/include/asm-mips/toshiba-boards/tx4927evb.h
---- linux-2.4.32/include/asm-mips/toshiba-boards/tx4927evb.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/toshiba-boards/tx4927evb.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/toshiba-boards/tx4927evb.h linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/tx4927evb.h
+--- linux-2.4.35.3/include/asm-mips/toshiba-boards/tx4927evb.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/toshiba-boards/tx4927evb.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,275 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -18479,9 +18430,9 @@ diff -Naru linux-2.4.32/include/asm-mips/toshiba-boards/tx4927evb.h linux-2.4.32
 +#define TX4927EVB_IRQ_PREMIER3	TX4927EVB_IRQ_IOC_EXBINT(0)
 +
 +#endif /* __ASM_TOSHIBA_BOARDS_TX4927EVB_H */
-diff -Naru linux-2.4.32/include/asm-mips/tx3927.h linux-2.4.32-mct/include/asm-mips/tx3927.h
---- linux-2.4.32/include/asm-mips/tx3927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/tx3927.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/tx3927.h linux-2.4.35.3-mct/include/asm-mips/tx3927.h
+--- linux-2.4.35.3/include/asm-mips/tx3927.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/tx3927.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,363 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -18846,9 +18797,9 @@ diff -Naru linux-2.4.32/include/asm-mips/tx3927.h linux-2.4.32-mct/include/asm-m
 +#endif /* _LANGUAGE_ASSEMBLY */
 +
 +#endif /* __ASM_TX3927_H */
-diff -Naru linux-2.4.32/include/asm-mips/tx4925.h linux-2.4.32-mct/include/asm-mips/tx4925.h
---- linux-2.4.32/include/asm-mips/tx4925.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/tx4925.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/tx4925.h linux-2.4.35.3-mct/include/asm-mips/tx4925.h
+--- linux-2.4.35.3/include/asm-mips/tx4925.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/tx4925.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,511 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -19361,9 +19312,9 @@ diff -Naru linux-2.4.32/include/asm-mips/tx4925.h linux-2.4.32-mct/include/asm-m
 +#endif /* _LANGUAGE_ASSEMBLY */
 +
 +#endif /* __ASM_MIPS_TX4925_H */
-diff -Naru linux-2.4.32/include/asm-mips/tx4927.h linux-2.4.32-mct/include/asm-mips/tx4927.h
---- linux-2.4.32/include/asm-mips/tx4927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/tx4927.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/tx4927.h linux-2.4.35.3-mct/include/asm-mips/tx4927.h
+--- linux-2.4.35.3/include/asm-mips/tx4927.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/tx4927.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,507 @@
 +/*
 + * This file is subject to the terms and conditions of the GNU General Public
@@ -19872,9 +19823,9 @@ diff -Naru linux-2.4.32/include/asm-mips/tx4927.h linux-2.4.32-mct/include/asm-m
 +#endif /* _LANGUAGE_ASSEMBLY */
 +
 +#endif /* __ASM_MIPS_TX4927_H */
-diff -Naru linux-2.4.32/include/asm-mips/txx927.h linux-2.4.32-mct/include/asm-mips/txx927.h
---- linux-2.4.32/include/asm-mips/txx927.h	1970-01-01 01:00:00.000000000 +0100
-+++ linux-2.4.32-mct/include/asm-mips/txx927.h	2006-12-02 15:08:43.000000000 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/txx927.h linux-2.4.35.3-mct/include/asm-mips/txx927.h
+--- linux-2.4.35.3/include/asm-mips/txx927.h	1970-01-01 01:00:00.000000000 +0100
++++ linux-2.4.35.3-mct/include/asm-mips/txx927.h	2007-11-04 14:10:46.000000000 +0100
 @@ -0,0 +1,180 @@
 +/*
 + * Common difinitins for TX3927/TX4927
@@ -20056,10 +20007,10 @@ diff -Naru linux-2.4.32/include/asm-mips/txx927.h linux-2.4.32-mct/include/asm-m
 + */
 +
 +#endif /* __ASM_TXX927_H */
-diff -Naru linux-2.4.32/include/linux/pci_ids.h linux-2.4.32-mct/include/linux/pci_ids.h
---- linux-2.4.32/include/linux/pci_ids.h	2005-11-16 20:12:54.000000000 +0100
-+++ linux-2.4.32-mct/include/linux/pci_ids.h	2006-12-02 15:08:44.000000000 +0100
-@@ -1490,6 +1490,9 @@
+diff -Naru linux-2.4.35.3/include/linux/pci_ids.h linux-2.4.35.3-mct/include/linux/pci_ids.h
+--- linux-2.4.35.3/include/linux/pci_ids.h	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/include/linux/pci_ids.h	2007-11-04 14:10:46.000000000 +0100
+@@ -1505,6 +1505,9 @@
  #define PCI_DEVICE_ID_ITE_IT8181	0x8181
  #define PCI_DEVICE_ID_ITE_8872		0x8872
  
@@ -20069,9 +20020,9 @@ diff -Naru linux-2.4.32/include/linux/pci_ids.h linux-2.4.32-mct/include/linux/p
  #define PCI_DEVICE_ID_ITE_IT8330G_0    0xe886
  
  /* formerly Platform Tech */
-diff -Naru linux-2.4.32/init/do_mounts.c linux-2.4.32-mct/init/do_mounts.c
---- linux-2.4.32/init/do_mounts.c	2003-11-28 19:26:21.000000000 +0100
-+++ linux-2.4.32-mct/init/do_mounts.c	2006-12-02 15:09:44.000000000 +0100
+diff -Naru linux-2.4.35.3/init/do_mounts.c linux-2.4.35.3-mct/init/do_mounts.c
+--- linux-2.4.35.3/init/do_mounts.c	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/init/do_mounts.c	2007-11-04 14:10:46.000000000 +0100
 @@ -344,15 +344,28 @@
  	}
  	*s = '\0';
@@ -20200,9 +20151,61 @@ diff -Naru linux-2.4.32/init/do_mounts.c linux-2.4.32-mct/init/do_mounts.c
  }
  
  #ifdef CONFIG_BLK_DEV_INITRD
-diff -Naru linux-2.4.32/net/ipv4/ipconfig.c linux-2.4.32-mct/net/ipv4/ipconfig.c
---- linux-2.4.32/net/ipv4/ipconfig.c	2005-04-04 03:42:20.000000000 +0200
-+++ linux-2.4.32-mct/net/ipv4/ipconfig.c	2006-12-02 15:08:44.000000000 +0100
+diff -Naru linux-2.4.35.3/Makefile linux-2.4.35.3-mct/Makefile
+--- linux-2.4.35.3/Makefile	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/Makefile	2007-11-04 14:10:45.000000000 +0100
+@@ -1,11 +1,11 @@
+ VERSION = 2
+ PATCHLEVEL = 4
+ SUBLEVEL = 35
+-EXTRAVERSION = .3
++EXTRAVERSION = .3-mct
+ 
+ KERNELRELEASE=$(VERSION).$(PATCHLEVEL).$(SUBLEVEL)$(EXTRAVERSION)
+ 
+-ARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ -e s/arm.*/arm/ -e s/sa110/arm/)
++ARCH := mips
+ KERNELPATH=kernel-$(shell echo $(KERNELRELEASE) | sed -e "s/-//g")
+ 
+ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
+@@ -17,7 +17,7 @@
+ FINDHPATH	= $(HPATH)/asm $(HPATH)/linux $(HPATH)/scsi $(HPATH)/net $(HPATH)/math-emu
+ 
+ HOSTCC  	= gcc
+-HOSTCFLAGS	= -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer
++HOSTCFLAGS	= -Wall -Wstrict-prototypes -Os -fomit-frame-pointer
+ 
+ CROSS_COMPILE 	=
+ 
+@@ -91,7 +91,7 @@
+ 
+ CPPFLAGS := -D__KERNEL__ -I$(HPATH)
+ 
+-CFLAGS := $(CPPFLAGS) -Wall -Wstrict-prototypes -Wno-trigraphs -O2 \
++CFLAGS := $(CPPFLAGS) -Wall -Wstrict-prototypes -Wno-trigraphs -Os \
+ 	  -fno-strict-aliasing -fno-common
+ CFLAGS += -fno-builtin-strpbrk -fno-builtin-sprintf
+ ifndef CONFIG_FRAME_POINTER
+@@ -208,7 +208,7 @@
+ # files removed with 'make clean'
+ CLEAN_FILES = \
+ 	kernel/ksyms.lst include/linux/compile.h \
+-	vmlinux System.map \
++	vmlinux vmlinux.bin System.map \
+ 	.tmp* \
+ 	drivers/char/consolemap_deftbl.c drivers/video/promcon_tbl.c \
+ 	drivers/char/conmakehash \
+@@ -301,6 +301,7 @@
+ 		$(LIBS) \
+ 		--end-group \
+ 		-o vmlinux
++	$(OBJCOPY) -g -O binary vmlinux vmlinux.bin
+ 	$(NM) vmlinux | grep -v '\(compiled\)\|\(\.o$$\)\|\( [aUw] \)\|\(\.\.ng$$\)\|\(LASH[RL]DI\)' | sort > System.map
+ 
+ symlinks:
+diff -Naru linux-2.4.35.3/net/ipv4/ipconfig.c linux-2.4.35.3-mct/net/ipv4/ipconfig.c
+--- linux-2.4.35.3/net/ipv4/ipconfig.c	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/net/ipv4/ipconfig.c	2007-11-04 14:10:46.000000000 +0100
 @@ -86,8 +86,8 @@
  #define CONF_POST_OPEN		(1*HZ)	/* After opening: 1 second */
  

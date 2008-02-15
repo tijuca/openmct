@@ -1,6 +1,6 @@
-diff -Naru linux-2.4.32/arch/mips/kernel/syscalls.h linux-2.4.32-vserver-mips-syscall/arch/mips/kernel/syscalls.h
---- linux-2.4.32/arch/mips/kernel/syscalls.h	2003-08-25 13:44:40.000000000 +0200
-+++ linux-2.4.32-vserver-mips-syscall/arch/mips/kernel/syscalls.h	2005-11-18 11:13:42.450675728 +0100
+diff -Naru linux-2.4.35.3/arch/mips/kernel/syscalls.h linux-2.4.35.3-mct/arch/mips/kernel/syscalls.h
+--- linux-2.4.35.3/arch/mips/kernel/syscalls.h	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/arch/mips/kernel/syscalls.h	2007-10-03 13:07:54.000000000 +0200
 @@ -255,3 +255,36 @@
  SYS(sys_ni_syscall, 0)				/* res. for futex */
  SYS(sys_ni_syscall, 0)				/* res. for sched_setaffinity */
@@ -38,9 +38,9 @@ diff -Naru linux-2.4.32/arch/mips/kernel/syscalls.h linux-2.4.32-vserver-mips-sy
 +SYS(sys_ni_syscall, 0)
 +SYS(sys_ni_syscall, 0)
 +SYS(sys_vserver, 0)				/* 4273 vserver */
-diff -Naru linux-2.4.32/include/asm-mips/unistd.h linux-2.4.32-vserver-mips-syscall/include/asm-mips/unistd.h
---- linux-2.4.32/include/asm-mips/unistd.h	2005-01-19 15:10:12.000000000 +0100
-+++ linux-2.4.32-vserver-mips-syscall/include/asm-mips/unistd.h	2005-11-18 11:13:42.451675201 +0100
+diff -Naru linux-2.4.35.3/include/asm-mips/unistd.h linux-2.4.35.3-mct/include/asm-mips/unistd.h
+--- linux-2.4.35.3/include/asm-mips/unistd.h	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/include/asm-mips/unistd.h	2007-10-03 13:07:54.000000000 +0200
 @@ -257,16 +257,17 @@
  #define __NR_futex			(__NR_Linux + 238)
  #define __NR_sched_setaffinity		(__NR_Linux + 239)

@@ -1,3 +1,9 @@
+Fr 15 Feb 2008 21:13:00 CEST carsten
+* after a long time i get working agin on the cdk section
+* porting the kernel to the not fully actually version 2.4.35.3, also porting the current patches for 2.4.35.3
+* changing the gcc version backward to 3.3.6 to be compilant to the current working version in the trunk
+* many little changes in the build process of the gcc, most of the work should now be done!
+
 Sa 11 May 2007 20:46:00 CEST carsten
 * some improvements to the tools section
 

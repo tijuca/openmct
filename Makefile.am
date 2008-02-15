@@ -16,10 +16,10 @@ VPATH=@srcdir@
 
 AUTOMAKE_OPTION = foreign
 
-KERNEL=2.4.34.1
+KERNEL=2.4.35.3
 BINUTILS=2.16.1
 CCACHE=2.4
-GCC=3.4.4
+GCC=3.3.6
 GDB=6.3
 GLIBC=2.3.6
 UCLIBC=0.9.28
@@ -117,18 +117,9 @@ cdkroot-skeleton:
 kernel-header: prepare $(DOWNLOAD)/linux-$(KERNEL)
 	@echo -e "\033[1;33mprepare Kernel \033[0m(kernel-version $(KERNEL)) ..."
 	rm -rf $(BUILDDIR)/linux-$(KERNEL)
-	test -d $(BUILDDIR)/linux-$(KERNEL) || (bzcat $(DOWNLOAD)/linux-$(KERNEL).tar.bz2 | /bin/tar -C $(BUILDDIR) -xf - && cd $(BUILDDIR)/linux-$(KERNEL) && \
-	    echo -e "\npatching 001-mct.patch" && patch -p1 < $(PATCHDIR)/kernel/001-mct.patch &&\
-	    echo -e "\npatching 002-squashfs.patch" && patch -p1 < $(PATCHDIR)/kernel/002-squashfs.patch &&\
-	    echo -e "\npatching 003-mppe-mppc.patch" && patch -p1 < $(PATCHDIR)/kernel/003-mppe-mppc.patch &&\
-	    echo -e "\npatching 005-vserver.patch" && patch -p1 < $(PATCHDIR)/kernel/005-vserver.patch &&\
-	    echo -e "\npatching 007-vserver-mips-syscall.patch" && patch -p1 < $(PATCHDIR)/kernel/007-vserver-mips-syscall.patch &&\
-	    echo -e "\npatching 008-nfs-maxblksize.patch" && patch -p1 < $(PATCHDIR)/kernel/008-nfs-maxblksize.patch &&\
-	    echo -e "\npatching 009-usb-wlan.patch" && patch -p1 < $(PATCHDIR)/kernel/009-usb-wlan.patch &&\
-	    echo -e "\npatching 010-usb-camera.patch" && patch -p1 < $(PATCHDIR)/kernel/010-usb-camera.patch &&\
-	    echo -e "\npatching 011-lzma.patch" && patch -p1 < $(PATCHDIR)/kernel/011-lzma.patch &&\
-	    echo -e "\npatching 012-squashfs-lzma.patch" && patch -p1 < $(PATCHDIR)/kernel/012-squashfs-lzma.patch &&\
-	    echo -e "\npatching 013-scsi-idle.patch" && patch -p1 < $(PATCHDIR)/kernel/013-scsi-idle.patch)
+	test -d $(BUILDDIR)/linux-$(KERNEL) || \
+	    (bzcat $(DOWNLOAD)/linux-$(KERNEL).tar.bz2 | /bin/tar -C $(BUILDDIR) -xf -; \
+	    $(TOPDIR)/patch-kernel.sh $(BUILDDIR)/linux-$(KERNEL) $(PATCHDIR)/kernel)
 	ln -sf $(BUILDDIR)/linux-$(KERNEL) $(BUILDDIR)/linux
 	touch $(DEPS)/$@-prepare
 	cd $(BUILDDIR) &&\
@@ -140,13 +131,10 @@ kernel-header: prepare $(DOWNLOAD)/linux-$(KERNEL)
 uclibc-header: $(DOWNLOAD)/uClibc-$(UCLIBC)
 	@echo -e "\033[1;33mprepare uClibc-Header \033[0m(uClibc-version $(UCLIBC)) ..."
 	test -d $(BUILDDIR)/linux-$(KERNEL) || $(MAKE) kernel-header
-	test -d $(BUILDDIR)/uClibc-$(UCLIBC) || (bzcat $(DOWNLOAD)/uClibc-$(UCLIBC).tar.bz2 | /bin/tar -C $(BUILDDIR) -xf - &&	cd $(BUILDDIR)/uClibc-$(UCLIBC) && install -m444 $(DOWNLOAD)/uClibc-locale-030818.tgz extra/locale/ &&\
-	cd $(BUILDDIR)/uClibc-$(UCLIBC) && patch -Np1 -i $(PATCHDIR)/uClibc-$(UCLIBC)/100-signal_handler_crash_workaround.patch &&\
-					   patch -Np1 -i $(PATCHDIR)/uClibc-$(UCLIBC)/110-mips_pipe.patch &&\
-					   patch -Np1 -i $(PATCHDIR)/uClibc-$(UCLIBC)/120-more_standard_math.patch &&\
-					   patch -Np1 -i $(PATCHDIR)/uClibc-$(UCLIBC)/140-uclibc_do_div_ldso.patch &&\
-					   patch -Np1 -i $(PATCHDIR)/uClibc-$(UCLIBC)/150-portability.patch &&\
-					   patch -Np1 -i $(PATCHDIR)/uClibc-$(UCLIBC)/ipv6_missing_sockopts.patch)
+	test -d $(BUILDDIR)/uClibc-$(UCLIBC) || \
+	    (bzcat $(DOWNLOAD)/uClibc-$(UCLIBC).tar.bz2 | /bin/tar -C $(BUILDDIR) -xf -; \
+	    cd $(BUILDDIR)/uClibc-$(UCLIBC) && install -m444 $(DOWNLOAD)/uClibc-locale-030818.tgz extra/locale/ ;\
+	    $(TOPDIR)/patch-kernel.sh $(BUILDDIR)/uClibc-$(UCLIBC) $(PATCHDIR)/uClibc-$(UCLIBC))
 	sed -i -e 's,^CROSS=.*,CROSS=$(CDK)/bin/$(TARGET)-,g' $(BUILDDIR)/uClibc-$(UCLIBC)/Rules.mak
 	cp $(CONFIG)/uclibc.config $(BUILDDIR)/uClibc-$(UCLIBC)/.config
 	sed -i -e 's,^KERNEL_SOURCE=.*,KERNEL_SOURCE=\"$(BUILDDIR)/linux\",g' $(BUILDDIR)/uClibc-$(UCLIBC)/.config
@@ -165,59 +153,41 @@ uclibc-header: $(DOWNLOAD)/uClibc-$(UCLIBC)
 	touch $(DEPS)/$@
 	@echo -e "\033[1;33mprepare uClibc-Header \033[0m... \033[1;32mDone!\033[0m"
 
-
 binutils: $(DOWNLOAD)/binutils-$(BINUTILS)
 	@echo -e "\033[1;33mbuild Binutils \033[0m(binutils-version $(BINUTILS)) ..."
 	test -d $(BUILDDIR)/uClibc-$(UCLIBC) || $(MAKE) uclibc-header
-	test -d $(BUILDDIR)/binutils-$(BINUTILS) || (bzcat $(DOWNLOAD)/binutils-$(BINUTILS).tar.bz2 | /bin/tar -C $(BUILDDIR) -xf - &&\
-	cd $(BUILDDIR)/binutils-$(BINUTILS) && patch -Np1 -i $(PATCHDIR)/binutils-$(BINUTILS)/042-ld-Wlcomma.patch &&\
-					       patch -Np1 -i $(PATCHDIR)/binutils-$(BINUTILS)/100-uclibc-conf.patch &&\
-					       patch -Np1 -i $(PATCHDIR)/binutils-$(BINUTILS)/110-uclibc-libtool-conf.patch &&\
-					       patch -Np1 -i $(PATCHDIR)/binutils-$(BINUTILS)/300-001_ld_makefile_patch.patch &&\
-					       patch -Np1 -i $(PATCHDIR)/binutils-$(BINUTILS)/300-006_better_file_error.patch &&\
-					       patch -Np1 -i $(PATCHDIR)/binutils-$(BINUTILS)/300-012_check_ldrunpath_length.patch &&\
-					       patch -Np1 -i $(PATCHDIR)/binutils-$(BINUTILS)/400-mips-ELF_MAXPAGESIZE-4k.patch &&\
-					       patch -Np1 -i $(PATCHDIR)/binutils-$(BINUTILS)/702-binutils-skip-comments.patch)
-					       
-	mkdir -p $(BUILDDIR)/binutils_build && cd $(BUILDDIR)/binutils_build &&\
+	test -d $(BUILDDIR)/binutils-$(BINUTILS) || \
+	    (bzcat $(DOWNLOAD)/binutils-$(BINUTILS).tar.bz2 | /bin/tar -C $(BUILDDIR) -xf -;\
+	    $(TOPDIR)/patch-kernel.sh $(BUILDDIR)/binutils-$(BINUTILS) $(PATCHDIR)/binutils-$(BINUTILS))
+	mkdir -p $(BUILDDIR)/binutils_build
+	cp $(PATCHDIR)/gnuconfig/config.sub $(PATCHDIR)/gnuconfig/config.guess $(BUILDDIR)/binutils-$(BINUTILS)
+	cd $(BUILDDIR)/binutils_build &&\
 	        $(BUILDDIR)/binutils-$(BINUTILS)/configure \
 	        --prefix=$(PREFIX) \
+		--build=$(build) \
+		--host=$(host) \
 	        --target=$(TARGET) \
 	        --disable-nls \
-		--disable-dependency-tracking \
-		--disable-libtool-lock \
+		--enable-multilib \
 		--disable-werror &&\
 	        $(MAKE) all &&\
 	        $(MAKE) install
-		
 	touch $(DEPS)/$@
 	@echo -e "\033[1;33mbuild binutils \033[0m... \033[1;32mDone!\033[0m"
 
-
-
-coregcc: $(DOWNLOAD)/gcc-$(GCC)
-	@echo -e "\033[1;33mbuild coregcc \033[0m(gcc-version $(GCC)) ..."
+coregcc:$(DOWNLOAD)/gcc-$(GCC)
+	echo -e "\033[1;33mbuild coregcc \033[0m(gcc-version $(GCC)) ..."
 	test -d $(BUILDDIR)/binutils-$(BINUTILS) || $(MAKE) binutils
-	test -d $(BUILDDIR)/gcc-$(GCC) || (bzcat $(DOWNLOAD)/gcc-$(GCC).tar.bz2 | /bin/tar -C $(BUILDDIR) -xf - &&\
-	cd $(BUILDDIR)/gcc-$(GCC) && patch -Np1 -i $(PATCHDIR)/gcc-$(GCC)/100-uclibc-conf.patch &&\
-				     patch -Np1 -i $(PATCHDIR)/gcc-$(GCC)/200-uclibc-locale.patch &&\
-				     patch -Np1 -i $(PATCHDIR)/gcc-$(GCC)/300-libstdc++-pic.patch &&\
-				     patch -Np1 -i $(PATCHDIR)/gcc-$(GCC)/601-gcc34-arm-ldm.patch &&\
-				     patch -Np1 -i $(PATCHDIR)/gcc-$(GCC)/602-sdk-libstdc++-includes.patch &&\
-				     patch -Np1 -i $(PATCHDIR)/gcc-$(GCC)/700-pr15068-fix.patch &&\
-				     patch -Np1 -i $(PATCHDIR)/gcc-$(GCC)/800-arm-bigendian.patch &&\
-				     patch -Np1 -i $(PATCHDIR)/gcc-$(GCC)/810-arm-bigendian-uclibc.patch &&\
-				     patch -Np1 -i $(PATCHDIR)/gcc-$(GCC)/830-gcc-bug-num-22167.patch &&\
-				     patch -Np1 -i $(PATCHDIR)/gcc-$(GCC)/900-use-cp.patch &&\
-				     patch -Np1 -i $(PATCHDIR)/gcc-$(GCC)/910-mbsd-multi.patch &&\
-				     patch -Np1 -i $(PATCHDIR)/gcc-$(GCC)/920-integer-overflow.patch)
-	
-#adding special info to the compiler			     
+	test -d $(BUILDDIR)/gcc-$(GCC) || \
+	    (bzcat $(DOWNLOAD)/gcc-$(GCC).tar.bz2 | /bin/tar -C $(BUILDDIR) -xf -; \
+	    $(TOPDIR)/patch-kernel.sh $(BUILDDIR)/gcc-$(GCC) $(PATCHDIR)/gcc-$(GCC))
+#	adding special info to the compiler, maybe i make it configurable
 	sed -i -e 's,\(version_string.. = "[0-9\.]*\).*\(";\),\1 (OpenMCT)\2,' $(BUILDDIR)/gcc-$(GCC)/gcc/version.c
 	sed -i -e 's,\(bug_report_url.. = "\).*\(";\),\1<URL:http://forum.openmct.org>\2,' $(BUILDDIR)/gcc-$(GCC)/gcc/version.c
-	
-	mkdir -p $(BUILDDIR)/coregcc_build && (cd $(BUILDDIR)/coregcc_build && rm -f config.cache && PATH=$(PREFIX)/bin:$(PATH) \
-	    $(BUILDDIR)/gcc-$(GCC)/configure \
+	mkdir -p $(BUILDDIR)/gcc-$(GCC)-initial
+	cp $(PATCHDIR)/gnuconfig/config.sub $(PATCHDIR)/gnuconfig/config.guess $(BUILDDIR)/gcc-$(GCC)
+	(cd $(BUILDDIR)/gcc-$(GCC)-initial; PATH=$(PREFIX)/bin:$(BUILDDIR)/bin:$(PATH) \
+		$(BUILDDIR)/gcc-$(GCC)/configure \
 	        --prefix=$(PREFIX) \
 		--build=$(build) \
 		--host=$(host) \
@@ -229,11 +199,10 @@ coregcc: $(DOWNLOAD)/gcc-$(GCC)
 		--enable-target-optspace \
 		--with-gnu-ld \
 		--disable-nls \
-		--disable-depency-tracking \
-		--disable-libtool-lock && \
-	        PATH=$(PREFIX)/bin:$(PATH) $(MAKE) all-gcc &&\
-	        PATH=$(PREFIX)/bin:$(PATH) $(MAKE) install-gcc)
-	
+		--enable-multilib \
+		--disable-threads )
+	PATH=$(PREFIX)/bin:$(BUILDDIR)/bin:$(PATH) $(MAKE) -C $(BUILDDIR)/gcc-$(GCC)-initial all-gcc
+	PATH=$(PREFIX)/bin:$(BUILDDIR)/bin:$(PATH) $(MAKE) -C $(BUILDDIR)/gcc-$(GCC)-initial install-gcc
 	touch $(DEPS)/$@
 	@echo -e "\033[1;33mbuild coregcc \033[0m... \033[1;32mDone!\033[0m"
 
@@ -243,9 +212,9 @@ uclibc:
 	cd $(BUILDDIR)/uClibc-$(UCLIBC) && $(MAKE) PREFIX= \
 						DEVEL_PREFIX=/ \
 						RUNTIME_PREFIX=/ \
-						HOSTCC="cc" \
-						CPU_CFLAGS="-Os -fno-ident -fwrapv -fhonour-copts" \
+						HOSTCC="gcc" \
 						all
+#						CPU_CFLAGS="-Os -fno-ident -fwrapv -fhonour-copts" \
 	touch -c $(BUILDDIR)/uClibc-$(UCLIBC)/lib/libc.a
 	cd $(BUILDDIR)/uClibc-$(UCLIBC) && $(MAKE) PREFIX=$(CDK)/ \
 				                DEVEL_PREFIX=/ \
@@ -264,12 +233,12 @@ uclibc:
 gcc-final:
 	@echo -e "\033[1;33mbuild final gcc \033[0m ..."
 	test -f $(CDK)/lib/libc.a || $(MAKE) uclibc
-	mkdir -p $(BUILDDIR)/gcc-$(GCC)-final
+	test -d $(BUILDDIR)/gcc-$(GCC)-final || mkdir -p $(BUILDDIR)/gcc-$(GCC)-final
 # Important!  Required for limits.h to be fixed.
 	rm -rf $(CDK)/$(TARGET)/sys-include
-	ln -sf $(CDK)/include $(CDK)/$(TARGET)/sys-include
+	ln -snf $(CDK)/include $(CDK)/$(TARGET)/sys-include
 	rm -rf $(CDK)/$(TARGET)/lib
-	ln -sf $(CDK)/lib $(CDK)/$(TARGET)/lib
+	ln -snf $(CDK)/lib $(CDK)/$(TARGET)/lib
 	(cd $(BUILDDIR)/gcc-$(GCC)-final; rm -f config.cache; PATH=$(PREFIX)/bin:$(PATH) \
 	    $(BUILDDIR)/gcc-$(GCC)/configure \
 		--prefix=$(CDK) \
@@ -281,7 +250,9 @@ gcc-final:
 		--disable-__cxa_atexit \
 		--enable-target-optspace \
 		--with-gnu-ld \
-		--disable-nls && \
+		--disable-nls \
+		--disable-threads \
+		--enable-multilib && \
 	PATH=$(PREFIX)/bin:$(PATH) $(MAKE) all &&\
 	PATH=$(PREFIX)/bin:$(PATH) $(MAKE) install)
 	echo $(GCC) > $(CDK)/gcc_version
@@ -293,6 +264,10 @@ gcc-final:
 cdk-extra:
 	@echo -e "\033[1;33mfinal work on the cdk \033[0m ..."
 	test -f $(CDK)/bin/$(TARGET)-gcc || $(MAKE) gcc-final
+	echo doing the stripping ...
+	mv $(PREFIX)/bin/mipsel-linux-uclibc-gccbug $(PREFIX)
+	strip --strip-all -R .note -R .comment $(PREFIX)/bin/*
+	mv $(CDK)/mipsel-linux-uclibc-gccbug $(CDK)/bin
 # Set up the symlinks to enable lying about target name.
 	set -e; \
 	(cd $(CDK) ;\
@@ -313,33 +288,9 @@ cdk-extra:
 
 gdb: $(DOWNLOAD)/gdb-$(GDB)
 	@echo -e "\033[1;33mbuild GDB (gdb-version $(GDB)) \033[0m ..."
-	test -d $(BUILDDIR)/gdb-$(GDB) || (bzcat $(DOWNLOAD)/gdb-$(GDB).tar.bz2 | /bin/tar -C $(BUILDDIR) -xf - && cd $(BUILDDIR)/gdb-$(GDB) &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/100-uclibc-conf.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/200-uclibc-readline-conf.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/400-mips-coredump.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/500-thread-timeout.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/600-debian_10.selected-frame.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/620-debian_static-thread-db.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/630-debian_24.tracepoint-segv.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/640-debian_dwarf2-frame-signal-unwinder.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/650-debian_vsyscall-gdb-support.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/660-debian_dwarf-cfa-restore.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/680-debian_sim-destdir.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/690-debian_member-field-symtab.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/700-debian_cp-pass-by-reference.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/710-debian_thread-db-multiple-libraries.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/720-debian_static-threads-test.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/730-debian_gdb-fix-tracefork-check.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/740-debian_make-cv-type-crash.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/750-debian_sparc-singlestep.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/760-debian_vsyscall-bfd-close-result.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/770-debian_vfork-done-spelling.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/780-debian_gdbserver-rdynamic.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/790-debian_dwarf2-cfi-warning.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/800-debian_linux-use-underscore-exit.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/810-debian_bfd-no-kylix-crash.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/820-debian_disable-linux-fork-messages.patch &&\
-	    patch -Np1 -i $(PATCHDIR)/gdb-$(GDB)/830-arm_gcc4.patch)
+	test -d $(BUILDDIR)/gdb-$(GDB) || \
+	    (bzcat $(DOWNLOAD)/gdb-$(GDB).tar.bz2 | /bin/tar -C $(BUILDDIR) -xf -; \
+	    $(TOPDIR)/patch-kernel.sh $(BUILDDIR)/gdb-$(GDB) $(PATCHDIR)/gdb-$(GDB))
 	mkdir -p $(BUILDDIR)/gdbclient-$(GDB) &&\
 	(cd $(BUILDDIR)/gdbclient-$(GDB) &&\
 	    gdb_cv_func_sigsetjmp=yes \
@@ -537,7 +488,7 @@ rootfs:
 ##########################################################################################
 # cleaning
 
-coreclean: kernel-header uclibc-clean binutils-clean coregcc-clean gdb-clean
+coreclean: kernel-clean uclibc-clean binutils-clean coregcc-clean gdb-clean
 	rm -rf $(BUILDDIR)
 	rm -rf $(CDK)
 	rm -rf $(CDKROOT)
