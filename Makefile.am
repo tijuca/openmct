@@ -318,23 +318,36 @@ gdb: $(DOWNLOAD)/gdb-$(GDB)
 ccache: $(DOWNLOAD)/ccache-$(CCACHE)
 	@echo -e "\033[1;33mbuild ccache\033[0m ..."
 	rm -rf $(BUILDDIR)/ccache-$(CCACHE) && cd $(BUILDDIR) && tar xzf $(DOWNLOAD)/ccache-$(CCACHE).tar.gz
+	sed -i -e "s,getenv(\"CCACHE_PATH\"),\"$(PREFIX)/bin-ccache\",g" $(BUILDDIR)/ccache-$(CCACHE)/execute.c
+	sed -i -e "s,getenv(\"CCACHE_DIR\"),\"$(PREFIX)/cache\",g" $(BUILDDIR)/ccache-$(CCACHE)/ccache.c
 	cd $(BUILDDIR)/ccache-$(CCACHE) &&\
 	    rm -rf config.cache; \
+	    CC=gcc \
 	    ./configure \
 	    --target=$(host) \
 	    --host=$(host) \
 	    --build=$(host) \
-	    --prefix=$(CDK)/bin \
-	    --exec-prefix=$(CDK)/bin \
-	    --bindir=$(CDK)/bin \
-	    --sbindir=$(CDK)/sbin \
-	    --libexecdir=$(CDK)/lib \
-	    --sysconfdir=$(CDK)/etc \
-	    --datadir=$(CDK)/share \
-	    --localstatedir=$(CDK)/var \
-	    --mandir=$(CDK)/man \
-	    --infodir=$(CDK)/info
-	$(MAKE) -C $(BUILDDIR)/ccache-$(CCACHE) all install
+	    --prefix=/usr/ 
+	$(MAKE) -C $(BUILDDIR)/ccache-$(CCACHE) CC=gcc
+	mkdir -p $(PREFIX)/bin-ccache $(PREFIX)/usr/bin $(PREFIX)/cache
+	cp $(BUILDDIR)/ccache-$(CCACHE)/ccache $(PREFIX)/usr/bin
+	cd $(PREFIX)/bin && mv $(TARGET)-gcc $(TARGET)-g++ $(TARGET)-c++ $(PREFIX)/bin-ccache
+	(cd $(PREFIX)/bin-ccache ; \
+	    ln -sf $(TARGET)-gcc mipsel-linux-gcc; \
+	    ln -sf $(TARGET)-gcc mipsel-linux-cc; \
+	    ln -sf $(TARGET)-gcc mipsel-linux-uclibc-cc; \
+	    ln -sf $(TARGET)-g++ mipsel-linux-g++; \
+	    ln -sf $(TARGET)-c++ mipsel-linux-c++)
+	(cd $(PREFIX)/bin ; \
+	    ln -sf ../usr/bin/ccache $(TARGET)-gcc; \
+	    ln -sf ../usr/bin/ccache $(TARGET)-cc; \
+	    ln -sf ../usr/bin/ccache mipsel-linux-cc; \
+	    ln -sf ../usr/bin/ccache mipsel-linux-gcc; \
+	    ln -sf ../usr/bin/ccache $(TARGET)-g++; \
+	    ln -sf ../usr/bin/ccache $(TARGET)-c++; \
+	    ln -sf ../usr/bin/ccache mipsel-linux-g++; \
+	    ln -sf ../usr/bin/ccache mipsel-linux-c++; \
+	    )
 	touch $(DEPS)/$@
 	@echo -e "\033[1;33mbuild ccache \033[0m... \033[1;32mDone!\033[0m"
 
@@ -348,14 +361,14 @@ kernel24:
 	cp $(CONFIG)/kernel-@device@.config $(BUILDDIR)/linux-$(KERNEL)/.config
 	cd $(BUILDDIR)/linux-$(KERNEL) &&\
 	    $(MAKE) ARCH=mips oldconfig include/linux/version.h &&\
-	    PATH=$(PREFIX)/bin:$(PATH) $(BUILDENV) \
+	    PATH=$(PREFIX)/bin:$(PREFIX)/bin-ccache:$(PATH) $(BUILDENV) \
 	    $(MAKE) depend &&\
 	    $(MAKE) CROSS_COMPILE=$(CDK)/bin/$(TARGET)- vmlinux modules
 	cd $(BUILDDIR)/linux-$(KERNEL) &&\
 	    $(MAKE) ARCH=mips \
-	    PATH=$(PREFIX)/bin:$(PATH) $(BUILDENV) \
+	    PATH=$(PREFIX)/bin:$(PREFIX)/bin-ccache:$(PATH) $(BUILDENV) \
 	    DEPMOD=/bin/true \
-	    CROSS_COMPILE=$(CDK)/bin/$(TARGET)- INSTALL_MOD_PATH=$(CDKROOT) modules_install
+	    CROSS_COMPILE=$(CDK)/bin-ccache/$(TARGET)- INSTALL_MOD_PATH=$(CDKROOT) modules_install
 	
 	gzip -9 -c $(BUILDDIR)/linux-$(KERNEL)/vmlinux.bin > $(CDKROOT)/vmlinux.bin.gz
 	cp $(BUILDDIR)/linux-$(KERNEL)/System.map $(CDKROOT)
