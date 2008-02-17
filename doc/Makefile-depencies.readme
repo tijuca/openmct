@@ -4,9 +4,9 @@ Basicly are two parts in the Makefile.
 1. The cdk part (that have nothing to do with the later targets that build the Image or parts of it)
    This target is splittet in the Crosscompiler and the tools that needed for later work.
 
- -------     --------      -------------------     -----------
- | cdk | --- | core | ---- | kernel-header   | --- | prepare |
- -------  |  --------   |  -------------------     -----------
+ -------     --------      -------------------     ---------------
+ | cdk | --- | core | ---- | kernel-header   | --- | prepare-dir |
+ -------  |  --------   |  -------------------     ---------------
           |             |  -------------------
           |             |- | uclibc-header   |
           |             |  -------------------

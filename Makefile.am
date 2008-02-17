@@ -33,6 +33,7 @@ TARGET_CXXFLAGS=$(TARGET_CFLAGS)
 TOPDIR := $(shell pwd)
 BUILDDIR= $(TOPDIR)/toolchain_build_mipsel
 PATCHDIR= $(TOPDIR)/patches
+APPS_BUILD_DIR= $(TOPDIR)/apps_build
 DOWNLOAD= @prefix@/archives
 CDK     = @cdk@
 CDKROOT = @rootfs@

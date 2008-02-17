@@ -20,7 +20,7 @@ core: kernel-header uclibc-header binutils coregcc uclibc gcc-final cdk-extra gd
 
 tools: mct_modify mkjffs2 mksquashfs.lzma
 
-prepare: 
+prepare-dir:
 # creating .deps dir
 	test -d $(DEPS) || mkdir -p $(DEPS)
 # creating the temporaer builddir
@@ -33,8 +33,10 @@ prepare:
 	install -c -d $(CDK)/$(TARGET)/lib
 # creating the tftp boot dir
 	install -c -d $(TFTPBOOT)
+# creating the builddir for apps
+	install -c -d $(APPS_BUILD_DIR)
 
-kernel-header: prepare $(DOWNLOAD)/linux-$(KERNEL)
+kernel-header: prepare-dir $(DOWNLOAD)/linux-$(KERNEL)
 	@echo -e "\033[1;33mprepare Kernel \033[0m(kernel-version $(KERNEL)) ..."
 	rm -rf $(BUILDDIR)/linux-$(KERNEL)
 	test -d $(BUILDDIR)/linux-$(KERNEL) || \
