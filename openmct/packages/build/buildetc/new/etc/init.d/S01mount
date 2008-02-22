@@ -1,9 +1,6 @@
 #!/bin/sh
 
-#create the classic hda4 device-node, because in other cases the mount -F will fail
-#/bin/mknod /dev/hda4 block 3 4
-
-# mount proc
+# mount /proc and /tmp
 /bin/mount -t proc	none	/proc
 /bin/mount -t ramfs	tmpfs	/tmp
 
@@ -17,8 +14,15 @@ echo "Enable Swap space (if exist)..."
 echo "Mounting filesystems..."
 /bin/mount -a > /dev/null 2>&1
 
+/bin/echo
+/bin/echo mounted the following filesystems:
+/bin/echo ----------------------------------------
+/bin/mount
+/bin/echo ----------------------------------------
+/bin/echo
+
 #create some paths
-#/bin/mkdir /dev/shm/root
+/bin/mkdir /tmp/root
 #/bin/mkdir /dev/shm/home
 #/bin/mkdir /dev/shm/network
 

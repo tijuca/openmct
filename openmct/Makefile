@@ -129,7 +129,7 @@ endif
 $(OUTPUTDIR)/$(ROOT): etc
 	@$(ECHO) -e "\033[1;33mREMOVE .svn FROM $(NEWROOTDIR)" 
 	@$(REMOVESVN) $(NEWROOTDIR)
-	@$(ECHO) -e "\033[1;33mCALCULATE DEPENDENCIES FOR KERNEL MODULES"
+	@$(ECHO) -e "\033[1;33mCALCULATE DEPENDENCIES FOR KERNEL MODULES\033[0m"
 	@$(DEPMOD) -b $(NEWROOTDIR)/lib/modules/`$(UNAME) $(PACKAGEDIR)/system/linux/src` \
 	           -k $(PACKAGEDIR)/system/linux/src/vmlinux
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/$(IMAGERELEASEFILENAME)\033[0m"
@@ -138,7 +138,9 @@ $(OUTPUTDIR)/$(ROOT): etc
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hostname\033[0m"
 	@$(ECHO) $(IMAGETARGET) > $(NEWROOTDIR)/var/etc/hostname
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/issue\033[0m"
-	@$(ECHO) "Welcome on OpenMCT $(IMAGETARGET) $(IMAGEVERSION) $(SOFTWAREVERSION) - Kernel \r \m (\d \t)" > $(NEWROOTDIR)/etc/issue
+	@$(ECHO) "Welcome on OpenMCT" > $(NEWROOTDIR)/etc/issue
+	@$(ECHO) "$(IMAGETARGET) $(IMAGEVERSION) Software $(SOFTWAREVERSION) visit http://openmct.org" >> $(NEWROOTDIR)/etc/issue
+	@$(ECHO) "working Kernel is \r \m (\d \t)" >> $(NEWROOTDIR)/etc/issue
 	
 ifdef ETH0IPADDR 
 	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth0\033[0m"
@@ -222,31 +224,35 @@ else
 endif
 endif
 	@$(ECHO) "nameserver $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/resolv.conf
-
-#	@$(CP) $(NEWROOTDIR)/var/etc/network/interfaces $(NEWROOTDIR)/var/etc/default/interfaces
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"
-	@$(OUTPUTDIR)/$(MKSQUASHFS) $(NEWROOTDIR) $(OUTPUTDIR)/$(ROOT) $(ROOTOPTS)
+	@if [ -f $(OUTPUTDIR)/$(ROOT) ]; then rm -rf $(OUTPUTDIR)/$(ROOT) ; fi
+	$(OUTPUTDIR)/$(MKSQUASHFS) $(NEWROOTDIR) $(OUTPUTDIR)/$(ROOT) $(ROOTOPTS)
 
-$(OUTPUTDIR)/$(JFFS2):
+jffs2:
 	@$(MKDIR) $(JFFS2DIR)
-	@$(TOUCH) $(JFFS2DIR)/.config
-	@$(MKFSJFFS2) -d $(JFFS2DIR) -o $(OUTPUTDIR)/$(JFFS2)
+	rm -rf $(JFFS2DIR)/*
+	mv $(NEWROOTDIR)/var/* $(JFFS2DIR)
+	$(MKFSJFFS2) -d $(JFFS2DIR) -o $(OUTPUTDIR)/$(JFFS2)
 
-$(IMAGEFILENAME):	$(OUTPUTDIR)/$(MCT_MODIFY) $(OUTPUTDIR)/$(MKSQUASHFS) $(OUTPUTDIR)/$(KERNEL) $(OUTPUTDIR)/$(JFFS2) pkg $(OUTPUTDIR)/$(ROOT)
+$(IMAGEFILENAME): $(OUTPUTDIR)/$(MCT_MODIFY) $(OUTPUTDIR)/$(MKSQUASHFS) $(OUTPUTDIR)/$(KERNEL) pkg $(OUTPUTDIR)/$(ROOT) jffs2
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(IMAGEFILENAME)\033[0m"
-	@$(OUTPUTDIR)/$(MCT_MODIFY) -w -i $(IMAGEFILENAME) -m $(IMAGEMODE) -p $(IMAGEPRODCODE) \
+	$(OUTPUTDIR)/$(MCT_MODIFY) -w -i $(IMAGEFILENAME) -m $(IMAGEMODE) -p $(IMAGEPRODCODE) \
 		-v $(IMAGEVERSION) -n $(IMAGESUBVERSION) -k $(OUTPUTDIR)/$(KERNEL) \
-                -l $(OUTPUTDIR)/$(ROOT),$(OUTPUTDIR)/$(JFFS2) \
+                -l output/root.bin,output/jffs2.bin \
                 -a $(IMAGEFLASHKERNELSIZE),$(shell expr $(IMAGEFLASHROOTSIZE) + $(IMAGEFLASHKERNELSIZE)) \
 		-z $(shell expr $(IMAGEFLASHROOTSIZE) + $(IMAGEFLASHETCSIZE))
 
+# do not use this rule! It's actually broken!
 rebuild:
+	rm -rf $(OUTPUTDIR)/$(JFFS2)
+	$(MAKE) jffs2
 	@rm -rf $(OUTPUTDIR)/$(ROOT)
-	@$(MAKE) $(OUTPUTDIR)/$(ROOT)
+	$(MAKE) $(OUTPUTDIR)/$(ROOT)
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(IMAGEFILENAME)\033[0m"
-	@$(OUTPUTDIR)/$(MCT_MODIFY) -w -i $(IMAGEFILENAME) -m $(IMAGEMODE) -p $(IMAGEPRODCODE) \
+	@if [ -f $(OUTPUTDIR)/$(ROOT) ]; then rm -rf $(OUTPUTDIR)/$(ROOT) ; fi
+	$(OUTPUTDIR)/$(MCT_MODIFY) -w -i $(IMAGEFILENAME) -m $(IMAGEMODE) -p $(IMAGEPRODCODE) \
 		-v $(IMAGEVERSION) -n $(IMAGESUBVERSION) -k $(OUTPUTDIR)/$(KERNEL) \
-                -l $(OUTPUTDIR)/$(ROOT),$(OUTPUTDIR)/$(JFFS2) \
+                -l output/root.bin,output/jffs2.bin \
                 -a $(IMAGEFLASHKERNELSIZE),$(shell expr $(IMAGEFLASHROOTSIZE) + $(IMAGEFLASHKERNELSIZE)) \
 		-z $(shell expr $(IMAGEFLASHROOTSIZE) + $(IMAGEFLASHETCSIZE))
 
