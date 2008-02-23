@@ -1,0 +1,27 @@
+#!/bin/sh
+. /var/etc/rc.conf
+
+case "$1" in
+    start)
+	if [ "$START_NTPDATE" == "yes" ]; then
+	# we need to check if the network can go out else there is no chance get a timerserver!
+	    /sbin/ntpdate $OPTIONS_NTPDATE_SERVER
+	    /sbin/hwclock -w -u
+	    /bin/echo -n "Running ntp client with Server IP $OPTIONS_NTPDATE_SERVER ... "
+	    /bin/echo -e "\033[1;32mdone\033[0m"
+   	elif [ "$START_NTPDATE" != "yes" ]; then
+	    /bin/echo "Your /var/etc/rc.conf is not configured for starting NTPDate automaticly!"
+	fi
+	;;
+    stop)
+        /bin/echo "Nothing to stop! Maybe you want to edit an cron job?"
+   	;;
+    restart)
+	$0 start
+	;;
+    *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit 0

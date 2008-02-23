@@ -1,10 +1,37 @@
 #!/bin/sh
+. /var/etc/rc.conf
 
-#if [ ! -f /var/httpd/cgi-bin/control-cgi ]; then 
-#    echo "creating httpd default data..."
-#    gunzip -c /httpd.tar.gz | tar xf -
-#else
-#    echo "using existing httpd files..."
-#fi;
+case "$1" in
+        start)
+            if [ "$START_HTTPD" == "yes" ]; then
+		/bin/echo -n "Starting Web Server ... "
+		if [ -d /usr/var/www ]; then
+    	    		/sbin/httpd -h /usr/var/www
+	    		/bin/echo "with document root from hardisk (/usr/var/www) "
+		else
+    	    		/sbin/httpd -h /var/www
+	    		/bin/echo -n "with document root from flash (/var/www/) "
+		fi
+		/bin/echo -e "\033[1;32mdone\033[0m"
+   	    elif [ "$START_???" != "yes" ]; then
+   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting 'httpd' automaticly!\033[0m"
+	    fi
+            ;;
 
-#/bin/httpd
+        stop)
+            /bin/echo -n "Stopping httpd "
+            killall -9 httpd
+	    /bin/echo -e "\033[1;32mdone\033[0m"
+            ;;
+
+        restart)
+            $0 stop
+            sleep 1
+            $0 start
+            ;;
+
+        *)
+            echo "Usage: $0 {start|stop|restart}"
+            exit 1
+    	    ;;
+esac

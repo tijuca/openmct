@@ -1,0 +1,31 @@
+#!/bin/sh
+. /var/etc/rc.conf
+
+case "$1" in
+        start)
+            if [ "$START_SYSLOGD" == "yes" ]; then
+		/bin/echo -n "Starting Syslog daemon ... "
+		/sbin/syslogd -O /tmp/messages
+		/bin/echo -e "\033[1;32mdone\033[0m"
+   	    elif [ "$START_SYSLOGD" != "yes" ]; then
+   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting syslogd automaticly!\033[0m"
+	    fi
+            ;;
+
+        stop)
+            /bin/echo "Stopping syslogd"
+            killall -9 syslogd
+	    /bin/echo -e "\033[1;32mdone\033[0m"
+            ;;
+
+        restart)
+            $0 stop
+            sleep 1
+            $0 start
+            ;;
+
+        *)
+            echo "Usage: $0 {start|stop|restart}"
+            exit 1
+    	    ;;
+esac

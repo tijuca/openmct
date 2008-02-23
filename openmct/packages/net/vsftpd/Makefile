@@ -5,11 +5,11 @@ MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc LIBS="-lcrypt"
 
 INSTALL=	$(CP) $(SRCDIR)/vsftpd $(NEWROOTDIR)/sbin && \
 		$(STRIP) $(NEWROOTDIR)/sbin/vsftpd && \
-		$(ECHO) "listen=YES" > $(NEWROOTDIR)/etc/vsftpd.conf && \
-		$(ECHO) "anonymous_enable=NO" >> $(NEWROOTDIR)/etc/vsftpd.conf && \
-		$(ECHO) "local_enable=YES" >> $(NEWROOTDIR)/etc/vsftpd.conf && \
-		$(ECHO) "write_enable=YES" >> $(NEWROOTDIR)/etc/vsftpd.conf && \
-		$(ECHO) "background=YES" >> $(NEWROOTDIR)/etc/vsftpd.conf && \
-		$(ECHO) "secure_chroot_dir=/var/empty" >> $(NEWROOTDIR)/etc/vsftpd.conf
+		$(ECHO) "listen=YES" > $(NEWROOTDIR)/var/etc/vsftpd.conf && \
+		$(ECHO) "anonymous_enable=NO" >> $(NEWROOTDIR)/var/etc/vsftpd.conf && \
+		$(ECHO) "local_enable=YES" >> $(NEWROOTDIR)/var/etc/vsftpd.conf && \
+		$(ECHO) "write_enable=YES" >> $(NEWROOTDIR)/var/etc/vsftpd.conf && \
+		$(ECHO) "background=YES" >> $(NEWROOTDIR)/var/etc/vsftpd.conf && \
+		$(ECHO) "secure_chroot_dir=/var/run/vsftpd" >> $(NEWROOTDIR)/var/etc/vsftpd.conf
 
 include		$(OPENMCT_DEVEL_PREFIX)Rules

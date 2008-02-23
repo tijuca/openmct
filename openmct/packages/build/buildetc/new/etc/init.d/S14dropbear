@@ -1,0 +1,44 @@
+#!/bin/sh
+. /var/etc/rc.conf
+
+case "$1" in
+        start)
+            if [ "$START_SSHD" == "yes" ]; then
+		if [ ! -d /var/etc/dropbear ]; then
+		    /bin/mkdir /var/etc/dropbear
+		fi
+		if [ ! -f /var/etc/dropbear/dropbear_dss_host_key ]; then
+		    /bin/echo -e "\033[05;31mno secret key for `/bin/cat /etc/hostname` found, generate new one!\033[0m"
+		    /sbin/dropbearkey -t dss -f /var/etc/dropbear/dropbear_dss_host_key
+		fi
+		if [ ! -f /var/etc/dropbear/dropbear_rsa_host_key ]; then
+		    /bin/echo -e "\033[05;31mno public key for `/bin/cat /etc/hostname` found, generate new one!\033[0m"
+		    /sbin/dropbearkey -t rsa -f /var/etc/dropbear/dropbear_rsa_host_key
+		fi
+		/bin/echo -n "Starting SSH daemon ... "
+		/sbin/dropbear -P /tmp/run/dropbear.pid \
+				-r /var/etc/dropbear/dropbear_rsa_host_key \
+				-d /var/etc/dropbear/dropbear_dss_host_key
+		/bin/echo -e "\033[1;32mdone\033[0m"
+	    elif [ "$START_SSHD" != "yes" ]; then
+   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting dropbear automaticly!\033[0m"
+	    fi
+            ;;
+
+        stop)
+            /bin/echo "Stopping SSH"
+            killall -9 dropbear
+	    /bin/echo -e "\033[1;32mdone\033[0m"
+            ;;
+
+        restart)
+            $0 stop
+            sleep 1
+            $0 start
+            ;;
+
+        *)
+            echo "Usage: $0 {start|stop|restart}"
+            exit 1
+    	    ;;
+esac

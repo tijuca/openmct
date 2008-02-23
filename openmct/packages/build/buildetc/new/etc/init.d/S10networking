@@ -1,0 +1,53 @@
+#!/bin/sh
+
+# manage network interfaces and configure some networking options
+. /var/etc/rc.conf
+
+case "$1" in
+    start)
+	echo -n "Configuring network interfaces... "
+	ifup -a &
+	echo -e "\033[1;32mdone\033[0m"
+	if [ "$START_ETHTOOL_ETH0" == "yes" ]; then
+	    /bin/echo -n "set ethool parameters for eth0 ... "
+	    /sbin/ethtool -s eth0 duplex $OPTIONS_ETHTOOL_ETH0_DUPLEX \
+        	         autoneg $OPTIONS_ETHTOOL_ETH0_AUTONEG \
+                         speed $OPTIONS_ETHTOOL_ETH0_SPEED \
+                         wol $OPTIONS_ETHTOOL_ETH0_WAKEONLAN
+   	    /bin/echo -e "\033[1;32mdone\033[0m"
+	elif [ "START_ETHTOOL_ETH0" == "no" ]; then
+   	    /bin/echo -e "\033[1;33mnot set\033[0m"
+   	elif [ "$START_ETHTOOL_ETH0" != "yes" ]; then
+   	    /bin/echo "Your /var/etc/rc.conf is not configured for starting ethtool for eth0 automaticly!"
+	fi
+
+	# ethtool for eth1?
+	if [ "$START_ETHTOOL_ETH1" == "yes" ]; then
+   	    /bin/echo -n "set ethool parameters for eth1 ... "
+	    /sbin/ethtool -s eth1 duplex $OPTIONS_ETHTOOL_ETH1_DUPLEX \
+                     autoneg $OPTIONS_ETHTOOL_ETH1_AUTONEG \
+                     speed $OPTIONS_ETHTOOL_ETH1_SPEED \
+                     wol $OPTIONS_ETHTOOL_ETH1_WAKEONLAN
+   	    /bin/echo -e "\033[1;32mdone\033[0m"
+	elif [ "START_ETHTOOL_ETH1" == "no" ]; then
+   	    /bin/echo -e "\033[1;33mnot set\033[0m"
+   	elif [ "$START_ETHTOOL_ETH1" != "yes" ]; then
+   	    /bin/echo "Your /var/etc/rc.conf is not configured for starting ethtool for eth1 automaticly!"
+   	fi
+	;;
+    stop)
+	echo -n "Deconfiguring network interfaces... "
+	ifdown -a
+	echo -e "\033[1;32mdone\033[0m"
+	;;
+    force-reload|restart)
+	$0 stop
+	sleep 1
+	$0 start
+	;;
+    *)
+        echo "Usage: $0 {start|stop|restart|force-reload}"
+	exit 1
+esac
+
+exit 0

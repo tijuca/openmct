@@ -23,7 +23,17 @@ echo "Mounting filesystems..."
 
 #create some paths
 /bin/mkdir /tmp/root
+/bin/mkdir /tmp/run
 #/bin/mkdir /dev/shm/home
 #/bin/mkdir /dev/shm/network
+
+# setting the variables from /var/etc/rc.conf
+/bin/sh /var/etc/rc.conf
+if [ $? -ne 0 ]; then
+    /bin/echo "Upps, did not find /var/etc/rc.conf"
+    /bin/cp /etc/rc.conf.backup /var/etc/rc.conf
+    /bin/echo "recoverd /var/etc/rc.conf with default values!"
+fi
+
 
 exit 0

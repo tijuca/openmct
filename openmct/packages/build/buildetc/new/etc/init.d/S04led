@@ -1,0 +1,39 @@
+#!/bin/sh
+. /var/etc/rc.conf
+
+case "$1" in
+        start)
+            if [ "$START_LEDS" == "yes" ]; then
+		/bin/echo -n "Starting LED display ... "
+   		/bin/echo $OPTIONS_LEDS_HB > /proc/mct/led/hb
+    		/bin/echo $OPTIONS_LEDS_IN_DEVICE \
+        		  $OPTIONS_LEDS_IN_DIRECTION \
+			  $OPTIONS_LEDS_IN_INTERVAL > /proc/mct/led/in
+    		/bin/echo $OPTIONS_LEDS_OUT_DEVICE \
+        		  $OPTIONS_LEDS_OUT_DIRECTION \
+			  $OPTIONS_LEDS_OUT_INTERVAL > /proc/mct/led/out
+    		/bin/echo -e "\033[1;32mdone\033[0m"
+   	    elif [ "$START_LEDS" != "yes" ]; then
+   		/bin/echo "Your /var/etc/rc.conf is not configured for starting LEDs automaticly!"
+	    fi
+            ;;
+
+        stop)
+            /bin/echo "Stopping LEDs"
+   	    /bin/echo "" > /proc/mct/led/hb
+    	    /bin/echo "" > /proc/mct/led/in
+    	    /bin/echo "" > /proc/mct/led/out
+    	    /bin/echo -e "\033[1;32mdone\033[0m"
+            ;;
+
+        restart)
+            $0 stop
+            sleep 1
+            $0 start
+            ;;
+
+        *)
+            echo "Usage: $0 {start|stop|restart}"
+            exit 1
+    	    ;;
+esac
