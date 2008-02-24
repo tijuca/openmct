@@ -7,10 +7,10 @@ case "$1" in
 		/bin/echo -n "Starting Web Server ... "
 		if [ -d /usr/var/www ]; then
     	    		/sbin/httpd -h /usr/var/www
-	    		/bin/echo "with document root from hardisk (/usr/var/www) "
+	    		/bin/echo "with document root from hardisk (/usr/var/www) ... "
 		else
     	    		/sbin/httpd -h /var/www
-	    		/bin/echo -n "with document root from flash (/var/www/) "
+	    		/bin/echo -n "with document root from flash (/var/www/) ... "
 		fi
 		/bin/echo -e "\033[1;32mdone\033[0m"
    	    elif [ "$START_???" != "yes" ]; then

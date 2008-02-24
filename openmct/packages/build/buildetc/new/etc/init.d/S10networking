@@ -2,10 +2,10 @@
 
 # manage network interfaces and configure some networking options
 . /var/etc/rc.conf
-
+HOSTNAME=`cat /etc/hostname`
 case "$1" in
     start)
-	echo -n "Configuring network interfaces... "
+	echo -n "Configuring network interfaces ... "
 	ifup -a &
 	echo -e "\033[1;32mdone\033[0m"
 	if [ "$START_ETHTOOL_ETH0" == "yes" ]; then
@@ -15,25 +15,27 @@ case "$1" in
                          speed $OPTIONS_ETHTOOL_ETH0_SPEED \
                          wol $OPTIONS_ETHTOOL_ETH0_WAKEONLAN
    	    /bin/echo -e "\033[1;32mdone\033[0m"
-	elif [ "START_ETHTOOL_ETH0" == "no" ]; then
+	elif [ "$START_ETHTOOL_ETH0" == "no" ]; then
    	    /bin/echo -e "\033[1;33mnot set\033[0m"
-   	elif [ "$START_ETHTOOL_ETH0" != "yes" ]; then
-   	    /bin/echo "Your /var/etc/rc.conf is not configured for starting ethtool for eth0 automaticly!"
+   	elif [ "$START_ETHTOOL_ETH0" != "yes" ] || [ "$START_ETHTOOL_ETH0" != "no" ]; then
+   	    /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is missconfigured for ethtool on eth0!\033[0m"
 	fi
 
 	# ethtool for eth1?
-	if [ "$START_ETHTOOL_ETH1" == "yes" ]; then
-   	    /bin/echo -n "set ethool parameters for eth1 ... "
-	    /sbin/ethtool -s eth1 duplex $OPTIONS_ETHTOOL_ETH1_DUPLEX \
+	if ([ $HOSTNAME != "nas110" ] && [ $HOSTNAME != "nas200" ]); then
+	    if [ "$START_ETHTOOL_ETH1" == "yes" ]; then
+	        /bin/echo -n "set ethool parameters for eth1 ... "
+		/sbin/ethtool -s eth1 duplex $OPTIONS_ETHTOOL_ETH1_DUPLEX \
                      autoneg $OPTIONS_ETHTOOL_ETH1_AUTONEG \
                      speed $OPTIONS_ETHTOOL_ETH1_SPEED \
                      wol $OPTIONS_ETHTOOL_ETH1_WAKEONLAN
-   	    /bin/echo -e "\033[1;32mdone\033[0m"
-	elif [ "START_ETHTOOL_ETH1" == "no" ]; then
-   	    /bin/echo -e "\033[1;33mnot set\033[0m"
-   	elif [ "$START_ETHTOOL_ETH1" != "yes" ]; then
-   	    /bin/echo "Your /var/etc/rc.conf is not configured for starting ethtool for eth1 automaticly!"
-   	fi
+   		/bin/echo -e "\033[1;32mdone\033[0m"
+	    elif [ "$START_ETHTOOL_ETH1" == "no" ]; then
+   		/bin/echo -e "set ethool parameters for eth1 ... \033[1;33mnot set\033[0m"
+   	    elif [ "$START_ETHTOOL_ETH1" != "yes" ] || [ "$START_ETHTOOL_ETH1" != "no" ]; then
+   		/bin/echo -e "\033[1;33mYour /var/etc/rc.conf is missconfigured for ethtool on eth1!\033[0m"
+   	    fi
+	fi
 	;;
     stop)
 	echo -n "Deconfiguring network interfaces... "

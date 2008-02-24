@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# loading recovery kernel modul
+/sbin/insmod recovery
+
 # extract var.tar.gz in case that's neccessary
 
 #echo -n "Checking /var partition: "
