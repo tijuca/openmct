@@ -14,7 +14,7 @@ case "$1" in
 			  $OPTIONS_LEDS_OUT_INTERVAL > /proc/mct/led/out
     		/bin/echo -e "\033[1;32mdone\033[0m"
    	    elif [ "$START_LEDS" != "yes" ]; then
-   		/bin/echo "Your /var/etc/rc.conf is not configured for starting LEDs automaticly!"
+   		/bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting LEDs automaticly!\033[0m"
 	    fi
             ;;
 
