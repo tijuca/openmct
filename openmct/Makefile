@@ -163,11 +163,11 @@ endif
 ifdef ETH0NETWORK
 	@$(ECHO) -e "\tnetwork $(ETH0NETWORK)" >> $(NEWROOTDIR)/var/etc/network/interfaces
 	@$(ECHO) "# default nfs release for eth0" > $(NEWROOTDIR)/var/etc/exports
-	@$(ECHO) "/harddisk $(ETH0NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports
+	@$(ECHO) "/usr/data $(ETH0NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports
 else
 	@$(ECHO) -e "\tnetwork 192.168.1.0" >> $(NEWROOTDIR)/var/etc/network/interfaces
 	@$(ECHO) "# default nfs release for eth0" > $(NEWROOTDIR)/var/etc/exports
-	@$(ECHO) "/harddisk 192.168.1.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports
+	@$(ECHO) "/usr/data 192.168.1.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports
 endif
 	
 ifdef ETH0BROADCAST

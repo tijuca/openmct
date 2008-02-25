@@ -1,0 +1,34 @@
+#!/bin/sh
+. /var/etc/rc.conf
+
+case "$1" in
+        start)
+            if [ "$START_NFS" == "yes" ]; then
+		/sbin/rpc.mountd
+		/sbin/rpc.nfsd
+		/sbin/exportfs -rfa
+		/bin/echo -n "Starting NFS daemons ... "
+		/bin/echo -e "\033[1;32mdone\033[0m"
+	    elif [ "$START_FTPD" != "yes" ]; then
+   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting dropbear automaticly!\033[0m"
+	    fi
+            ;;
+
+        stop)
+            /bin/echo "Stopping NFS daemons "
+            killall -9 nfsd
+	    killall -9 rpc.mountd
+	    /bin/echo -e "\033[1;32mdone\033[0m"
+            ;;
+
+        restart)
+            $0 stop
+            sleep 1
+            $0 start
+            ;;
+
+        *)
+            echo "Usage: $0 {start|stop|restart}"
+            exit 1
+    	    ;;
+esac
