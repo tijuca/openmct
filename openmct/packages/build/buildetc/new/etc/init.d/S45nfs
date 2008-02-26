@@ -1,16 +1,23 @@
 #!/bin/sh
 . /var/etc/rc.conf
+/bin/mkdir -p /var/lib/nfs
+/bin/touch /var/lib/nfs/rmtab
+HDD=`mount |grep /dev/ide/ | cut -c1-14`
 
 case "$1" in
         start)
-            if [ "$START_NFS" == "yes" ]; then
+            if [ "$HDD" != "/dev/ide/host0" ]; then
+		/bin/echo -e "\033[1;33mCould't start NFS because no hardisk is mounted!\033[0m"
+	    elif [ "$START_NFS" == "yes" ]; then
 		/sbin/rpc.mountd
 		/sbin/rpc.nfsd
 		/sbin/exportfs -rfa
 		/bin/echo -n "Starting NFS daemons ... "
 		/bin/echo -e "\033[1;32mdone\033[0m"
+		/bin/echo ""
 	    elif [ "$START_FTPD" != "yes" ]; then
-   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting dropbear automaticly!\033[0m"
+   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting NFS automaticly!\033[0m"
+		/bin/echo ""
 	    fi
             ;;
 

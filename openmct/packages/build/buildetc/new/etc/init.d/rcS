@@ -10,5 +10,7 @@ for i in /etc/init.d/S??* ; do
 done
 
 /bin/echo "All Scripts from /etc/init.d started!"
+/bin/echo ""
 /bin/echo "Starting addional Scripts from /var/etc/rc.local ..."
+/bin/echo ""
 /var/etc/rc.local

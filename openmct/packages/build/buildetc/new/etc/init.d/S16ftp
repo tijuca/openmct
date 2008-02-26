@@ -8,8 +8,10 @@ case "$1" in
 		/bin/mkdir -p /var/run/vsftpd
 		/sbin/vsftpd &
 		/bin/echo -e "\033[1;32mdone\033[0m"
+		/bin/echo ""
 	    elif [ "$START_FTPD" != "yes" ]; then
    	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting dropbear automaticly!\033[0m"
+		/bin/echo ""
 	    fi
             ;;
 

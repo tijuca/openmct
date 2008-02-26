@@ -7,8 +7,10 @@ case "$1" in
 		/bin/echo -n "Starting Telnet daemon ... "
 		/sbin/telnetd
 		/bin/echo -e "\033[1;32mdone\033[0m"
-	    elif [ "$START_SSHD" != "yes" ] || [ "$START_TELNETD" != "no" ]; then
-   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not missconfigured for starting telnet!\033[0m"
+		/bin/echo ""
+	    elif [ "$START_TELNETD" != "yes" ] || [ "$START_TELNETD" != "no" ]; then
+   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is missconfigured for starting telnet!\033[0m"
+		/bin/echo ""
 	    fi
             ;;
 

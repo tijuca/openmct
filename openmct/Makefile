@@ -195,21 +195,21 @@ else
 endif
 ifdef ETH1NETWORK
 	@$(ECHO) -e "\tnetwork $(ETH0NETWORK)" >> $(NEWROOTDIR)/var/etc/network/interfaces
-	@if [ -f $(NEWROOTDIR)/etc/exports ]; then \
+	@if [ -f $(NEWROOTDIR)/var/etc/exports ]; then \
 	    @$(ECHO) "# default nfs release for eth1" >> $(NEWROOTDIR)/var/etc/exports
-	    $(ECHO) "/harddisk $(ETH1NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
+	    $(ECHO) "/usr/data $(ETH1NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
 	else \
 	    @$(ECHO) "# default nfs release for eth1" > $(NEWROOTDIR)/var/etc/exports
-	    $(ECHO) "/harddisk $(ETH1NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
+	    $(ECHO) "/usr/data $(ETH1NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
 	fi
 else
 	@$(ECHO) -e "\tnetwork 172.16.0.0" >> $(NEWROOTDIR)/var/etc/network/interfaces
 	@if [ -f $(NEWROOTDIR)/etc/exports ]; then \
 	    $(ECHO) "# default nfs release for eth1" >> $(NEWROOTDIR)/var/etc/exports; \
-	    $(ECHO) "/harddisk 172.16.0.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
+	    $(ECHO) "/usr/data 172.16.0.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
 	else \
 	    $(ECHO) "# default nfs release for eth1" > $(NEWROOTDIR)/var/etc/exports; \
-	    $(ECHO) "/harddisk 172.16.0.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
+	    $(ECHO) "/usr/data 172.16.0.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
 	fi
 endif
 ifdef ETH1BROADCAST
