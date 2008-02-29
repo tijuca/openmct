@@ -217,12 +217,6 @@ ifdef ETH1BROADCAST
 else
 	@$(ECHO) -e "\tbroadcast 172.16.0.255" >> $(NEWROOTDIR)/var/etc/network/interfaces
 endif
-ifdef ETH1DEFAULTGW
-	@$(ECHO) -e "\tgateway $(ETH1DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/network/interfaces
-else
-	@$(ECHO) -e "\tgateway 172.16.0.1" >> $(NEWROOTDIR)/var/etc/network/interfaces
-endif
-endif
 	@$(ECHO) "nameserver $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/resolv.conf
 	@$(ECHO) "/bin/echo \"You are in! Do the right thing! :-)\"" >>  $(NEWROOTDIR)/var/etc/profile
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"

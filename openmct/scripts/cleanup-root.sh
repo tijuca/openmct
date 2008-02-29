@@ -7,7 +7,8 @@ if [ "$1" != "" ]; then
 	rm -rf $1/mnt
 	rm -rf $1/opt
 	rm -rf $1/root
-	cd $1 && pwd  && ln -s /tmp/root root
+	cd $1 && ln -s /tmp/root root 
+	cd $1 && ln -s /usr/home home
 	rm -rf $1/usr
 	rm -rf $1/var
 	rm -rf $1/etc
