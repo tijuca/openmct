@@ -142,14 +142,13 @@ $(OUTPUTDIR)/$(ROOT): etc
 	@$(ECHO) "$(IMAGETARGET) $(IMAGEVERSION) Software $(SOFTWAREVERSION) visit http://openmct.org" >> $(NEWROOTDIR)/etc/issue
 	@$(ECHO) "working Kernel is \r \m (\d \t)" >> $(NEWROOTDIR)/etc/issue
 	
-ifdef ETH0IPADDR 
 	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth0\033[0m"
 	
 	@$(ECHO) "auto lo" > $(NEWROOTDIR)/var/etc/network/interfaces
 	@$(ECHO) "" >> $(NEWROOTDIR)/var/etc/network/interfaces
 	
 	@$(ECHO) -e "\tiface lo inet loopback" >> $(NEWROOTDIR)/var/etc/network/interfaces
-	
+ifdef ETH0IPADDR 
 	@$(ECHO) "auto eth0" >> $(NEWROOTDIR)/var/etc/network/interfaces
 	@$(ECHO) "iface eth0 inet static" >> $(NEWROOTDIR)/var/etc/network/interfaces
 	@$(ECHO) -e "\taddress $(ETH0IPADDR)" >> $(NEWROOTDIR)/var/etc/network/interfaces
@@ -216,6 +215,7 @@ ifdef ETH1BROADCAST
 	@$(ECHO) -e "\tbroadcast $(ETH1BROADCAST)" >> $(NEWROOTDIR)/var/etc/network/interfaces
 else
 	@$(ECHO) -e "\tbroadcast 172.16.0.255" >> $(NEWROOTDIR)/var/etc/network/interfaces
+endif
 endif
 	@$(ECHO) "nameserver $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/resolv.conf
 	@$(ECHO) "/bin/echo \"You are in! Do the right thing! :-)\"" >>  $(NEWROOTDIR)/var/etc/profile
