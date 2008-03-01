@@ -1,5 +1,5 @@
 # Busybox (Basic Shell Utils)
-DOWNLOAD=	http://busybox.net/downloads/busybox-1.7.2.tar.bz2
+DOWNLOAD=	http://busybox.net/downloads/busybox-1.8.0.tar.bz2
 
 MAKEARGS=	CROSS_COMPILE=$(OPENMCT_CROSS_COMPILE) ARCH=mipsel
 
