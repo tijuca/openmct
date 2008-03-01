@@ -21,10 +21,8 @@ case "$1" in
 				-r $DROPBEARDIR/dropbear_rsa_host_key \
 				-d $DROPBEARDIR/dropbear_dss_host_key
 		/bin/echo -e "\033[1;32mdone\033[0m"
-		/bin/echo ""
 	    elif [ "$START_SSHD" != "yes" ]; then
    	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting dropbear automaticly!\033[0m"
-		/bin/echo ""
 	    fi
             ;;
 

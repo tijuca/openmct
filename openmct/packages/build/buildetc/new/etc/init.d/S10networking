@@ -36,7 +36,6 @@ case "$1" in
    		/bin/echo -e "\033[1;33mYour /var/etc/rc.conf is missconfigured for ethtool on eth1!\033[0m"
    	    fi
 	fi
-	/bin/echo ""
 	;;
     stop)
 	echo -n "Deconfiguring network interfaces... "

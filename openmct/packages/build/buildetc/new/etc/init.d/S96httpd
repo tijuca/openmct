@@ -20,7 +20,7 @@ check_config(){
 # .au:audio/basic   # additional mime type for audio.au files
 #
 A:*
-/cgi-bin:${USER}:password
+/cgi-bin:root:168Mct168
 __EOF__
   fi
 }
@@ -42,10 +42,8 @@ case "$1" in
 	    		/bin/echo -n "with document root from flash (/var/www/) ... "
 		fi
 		/bin/echo -e "\033[1;32mdone\033[0m"
-		/bin/echo ""
    	    elif [ "$START_???" != "yes" ]; then
    	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting 'httpd' automaticly!\033[0m"
-		/bin/echo ""
 	    fi
             ;;
 
