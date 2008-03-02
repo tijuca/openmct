@@ -1,0 +1,11 @@
+--- src.working/Makefile.in	2008-03-02 21:30:50.000000000 +0100
++++ src/Makefile.in	2007-10-23 23:34:21.000000000 +0200
+@@ -163,7 +163,7 @@
+ sharedstatedir = @sharedstatedir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
++AM_CPPFLAGS = -DUSBIDS_DIR='"/var/share"'
+-AM_CPPFLAGS = -DUSBIDS_DIR='"@datadir@"'
+ AM_CFLAGS = -Wall -W -Wunused
+ lsusb_SOURCES = lsusb.c \
+ 	names.c names.h \

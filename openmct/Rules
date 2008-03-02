@@ -5,6 +5,7 @@
 # Base packages
 BASEPACKAGES=	packages/build/buildetc \
 		packages/base/busybox \
+		packages/base/usbutils \
 		packages/lib/e2fsprogs \
 		packages/net/dropbear \
 		packages/net/nfsutils \

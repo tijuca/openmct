@@ -1,0 +1,10 @@
+--- src.working/Makefile.am	2007-10-23 23:33:50.000000000 +0200
++++ src/Makefile.am	2008-03-02 21:24:58.000000000 +0100
+@@ -1,6 +1,6 @@
+ # Process this file with 'automake' to create 'Makefile.in'
+ 
+-AM_CPPFLAGS = -DUSBIDS_DIR='"@datadir@"'
++AM_CPPFLAGS = -DUSBIDS_DIR='"/var/share"'
+ 
+ AM_CFLAGS = -Wall -W -Wunused
+ 
