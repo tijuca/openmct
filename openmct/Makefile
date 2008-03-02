@@ -138,8 +138,8 @@ $(OUTPUTDIR)/$(ROOT): etc
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hostname\033[0m"
 	@$(ECHO) $(IMAGETARGET) > $(NEWROOTDIR)/var/etc/hostname
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/issue\033[0m"
-	@$(ECHO) "Welcome on OpenMCT" > $(NEWROOTDIR)/etc/issue
-	@$(ECHO) "$(IMAGETARGET) $(IMAGEVERSION) Software $(SOFTWAREVERSION) visit http://openmct.org" >> $(NEWROOTDIR)/etc/issue
+	@$(ECHO) "Welcome on $(IMAGETARGET) with OpenMCT $(SOFTWAREVERSION) !" > $(NEWROOTDIR)/etc/issue
+	@$(ECHO) "### visit http://www.openmct.org ###" >> $(NEWROOTDIR)/etc/issue
 	@$(ECHO) "working Kernel is \r \m (\d \t)" >> $(NEWROOTDIR)/etc/issue
 	
 	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth0\033[0m"
