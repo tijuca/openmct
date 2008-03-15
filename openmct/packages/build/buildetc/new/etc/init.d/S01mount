@@ -11,20 +11,20 @@ cat /etc/fstab.in | sed -e "s/REALVAR/$VAR/g" > /etc/fstab
 echo "Enable Swap space (if exist)..."
 /sbin/swapon -a > /dev/null 2>&1
 
-echo "Mounting filesystems..."
-/bin/mount -a > /dev/null 2>&1
+echo "Mounting filesystems ..."
+/bin/mount -a 
 
 /bin/echo
-/bin/echo mounted the following filesystems:
-/bin/echo ----------------------------------------
+/bin/echo "mounted actually the following filesystems (thats not final!):"
+/bin/echo --------------------------------------------------------------
 /bin/mount
-/bin/echo ----------------------------------------
+/bin/echo --------------------------------------------------------------
 /bin/echo
 
 #create some paths
 /bin/mkdir /tmp/root
 /bin/mkdir /tmp/run
-#/bin/mkdir /dev/shm/home
+/bin/mkdir /tmp/media
 #/bin/mkdir /dev/shm/network
 
 # setting the variables from /var/etc/rc.conf

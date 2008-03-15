@@ -14,3 +14,4 @@ done
 /bin/echo "Starting addional Scripts from /var/etc/rc.local ..."
 /bin/echo ""
 /var/etc/rc.local
+/bin/cat /etc/banner

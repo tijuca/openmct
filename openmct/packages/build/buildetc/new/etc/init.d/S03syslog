@@ -4,8 +4,9 @@
 case "$1" in
         start)
             if [ "$START_SYSLOGD" == "yes" ]; then
-		/bin/echo -n "Starting Syslog daemon ... "
+		/bin/echo -n "Starting Syslog and Kernellog daemon ... "
 		/sbin/syslogd -O /tmp/messages
+		/sbin/klogd
 		/bin/echo -e "\033[1;32mdone\033[0m"
    	    elif [ "$START_SYSLOGD" != "yes" ]; then
    	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting syslogd automaticly!\033[0m"
@@ -15,6 +16,7 @@ case "$1" in
         stop)
             /bin/echo "Stopping Syslogd"
             killall -9 syslogd
+	    killall -9 klogd
 	    /bin/echo -e "\033[1;32mdone\033[0m"
             ;;
 

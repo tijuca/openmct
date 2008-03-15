@@ -1,0 +1,51 @@
+#!/bin/sh
+
+. /var/etc/rc.conf
+HOSTNAME=`cat /etc/hostname`
+
+case "$1" in
+    start)
+	if ([ $HOSTNAME != "nas110" ]); then
+	    LOOP=1
+#	    while test $LOOP -le 10
+#	    do
+		sleep 1
+		echo -n "Enabling usbfs ... "
+	    # mount usbfs for lsusb
+#	    	echo "Loop number: $LOOP"
+		/bin/mount -t usbfs none /proc/bus/usb
+#		if [ "$?" == "0" ];then
+#		    echo success
+#		    mount
+#		    break
+#		fi
+#		LOOP=`expr $LOOP + 1`
+		echo -e "\033[1;32mdone\033[0m"
+#	    done
+
+	    # loading recovery kernel modul
+	    /sbin/modprobe ehci-hcd > /dev/null 2>&1
+	    /sbin/modprobe usb-storage > /dev/null 2>&1
+	    /sbin/modprobe scsi_mod > /dev/null 2>&1
+	    /sbin/modprobe sd_mod > /dev/null 2>&1
+	    /sbin/modprobe vfat > /dev/null 2>&1
+	    # loading umsdos ??
+	    #/sbin/modprobe vfat > /dev/null 2>&1
+	fi
+	;;
+    stop)
+	echo -n "Disabling usbfs... "
+	/bin/umount /proc/bus/usb
+	echo -e "\033[1;32mdone\033[0m"
+	;;
+    force-reload|restart)
+	$0 stop
+	sleep 1
+	$0 start
+	;;
+    *)
+        echo "Usage: $0 {start|stop|restart|force-reload}"
+	exit 1
+esac
+
+exit 0

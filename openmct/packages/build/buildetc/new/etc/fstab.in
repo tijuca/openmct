@@ -3,7 +3,6 @@
 # <file system>		<mount pt>     <type>   <options>      <dump> <pass>
 
 proc			/proc		proc	defaults	0	0
-/dev/rootfs		/		rootfs	defaults	0	0
+/dev/usb 		/proc/bus/usb 	usbfs 	defaults 	0 	0
 /dev/mtdblock/REALVAR		/var		jffs2	rw		0	0
 /dev/ide/host0/bus0/target0/lun0/part1	/usr	ext3	defaults	0	0
-/dev/ide/host0/bus0/target0/lun0/part2	swap	swap	defaults	0	0

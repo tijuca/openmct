@@ -1,8 +1,7 @@
 #!/bin/sh
 
 # loading recovery kernel modul
-/sbin/insmod recovery
-/sbin/modprobe usb-storage
+/sbin/modprobe recovery
 
 # extract var.tar.gz in case that's neccessary
 

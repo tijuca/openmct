@@ -36,7 +36,7 @@ case "$1" in
 		fi
 		if [ -d /usr/var/www ]; then
     	    		/sbin/httpd -h /usr/var/www -c $CONFIG
-	    		/bin/echo "with document root from hardisk (/usr/var/www) ... "
+	    		/bin/echo -n "with document root from hardisk (/usr/var/www) ... "
 		else
     	    		/sbin/httpd -h /var/www -c $CONFIG
 	    		/bin/echo -n "with document root from flash (/var/www/) ... "
