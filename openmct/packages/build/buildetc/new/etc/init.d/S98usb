@@ -6,23 +6,6 @@ HOSTNAME=`cat /etc/hostname`
 case "$1" in
     start)
 	if ([ $HOSTNAME != "nas110" ]); then
-	    LOOP=1
-#	    while test $LOOP -le 10
-#	    do
-		sleep 1
-		echo -n "Enabling usbfs ... "
-	    # mount usbfs for lsusb
-#	    	echo "Loop number: $LOOP"
-		/bin/mount -t usbfs none /proc/bus/usb
-#		if [ "$?" == "0" ];then
-#		    echo success
-#		    mount
-#		    break
-#		fi
-#		LOOP=`expr $LOOP + 1`
-		echo -e "\033[1;32mdone\033[0m"
-#	    done
-
 	    # loading recovery kernel modul
 	    /sbin/modprobe ehci-hcd > /dev/null 2>&1
 	    /sbin/modprobe usb-storage > /dev/null 2>&1
@@ -30,7 +13,14 @@ case "$1" in
 	    /sbin/modprobe sd_mod > /dev/null 2>&1
 	    /sbin/modprobe vfat > /dev/null 2>&1
 	    # loading umsdos ??
-	    #/sbin/modprobe vfat > /dev/null 2>&1
+	    #/sbin/modprobe umsdos > /dev/null 2>&1
+	    
+	    /bin/sleep 1
+	    /bin/echo -n "Enabling usbfs and adding to /etc/fstab ... "
+	    # mount usbfs for lsusb
+	    /bin/mount -t usbfs none /proc/bus/usb
+	    /bin/echo "usbfs					/proc/bus/usb	usbfs	defaults	0	0" >> /etc/fstab
+	    /bin/echo -e "\033[1;32mdone\033[0m"
 	fi
 	;;
     stop)

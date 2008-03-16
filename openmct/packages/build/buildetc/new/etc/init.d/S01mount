@@ -8,8 +8,12 @@
 VAR=`cat /proc/mtd | grep etc | cut -b 4`
 cat /etc/fstab.in | sed -e "s/REALVAR/$VAR/g" > /etc/fstab
 
-echo "Enable Swap space (if exist)..."
-/sbin/swapon -a > /dev/null 2>&1
+if [ -d /dev/ide/host0/bus0/target0/lun0/ ]; then
+    echo "Enable Swap space (if exist)..."
+    /sbin/swapon -a > /dev/null 2>&1
+else
+    cat /etc/fstab | sed -e "s#/dev/ide/#\#/dev/ide/#g" > /etc/fstab
+fi
 
 echo "Mounting filesystems ..."
 /bin/mount -a 
