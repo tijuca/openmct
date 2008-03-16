@@ -6,7 +6,7 @@ HOSTNAME=`cat /etc/hostname`
 case "$1" in
     start)
 	if ([ $HOSTNAME != "nas110" ]); then
-	    # loading recovery kernel modul
+	    # loading usb kernel modules
 	    /sbin/modprobe ehci-hcd > /dev/null 2>&1
 	    /sbin/modprobe usb-storage > /dev/null 2>&1
 	    /sbin/modprobe scsi_mod > /dev/null 2>&1
