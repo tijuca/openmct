@@ -220,6 +220,8 @@ endif
 	@$(ECHO) "nameserver $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/resolv.conf
 	@$(ECHO) "/bin/echo \"You are in! Do the right thing! :-)\"" >>  $(NEWROOTDIR)/var/etc/profile
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"
+
+squashfs:
 	@if [ -f $(OUTPUTDIR)/$(ROOT) ]; then rm -rf $(OUTPUTDIR)/$(ROOT) ; fi
 	$(OUTPUTDIR)/$(MKSQUASHFS) $(NEWROOTDIR) $(OUTPUTDIR)/$(ROOT) $(ROOTOPTS)
 
@@ -229,13 +231,25 @@ jffs2:
 	mv $(NEWROOTDIR)/var/* $(JFFS2DIR)
 	$(MKFSJFFS2) -d $(JFFS2DIR) -o $(OUTPUTDIR)/$(JFFS2)
 
-$(IMAGEFILENAME): $(OUTPUTDIR)/$(MCT_MODIFY) $(OUTPUTDIR)/$(MKSQUASHFS) $(OUTPUTDIR)/$(KERNEL) etc pkg $(OUTPUTDIR)/$(ROOT) jffs2
+$(IMAGEFILENAME): $(OUTPUTDIR)/$(MCT_MODIFY) $(OUTPUTDIR)/$(MKSQUASHFS) $(OUTPUTDIR)/$(KERNEL) etc pkg $(OUTPUTDIR)/$(ROOT) jffs2 squashfs
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(IMAGEFILENAME)\033[0m"
 	$(OUTPUTDIR)/$(MCT_MODIFY) -w -i $(IMAGEFILENAME) -m $(IMAGEMODE) -p $(IMAGEPRODCODE) \
 		-v $(IMAGEVERSION) -n $(IMAGESUBVERSION) -k $(OUTPUTDIR)/$(KERNEL) \
                 -l output/root.bin,output/jffs2.bin \
                 -a $(IMAGEFLASHKERNELSIZE),$(shell expr $(IMAGEFLASHROOTSIZE) + $(IMAGEFLASHKERNELSIZE)) \
 		-z $(shell expr $(IMAGEFLASHROOTSIZE) + $(IMAGEFLASHETCSIZE))
+
+nfs: etc pkg $(OUTPUTDIR)/$(ROOT) jffs2
+	@$(ECHO) -e "\033[1;33mCREATE \033[1;32mdirectory for NFS export (instead of nfs boot for your nas)\033[0m"
+	@mkdir -p $(OUTPUTDIR)/nfs
+	@cp -a $(NEWROOTDIR)/* $(OUTPUTDIR)/nfs
+	@cp -a $(JFFS2DIR)/* $(OUTPUTDIR)/nfs/var
+	@cat $(OUTPUTDIR)/nfs/etc/fstab.in | sed -e "s#/dev/mtdblock/#\#/dev/mtdblock/#g" > $(OUTPUTDIR)/nfs/etc/fstab.in
+	@$(ECHO) -e "\033[1;32mNOTE! \033[0myou need the following entry in your /etc/exports :"
+	@$(ECHO) -e "\t$(OUTPUTDIR)/nfs	[given nas IP]/255.255.255.0(sync,no_subtree_check,rw,all_squash,anonuid=[YOUR uid],anongid=[YOUR gid])"
+	@$(ECHO) -e "\n\tfor example: the IP given by the DHCP server is \033[1;34m192.168.1.120 \033[0mand the User ID is \033[1;34m1000\033[0m, your Group ID is \033[1;34m100\033[0m"
+	@$(ECHO) -e "\t$(OUTPUTDIR)/nfs	\033[1;34m192.168.1.120\033[0m/255.255.255.0(sync,no_subtree_check,rw,all_squash,anonuid=\033[1;34m1000\033[0m,anongid=\033[1;34m100\033[0m)"
+	@$(ECHO)
 
 # do not use this rule! It's actually broken!
 rebuild:

@@ -71,6 +71,17 @@ diff -Naru linux-2.4.35.3/arch/mips/config-shared.in linux-2.4.35.3-mct/arch/mip
     fi
  fi
  if [ "$CONFIG_SIBYTE_SB1250" = "y" -o \
+diff -Naru linux-2.4.35.3/kernel/ksym.c linux-2.4.35.3-mct/kernel/ksym.c
+--- linux-2.4.35.3/kernel/ksyms.c	2008-03-23 17:34:57.000000000 +0100
++++ linux-2.4.33.3-mct/kernel/ksyms.c	2008-03-23 17:34:36.000000000 +0100
+@@ -579,6 +579,7 @@
+ EXPORT_SYMBOL(strnicmp);
+ EXPORT_SYMBOL(strspn);
+ EXPORT_SYMBOL(strsep);
++EXPORT_SYMBOL(memchr); /* needed for smbfs */
+ 
+ #ifdef CONFIG_CRC32
+ EXPORT_SYMBOL(crc32_le)
 diff -Naru linux-2.4.35.3/arch/mips/kernel/head.S linux-2.4.35.3-mct/arch/mips/kernel/head.S
 --- linux-2.4.35.3/arch/mips/kernel/head.S	2007-09-24 00:02:58.000000000 +0200
 +++ linux-2.4.35.3-mct/arch/mips/kernel/head.S	2007-11-04 14:10:45.000000000 +0100

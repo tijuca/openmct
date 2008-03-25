@@ -27,7 +27,7 @@ case "$1" in
             ;;
 
         stop)
-            /bin/echo "Stopping SSH"
+            /bin/echo -n "Stopping SSH ..."
             killall -9 dropbear
 	    /bin/echo -e "\033[1;32mdone\033[0m"
             ;;
