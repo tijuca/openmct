@@ -239,7 +239,6 @@ int mct_modify_extract(char *firmware, char *kernel, char *ramdisk, int flashbas
 	int		fd_kernel;
 	int		fd_ramdisk;
 	char*		buf = NULL;
-	(char *)malloc(MCT_DEFAULT_FIRMWARESIZE);
 	int		retcode = -1;
 	struct stat	st_firmware;
 	
