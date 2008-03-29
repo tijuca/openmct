@@ -238,46 +238,53 @@ int mct_modify_extract(char *firmware, char *kernel, char *ramdisk, int flashbas
 	int		fd_firmware;
 	int		fd_kernel;
 	int		fd_ramdisk;
-	char*		buf = (char *)malloc(MCT_DEFAULT_FIRMWARESIZE);
+	char*		buf = NULL;
+	(char *)malloc(MCT_DEFAULT_FIRMWARESIZE);
 	int		retcode = -1;
-
-	if (buf == NULL) {
-		printf("[*] can't allocate buffer for firmware\n");
+	struct stat	st_firmware;
+	
+	if (stat(firmware, &st_firmware) == -1) {
+		printf("[*] can't get file information for firmware\n");
 	} else {
-		fd_firmware = open(firmware, O_RDONLY);
-		if (fd_firmware != -1) {
-			fd_kernel = open(kernel, O_CREAT | O_WRONLY, 0644);
-			if (fd_kernel != -1) {
-				fd_ramdisk = open(ramdisk, O_CREAT | O_WRONLY, 0644);
-				if (fd_ramdisk != -1) {
-					if (read(fd_firmware, buf, MCT_DEFAULT_FIRMWARESIZE) != -1) {
-						header = (struct mct_h_t *)buf;
-						mct_modify_adjust_endianness(header);
-						mct_modify_dump_header(header, flashbase, updateoffset);
-						printf("[*] writing kernel to file '%s'...\n", kernel);
-						mct_modify_write_kernel(buf, fd_kernel);
-						printf("[*] writing ramdisk to file '%s'...\n", ramdisk);
-						mct_modify_write_ramdisk(buf, fd_ramdisk);
+		buf = (char*)malloc(st_firmware.st_size);
+		if (buf == NULL) {
+			printf("[*] can't allocate buffer for firmware\n");
+		} else {
+			fd_firmware = open(firmware, O_RDONLY);
+			if (fd_firmware != -1) {
+				fd_kernel = open(kernel, O_CREAT | O_WRONLY, 0644);
+				if (fd_kernel != -1) {
+					fd_ramdisk = open(ramdisk, O_CREAT | O_WRONLY, 0644);
+					if (fd_ramdisk != -1) {
+						if (read(fd_firmware, buf, MCT_DEFAULT_FIRMWARESIZE) != -1) {
+							header = (struct mct_h_t *)buf;
+							mct_modify_adjust_endianness(header);
+							mct_modify_dump_header(header, flashbase, updateoffset);
+							printf("[*] writing kernel to file '%s'...\n", kernel);
+							mct_modify_write_kernel(buf, fd_kernel);
+							printf("[*] writing ramdisk to file '%s'...\n", ramdisk);
+							mct_modify_write_ramdisk(buf, fd_ramdisk);
+							close(fd_firmware);
+							close(fd_kernel);
+							close(fd_ramdisk);
+							retcode = 0;
+						} else {
+							printf("[*] can't read firmware\n");
+						}
+					} else {
+						printf("[*] can't open ramdisk '%s' for writing\n", ramdisk);
 						close(fd_firmware);
 						close(fd_kernel);
-						close(fd_ramdisk);
-						retcode = 0;
-					} else {
-						printf("[*] can't read firmware\n");
 					}
 				} else {
-					printf("[*] can't open ramdisk '%s' for writing\n", ramdisk);
+					printf("[*] can't open kernel '%s' for writing\n", kernel);
 					close(fd_firmware);
-					close(fd_kernel);
 				}
 			} else {
-				printf("[*] can't open kernel '%s' for writing\n", kernel);
-				close(fd_firmware);
+				printf("[*] can't open firmware '%s' for reading\n", firmware);
 			}
-		} else {
-			printf("[*] can't open firmware '%s' for reading\n", firmware);
+			free(buf);
 		}
-		free(buf);
 	}
 
 	return retcode;
