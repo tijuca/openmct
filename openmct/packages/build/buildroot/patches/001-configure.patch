@@ -19,7 +19,7 @@ diff -Naru buildroot/toolchain/gcc/gcc-uclibc-3.x.mk buildroot-mct/toolchain/gcc
  
 -#GCC_SITE:=ftp://ftp.gnu.org/gnu/gcc/releases/gcc-$(GCC_VERSION)
 -GCC_SITE:=http://mirrors.rcn.net/pub/sourceware/gcc/releases/gcc-$(GCC_VERSION)
-+GCC_SITE:=http://gcc.fyxm.net/releases/gcc-3.3.6
++GCC_SITE:=ftp://ftp.gwdg.de/pub/misc/gcc/releases/gcc-3.3.6
 +#GCC_SITE:=http://mirrors.rcn.net/pub/sourceware/gcc/releases/gcc-$(GCC_VERSION)
  
  #
