@@ -75,7 +75,7 @@ static int mct_flash_reset_thread(void *data)
 #endif
                         old_fs = get_fs();
                         set_fs(KERNEL_DS);
-                        file = filp_open("/var/etc/rc.local", O_WRONLY|O_CREAT, 0644);
+                        file = filp_open("/var/.recover", O_WRONLY|O_CREAT, 0644);
                         if (file) {
                                 filp_close(file, NULL);
                         }

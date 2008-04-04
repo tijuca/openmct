@@ -3,6 +3,38 @@
 # loading recovery kernel modul
 /sbin/modprobe recovery
 
+RECOVER_REQUEST=/var/.recover
+
+recover_network(){
+if [ -f $RECOVER_REQUEST  ]; then
+    /bin/echo -e -n "\033[05;31mfound recover request.\033[0m"
+    if [ -f /etc/init.d/backup/interfaces.backup ]; then
+	/bin/cp /etc/init.d/backup/interfaces.backup /var/etc/network/
+	/bin/echo " Copy backup network file!"
+	/bin/rm $RECOVER_REQUEST
+    fi
+else
+    /bin/echo -e "\033[1;32mnothing to do!\033[0m"
+fi
+}
+
+case "$1" in
+	start)
+	    /bin/echo -n "Checking for recover something ... "
+	    recover_network
+	    ;;
+
+        force)
+	    /bin/touch $RECOVER_REQUEST
+            $0 start
+	    reboot
+            ;;
+
+        *)
+            echo "Usage: $0 {start|force} #force is for recover without reset button!"
+            exit 1
+    	    ;;
+esac
 # extract var.tar.gz in case that's neccessary
 
 #echo -n "Checking /var partition: "

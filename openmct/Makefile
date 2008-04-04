@@ -219,10 +219,11 @@ endif
 endif
 	@$(ECHO) "nameserver $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/resolv.conf
 	@$(ECHO) "/bin/echo \"You are in! Do the right thing! :-)\"" >>  $(NEWROOTDIR)/var/etc/profile
-	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"
+	@cp $(NEWROOTDIR)/var/etc/network/interfaces $(NEWROOTDIR)/etc/init.d/backup/interfaces.backup
 
 squashfs:
 	@if [ -f $(OUTPUTDIR)/$(ROOT) ]; then rm -rf $(OUTPUTDIR)/$(ROOT) ; fi
+	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m$(ROOT)\033[0m"
 	$(OUTPUTDIR)/$(MKSQUASHFS) $(NEWROOTDIR) $(OUTPUTDIR)/$(ROOT) $(ROOTOPTS)
 
 jffs2:
