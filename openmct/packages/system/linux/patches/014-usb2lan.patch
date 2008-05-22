@@ -1,0 +1,29 @@
+diff -Naru linux-2.4.35.3/drivers/usb/pegasus.h linux-2.4.35.3-mct/drivers/usb/pegasus.h
+--- src-orig/drivers/usb/pegasus.h	2007-09-24 00:02:58.000000000 +0200
++++ src/drivers/usb/pegasus.h	2008-05-22 12:48:50.000000000 +0200
+@@ -176,7 +176,10 @@
+ 		DEFAULT_GPIO_RESET | PEGASUS_II | HAS_HOME_PNA )
+ PEGASUS_DEV( "ADMtek ADM8513 \"Pegasus II\" USB Ethernet",
+ 		VENDOR_ADMTEK, 0x8513,
+-		DEFAULT_GPIO_RESET | PEGASUS_II )	
++		DEFAULT_GPIO_RESET | PEGASUS_II )
++PEGASUS_DEV( "ADMtek ADM8515 \"Pegasus II\" USB Ethernet",
++		VENDOR_ADMTEK, 0x8515,
++                DEFAULT_GPIO_RESET | PEGASUS_II )
+ PEGASUS_DEV( "ADMtek AN986 \"Pegasus\" USB Ethernet (evaluation board)",
+ 		VENDOR_ADMTEK, 0x0986,
+ 		DEFAULT_GPIO_RESET | HAS_HOME_PNA )
+diff -Naru linux-2.4.35.3/drivers/usb/pegasus.c linux-2.4.35.3-mct/drivers/usb/pegasus.c
+--- src/drivers/usb/pegasus.c	2008-05-22 18:14:08.000000000 +0200
++++ src-orig/drivers/usb/pegasus.c	2007-09-24 00:02:58.000000000 +0200
+@@ -42,8 +42,8 @@
+ /*
+  * Version Information
+  */
+-#define DRIVER_VERSION "v0.4.32 (2003/06/06)"
+-#define DRIVER_AUTHOR "Petko Manolov <petkan@users.sourceforge.net>"
++#define DRIVER_VERSION "v0.4.32 (2003/06/06) patched for OpenMCT"
++#define DRIVER_AUTHOR "Petko Manolov <petkan@users.sourceforge.net> +OpenMCT Team"
+ #define DRIVER_DESC "Pegasus/Pegasus II USB Ethernet driver"
+ 
+ static const char driver_name[] = "pegasus";
