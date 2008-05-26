@@ -6,21 +6,23 @@ HOSTNAME=`cat /etc/hostname`
 case "$1" in
     start)
 	if ([ $HOSTNAME != "nas110" ]); then
-	    # loading usb kernel modules
+	    /bin/echo -n "Loading usbfs related kernel modul ... "
+	    /sbin/modprobe usbcore > /dev/null 2>&1
+	    /bin/echo -e "\033[1;32mdone\033[0m"
+	    
+	    /bin/echo -e "Enabling usbfs and adding to /etc/fstab ..."
+	    /bin/mount -t usbfs none /proc/bus/usb
+	    /bin/echo "usbfs					/proc/bus/usb	usbfs	defaults	0	0" >> /etc/fstab
+	    /bin/sleep 1
 	    /sbin/modprobe ehci-hcd > /dev/null 2>&1
+	    /bin/sleep 1
 	    /sbin/modprobe usb-storage > /dev/null 2>&1
 	    /sbin/modprobe scsi_mod > /dev/null 2>&1
 	    /sbin/modprobe sd_mod > /dev/null 2>&1
 	    /sbin/modprobe vfat > /dev/null 2>&1
 	    # loading umsdos ??
 	    #/sbin/modprobe umsdos > /dev/null 2>&1
-	    
-	    /bin/sleep 1
-	    /bin/echo -n "Enabling usbfs and adding to /etc/fstab ... "
-	    # mount usbfs for lsusb
-	    /bin/mount -t usbfs none /proc/bus/usb
-	    /bin/echo "usbfs					/proc/bus/usb	usbfs	defaults	0	0" >> /etc/fstab
-	    /bin/echo -e "\033[1;32mdone\033[0m"
+	    /bin/echo -e "Enabling usbfs and adding to /etc/fstab ... \033[1;32mdone\033[0m"
 	fi
 	;;
     stop)
