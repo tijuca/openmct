@@ -1,6 +1,7 @@
 LANGUAGE=LANG_GERMAN
-#CFLAGS=-D$(LANGUAGE) -Os -Wall -DFILE_BASE='""'
-CFLAGS=-D$(LANGUAGE) -Os -Wall -DFILE_BASE='"../examples"'
+CFLAGS=-D$(LANGUAGE) -Os -Wall -DFILE_BASE='""'
+#CFLAGS=-D$(LANGUAGE) -Os -Wall -DFILE_BASE='"../examples"'
+#CFLAGS=-D$(LANGUAGE)  -g3 -O0 -Wall -DFILE_BASE='""'
 CC=$(CROSS)gcc
 STRIP=$(CROSS)strip
 OUTPUT=../www
