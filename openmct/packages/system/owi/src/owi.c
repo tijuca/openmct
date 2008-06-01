@@ -190,7 +190,7 @@ void owi_footer(struct owi_t *owi, char *button, ...) {
 	  "</table>\n"
 	  "<table class=\"footer\">\n"
 	  "<tr>\n"
-	  "<td>OpenMCT is &copy; 2005 by OpenMCT. All rights reserved.<br />"
+	  "<td>OpenMCT is &copy; 2008 by OpenMCT. All rights reserved.<br />"
 	  "<a href=\"http://www.openmct.org\" target=\"_blank\">http://www.openmct.org</a></td>\n"
 	  "</tr>\n"
 	  "</table>\n"

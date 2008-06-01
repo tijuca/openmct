@@ -32,17 +32,6 @@
 struct data_t process_data[] = {
    {
      DATA_TYPE_TEXT,
-     DATA_FLAG_LIST,
-     "User",
-     "Process owner",
-     "user",
-     "user",
-     NULL,
-     NULL,
-   },
-
-   {
-     DATA_TYPE_TEXT,
      DATA_FLAG_LIST | DATA_FLAG_ID,
      "Process ID",
      "Process owner",
@@ -55,32 +44,10 @@ struct data_t process_data[] = {
    {
      DATA_TYPE_TEXT,
      DATA_FLAG_LIST,
-     "CPU",
-     "CPU usage",
-     "cpu",
-     "cpu",
-     NULL,
-     NULL,
-   },
-
-   {
-     DATA_TYPE_TEXT,
-     DATA_FLAG_LIST,
-     "MEM",
-     "Memory usage",
-     "mem",
-     "mem",
-     NULL,
-     NULL
-   },
-
-   {
-     DATA_TYPE_TEXT,
-     0,
-     "VSZ",
-     "VSZ",
-     "VSZ",
-     "VSZ",
+     "User",
+     "Process owner",
+     "user",
+     "user",
      NULL,
      NULL,
    },
@@ -88,21 +55,10 @@ struct data_t process_data[] = {
    {
      DATA_TYPE_TEXT,
      0,
-     "RSS",
-     "RSS",
-     "RSS",
-     "RSS",
-     NULL,
-     NULL
-   },
-
-   {
-     DATA_TYPE_TEXT,
-     0,
-     "TTY",
-     "TTY",
-     "TTY",
-     "TTY",
+     "VSZ",
+     "VSZ",
+     "VSZ",
+     "VSZ",
      NULL,
      NULL,
    },
@@ -116,28 +72,6 @@ struct data_t process_data[] = {
      "stat",
      NULL,
      NULL,
-   },
-
-   {
-     DATA_TYPE_TEXT,
-     0,
-     "start",
-     "Start",
-     "Start",
-     "start",
-     NULL,
-     NULL,
-   },
-
-   {
-     DATA_TYPE_TEXT,
-     0,
-     "Time",
-     "Time",
-     "Time",
-     "Time",
-     NULL,
-     NULL
    },
 
    {
@@ -164,6 +98,7 @@ struct data_t process_data[] = {
 
 };
 
+
 /* \fn process_main(owi)
  * Process information
  * \param[in] owi handler
@@ -173,14 +108,23 @@ int process_main(struct owi_t *owi) {
    /* Set separator */
    owi->file->separator = string_copy_value(PROCESS_SEPARATOR);
    /* Set filename */
-   owi->file->name = string_copy_value(PROCESS_COMMAND);
+   owi->file->name = string_copy_value(PROCESS_FILE);
    /* Set owi properties for display */
    owi->headline = string_copy_value(PROCESS_HEADLINE);
    owi->data = process_data;
    owi->flags = OWI_FLAG_ACTION | OWI_FLAG_ACTION_KILL |
                 OWI_FLAG_ROW | OWI_FLAG_HIDE_NEW;
+
+   /* Execute command which creates input data in PROCESS_FILE */
+   system (PROCESS_COMMAND);
+  
    /* Start main */
    owi_main(owi);
+  
+   /* Kill file created through system() call. */
+   /* TODO This is not working */
+   /*remove (string_value(owi->file->name));*/
+
    /* Return success */
    return 0;
 }
