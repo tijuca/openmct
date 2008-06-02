@@ -1,4 +1,5 @@
 # Samba 2.x
+OPENMCT_DEVEL_PREFIX=/home/mgoettin/openmct/head/openmct/
 DOWNLOAD=	http://samba.org/samba/ftp/stable/samba-2.2.12.tar.gz
 
 SRCDIRSUFFIX=	/source
@@ -10,9 +11,9 @@ CONFIGUREARGS=	--host=$(TARGET) \
                 --disable-pie \
                 --prefix=$(PREFIX) \
                 --sysconfdir=/etc \
-                --libdir=/etc/samba \
-                --with-privatedir=/etc/samba \
-                --with-piddir=/var/run/samba \
+                --libdir=/var/etc/samba \
+                --with-privatedir=/var/etc/samba \
+                --with-piddir=/var/run/run \
                 --localstatedir=/var \
                 --with-netatalk \
                 --with-syslog \
@@ -27,7 +28,7 @@ CONFIGUREARGS=	--host=$(TARGET) \
 
 INSTALL=	$(CP) $(SRCDIR)/source/bin/{smbd,nmbd,smbpasswd} $(NEWROOTDIR)/sbin && \
 		$(STRIP) $(NEWROOTDIR)/sbin/{smbd,nmbd,smbpasswd} && \
-		$(MKDIR) $(NEWROOTDIR)/etc/samba && \
-		$(CP) $(SRCDIR)/examples/simple/smb.conf $(NEWROOTDIR)/etc/samba
+		$(MKDIR) $(NEWROOTDIR)/var/etc/samba && \
+		$(CP) $(SRCDIR)/examples/simple/smb.conf $(NEWROOTDIR)/var/etc/samba
 
 include		$(OPENMCT_DEVEL_PREFIX)Rules

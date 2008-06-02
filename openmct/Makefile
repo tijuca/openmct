@@ -243,8 +243,8 @@ $(IMAGEFILENAME): $(OUTPUTDIR)/$(MCT_MODIFY) $(OUTPUTDIR)/$(MKSQUASHFS) $(OUTPUT
 nfs: etc pkg $(OUTPUTDIR)/$(ROOT) jffs2
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32mdirectory for NFS export (instead of nfs boot for your nas)\033[0m"
 	@mkdir -p $(OUTPUTDIR)/nfs
-	@cp -a $(NEWROOTDIR)/* $(OUTPUTDIR)/nfs
-	@cp -a $(JFFS2DIR)/* $(OUTPUTDIR)/nfs/var
+	@cp -au $(NEWROOTDIR)/* $(OUTPUTDIR)/nfs
+	@cp -au $(JFFS2DIR)/* $(OUTPUTDIR)/nfs/var
 	@cat $(OUTPUTDIR)/nfs/etc/fstab.in | sed -e "s#/dev/mtdblock/#\#/dev/mtdblock/#g" > $(OUTPUTDIR)/nfs/etc/fstab.in
 	@$(ECHO) -e "\033[1;32mNOTE! \033[0myou need the following entry in your /etc/exports :"
 	@$(ECHO) -e "\t$(OUTPUTDIR)/nfs	[given nas IP]/255.255.255.0(sync,no_subtree_check,rw,all_squash,anonuid=[YOUR uid],anongid=[YOUR gid])"
