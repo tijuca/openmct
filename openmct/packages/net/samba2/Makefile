@@ -1,5 +1,4 @@
 # Samba 2.x
-OPENMCT_DEVEL_PREFIX=/home/mgoettin/openmct/head/openmct/
 DOWNLOAD=	http://samba.org/samba/ftp/stable/samba-2.2.12.tar.gz
 
 SRCDIRSUFFIX=	/source
@@ -13,7 +12,7 @@ CONFIGUREARGS=	--host=$(TARGET) \
                 --sysconfdir=/etc \
                 --libdir=/var/etc/samba \
                 --with-privatedir=/var/etc/samba \
-                --with-piddir=/var/run/run \
+                --with-piddir=/var/run \
                 --localstatedir=/var \
                 --with-netatalk \
                 --with-syslog \
