@@ -1,5 +1,5 @@
 # mt-daapd
-DOWNLOAD=	http://nightlies.mt-daapd.org/dl.php?FILE=mt-daapd-svn-1671.tar.gz
+DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/mt-daapd/mt-daapd-0.2.4.1.tar.gz	
 
 DEPENDSON=	packages/lib/gdbm \
 		packages/lib/id3tag \

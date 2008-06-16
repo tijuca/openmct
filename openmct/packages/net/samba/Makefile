@@ -27,6 +27,7 @@ CONFIGUREARGS=	--host=$(TARGET) \
 		--without-ldap
 
 INSTALL=	$(CP) $(SRCDIR)/source/bin/{smbd,nmbd,smbpasswd} $(NEWROOTDIR)/sbin && \
-		$(STRIP) $(NEWROOTDIR)/sbin/{smbd,nmbd,smbpasswd}
+		$(STRIP) $(NEWROOTDIR)/sbin/{smbd,nmbd,smbpasswd} && \
+		$(LN) -s /var/etc/samba $(NEWROOTDIR)/etc/samba
 
 include		$(OPENMCT_DEVEL_PREFIX)Rules
