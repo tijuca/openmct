@@ -9,15 +9,11 @@ if [ "$1" != "" ]; then
 	rm -rf $1/root
 	cd $1 && ln -s /usr/root root 
 	cd $1 && ln -s /usr/home home
+	cd $1 && ln -s /tmp/media media
 	rm -rf $1/usr
 	rm -rf $1/var
 	rm -rf $1/etc
 	rm $1/lib/libstdc++.so*
 	mkdir $1/usr
 	mkdir $1/var
-	mkdir -p $1/media/hd
-	mkdir -p $1/media/usb1
-	mkdir -p $1/media/usb2
-	mkdir -p $1/media/nfs1
-	mkdir -p $1/media/nfs2
 fi
