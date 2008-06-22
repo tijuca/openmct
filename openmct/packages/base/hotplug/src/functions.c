@@ -17,11 +17,10 @@
 #define USB_STORAGE  "/proc/scsi/usb-storage-"
 
 /* read out the serial number from the requested USB device from /proc/bus/usb/devices */
-
 int read_serial(FILE *usbdevice, int g_bus, int g_dev) {
 
 	char buf[150];				// buffer for readed line from file pointer 
-	char debug_buf[150];		// buffer for debuging output
+	char debug_buf[150];			// buffer for debuging output
 	char tmp[150];				// temp field for sscanf
 	char *serial=NULL,
 	     *vendorname=NULL,
@@ -92,17 +91,17 @@ unsigned char *create_devicepath(char *vendorname, char *vendortype, char *seria
 	FILE *storage=NULL;
 	unsigned static char mountpath[80];	// return value of the function
 	unsigned char openfile[100];		// file for fopen
-	unsigned char append[10];			// path appendix and file for Filepointer
-	char buf[50], *tmp=NULL;			// buffer for readed line from file pointer
-	char g_usb_vendor[25],				// readed USB Vendor from /proc/scsi/usb-storage-x/x
-		 g_usb_product[20], 			// readed USB Product from /proc/scsi/usb-storage-x/x
-		 g_usb_serial[20],				// readed USB Serial from /proc/scsi/usb-storage-x/x
-		 g_usb_attached[4];				// attached Yes/No
+	unsigned char append[10];		// path appendix and file for Filepointer
+	char buf[50], *tmp=NULL;		// buffer for readed line from file pointer
+	char g_usb_vendor[25],			// readed USB Vendor from /proc/scsi/usb-storage-x/x
+		 g_usb_product[20], 		// readed USB Product from /proc/scsi/usb-storage-x/x
+		 g_usb_serial[20],		// readed USB Serial from /proc/scsi/usb-storage-x/x
+		 g_usb_attached[4];		// attached Yes/No
 		
-	int g_usb_host=-1;					// readed hostnumber for later to created the mountpath
-	int path, file, ok=6;				// variables for getting the file to open
+	int g_usb_host=-1;			// readed hostnumber for later to created the mountpath
+	int path, file, ok=6;			// variables for getting the file to open
 	
-	char debug_buf[150];				// buffer for debuging output
+	char debug_buf[150];			// buffer for debuging output
 
 	/* generating the path appendix and the filename */
 	for (path=0,file=0 ;ok>1 && path <=10; path++,file++){

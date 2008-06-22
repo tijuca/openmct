@@ -10,7 +10,6 @@ this file is part of the hotplug handler for OpenMCT (http://www.openmct.org)
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <fcntl.h>
 #include <signal.h>
 #include <unistd.h>
 
@@ -23,7 +22,7 @@ this file is part of the hotplug handler for OpenMCT (http://www.openmct.org)
 #define USB_STICK_MP "/media/usbstick/"
 
 int have_config_file=0;		// used in read_config_entrys
-int configentrys=0;			// used in read_config_entrys
+int configentrys=0;		// used in read_config_entrys
 
 int main(int argc, char *argv[], char *envp[]) {
 
