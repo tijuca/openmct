@@ -5,7 +5,6 @@
 # Base packages
 BASEPACKAGES=	packages/build/buildetc \
 		packages/base/busybox \
-		packages/base/usbutils \
 		packages/lib/e2fsprogs \
 		packages/net/dropbear \
 		packages/net/nfsutils \
@@ -161,7 +160,7 @@ ifndef CONFIGUREARGS
 CONFIGUREARGS=--prefix=$(PREFIX) --host=$(TARGET)
 endif
 
-do-all: do-depends $(FILENAME) $(SRCDIR) $(SRCDIR)$(SRCDIRSUFFIX)/$(CONFIG) do-build do-install
+do-all: do-prepare do-depends $(FILENAME) $(SRCDIR) $(SRCDIR)$(SRCDIRSUFFIX)/$(CONFIG) do-build do-install
 
 # default do-depends target
 ifdef DEPENDSON
@@ -222,6 +221,11 @@ $(SRCDIR)$(SRCDIRSUFFIX)/$(CONFIG):
 		cd $(ACTDIR) ; \
 	fi 
 	$(TOUCH) $(SRCDIR)$(SRCDIRSUFFIX)/$(CONFIG)
+
+# default prepare (for autotools packages for example)
+do-prepare:	$(SRCDIR)
+	@$(ECHO) -e "\033[1;33mPREPARE \033[1;32m$(FILENAME)\033[0m"
+	@$(PREPARE)
 
 # default do-build target
 do-build:	$(SRCDIR)

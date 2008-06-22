@@ -1,0 +1,12 @@
+# hotplug
+
+PREPARE= [ -f $(SRCDIR)/Makefile.in ] ||  (cd $(SRCDIR) && ./prepare.sh)
+
+CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --target=$(TARGET)-uclibc --enable-maintainer-mode --enable-debug --host=i686-pc-linux-gnu
+
+MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc RN=$(OPENMCT_CROSS_COMPILE)ranlib LD=$(OPENMCT_CROSS_COMPILE)ld
+
+INSTALL=	$(CP) $(SRCDIR)/hotplug $(NEWROOTDIR)/sbin && \
+		$(STRIP) $(NEWROOTDIR)/sbin/hotplug
+
+include		$(OPENMCT_DEVEL_PREFIX)Rules
