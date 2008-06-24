@@ -1,2 +1,6 @@
+2008-06-24  Carsten
+* change replace_spaces to use pointer
+* lot of formating changes
+
 2008-06-22  Carsten
 * initial collection of the OpenMCT Hotplughandler
