@@ -5,17 +5,19 @@ this file is part of the hotplug handler for OpenMCT (http://www.openmct.org)
 */
 
 /* some definitions */
-#define USB_CONFIG_FILE "/var/etc/usb.conf"
-#define BACKUP 		"/tmp/usb.conf.backup"
-#define NEW 		"/tmp/usb.conf.new"
+#define USB_CONFIG_FILE     "/var/etc/usb.conf"
+#define BACKUP_CONFIG_FILE  "/tmp/usb.conf.backup"
+#define NEW_CONFIG_FILE     "/tmp/usb.conf.new"
 
-#define OUT_INFO	out_info
-#define OUT_WARN	(void out_warn(char *infotext))
-#define OUT_DEBUG	(void debug_info(char *infotext))
+#ifdef DEBUG
+/* debugging stuff */
+//extern char debug_buf[];                // buffer for debuging output
 
+#endif //DEBUG
 
-// struct for usb devices
+// struct for usb hotplug devices
 struct device {
+
 /* given by getenv("PRODUCT") */
     int vendorid;			/* vendor ID */
     int productid;			/* product ID */
@@ -33,13 +35,6 @@ struct device {
     char vendorname[20];        /* real vendorname */
     char vendortype[20];        /* real vendorname */
     char serial[25];            /* serial number of the device */
-};
-
-struct config {
-    char typ[4];                /* type of config entry, like S: (Stick), C:(Camera), or P: (Printer) */
-    int level;                  /* number of some level (for Debug meanly) */
-    char serial[25];            /* serial number */
-    char mountpath[40];         /* the appendix for the mountpath */
 };
 
 struct device hotplug;
@@ -60,8 +55,10 @@ unsigned char *remove_spaces_end(char *input);
 unsigned char *replace_spaces(char *vendorname, char *vendortype);
 
 // functions in config.c
+/* create a new config file */
+int create_config_file();
 /* parse the config file for given string serial returns the mountpath */
-unsigned char *read_config(char *serial);
+unsigned char *read_mountpath(char *serial);
 /* read the entry numbers in the configfile */
 int read_config_entrys(void);
 /* split a single given line, return the value after the ":" */
@@ -71,3 +68,4 @@ void write_append2config(char *typ, char *serial, char *path, int vid, int pid);
 /* write the default header entrys to the new USB_CONFIG_FILE */
 void write_config_file_header (FILE *file);
 
+void write_new_config_entry (FILE *file, char *typ, char *serial, char *path, int vid, int pid);

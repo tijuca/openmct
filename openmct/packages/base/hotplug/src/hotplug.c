@@ -21,37 +21,42 @@ this file is part of the hotplug handler for OpenMCT (http://www.openmct.org)
 
 #define USB_STICK_MP "/media/usbstick/"
 
-int have_config_file=0;		// used in read_config_entrys
-int configentrys=0;		// used in read_config_entrys
+int have_config_file=0;     // used in read_mountpath
+int configentrys=0;         // used in read_mountpath
 
 int main(int argc, char *argv[], char *envp[]) {
 
     FILE *devices=NULL;
 
-    char tmpinfo[1000];
+    char debug_buf[500];   // for debugging output
     char *devicepath=NULL;
     char *mountpath=NULL;
 
     if ((!argv[1]) || (!getenv("ACTION"))){
-    // some kids may play by calling all the executables, so give an notice a quit */
-    printf ("-------------------------------------------------------------\n");
-    printf ("Linux Hotplug Kernel-helper (C) carsten %s\n",HOTPLUG_VERSION);
-    printf ("this binary is called by the kernel! You can't use it without\n"
-            "the given parameters by the kernel!\n");
-    printf ("-------------------------------------------------------------\n");
-    return 0;
+        // some kids may play by calling all the executables, so give an notice and quit
+        printf ("-------------------------------------------------------------\n");
+        printf ("Linux Hotplug Kernel-helper (C) carsten v%s\n",HOTPLUG_VERSION);
+        printf ("this binary is called by the kernel! You can't use it without\n"
+                "the given parameters by the kernel!\n");
+        printf ("-------------------------------------------------------------\n");
+        return 0;
     }
-    snprintf(tmpinfo, sizeof(tmpinfo)-1, "[%s/%d] %s %s started\n",__FUNCTION__,__LINE__,PACKAGE_NAME,HOTPLUG_VERSION);
-    OUT_INFO(tmpinfo);
+    // try to read the config file
+    configentrys=read_config_entrys();
+    if (configentrys > 0) { // if we found more then 0 entrys we have a config file
+        have_config_file=1;
+    } else {
+        if (create_config_file() == -1) // still to complete!
+            return -1;
+    }
+    
+    snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] %s %s started\n",__FUNCTION__,__LINE__,PACKAGE_NAME,HOTPLUG_VERSION);
+    debug_info(debug_buf);
     write_debug_output(argv[1], getenv("ACTION"), getenv("PRODUCT"), getenv("INTERFACE"), getenv("DEVICE"), getenv("TYPE"));
 
     // so we have to start with the splitting of the informations */
     if (strncmp(argv[1], "usb", 3) == 0){
         if (strncmp(getenv("ACTION"), "add", 3) == 0){
-            // try to read the config file */
-            configentrys=read_config_entrys();
-            if (configentrys > 0) // if we found more then 0 entrys we have a config file
-                have_config_file=1;
             // 1st we get the VendorID and ProductID
             if (sscanf(getenv("PRODUCT"), "%x/%x/%x", &hotplug.vendorid, &hotplug.productid, &hotplug.protoid) !=3 ){
                 debug_info("could't get PRODUCT infos\n");
@@ -72,8 +77,8 @@ int main(int argc, char *argv[], char *envp[]) {
                 if (devices != NULL){
                     int read = read_serial(devices,hotplug.bus,hotplug.number);
                     if (read != 4) {
-                        snprintf(tmpinfo, sizeof(tmpinfo)-1, "[%s/%d] read_serial failed! status %d\n",__FUNCTION__,__LINE__,read);
-                        OUT_INFO(tmpinfo);
+                        snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] read_serial failed! status %d\n",__FUNCTION__,__LINE__,read);
+                        debug_info(debug_buf);
                         return -1; // nothing more can be done, exiting!
                     }
                 }
@@ -84,48 +89,48 @@ int main(int argc, char *argv[], char *envp[]) {
                 // we have now to search for the host number where the usb-storage
                 // is bound to the file tree (we found this in /proc/scsi/usb-storage-x/x
                 devicepath=create_devicepath(hotplug.vendorname, hotplug.vendortype, hotplug.serial);
-                snprintf(tmpinfo, sizeof(tmpinfo)-1, "[%s/%d] devicepath for %s/%s = \n\t\"%s\"\n",__FUNCTION__,__LINE__,hotplug.vendorname, hotplug.vendortype, devicepath);
-                debug_info(tmpinfo);
+                snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] devicepath for %s/%s = \n\t\"%s\"\n",__FUNCTION__,__LINE__,hotplug.vendorname, hotplug.vendortype, devicepath);
+                debug_info(debug_buf);
                 
-                mountpath = read_config(hotplug.serial);
+                mountpath = read_mountpath(hotplug.serial);
                 if (strcmp(mountpath,"noconfigfile")==0) {
                     // add some code here
-                    snprintf(tmpinfo, sizeof(tmpinfo)-1, "[%s/%d] no config file found! give up!\n",__FUNCTION__,__LINE__);
-                    debug_info(tmpinfo);
+                    snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] no config file found! give up!\n",__FUNCTION__,__LINE__);
+                    debug_info(debug_buf);
                     return -1;
                 }
                 if (strcmp(mountpath,"error")==0) { // if no config entry for the stick is found
-                    snprintf(tmpinfo, sizeof(tmpinfo)-1, "[%s/%d] no config entry found! generate new mountpath!\n",__FUNCTION__,__LINE__);
-                    debug_info(tmpinfo);
+                    snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] no config entry found! generate new mountpath!\n",__FUNCTION__,__LINE__);
+                    debug_info(debug_buf);
                     mountpath=replace_spaces(hotplug.vendorname,hotplug.vendortype);
-                    snprintf(tmpinfo, sizeof(tmpinfo)-1, "[%s/%d] generated mountpath= \"%s\"\n",__FUNCTION__,__LINE__,mountpath);
-                    debug_info(tmpinfo);
-                    strcpy(tmpinfo,"\0");
+                    snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] generated mountpath= \"%s\"\n",__FUNCTION__,__LINE__,mountpath);
+                    debug_info(debug_buf);
+                    strcpy(debug_buf,"\0");
                     write_append2config("S",hotplug.serial, mountpath, hotplug.vendorid, hotplug.productid);
                 }
-                snprintf(tmpinfo, sizeof(tmpinfo)-1, "[%s/%d] mountpath for %s/%s = \n\t\""USB_STICK_MP"%s\"\n",__FUNCTION__,__LINE__,hotplug.vendorname, hotplug.vendortype, mountpath);
-                debug_info(tmpinfo);
-                snprintf(tmpinfo, sizeof(tmpinfo)-1, "mkdir -p "USB_STICK_MP"%s\n", mountpath);
-                system(tmpinfo);
-                snprintf(tmpinfo, sizeof(tmpinfo)-1, "mount %s "USB_STICK_MP"%s\n",devicepath, mountpath);
+                snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] mountpath for %s/%s = \n\t\""USB_STICK_MP"%s\"\n",__FUNCTION__,__LINE__,hotplug.vendorname, hotplug.vendortype, mountpath);
+                debug_info(debug_buf);
+                snprintf(debug_buf, sizeof(debug_buf)-1, "mkdir -p "USB_STICK_MP"%s\n", mountpath);
+                system(debug_buf);
+                snprintf(debug_buf, sizeof(debug_buf)-1, "mount %s "USB_STICK_MP"%s\n",devicepath, mountpath);
                 
                 if (mountpath) {
                     free(mountpath);
                     mountpath=NULL;
                 }
-                if (system(tmpinfo)==0) { // change to != 0 for testing updating the usb.conf
-                    snprintf(tmpinfo, sizeof(tmpinfo)-1, "[%s/%d] %s/%s sucessfully mounted\n",__FUNCTION__,__LINE__,hotplug.vendorname, hotplug.vendortype);
-                    debug_info(tmpinfo);
+                if (system(debug_buf)==0) { // change to != 0 for testing updating the usb.conf
+                    snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] %s/%s sucessfully mounted\n",__FUNCTION__,__LINE__,hotplug.vendorname, hotplug.vendortype);
+                    debug_info(debug_buf);
                 } else {
-                    snprintf(tmpinfo, sizeof(tmpinfo)-1, "[%s/%d] %s/%s mount failed!\n",__FUNCTION__,__LINE__,hotplug.vendorname, hotplug.vendortype);
-                    debug_info(tmpinfo);
+                    snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] %s/%s mount failed!\n",__FUNCTION__,__LINE__,hotplug.vendorname, hotplug.vendortype);
+                    debug_info(debug_buf);
                 }
-                strcpy(tmpinfo,"\0");
+                strcpy(debug_buf,"\0");
             }
 
 #ifdef DEBUG
             debug_info("   summary of infos getting by the hotplug binary\n");
-            snprintf(tmpinfo, sizeof(tmpinfo)-1, "\nfound hotplug.vendorid   = %x\n"
+            snprintf(debug_buf, sizeof(debug_buf)-1, "\nfound hotplug.vendorid   = %x\n"
                                                  "found hotplug.productid  = %x\n"
                                                  "found hotplug.class      = %d\n"
                                                  "found hotplug.subclassid = %d\n"
@@ -143,11 +148,10 @@ int main(int argc, char *argv[], char *envp[]) {
                                                  hotplug.serial,
                                                  hotplug.vendorname,
                                                  hotplug.vendortype);
-            debug_info(tmpinfo);
+            debug_info(debug_buf);
 #endif
         }
     }
-    close_all_files();
     fclose(devices);
     debug_info("\n-------------------------------\n");
     return 0;

@@ -31,7 +31,7 @@ int read_serial(FILE *usbdevice, int g_bus, int g_dev) {
     int r_bus=0;               // number of the readed bus
     int r_dev=0;               // number of the readed device
 
-    snprintf(debug_buf,99,"[%s/%d] started, given parameters (bus=%d , dev=%d)\n",__FUNCTION__,__LINE__,g_bus,g_dev);
+    snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] started, given parameters (bus=%d , dev=%d)\n",__FUNCTION__,__LINE__,g_bus,g_dev);
     debug_info(debug_buf);
 
     while ((fgets (buf, sizeof (buf), usbdevice) != NULL) && (found <4)){
@@ -41,7 +41,7 @@ int read_serial(FILE *usbdevice, int g_bus, int g_dev) {
                     if (g_bus == r_bus && g_dev == r_dev){
                         found = 1;
 #ifdef debug
-                        snprintf(debug_buf,99,"[%s/%d] given parameters (bus=%d , dev=%d)\n",__FUNCTION__,
+                        snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] given parameters (bus=%d , dev=%d)\n",__FUNCTION__,
                                                                                              __LINE__,
                                                                                              g_bus,
                                                                                              g_dev);
@@ -49,7 +49,7 @@ int read_serial(FILE *usbdevice, int g_bus, int g_dev) {
 #endif //debug
                     }
                 } else { /* give up and return some default values */
-                    snprintf(debug_buf,99,"[%s/%d] could't read bus+device!\n",__FUNCTION__,__LINE__);
+                    snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] could't read bus+device!\n",__FUNCTION__,__LINE__);
                     debug_info(debug_buf);
                     strcpy(hotplug.vendorname,"not found");
                     strcpy(hotplug.vendortype,"not found");
@@ -106,30 +106,30 @@ unsigned char *create_devicepath(char *vendorname, char *vendortype, char *seria
     /* generating the path appendix and the filename */
     for (path=0,file=0 ;ok>1 && path <=10; path++,file++){
 
-        snprintf(debug_buf,149,"[%s/%d] for() processed - path/file = %d/%d    (o.k. = %d)\n",__FUNCTION__,__LINE__,path,file,ok);
+        snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] for() processed - path/file = %d/%d    (o.k. = %d)\n",__FUNCTION__,__LINE__,path,file,ok);
         debug_info(debug_buf);
         strcpy(openfile, USB_STORAGE);
         sprintf(append, "%d/%d",path,file);
         strcat(openfile,append);
         if ((storage=fopen(openfile, "r")) !=NULL){
             ok=5;
-            snprintf(debug_buf,149,"[%s/%d] open %s o.k. (o.k. = %d)\n",__FUNCTION__,__LINE__,openfile,ok);
+            snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] open %s o.k. (o.k. = %d)\n",__FUNCTION__,__LINE__,openfile,ok);
             debug_info(debug_buf);
             while ((fgets (buf, sizeof (buf), storage) != NULL) && ok<=5){
                 if (strstr(buf,"Host")){
                     sscanf(buf, "   Host scsi%d: usb-storage",&g_usb_host);
-                    snprintf(debug_buf,149,"[%s/%d] readed hostnumber: %d\n",__FUNCTION__,__LINE__,g_usb_host);
+                    snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] readed hostnumber: %d\n",__FUNCTION__,__LINE__,g_usb_host);
                     debug_info(debug_buf);
                 }
                 if (strstr(buf,"Vendor")){
                     tmp=strtok(buf," ");
                     tmp=strtok(NULL,"\n");
                     strcpy(g_usb_vendor,remove_spaces_end(tmp));
-                    snprintf(debug_buf,99,"[%s/%d] vendor given/cleaned \"%s\"/\"%s\"\n",__FUNCTION__,__LINE__,tmp,g_usb_vendor);
-                    debug_info(debug_buf);
+                    //snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] vendor given/cleaned \"%s\"/\"%s\"\n",__FUNCTION__,__LINE__,tmp,g_usb_vendor);
+                    //debug_info(debug_buf);
                     if (strcmp(vendorname,g_usb_vendor) == 0){
                         ok=4;
-                        snprintf(debug_buf,149,"[%s/%d] vendor compare status:     true      (o.k. = %d)\n",__FUNCTION__,__LINE__,ok);
+                        snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] vendor compare status:     true      (o.k. = %d)\n",__FUNCTION__,__LINE__,ok);
                         debug_info(debug_buf);
                     }
                     tmp=NULL;
@@ -138,11 +138,11 @@ unsigned char *create_devicepath(char *vendorname, char *vendortype, char *seria
                     tmp=strtok(buf," ");
                     tmp=strtok(NULL,"\n");
                     strcpy(g_usb_product,remove_spaces_end(tmp));
-                    snprintf(debug_buf,149,"[%s/%d] product given/cleaned \"%s\"/\"%s\" \n",__FUNCTION__,__LINE__,tmp,g_usb_product);
-                    debug_info(debug_buf);
+                    //snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] product given/cleaned \"%s\"/\"%s\" \n",__FUNCTION__,__LINE__,tmp,g_usb_product);
+                    //debug_info(debug_buf);
                     if (strcmp(vendortype,g_usb_product) == 0){
                         ok=3;
-                        snprintf(debug_buf,149,"[%s/%d] product compare status:    true      (o.k. = %d)\n",__FUNCTION__,__LINE__,ok);
+                        snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] product compare status:    true      (o.k. = %d)\n",__FUNCTION__,__LINE__,ok);
                         debug_info(debug_buf);
                     }
                     tmp=NULL;
@@ -154,7 +154,7 @@ unsigned char *create_devicepath(char *vendorname, char *vendortype, char *seria
                     strcpy(g_usb_serial,tmp);
                     if (strcmp(serial,g_usb_serial) == 0){
                         ok=2;
-                        snprintf(debug_buf,149,"[%s/%d] serial compare status:     true      (o.k. = %d)\n",__FUNCTION__,__LINE__,ok);
+                        snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] serial compare status:     true      (o.k. = %d)\n",__FUNCTION__,__LINE__,ok);
                         debug_info(debug_buf);
                     }
                     tmp=NULL;
@@ -164,7 +164,7 @@ unsigned char *create_devicepath(char *vendorname, char *vendortype, char *seria
                     tmp=strtok(buf,":");
                     tmp=strtok(NULL,"\n");
                     strcpy(g_usb_attached,tmp);
-                    snprintf(debug_buf,149,"[%s/%d] attached status:          %s       (o.k. = %d)\n",__FUNCTION__,__LINE__,g_usb_attached,ok);
+                    snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] attached status:          %s       (o.k. = %d)\n",__FUNCTION__,__LINE__,g_usb_attached,ok);
                     debug_info(debug_buf);
                     tmp=NULL;
                 }
@@ -192,7 +192,7 @@ unsigned char *remove_spaces_end(char *input){
     int r_length=0, z=0;
 
     r_length=strlen(input);
-    //snprintf(debug_buf,99,"[%s/%d] string length = %d input = \"%s\"\n",__FUNCTION__,__LINE__,r_length,input);
+    //snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] string length = %d input = \"%s\"\n",__FUNCTION__,__LINE__,r_length,input);
     //debug_info(debug_buf);
     if ((input[r_length-1]<=0x21) ){
         int last=1, spaces=0;
@@ -205,7 +205,7 @@ unsigned char *remove_spaces_end(char *input){
         }
         strncpy(help,input,r_length-spaces);
         strcpy(output,help);
-        //snprintf(debug_buf,99,"[%s/%d] string given/cleaned \"%s\"/\"%s\" \n",__FUNCTION__,__LINE__,input,output);
+        //snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] string given/cleaned \"%s\"/\"%s\" \n",__FUNCTION__,__LINE__,input,output);
         //debug_info(debug_buf);
         input=NULL;
         return output;
@@ -220,7 +220,7 @@ unsigned char *remove_spaces_end(char *input){
 unsigned char *replace_spaces(char *vendorname, char *vendortype) {
 	
     char *ret=NULL;
-    int l=0, l_vn=0, l_vt=0;
+    int l=0, l_vname=0, l_vtype=0;
 	int loop;
 
     if(vendorname) {
@@ -230,19 +230,20 @@ unsigned char *replace_spaces(char *vendorname, char *vendortype) {
     }
     if (vendortype) {
         strcat(ret,"_");
-        l_vt = strlen(vendortype);
-        if (l_vt > 0) {
+        l_vtype = strlen(vendortype);
+        if (l_vtype > 0) {
             if (ret) {
-                l_vn = strlen(ret);
-                ret = realloc(ret, l_vn + l_vt + 1);
-                strcpy(ret + l_vn, vendortype);
-            } else 
+                l_vname = strlen(ret);
+                ret = realloc(ret, l_vname + l_vtype + 1);
+                strcpy(ret + l_vname, vendortype);
+            } else {
                 ret = strdup(vendortype);
+            }
         }
     }
     l=strlen(ret);
     if (ret) {
-       for (loop=0;loop<=l_vn+l_vt;loop++){
+       for (loop=0;loop<=l_vname+l_vtype;loop++){
             if (ret[loop] == ' ')
                 ret[loop] = '_';
        }

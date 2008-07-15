@@ -1,3 +1,7 @@
+2008-07-15  Carsten
+* adding automatic expand of config if a new stick is added
+* starting rework of info output of the binary
+
 2008-06-24  Carsten
 * change replace_spaces to use pointer
 * lot of formating changes

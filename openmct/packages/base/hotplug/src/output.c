@@ -14,14 +14,14 @@ this file is part of the hotplug handler for OpenMCT (http://www.openmct.org)
     #include "config.h"
 #endif
 
-void write_debug_output(char *source, char *action, char *product, char *interface, char *device, char *type){
+void write_debug_output(char *source, char *action, char *product, char *interface, char *device, char *type) {
 	
-	time_t today;
-	time(&today);
+    time_t today;
+    time(&today);
 /* if we want some output to the console */
 #ifdef DEBUG
     FILE *debug = fopen("/dev/console", "w");
-	fprintf(debug, "\n\n   Output enviroments given by the kernel ...\n");
+    fprintf(debug, "\n\n   Output enviroments given by the kernel ...\n");
     fprintf(debug, "\n##HOTPLUG EVENT##\n"
                  "           date: %s"
                  "         source: %s\n"
@@ -38,7 +38,7 @@ void write_debug_output(char *source, char *action, char *product, char *interfa
 #endif
 /* if we want some logging of hotplug events we write the infos to /tmp/hotplug.event */
     FILE *hotplug_log = fopen("/tmp/hotplug.event", "a+");
-	fprintf(hotplug_log, "\n\n   Output enviroments given by the kernel ...\n");
+    fprintf(hotplug_log, "\n\n   Output enviroments given by the kernel ...\n");
     fprintf(hotplug_log, "\n##HOTPLUG EVENT##\n"
                              "           date: %s"
                              "         source: %s\n"
@@ -59,19 +59,14 @@ void write_debug_output(char *source, char *action, char *product, char *interfa
 #endif
 }
 
-void close_all_files(){
-
-
-}
-
 void debug_info(char *infotext){
-FILE *debug = fopen("/dev/console", "w");
-	fprintf(debug,"%s", infotext);
-	fclose(debug);
+    FILE *debug = fopen("/dev/console", "w");
+    fprintf(debug,"%s", infotext);
+    fclose(debug);
 }
 
 void out_info(char *infotext) {
-	FILE *info = fopen("/dev/console", "w");
-	fprintf(info,"%s", infotext);
-	fclose(info);
+    FILE *info = fopen("/dev/console", "w");
+    fprintf(info,"%s", infotext);
+    fclose(info);
 }
