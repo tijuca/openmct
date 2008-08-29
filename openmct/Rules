@@ -16,6 +16,7 @@ BASEPACKAGES=	packages/build/buildetc \
 		packages/system/ethtool \
 		packages/system/mtd-tools \
 		packages/system/recovery \
+		packages/system/haserl \
 		packages/system/owi
 #		packages/system/debootstrap \
 

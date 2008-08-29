@@ -13784,7 +13784,7 @@ diff -Naru linux-2.4.35.3/drivers/mtd/maps/mct.c linux-2.4.35.3-mct/drivers/mtd/
 +                mask_flags: 0
 +        },
 +        {
-+                name: "etc",
++                name: "var",
 +#ifdef CONFIG_MCT_SA200
 +                size: 1024 * 1024,
 +#else		      
