@@ -1,6 +1,5 @@
 # e2fsprogs
-#DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/e2fsprogs/e2fsprogs-1.40.2.tar.gz
-DOWNLOAD=	http://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/e2fsprogs-1.40.6.tar.bz2
+DOWNLOAD=	http://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/e2fsprogs-1.41.3.tar.bz2
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-elf-shlibs
 
