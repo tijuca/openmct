@@ -1,0 +1,319 @@
+body {
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+	font-family: Bitstream Vera Serif,verdana, arial, helvetica, sans-serif;
+	color: #ccc;
+	background-color: #DFDFDF;
+	font-size: 1.1em
+	}
+a {
+	text-decoration: none;
+	/*font-weight: bold;
+	color:  #ccc;*/
+	outline: none;
+	}
+a:visited {
+	color:  #ccc;
+	}
+a:active {
+	color:  #ccc;
+	}
+a:hover {
+	color: #800000;
+	text-decoration: underline;
+	}
+
+strong, b {
+	font-weight: bold;
+	}
+p, td{
+	font-size:11px;
+	line-height:7px;
+	margin-bottom:2px;
+	margin-top:0px;
+}
+
+/* weird ie5win bug: all line-height to font-size ratios must agree or box gets pushed around. UPDATE: this has turned out to be very rare. my current recommendation is IGNORE this warning. at the moment i'm leaving it in only in case the issue turns up again. possibly the original bug in march 2001 was caused by an unusual combination of factors, although this solved it at the time.*/
+
+h1 {
+	font-size: 24px;
+	line-height: 44px;
+	font-weight: bold;
+	margin-top: 0;
+	margin-bottom: 0;
+	}
+h2 {
+	font-size: 18px;
+	line-height: 40px;
+	font-weight: bold;
+	margin-top: 0;
+	margin-bottom: 0;
+	}
+h3 {
+	font-size: 16px;
+	line-height: 22px;
+	font-weight: bold;
+	margin-top: 0;
+	margin-bottom: 0;
+	}
+h4 {
+	font-size: 14px;
+	line-height: 26px;
+	font-weight: bold;
+	margin-top: 0;
+	margin-bottom: 0;
+	}
+h5 {
+	font-size: 12px;
+	line-height: 22px;
+	font-weight: bold;
+	margin-top: 0;
+	margin-bottom: 0;
+	}
+h6 {
+	font-size: 10px;
+	line-height: 18px;
+	font-weight: bold;
+	margin-top: 0;
+	margin-bottom: 0;
+	}
+img {
+	border: 0;
+	}
+.nowrap {
+	white-space: nowrap;
+	font-size: 10px;
+	font-weight: bold;
+	margin-top: 0;
+	margin-bottom: 0;
+/* must be combined with nobr in html for ie5win */
+	}
+.tiny {
+	font-size: 9px;
+	line-height: 16px;
+	margin-top: 15px;
+	margin-bottom: 5px; 
+	}
+
+.reset {
+	border:0 none;
+	clear:both;
+	float:none;
+	font-size:0;
+	height:0;
+	line-height:0;
+	margin:0;
+	padding:0;
+	width:0;
+}
+
+/* the top of every page */
+#top {
+	margin: 20px 20px 0px 20px;
+	padding: 10px;
+	background: #73b2e8 no-repeat;
+	height: 100px; /* ie5win fudge begins */
+	voice-family: "\"}\"";
+	voice-family:inherit;
+	height: 130px;
+	color: gray;
+	background-image: url(../img/schrift.png);
+	background-position: -135px 35px;
+	}
+html>body #top {
+	height: 130px; /* ie5win fudge ends */
+	}
+
+/* the menu on the left side */
+#left {
+	/*position: absolute;*/
+	float: left;
+	top: 170px;
+	left: 0px;
+	margin: 20px;
+	padding: 10px;
+	/*border: 5px solid #ccc;*/
+	background: #4682B4;
+	width: 180px; /*150px; /* ie5win fudge begins */
+	voice-family: "\"}\"";
+	voice-family:inherit;
+	width: 180px; /*120px;*/
+	}
+html>body #left {
+	width: 180px; /*120px; /* ie5win fudge ends */
+	}
+
+/* the content side */
+#right {
+	/*position: absolute;*/
+	float: left;
+	color: #003377;
+	
+	top: 170px;
+	/*right: 0px; /* Opera5.02 will show a space at right when there is no scroll bar */
+	left: 210px;
+	margin: 20px 0px;
+	padding: 10px;
+	/*border: 5px solid #ccc;*/
+	background: #F4A460 no-repeat;
+	width: 690px; /* ie5win fudge begins */
+	voice-family: "\"}\"";
+	voice-family:inherit;
+	background-image: url(../img/bootlog.png);
+	background-position: 205px 7px;
+	}
+
+html>body #right {
+	width: 690px; /* ie5win fudge ends */
+	}
+
+img {
+	margin: 2px;
+}
+
+#footer, b.footer, p.footer {
+  clear: both;
+  margin-top: 1em;
+  background: #bbbbbb;
+  color: #333333;
+  text-align: center;
+  padding: 10px;
+  position: relative;
+}
+#footer a:hover {
+  color: #800000;
+}
+/*
+some decoration for the start page */
+
+/* an helping #div */
+#centerhelp {
+	text-align: center;
+	position: absolute;
+	font-size: 0.8em;
+	top: 250px;
+	left: 0px;
+	width: 100%;
+	height: 1px;
+	overflow: visible;
+}
+
+/* the centered box down the rounded head box */
+#content_start {
+	background-color: #F4A460;
+	border: 1px dotted black;
+	margin-left: -200px;
+	position: absolute;
+	top: -50px;
+	left: 50%;
+	width: 400px;
+	/*text-align: left;*/
+	height: 150px;
+}
+
+p.content_start {
+	color:black;
+	font-size:1em;
+	line-height:20px;
+	margin:20px;
+}
+h1.text_top, h2.text_top, p.text_top {
+	color:black;
+	font-size:1.3em;
+	margin-left: 350px;
+	margin-top: -10px;
+	line-height: 45px;
+}
+
+h2.text_top {
+	font-size:1.1em;
+}
+
+p.text_top {
+	font-size:.7em;
+	margin: 13px;
+	line-height:7px;
+}
+
+img.text_top {
+    margin:0px;
+    padding-left:7px;
+    padding-right:7px;
+    vertical-align:sub;
+}
+
+/* all declaration for the dynamical content on the right window */
+
+b.content_text, h1.content_text, h2.content_text, h3.content_text, h4.content_text, p.content_text, 
+p.td, table.content_text {
+	color: #003377;
+	margin-left: 7px;
+	margin-right: 7px;
+	}
+b.content_text {
+	font-size: 0.7em;
+	margin-bottom: 0px;
+	line-height: 0em;
+	}
+h1.content_text {
+	font-size: 1.3em;
+	margin-left:75px;
+	}
+
+h2.content_text {
+	font-size: 0.9em;
+	}
+
+h3.content_text {
+	font-size: 0.8em;
+	}
+h4.content_text {
+	font-size: 0.7em;
+	}
+
+small {
+	font-size: 0.8em;
+	color: #003366;
+	}
+
+
+/* some decoration for the userinteraction */
+
+/* input form in the content field */
+form {
+	/*border: 1px solid #006699;
+	border:2px double #006699;*/
+	margin-bottom: 1px;
+	
+}
+
+fieldset {
+	border:2px solid #003366
+}
+
+/* legend deco */
+legend {
+ 	padding: 0.5em 0.5em;
+ 	margin:5px 10px 3px 10px;
+ 	border:2px solid #003366;
+ 	background-color: #B0C4DE;
+ 	font-size:90%;
+ 	text-align:right;
+ 	font-weight: 1em;
+ }
+  
+/* the labels */
+label {
+	width: 5em;
+	margin: 5px;
+	padding: 5px:
+	float: left;
+	text-align: right;
+	}
+/* the buttons */
+.submit, .reset {
+	background-color: #cccc99;
+	border: 3px double #006699;
+	margin:10px;
+	padding:3px;
+}

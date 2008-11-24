@@ -19,7 +19,7 @@ case "$1" in
             ;;
 
         stop)
-            /bin/echo "Stopping LEDs"
+            /bin/echo -n "Stopping LED display ... "
    	    /bin/echo "" > /proc/mct/led/hb
     	    /bin/echo "" > /proc/mct/led/in
     	    /bin/echo "" > /proc/mct/led/out

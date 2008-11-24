@@ -1,0 +1,108 @@
+/*
+all the menu related stuff is placed here!
+*/
+
+#navcontainer {
+    /*width: 19%;
+    max-width: 166px;*/
+    /*border-right: 2px solid #000; /* Farbe rechter Rand */
+    padding: 0px;
+    /*margin-bottom: 1em;*/
+    font-family: 0,7em Verdana, Lucida, Geneva, Helvetica, Arial, sans-serif;
+    background-color: #90bade;
+    /*background-repeat: no-repeat;*/
+    color: #333;
+}
+
+#navcontainer ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    border: none;
+}
+
+#navcontainer li {
+    border-bottom: 1px solid #90bade;
+    margin: 0;
+}
+
+#navcontainer li a {
+    display: block;
+    padding: 6px .5em 6px .5em; /* Größe der Boxen der Menüeinträge */
+    /*border-left: .7em solid #1958b7;
+    /*border-right: .7em solid #178fc4; /* Rechteckbox rechts */
+    background-color: #2175bc; /* der Hauptmnüpunkte */
+    color: #fff;
+    text-decoration: none;
+    /*width: 9em;*/
+    font-size:0.9em;
+}
+
+#navcontainer li a:hover {
+    border-left-color: #1c64d1;
+    border-right-color: #aba3e0;
+    background-color: #2586d7;
+    color: #fff;
+}
+
+/* Hauptmenüpunktbox */
+#navcontainer li li {
+    border-top: 1px solid #90bade;
+    border-bottom: 0;
+    margin: 0;
+    font-size:0.9em;
+}
+
+/* Hauptmenüpunkte */
+#navcontainer li li a {
+    /*padding: 3px 1em 4px 1.3em;*/
+    padding:4% 0 2% 14%;
+    background-color: #5ba3e0;
+    /*width: 7.7em;*/
+    /*width: 17%;*/
+}
+
+/* innerste menüeinträge */
+#navcontainer li li li a {
+    padding: 3px .5em 3px 1.9em;
+    background-color: #73b2e8;
+    /*width: 8.2em;*/
+}
+
+.submenu {
+	/*background-image:url("img/image-users_16x16.png");*/
+	color:#fff;
+}
+
+/* possible changes for the main menu points */
+#menu_first_level {
+	font-weight: bold;
+	color: #330000; /* <<- uuh taht doesent work! */
+}
+#menu_first_level ul {
+	font-weight: bold;
+	color: #330000;
+}
+
+/*#menu_first_level a{
+	font-size: 0.9em;
+	}
+*/
+
+/* possible changes for the submenu menu points */
+#menu_second_level {
+	color: #f0f;
+}
+
+/* menu*/
+
+#menu_deco {
+	margin: 5px 2px;
+	float: left;
+	width: 10em;
+	background-color: #73b2e8;
+	/*background-image: url(../img/Startup_Wizard.png);/* top left no-repeat;*/
+	/*background-attachment: fixed;*/
+	/*background-repeat:no-repeat;
+	background-position:3px 12px;*/
+}

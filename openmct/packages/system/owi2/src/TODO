@@ -1,0 +1,3 @@
+* implement the verification of valid readed rc.conf data
+* store rev and hostname in static variables
+
