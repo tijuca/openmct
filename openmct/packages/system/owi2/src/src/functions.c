@@ -994,6 +994,7 @@ int write_rcconf(struct CGI_DATA *data) {
         fprintf(conf,"OPTIONS_ETHTOOL_ETH1_WAKEONLAN=%s\n",DEFAULT_OPTIONS_ETHTOOL_ETH1_WAKEONLAN);
     else
         fprintf(conf,"OPTIONS_ETHTOOL_ETH1_WAKEONLAN=%s\n",tmp);
+	fprintf(conf,"############# end section ethtool #############\n");
 	fclose(conf);
     // all entrys are written, now we can replace the new config file with the old
 	if (rename(NEW_RC_CONFIG_FILE,"/tmp/rc.conf") !=0) {

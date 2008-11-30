@@ -253,7 +253,7 @@ void glob_set(char *title) {
     if (strcmp(options.ntpip,"192.53.103.104")==0) check="selected"; else check=" ";
     printf("                <option value=\"192.53.103.104\" %s>DTAG (192.53.103.104)</option>\n",check);
     if (strcmp(options.ntpip,"134.130.4.17")==0) check="selected"; else check=" ";
-    printf("                <option value=\"134.130.4.17\"/cgi-bin/owi?modul=create-global-set %s>RWTH Aachen (134.130.4.17)</option>\n",check);
+    printf("                <option value=\"134.130.4.17\" %s>RWTH Aachen (134.130.4.17)</option>\n",check);
     if (strcmp(options.ntpip,"131.188.3.221")==0) check="selected"; else check=" ";
     printf("                <option value=\"131.188.3.221\" %s>Uni Erlangen (131.188.3.221)</option>\n",check);
     if (strcmp(options.ntpip,"129.132.2.21")==0) check="selected"; else check=" ";
