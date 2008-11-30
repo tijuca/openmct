@@ -1,18 +1,24 @@
 # image folder for OWI
 
 imagedatadir = @OWI_IMAGEDIR@
+# Pics for the startpage
 imagedata_DATA = de.png \
                  gb.png \
-		 es.png \
-		 schrift.png \
-		 bootlog.png \
+		 es.png 
+
+# Pics on the header
+imagedata_DATA +=  schrift.png \
 		 kfm_home.png \
 		 konquest.png \
 		 kcmmemory.png \
 		 kcmprocessor.png \
-		 TuxKernel.48.png \
-		 preferences-system_16x16.png \
+		 TuxKernel.48.png
+
+# Pics in the menu
+imagedata_DATA +=  preferences-system_16x16.png \
 		 network-global_16x16.png \
 		 settings_16x16.gif \
 		 network_16x16.png
-imagedata_DATA += log.png
+
+# Pic for the background in the content field
+imagedata_DATA +=  bootlog.png

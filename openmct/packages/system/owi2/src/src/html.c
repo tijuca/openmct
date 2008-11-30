@@ -72,7 +72,7 @@ void page_menu(){
            "    <li><a id=\"menu_first_level\"><img src=\"../img/preferences-system_16x16.png\"> System</a>\n"
            "    <ul id=\"menu_second_level\">\n"
            "        <li><a href=\"../cgi-bin/owi?modul=create-global-set\"><img src=\"../img/settings_16x16.gif\" border=0 >  global Settings</a></li>\n"
-           /*"        <li><a href=\"#\"><img src=\"../img/system-user_16x16.png\" border=0 >  User</a></li>\n"
+           "        <li><a href=\"#\"><img src=\"../img/system-user_16x16.png\" border=0 >  User</a></li>\n"
            "        <li><a href=\"#\"><img src=\"../img/system-users_16x16.png\" border=0 >  Groups</a></li>\n"
            "        <li><a href=\"#\"><img src=\"../img/hd_16x16.png\" border=0 >  Harddisk</a></li>\n"
            "        <li><a href=\"#\"><img src=\"../img/shellscript_16x16.png\" border=0 >  Shell</a></li>\n"
@@ -80,7 +80,7 @@ void page_menu(){
            "        <li><a href=\"#\"><img src=\"../img/printer_16x16.png\" border=0 >  Printserver</a></li>\n"
            "        <li><a href=\"#\"><img src=\"../img/usbdrive_16x16.png\" border=0 >  USB</a></li>\n"
            "        <li><a href=\"#\"><img src=\"../img/time_16x16.png\" border=0 >  Timesettings</a></li>\n"
-           */
+
            "    </ul>\n");
     printf("    </li>\n"
            "        <li><a id=\"menu_first_level\"><img src=\"../img/network-global_16x16.png\"> Network</a>\n"

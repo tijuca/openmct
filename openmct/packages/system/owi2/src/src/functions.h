@@ -69,4 +69,5 @@ unsigned char *get_cpuinfo();
 unsigned char *kernelversion();
 unsigned char *get_memory();
 double average_load_since_previous(void);
+void set_rc_defaults(void);
 

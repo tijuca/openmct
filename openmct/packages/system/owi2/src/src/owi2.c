@@ -96,7 +96,7 @@ int main(void) {
     else if ( ((strcmp(cgi->variable,"modul"))==0) && (strcmp(cgi->value,"write-global-set")==0) ) {
         snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] start creating new 'rc.conf.new'\n",__FUNCTION__,__LINE__);
         debug_info(debug_buf);
-        printf_error("Zur Zeit noch nicht moeglich!");
+        //printf_error("Zur Zeit noch nicht moeglich!");
 		glob_set("globale Einstellungen");
         if(write_rcconf(cgi)==0) {
 			snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] creating of 'rc.conf.new successful!'\n",__FUNCTION__,__LINE__);

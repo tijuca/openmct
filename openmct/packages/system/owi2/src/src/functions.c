@@ -341,17 +341,22 @@ int read_rcconf(void) {
     char *tmp=NULL;
     int loop=0;         // counter for while
 
-    if ((rcconf = fopen(RC_CONFIG_FILE, "r")) == NULL )
-        return 0;
+    if ((rcconf = fopen(RC_CONFIG_FILE, "r")) == NULL ) {
+		set_rc_defaults();
+		return 1;
+	}
+	else {
 #ifdef DEBUG
     extern char debug_buf[600];   // for debugging output
     snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] open '/var/etc/rc.conf' o.k.\n",__FUNCTION__,__LINE__);
     debug_info(debug_buf);
 #endif
+	}
+// setting defaults to have always proofed data
+	set_rc_defaults();
     while (fgets (in, sizeof (in), rcconf) != NULL) {
         loop++;
         tmp=strtok(in,"="); // splitting the string on '='
-#warning "No check for valid readed rc.conf values implemented!"
         if (strcmp(tmp,"START_CROND")==0) {                         // if the left side of the splitted string is ...
             rc_start.crond=Strdup(strtok(NULL,"\0"));               // we store the right side of the string
             rc_start.crond[strlen(rc_start.crond)-1]='\0';          // and cut off the \n at the end
@@ -493,7 +498,7 @@ int read_rcconf(void) {
             options.ethtool_eth0_dm=Strdup(strtok(NULL,"\0"));
             options.ethtool_eth0_dm[strlen(options.ethtool_eth0_dm)-1]='\0';
         }
-        else if (strcmp(tmp,"OPTIONS_ETHTOOL_ETH0_AUTONEG")==0) { // Autonegotation on eth0 on or off
+        else if (strcmp(tmp,"OPTIONS_ETHTOOL_ETH0_AUTONEG")==0) { // Autonegotation on eth0 'on' or 'off'
             options.ethtool_eth0_nego=Strdup(strtok(NULL,"\0"));
             options.ethtool_eth0_nego[strlen(options.ethtool_eth0_nego)-1]='\0';
         }
@@ -586,7 +591,7 @@ int read_rcconf(void) {
 	if (options.hd_spindown < 1 || options.hd_spindown > 255)
 		sscanf(DEFAULT_OPTIONS_HDPARM_SPINDOWN_TIMEOUT,"%d",&options.hd_spindown);
 
-#ifdef DEBUG1
+#ifdef DEBUG
             snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d]\n"
                                                       "value rc_start.crond:\t\t'%s'\n"
                                                       "value rc_start.ethtool_eth0:\t'%s'\n"
@@ -737,6 +742,7 @@ int write_rcconf(struct CGI_DATA *data) {
 	// hdparm
 	tmp=(read_cgi_entry(data,"hdparm"));
         if(strcmp(tmp,"nothing")==0)
+
         fprintf(conf,"START_HDPARM=%s\n",DEFAULT_START_HDPARM);
     else
         fprintf(conf,"START_HDPARM=%s\n",tmp);
@@ -819,56 +825,56 @@ int write_rcconf(struct CGI_DATA *data) {
 	// Heartbeat LED
 	tmp=(read_cgi_entry(data,"hb"));
     if(strcmp(tmp,"nothing")==0)
-        fprintf(conf,"OPTIONS_LED_HB=%s\n",DEFAULT_OPTIONS_HB);
+        fprintf(conf,"OPTIONS_LEDS_HB=%s\n",DEFAULT_OPTIONS_HB);
     else
-        fprintf(conf,"OPTIONS_LED_HB=%s\n",tmp);
+        fprintf(conf,"OPTIONS_LEDS_HB=%s\n",tmp);
 	// if Heartbeat LED is set to blink
 	tmp=(read_cgi_entry(data,"blinkon"));
         if(strcmp(tmp,"nothing")==0)
-        fprintf(conf,"OPTIONS_LED_BLINK_ON=%s\n",DEFAULT_OPTIONS_LEDS_BLINK_ON);
+        fprintf(conf,"OPTIONS_LEDS_BLINK_ON=%s\n",DEFAULT_OPTIONS_LEDS_BLINK_ON);
     else
-        fprintf(conf,"OPTIONS_LED_BLINK_ON=%s\n",tmp);
+        fprintf(conf,"OPTIONS_LEDS_BLINK_ON=%s\n",tmp);
 	tmp=(read_cgi_entry(data,"blinkoff"));
         if(strcmp(tmp,"nothing")==0)
-        fprintf(conf,"OPTIONS_LED_BLINK_OFF=%s\n",DEFAULT_OPTIONS_LEDS_BLINK_OFF);
+        fprintf(conf,"OPTIONS_LEDS_BLINK_OFF=%s\n",DEFAULT_OPTIONS_LEDS_BLINK_OFF);
     else
-        fprintf(conf,"OPTIONS_LED_BLINK_OFF=%s\n",tmp);
+        fprintf(conf,"OPTIONS_LEDS_BLINK_OFF=%s\n",tmp);
 	// Device for Traffic LED row 'IN'
 	tmp=(read_cgi_entry(data,"led_in_dev"));
         if(strcmp(tmp,"nothing")==0)
-        fprintf(conf,"OPTIONS_LED_IN_DEVICE=%s\n",DEFAULT_OPTIONS_LEDS_IN_DEVICE);
+        fprintf(conf,"OPTIONS_LEDS_IN_DEVICE=%s\n",DEFAULT_OPTIONS_LEDS_IN_DEVICE);
     else
-        fprintf(conf,"OPTIONS_LED_IN_DEVICE=%s\n",tmp);
+        fprintf(conf,"OPTIONS_LEDS_IN_DEVICE=%s\n",tmp);
 	// Direction for Traffic LED row 'IN'
 	tmp=(read_cgi_entry(data,"led_in_dir"));
         if(strcmp(tmp,"nothing")==0)
-        fprintf(conf,"OPTIONS_LED_IN_DIRECTION=%s\n",DEFAULT_OPTIONS_LEDS_IN_DIRECTION);
+        fprintf(conf,"OPTIONS_LEDS_IN_DIRECTION=%s\n",DEFAULT_OPTIONS_LEDS_IN_DIRECTION);
     else
-        fprintf(conf,"OPTIONS_LED_IN_DIRECTION=%s\n",tmp);
+        fprintf(conf,"OPTIONS_LEDS_IN_DIRECTION=%s\n",tmp);
 	// Maximum for Traffic LED row 'IN'
 	tmp=(read_cgi_entry(data,"led_in_interval"));
         if(strcmp(tmp,"nothing")==0)
-        fprintf(conf,"OPTIONS_LED_IN_INTERVAL=%s\n",DEFAULT_OPTIONS_LEDS_IN_INTERVAL);
+        fprintf(conf,"OPTIONS_LEDS_IN_INTERVAL=%s\n",DEFAULT_OPTIONS_LEDS_IN_INTERVAL);
     else
-        fprintf(conf,"OPTIONS_LED_IN_INTERVAL=%s\n",tmp);
+        fprintf(conf,"OPTIONS_LEDS_IN_INTERVAL=%s\n",tmp);
 	// Device for Traffic LED row 'OUT'
 	tmp=(read_cgi_entry(data,"led_out_dev"));
         if(strcmp(tmp,"nothing")==0)
-        fprintf(conf,"OPTIONS_LED_OUT_DEVICE=%s\n",DEFAULT_OPTIONS_LEDS_OUT_DEVICE);
+        fprintf(conf,"OPTIONS_LEDS_OUT_DEVICE=%s\n",DEFAULT_OPTIONS_LEDS_OUT_DEVICE);
     else
-        fprintf(conf,"OPTIONS_LED_OUT_DEVICE=%s\n",tmp);
+        fprintf(conf,"OPTIONS_LEDS_OUT_DEVICE=%s\n",tmp);
 	// Direction for Traffic LED row 'OUT'
 	tmp=(read_cgi_entry(data,"led_out_dir"));
         if(strcmp(tmp,"nothing")==0)
-        fprintf(conf,"OPTIONS_LED_OUT_DIRECTION=%s\n",DEFAULT_OPTIONS_LEDS_OUT_DIRECTION);
+        fprintf(conf,"OPTIONS_LEDS_OUT_DIRECTION=%s\n",DEFAULT_OPTIONS_LEDS_OUT_DIRECTION);
     else
-        fprintf(conf,"OPTIONS_LED_OUT_DIRECTION=%s\n",tmp);
+        fprintf(conf,"OPTIONS_LEDS_OUT_DIRECTION=%s\n",tmp);
 	// Maximum for Traffic LED row 'OUT'
 	tmp=(read_cgi_entry(data,"led_out_interval"));
         if(strcmp(tmp,"nothing")==0)
-        fprintf(conf,"OPTIONS_LED_OUT_INTERVAL=%s\n",DEFAULT_OPTIONS_LEDS_OUT_INTERVAL);
+        fprintf(conf,"OPTIONS_LEDS_OUT_INTERVAL=%s\n",DEFAULT_OPTIONS_LEDS_OUT_INTERVAL);
     else
-        fprintf(conf,"OPTIONS_LED_OUT_INTERVAL=%s\n",tmp);
+        fprintf(conf,"OPTIONS_LEDS_OUT_INTERVAL=%s\n",tmp);
 	// end of led section
 	fprintf(conf,"############ end section leds ############\n#\n");
 
@@ -990,6 +996,15 @@ int write_rcconf(struct CGI_DATA *data) {
         fprintf(conf,"OPTIONS_ETHTOOL_ETH1_WAKEONLAN=%s\n",tmp);
 	fclose(conf);
     // all entrys are written, now we can replace the new config file with the old
+	if (rename(NEW_RC_CONFIG_FILE,"/tmp/rc.conf") !=0) {
+#ifdef DEBUG
+		snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] rename rc.conf failed!\n",__FUNCTION__,__LINE__);
+        debug_info(debug_buf);
+#endif
+	} else {
+	// o.k. we use system(foo), thats not smart! :-/
+	system("mv /tmp/rc.conf /var/etc/rc.conf");
+	}
     return 0;
 }
 
@@ -1020,3 +1035,37 @@ unsigned char *read_cgi_entry(struct CGI_DATA *data, char *variable) {
     return "nothing"; //should never happen, just for secure!
 }
 
+void set_rc_defaults(void) {
+	options.hb=DEFAULT_OPTIONS_HB;
+	sscanf(DEFAULT_OPTIONS_LEDS_BLINK_ON,"%d",&options.blinkon);
+	sscanf(DEFAULT_OPTIONS_LEDS_BLINK_OFF,"%d",&options.blinkoff);
+	/* LED row 'IN' */
+    options.led_in_device=DEFAULT_OPTIONS_LEDS_IN_DEVICE;
+    options.led_in_direction=DEFAULT_OPTIONS_LEDS_IN_DIRECTION;
+    sscanf(DEFAULT_OPTIONS_LEDS_IN_INTERVAL,"%d",&options.led_in_interval);
+    /* LED row 'OUT' */
+    options.led_out_device=DEFAULT_OPTIONS_LEDS_OUT_DEVICE;
+    options.led_out_direction=DEFAULT_OPTIONS_LEDS_OUT_DIRECTION;
+    sscanf(DEFAULT_OPTIONS_LEDS_OUT_INTERVAL,"%d",&options.led_out_interval);
+    /* ethtool for eth0 */
+    options.ethtool_eth0_dm=DEFAULT_OPTIONS_ETHTOOL_ETH0_DUPLEX;
+    options.ethtool_eth0_nego=DEFAULT_OPTIONS_ETHTOOL_ETH0_AUTONEG;
+    sscanf(DEFAULT_OPTIONS_ETHTOOL_ETH0_SPEED,"%d",&options.ethtool_eth0_speed);
+    options.ethtool_eth0_wol=DEFAULT_OPTIONS_ETHTOOL_ETH0_WAKEONLAN;
+    /* ethtool for eth1 */
+    options.ethtool_eth1_dm=DEFAULT_OPTIONS_ETHTOOL_ETH1_DUPLEX;
+    options.ethtool_eth1_nego=DEFAULT_OPTIONS_ETHTOOL_ETH1_AUTONEG;
+    sscanf(DEFAULT_OPTIONS_ETHTOOL_ETH1_SPEED,"%d",&options.ethtool_eth1_speed);
+    options.ethtool_eth1_wol=DEFAULT_OPTIONS_ETHTOOL_ETH1_WAKEONLAN;
+	options.ntpip=DEFAULT_OPTIONS_NTPDATE_SERVER;
+     /* IP Forwarding */
+	options.ip_forwarding=DEFAULT_ENABLE_IPFORWARDING;
+     /* harddisk */
+	options.hd_device=DEFAULT_OPTIONS_HDPARM_DEVICE;
+	sscanf(DEFAULT_OPTIONS_HDPARM_TRANSFER_MODE,"%d",&options.hd_transfer_mode);
+	sscanf(DEFAULT_OPTIONS_HDPARM_DMA,"%d",&options.hd_dma);
+	sscanf(DEFAULT_OPTIONS_HDPARM_INTERRUPT_UNMASK,"%d",&options.hd_interrupt_umask);
+	sscanf(DEFAULT_OPTIONS_HDPARM_SECTOR_COUNT,"%d",&options.hd_sector_count);
+	sscanf(DEFAULT_OPTIONS_HDPARM_32BIT,"%d",&options.hd_32bit);
+	sscanf(DEFAULT_OPTIONS_HDPARM_SPINDOWN_TIMEOUT,"%d",&options.hd_spindown);
+}

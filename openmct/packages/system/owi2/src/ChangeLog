@@ -1,4 +1,11 @@
-2008-11-24  Carsten
+2008-11-30  Carsten
+* fixing error in select field for heartbeat LED
+* fixing error on writing the rc.conf, the LED Section was't correct
+* activating the save button in global settings
+* inserting more sanity checks for reading the rc.conf
+
+2008-07-15  Carsten
 * Version 2.0.0-alpha
 * initial start of owi2
 * handling of reading/writing rc.conf
+

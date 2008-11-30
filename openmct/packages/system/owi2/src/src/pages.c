@@ -44,6 +44,11 @@ void glob_set(char *title) {
     page_menu();
     page_content_start();
     char *check=NULL;
+#ifdef DEBUG
+    extern char debug_buf[600];   // for debugging output
+    snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] page glob_set start\n",__FUNCTION__,__LINE__);
+    debug_info(debug_buf);
+#endif
     printf("<h1 class=\"content_text\">Einstellungen der zu startenden Dienste beim Booten des NAS</h1>\n");
     printf("<form action=\"../cgi-bin/owi\" method=\"post\">\n");
     printf("    <fieldset id=\"field12\">\n");
@@ -94,23 +99,23 @@ void glob_set(char *title) {
     printf("<fieldset>\n");
 
     printf("    <legend> Optionen f&#252r LED Anzeigen</legend>\n");
-    /* heartbeat LED */
+    // heartbeat LED //
     printf("        <table class=\"content_text\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\">\n");
     printf("        <tr>\n");
     printf("            <td align=\"right\"><p class=\"content_text\" >Anzeige der Heartbeat LED</b></td>\n");
     printf("            <td><select name=\"hb\" size=\"1\">\n");
-    if (strcmp(options.led_in_device,"cpu")==0) check="selected"; else check=" ";
+    if (strcmp(options.hb,"cpu")==0) check="selected"; else check=" ";
     printf("                <option value=\"cpu\" %s>CPU Aktivit&#228t</option>\n",check);
-    if (strcmp(options.led_in_device,"on")==0) check="selected"; else check=" ";
+    if (strcmp(options.hb,"on")==0) check="selected"; else check=" ";
     printf("                <option value=\"on\" %s>dauer an</option>\n",check);
-    if (strcmp(options.led_in_device,"off")==0) check="selected"; else check=" ";
+    if (strcmp(options.hb,"off")==0) check="selected"; else check=" ";
     printf("                <option value=\"off\" %s>dauer aus</option>\n",check);
-    if (strcmp(options.led_in_device,"off")==0) check="selected"; else check=" ";
+    if (strcmp(options.hb,"blink")==0) check="selected"; else check=" ";
     printf("                <option value=\"blink\" %s>blinkend</option>\n",check);
     printf("            </select>\n");
 	printf("			<td>Blinkdauer an</td><td><input name=\"blinkon\" type=\"text\" size=\"3\" maxlength=\"3\" value=%d>\n",options.blinkon);
     printf("			<td>Blinkdauer aus</td><td><input name=\"blinkoff\" type=\"text\" size=\"3\" maxlength=\"3\" value=%d></p></tr>\n",options.blinkoff);
-    /* LED IN row */
+    // LED IN row //
     printf("        <tr\n");
     printf("            <td align=\"right\"><p class=\"content_text\" >Anzeige LED Reihe <b>'IN'</b></td>\n");
     printf("            <td><select name=\"led_in_dev\" size=\"1\">\n");
@@ -136,7 +141,7 @@ void glob_set(char *title) {
     printf("            <td><input name=\"led_in_interval\" type=\"text\" size=\"3\" maxlength=\"3\" value=%d></p></td>\n",options.led_in_interval);
     printf("        </tr\n");
 
-    /* OUT row */
+    // OUT row //
     printf("        <tr\n");
     printf("            <td align=\"right\"><p class=\"content_text\" >Anzeige LED Reihe <b>'OUT'</b></td>\n");
     printf("            <td><select name=\"led_out_dev\" size=\"1\">\n");
@@ -162,41 +167,6 @@ void glob_set(char *title) {
     printf("            <td><input name=\"led_out_interval\" type=\"text\" size=\"3\" maxlength=\"3\" value=%d></p></td>\n",options.led_out_interval);
     printf("        </tr\n");
     printf("        </table>");
-/*
-    printf("        <table class=\"content_text\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\">\n");
-    printf("        <tr>\n");
-    printf("            <td align=\"right\">Anzeige der Heartbeat LED</td>\n");
-    if (strcmp(options.hb,"cpu")==0) check="checked=\"checked\""; else check=" ";
-    printf("            <td><input type=\"radio\" name=\"hb\" value=\"cpu\" %s>CPU Aktivitaet</td>\n",check);
-    if (strcmp(options.hb,"on")==0) check="checked=\"checked\""; else check=" ";
-    printf("            <td><input type=\"radio\" name=\"hb\" value=\"on\" %s>dauer an</td>\n",check);
-    if (strcmp(options.hb,"off")==0) check="checked=\"checked\""; else check=" ";
-    printf("            <td><input type=\"radio\" name=\"hb\" value=\"off\" %s>dauer aus</td>\n",check);
-    printf("        </tr>\n");
-
-    printf("            <td align=\"right\">Multiplikator</td>\n");
-    printf("            <td><input type=\"radio\" name=\"in_multi\" value=\"in_multi30\"> 30</td>\n");
-    printf("            <td><input type=\"radio\" name=\"in_multi\" value=\"in_multi60\"> 60</td>\n");
-    printf("            <td><input type=\"radio\" name=\"in_multi\" value=\"in_multi120\" checked=\"checked\"> 120</td>\n");
-    printf("            <td><input type=\"radio\" name=\"in_multi\" value=\"in_multi240\"> 240</td>\n");
-    printf("        </tr>\n");
-
-    printf("        <tr>\n");
-    printf("            <td>Anzeige ausgehender Traffic auf eth0 <small>(WAN Port)</small></td>\n");
-    printf("            <td><input type=\"radio\" name=\"out\" value=\"out_eth0\"></td>\n");
-    printf("        </tr>\n");
-    printf("        <tr>\n");
-    printf("            <td>Anzeige ausgehender Traffic auf eth1 <small>(Switch Ports)</small></td>\n");
-    printf("            <td><input type=\"radio\" name=\"out\" value=\"out_eth1\" checked=\"checked\"></td>\n");
-    printf("        </tr>\n");
-    printf("            <td align=\"right\">Multiplikator</td>\n");
-    printf("            <td><input type=\"radio\" name=\"out_multi\" value=\"out_multi30\"> 30</td>\n");
-    printf("            <td><input type=\"radio\" name=\"out_multi\" value=\"out_multi60\"> 60</td>\n");
-    printf("            <td><input type=\"radio\" name=\"out_multi\" value=\"out_multi120\" checked=\"checked\"> 120</td>\n");
-    printf("            <td><input type=\"radio\" name=\"out_multi\" value=\"out_multi240\"> 240</td>\n");
-    printf("        </tr>\n");
-    printf("        </table>\n");
-    */
     printf("    </fieldset>\n");
 
     printf("<fieldset>\n");
@@ -226,8 +196,10 @@ void glob_set(char *title) {
     printf("        </tr>\n");
     printf("        <tr>\n");
     printf("            <td>Wake On LAN</td>\n");
+
 #warning "The Wake On LAN can more modi then the default 'bg' !"
-    if (strcmp(options.ethtool_eth0_wol,"bg")==0) { /* FixME!! there are more modi then 'bg'*/
+
+    if (strcmp(options.ethtool_eth0_wol,"bg")==0) { // FixME!! there are more modi then 'bg'
         printf("            <td><input type=\"radio\" name=\"eth0_wol\" value=\"bg\" checked=\"checked\"> an</td>\n");
         printf("            <td><input type=\"radio\" name=\"eth0_wol\" value=\"d\" > aus</td>\n");
     } else {
@@ -262,7 +234,7 @@ void glob_set(char *title) {
     printf("        </tr>\n");
     printf("        <tr>\n");
     printf("            <td>Wake On LAN</td>\n");
-    if (strcmp(options.ethtool_eth1_wol,"bg")==0) { /* FixME!! there are more modi then 'bg'*/
+    if (strcmp(options.ethtool_eth1_wol,"bg")==0) { // FixME!! there are more modi then 'bg'
         printf("            <td><input type=\"radio\" name=\"eth1_wol\" value=\"bg\" checked=\"checked\">an</td>\n");
         printf("            <td><input type=\"radio\" name=\"eth1_wol\" value=\"d\" >aus</td>\n");
     } else {
@@ -272,6 +244,7 @@ void glob_set(char *title) {
     printf("        </tr>\n");
     printf("        </table>\n");
     printf("    </fieldset>\n");
+
     printf("    <fieldset>\n");
     printf("    <legend> Diverses</legend>\n");
     printf("        <h3 class=\"content_text\">NTPDate</h3>\n");
@@ -280,7 +253,7 @@ void glob_set(char *title) {
     if (strcmp(options.ntpip,"192.53.103.104")==0) check="selected"; else check=" ";
     printf("                <option value=\"192.53.103.104\" %s>DTAG (192.53.103.104)</option>\n",check);
     if (strcmp(options.ntpip,"134.130.4.17")==0) check="selected"; else check=" ";
-    printf("                <option value=\"134.130.4.17\" %s>RWTH Aachen (134.130.4.17)</option>\n",check);
+    printf("                <option value=\"134.130.4.17\"/cgi-bin/owi?modul=create-global-set %s>RWTH Aachen (134.130.4.17)</option>\n",check);
     if (strcmp(options.ntpip,"131.188.3.221")==0) check="selected"; else check=" ";
     printf("                <option value=\"131.188.3.221\" %s>Uni Erlangen (131.188.3.221)</option>\n",check);
     if (strcmp(options.ntpip,"129.132.2.21")==0) check="selected"; else check=" ";
@@ -350,11 +323,15 @@ void glob_set(char *title) {
     printf("            nie <input type=\"radio\" name=\"hd_to\" value=\"0\" %s>\n",check);
     printf("            <br>\n");
     printf("    </fieldset>\n");
+
     printf("    <input type=\"submit\" id=\"submit\" class=\"submit\" value=\"Speichern\" />\n");
     printf("    <input type=\"submit\" id=\"default\" class=\"submit\" value=\"setze Standard\" />\n");
     printf("    </form>\n");
     printf("</div><!-- end of #right -->\n");
-
+#ifdef DEBUG
+    snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] page glob_set end\n",__FUNCTION__,__LINE__);
+    debug_info(debug_buf);
+#endif
     page_content_end();
     page_footer();
 }
