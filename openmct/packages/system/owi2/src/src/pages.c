@@ -27,8 +27,44 @@ void start_page(char *title){
     page_head(title);
     page_menu();
     page_content_start();
-    printf("<h1 class=\"content_text\">Start</h1>");
-    printf("<h2 class=\"content_text\">Bitte einen Menuepunkt auswaehlen!</h2>");
+    printf("<h1 class=\"content_text\">Start</h1>\n");
+    printf("<h2 class=\"content_text\">Bitte einen Men&#252punkt ausw&#228hlen!</h2>\n");
+	printf("    <fieldset id=\"sysinfo\">\n");
+    printf("    <legend> Systemstatus</legend>\n");
+    printf("        <h3 class=\"content_text\">Festplatte\n"
+		   "		<img class=\"content_text\" border=\"0\" src=\"../img/hdd_unmount.png\">\n");
+	if (strncmp(hd.modell,"SAM",3)==0) 		// Samsung
+		printf("<img class=\"content_text\" border=\"0\" src=\"../img/samsung_logo16.png\"/></h3>\n");
+	else if (strncmp(hd.modell,"WDC",3)==0) // Western Digital
+		printf("<img class=\"content_text\" border=\"0\" src=\"../img/WD_logo16.png\"/></h3>\n");
+	else if (strncmp(hd.modell,"IBM",3)==0) // IBM
+		printf("<img class=\"content_text\" border=\"0\" src=\"../img/IBM_logo16.png\"/></h3>\n");
+	else
+		printf("<img class=\"content_text\" border=\"0\" src=\"../img/hdd_unmount.png\">\n"
+			   "</h3>\n");
+    printf("        <table class=\"content_text\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\">\n");
+    printf("        <tr>\n");
+    printf("        	<td align=\"left\"><p class=\"content_text\"><b>Hersteller/Modell:</b></td><td> %s </td>"
+					   "<td><b>Firmware:</b></td><td> %s </td>"
+					   "<td><b>Seriennummer:</b></td><td> %s</td></p>"
+		   "		</tr>\n"
+			,hd.modell,hd.fw,hd.serial);
+	printf("        <tr>\n"
+		   "			<td align=\"left\"><p class=\"content_text\"><b>Transfermodus:</b></td><td> %s </td>"
+					   "<td><b>Cachegr&#244&#223e:</b></td><td> %dkB </td>"
+					   "<td><b>Anzahl gelesener Sektoren:</b></td><td> %d </td></p>\n"
+		   "		</tr>\n"
+			,hd.tfmode,hd.cache,hd.maxscset);
+	printf("		<tr>\n");
+	printf("			<td align=\"left\"><p class=\"content_text\"><b>Kapazit&#228t:</b></td><td> %dGB </td>"
+						"</p>\n"
+		   "		</tr>\n</table>",100);
+    printf("    </fieldset>\n");
+	printf("    <fieldset id=\"sysinfo\">\n");
+    printf("    <legend>Netzwerk</legend>\n");
+    printf("        <h3 class=\"content_text\">Netzwerkstatus</h3>\n");
+	printf("	</fieldset>\n");
+
     page_content_end();
     page_footer();
 #ifdef DEBUG
@@ -274,7 +310,7 @@ void glob_set(char *title) {
     printf("            <p class=\"content_text\">DMA aktivieren\n");
     if (options.hd_dma==1) check="checked=\"checked\""; else check=" ";
     printf("            <input type=\"checkbox\" name=\"dma\" value=\"1\" %s><br>\n",check);
-
+// FixME! the values should be 34 for DMA2, 66 for UDMA2, 68 for UDMA4 !! see http://www.thedumbterminal.co.uk/information/hdparm.shtml
     if (options.hd_transfer_mode==33) check="checked=\"checked\""; else check=" ";
     printf("            UDMA Modus 2<input type=\"radio\" name=\"udma\" value=\"33\" %s>\n",check);
     if (options.hd_transfer_mode==66) check="checked=\"checked\""; else check=" ";
@@ -303,7 +339,7 @@ void glob_set(char *title) {
     if (options.hd_32bit==0) check="selected"; else check=" ";
     printf("                <option value=\"0\" %s>off (Modus 0)</option>\n",check);
     if (options.hd_32bit==2) check="selected"; else check=" ";
-    printf("                <option value=\"2\" %s>32bit (Modus 2)</option>\n",check);
+    printf("                <option value=\"2\" %s>32bit+w/async (Modus 2)</option>\n",check);
     if (options.hd_32bit==3) check="selected"; else check=" ";
     printf("                <option value=\"3\" %s>32bit+w/sync (Modus 3)</option>\n",check);
     printf("            </select></p>\n");

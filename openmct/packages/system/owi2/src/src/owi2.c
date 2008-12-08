@@ -45,7 +45,12 @@ int main(void) {
 		printf_error("Fehler beim Erstellen der Systeminfos");
 		return 1;
 	}
-    // reading in the rcconf parameter
+	// second we get the hd infos
+	if(get_hd_info()<=0) {
+		printf_error("Fehler beim Erstellen der HD Infos");
+		return 1;
+	}
+	// reading in the rcconf parameter
     if(read_rcconf()==0) {
         printf_error("Fehler &#246ffnen rc.conf");
         return 1;

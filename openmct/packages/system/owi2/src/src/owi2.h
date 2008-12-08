@@ -119,6 +119,23 @@ struct sysinfo {
 	int idle_procs1;
 } statistics;
 
+struct hdinfo {
+	// the hd manufactor and typ
+	char *modell;
+	// the firmware
+	char *fw;
+	// the serial
+	char *serial;
+	// the buffersize (Cache)
+	int cache;
+	// the maximal possible sector count
+	int maxsc;
+	// the setted maximal sector count
+	int maxscset;
+	// transfermode (Pio, DMA or UDMA modus)
+	char *tfmode;
+} hd;
+
 /* debug output to the console
  * function: give output to the text console
  */
@@ -142,3 +159,6 @@ void delete(struct CGI_DATA *daten);
 
 void start_page(char *title); // the start/overview page
 void glob_set(char *title); // the global settings page
+
+// sysinfo.c
+unsigned char *read_hd_model (void);

@@ -148,7 +148,6 @@ html>body #left {
 	/*position: absolute;*/
 	float: left;
 	color: #003377;
-	
 	top: 170px;
 	/*right: 0px; /* Opera5.02 will show a space at right when there is no scroll bar */
 	left: 210px;
@@ -156,7 +155,7 @@ html>body #left {
 	padding: 10px;
 	/*border: 5px solid #ccc;*/
 	background: #F4A460 no-repeat;
-	width: 690px; /* ie5win fudge begins */
+	width: 725px; /* ie5win fudge begins */
 	voice-family: "\"}\"";
 	voice-family:inherit;
 	background-image: url(../img/bootlog.png);
@@ -164,7 +163,7 @@ html>body #left {
 	}
 
 html>body #right {
-	width: 690px; /* ie5win fudge ends */
+	width: 725px; /* ie5win fudge ends */
 	}
 
 img {
@@ -249,6 +248,7 @@ p.td, table.content_text {
 	color: #003377;
 	margin-left: 7px;
 	margin-right: 7px;
+	line-height: 15px;
 	}
 b.content_text {
 	font-size: 0.7em;

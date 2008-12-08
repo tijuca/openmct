@@ -11,7 +11,7 @@ program_transform_name =
 
 # the owi itself
 bin_PROGRAMS = owi
-owi_SOURCES = owi2.c debug.c read_form_data.c html.c pages.c functions.c
+owi_SOURCES = owi2.c debug.c read_form_data.c html.c pages.c functions.c sysinfo.c
 
 all:
 

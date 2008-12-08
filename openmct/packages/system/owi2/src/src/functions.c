@@ -1,11 +1,11 @@
-/* p_start.c
+/* functions.c
  * Copyright (c) 2008 Carsten Schoenert (claxan-com@online.de)
  *
- *this file is part of the OWI2 for OpenMCT (http://www.openmct.org)
+ * this file is part of the OWI2 for OpenMCT (http://www.openmct.org)
  *
  * all the helper functions for the dynamic in the html sides
  */
-  #ifdef HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
     #include "config.h"
 #endif
 
@@ -1003,8 +1003,18 @@ int write_rcconf(struct CGI_DATA *data) {
         debug_info(debug_buf);
 #endif
 	} else {
-	// o.k. we use system(foo), thats not smart! :-/
-	system("mv /tmp/rc.conf /var/etc/rc.conf");
+		// make a backup of rc.conf if possible
+		// if we found no /var/etc/rc.conf.back
+		if ((conf = fopen(RC_CONFIG_FILE".back", "r")) == NULL) {
+			// we rename the old /var/etc/rc.conf to *.back
+			if (rename(RC_CONFIG_FILE, RC_CONFIG_FILE".back")!=0)
+#ifdef DEBUG
+				snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] rename 'rc.conf' to 'rc.conf.back' failed!\n",__FUNCTION__,__LINE__);
+				debug_info(debug_buf);
+#endif
+		}
+		// o.k. we use system(foo), thats not smart! :-/
+		system("mv /tmp/rc.conf /var/etc/rc.conf");
 	}
     return 0;
 }
