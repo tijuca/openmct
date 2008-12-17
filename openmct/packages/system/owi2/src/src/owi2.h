@@ -16,6 +16,8 @@ char debug_buf[600];   // for debugging output
 //#endif
 
 #define MAX_PAIRS 255
+#define HARDDISKMODEL	"/proc/ide/ide0/hda/model"
+#define HARDDISK		"/dev/ide/host0/bus0/target0/lun0/disc"
 
 struct CGI_DATA {
     char *variable;
@@ -134,6 +136,9 @@ struct hdinfo {
 	int maxscset;
 	// transfermode (Pio, DMA or UDMA modus)
 	char *tfmode;
+	// size of hd, netto is size with basis 1024, brutto is basis with 1000
+	int size_netto;
+	int size_brutto;
 } hd;
 
 /* debug output to the console
@@ -162,3 +167,4 @@ void glob_set(char *title); // the global settings page
 
 // sysinfo.c
 unsigned char *read_hd_model (void);
+int get_hd_info(void);

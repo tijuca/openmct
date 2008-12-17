@@ -28,4 +28,11 @@ imagedata_DATA +=  bootlog.png
 imagedata_DATA +=  hdd_unmount.png \
 		   IBM_logo16.png \
 		   WD_logo16.png \
-		   samsung_logo16.png
+		   samsung_logo16.png \
+		   maxtor_logo16.png \
+		   excelstore_logo16.png \
+		   hitachi_logo16.png \
+		   seagate_logo16.png \
+		   ok16x16.png \
+		   warning16x16.png \
+		   no16x16.png
