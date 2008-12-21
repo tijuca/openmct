@@ -53,20 +53,20 @@ void start_page(char *title)
         printf("</h3>\n");
     printf("        <table class=\"content_text\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\">\n");
     printf("        <tr>\n");
-    printf("        	<td align=\"left\"><p class=\"content_text\"><b>Hersteller/Modell:</b></td><td> %s </td>"
-           "<td><b>Firmware:</b></td><td> %s </td>"
-           "<td><b>Seriennummer:</b></td><td> %s</td></p>"
+    printf("        	<td align=\"right\"><p class=\"content_text\"><b>Hersteller/Modell:</b></td><td align=\"left\">%s</td>"
+           "<td align=\"right\"><b>Firmware:</b></td><td align=\"left\">%s</td>"
+           "<td align=\"right\"><b>Seriennummer:</b></td><td align=\"left\">%s</td></p>"
            "		</tr>\n"
            ,hd.modell,hd.fw,hd.serial);
     printf("        <tr>\n"
-           "			<td align=\"left\"><p class=\"content_text\"><b>Transfermodus:</b></td><td> %s </td>"
-           "<td><b>Cachegr&#244&#223e:</b></td><td> %dkB </td>"
-           "<td><b>Sektoren/Interrupt:</b></td><td> %d </td></p>\n"
+           "			<td align=\"right\"><p class=\"content_text\"><b>Transfermodus:</b></td><td align=\"left\">%s</td>"
+           "<td align=\"right\"><b>Cachegr&#246&#223e:</b></td><td align=\"left\">%dkB</td>"
+           "<td align=\"right\"><b>Sektoren/Interrupt:</b></td><td align=\"left\">%d</td></p>\n"
            "		</tr>\n"
            ,hd.tfmode,hd.cache,hd.maxscset);
     printf("		<tr>\n");
-    printf("			<td align=\"left\"><p class=\"content_text\"><b>Kapazit&#228t netto:</b></td><td>%dGB</td>"
-           "<td><b>Kapazit&#228t brutto:</b></td><td>%dGB</td></p>\n"
+    printf("			<td align=\"right\"><p class=\"content_text\"><b>Kapazit&#228t netto:</b></td><td align=\"left\">%dGB</td>"
+           "<td align=\"right\"><b>Kapazit&#228t brutto:</b></td><td align=\"left\">%dGB</td></p>\n"
            "		</tr>\n</table>",hd.size_netto,hd.size_brutto);
 
     // smartctl data
@@ -112,9 +112,9 @@ void start_page(char *title)
 				// hd temperature is a special case
 				if ( (id==194) && (atoi(raw_val) < 45) ) // if temperature is less then 45°C
 					grafic="<img class=\"content_text\" border=\"0\" src=\"../img/ok16x16.png\"/>";
-				else if ( (id==194) && (atoi(raw_val) > 45) ) // if temperature is less then 45°C
+				else if ( (id==194) && (atoi(raw_val) > 45) ) // if temperature is more then 45°C
 					grafic="<img class=\"content_text\" border=\"0\" src=\"../img/warning16x16.png\"/>";
-				else if ( (id==194) && (atoi(raw_val) > 55) ) // if temperature is less then 55°C
+				else if ( (id==194) && (atoi(raw_val) > 55) ) // if temperature is more then 55°C
 					grafic="<img class=\"content_text\" border=\"0\" src=\"../img/no16x16.png\"/>";
 
 				if (id!=190) // ID 190 is a manufactur special value and not temperature or something else!
