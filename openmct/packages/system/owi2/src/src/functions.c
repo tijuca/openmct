@@ -664,7 +664,7 @@ int read_rcconf(void)
     if (options.hd_spindown < 1 || options.hd_spindown > 255)
         sscanf(DEFAULT_OPTIONS_HDPARM_SPINDOWN_TIMEOUT,"%d",&options.hd_spindown);
 
-#ifdef DEBUG
+#ifdef DEBUG1
     snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d]\n"
              "value rc_start.crond:\t\t'%s'\n"
              "value rc_start.ethtool_eth0:\t'%s'\n"

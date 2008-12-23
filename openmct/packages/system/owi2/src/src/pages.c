@@ -77,6 +77,29 @@ void start_page(char *title)
            "<td><b>Type</b></td><td><b>Update</b></td><td><b>RAW Wert</b></td></p>"
            "		</tr>\n");
 
+// infos about partitions
+    printf("        <h3 class=\"content_text\">Partitionen</h3>\n");
+    int n=1;
+    while (n<= hd.partition)
+    {
+        if (n==1 && hd.fs_id1 != 82)
+            printf("        <p class=\"content_text\">/dev/ide/host0/bus0/target0/lun0/part%d <b>"
+                    "Typ:</b> %s <b> Gr&#246&#223e:</b> %dGB <b>eingeh&#228ngt auf:</b> %s <b> %s</b> benutzt</p>\n",
+                    n,hd.fs1,hd.size1,hd.mountpoint1,hd.usage1);
+        else if (n==1 && hd.fs_id1 == 82)
+            printf("        <p class=\"content_text\">/dev/ide/host0/bus0/target0/lun0/part%d <b>Typ:</b> Swap <b> Gr&#246&#223e:</b> %dMB </p>\n",
+            n,hd.size1);
+        if (n==2 && hd.fs_id2 != 82)
+            printf("        <p class=\"content_text\">/dev/ide/host0/bus0/target0/lun0/part%d <b>"
+                    "Typ:</b> %s <b> Gr&#246&#223e:</b> %dGB <b>eingeh&#228ngt auf:</b> %s <b>%s</b> benutzt</p>\n",
+                    n,hd.fs2,hd.size2,hd.mountpoint2,hd.usage2);
+        else if (n==2 && hd.fs_id2 == 82)
+            printf("        <p class=\"content_text\">/dev/ide/host0/bus0/target0/lun0/part%d <b>Typ:</b> Swap <b>  Gr&#246&#223e:</b> %dMB </p>\n",
+            n,hd.size2);
+
+        n++;
+    }
+
 // smartctl for info about hd fitness
     system("smartctl -A "HARDDISK" > /tmp/smartctl.tmp");
     FILE *i = fopen("/tmp/smartctl.tmp", "r");
@@ -128,6 +151,7 @@ void start_page(char *title)
             }
         }
         fclose(i);
+        system("rm -f /tmp/smartctl.tmp");
         printf("        </table>\n");
     }
     else
@@ -139,7 +163,10 @@ void start_page(char *title)
     printf("    </fieldset>\n");
     printf("    <fieldset id=\"sysinfo\">\n");
     printf("    <legend>Netzwerk</legend>\n");
-    printf("        <h3 class=\"content_text\">Netzwerkstatus</h3>\n");
+    printf("        <h3 class=\"content_text\">Netzwerkstatus\n"
+            "		<img class=\"content_text\" border=\"0\" src=\"../img/network_16x16.png\"></h3>\n");
+//    if (net1.iface)
+//        printf("        <p class=\"content_text\">Interface %s</p>\n",net1.iface);
     printf("	</fieldset>\n");
 
     page_content_end();

@@ -54,6 +54,12 @@ int main(void)
         printf_error("Fehler beim Erstellen der HD Infos");
         return 1;
     }
+    // third we get the current IP and network parameter + statistics
+    if (get_networking_info()<=0)
+    {
+        printf_error("Fehler beim Erstellen der Netzwerkinfos Infos");
+        return 1;
+    }
     // reading in the rcconf parameter
     if (read_rcconf()==0)
     {
@@ -130,7 +136,7 @@ int main(void)
         debug_info(debug_buf);
     }
 
-    // Speicher wieder freigeben */
+    // lets free the memory */
     delete(free_cgi);
 #ifdef DEBUG
 //    char debug_buf[600];   // for debugging output

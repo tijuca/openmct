@@ -136,10 +136,53 @@ struct hdinfo {
 	int maxscset;
 	// transfermode (Pio, DMA or UDMA modus)
 	char *tfmode;
+    // hd cyclinder, heads and sectors
+    int cyclinder;
+    int heads;
+    int sectors;
 	// size of hd, netto is size with basis 1024, brutto is basis with 1000
 	int size_netto;
 	int size_brutto;
+    // numbers of partitions on the hd
+    int partition;
+    // the size of the partion (in GB, if the fs_id is 83 the size is in MB because this is a swap partition)
+    int size1;
+    // the filesystem ID
+    int fs_id1;
+    // mountpoint of the partition
+    char *mountpoint1;
+    // the filesystem name
+    char *fs1;
+    // usage of the partition
+    char *usage1;
+
+    // the size of the partion (in GB, if the fs_id is 83 the size is in MB because this is a swap partition)
+    int size2;
+    // the filesystem ID
+    int fs_id2;
+    // mountpoint of the partition
+    char *mountpoint2;
+    // the filesystem name
+    char *fs2;
+    // usage of the partition
+    char *usage2;
 } hd;
+
+/* struct for holding the infos for one single partition of the hd */
+//struct hdpartitions {
+
+//};
+
+struct networking {
+    // interface eth0, eth1:0, ...
+    char *iface;
+    // MAC adress
+    char * mac;
+    // ip adress
+    char *ip;
+    // broadcast adress
+    char *bcast;
+};
 
 /* debug output to the console
  * function: give output to the text console
@@ -168,3 +211,4 @@ void glob_set(char *title); // the global settings page
 // sysinfo.c
 unsigned char *read_hd_model (void);
 int get_hd_info(void);
+int get_networking_info (void);
