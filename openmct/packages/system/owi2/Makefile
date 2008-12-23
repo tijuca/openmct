@@ -1,6 +1,6 @@
 # owi2
 
-OPENMCT_DEVEL_PREFIX=/home/carsten/openmct/trunk/openmct/
+#OPENMCT_DEVEL_PREFIX=/home/carsten/openmct/trunk/openmct/
 
 PREPARE= [ -f $(SRCDIR)/Makefile.in ] ||  (cd $(SRCDIR) && ./prepare.sh)
 
