@@ -13,7 +13,7 @@ if [ "$1" != "" ]; then
 	rm -rf $1/usr
 	rm -rf $1/var
 	rm -rf $1/etc
-	rm $1/lib/libstdc++.so*
+#	rm $1/lib/libstdc++.so*
 	mkdir $1/usr
 	mkdir $1/var
 fi
