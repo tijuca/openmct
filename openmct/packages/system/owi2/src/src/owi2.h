@@ -5,28 +5,26 @@
  */
 
 #ifndef OWI2_H_
-   #define OWI2_H_
+#define OWI2_H_
 #endif /*OWI2_H_*/
-/*#ifndef OWI_VERSION
-    #define OWI_VERSION "2.0.0-alpha/i386"
-#endif
-*/
-//#ifdef DEBUG
+#ifdef DEBUG
 char debug_buf[600];   // for debugging output
-//#endif
+#endif
 
 #define MAX_PAIRS 255
 #define HARDDISKMODEL	"/proc/ide/ide0/hda/model"
-#define HARDDISK		"/dev/ide/host0/bus0/target0/lun0/disc"
+#define HARDDISK	"/dev/ide/host0/bus0/target0/lun0/disc"
 
-struct CGI_DATA {
+struct CGI_DATA
+{
     char *variable;
     char *value;
     struct CGI_DATA *next;
 };
 
 // structure for holding the status of services to boot or not
-struct s_param {
+struct s_param
+{
     char *telnetd;
     char *sshd;
     char *portmap;
@@ -47,15 +45,16 @@ struct s_param {
 } rc_start;
 
 // structure for the options of some services
-struct s_opt {
+struct s_opt
+{
     /* heartbeat led */
     char *hb;                   // function for the HB LED
-	int   blinkon;				// ontime if HB LED is set to 'blink'
-	int   blinkoff;				// offtime if HB LED is set to 'blink'
+    int   blinkon;		// ontime if HB LED is set to 'blink'
+    int   blinkoff;		// offtime if HB LED is set to 'blink'
     /* LED row 'IN' */
     char *led_in_device;        // Interface for LED row 'IN'
-    char *led_in_direction;		// traffic direction for LED row 'IN'
-    int   led_in_interval;		// Maxium value (in kB) for LED row 'IN'
+    char *led_in_direction;	// traffic direction for LED row 'IN'
+    int   led_in_interval;	// Maxium value (in kB) for LED row 'IN'
     /* LED row 'OUT' */
     char *led_out_device;       // Interface for LED row 'OUT'
     char *led_out_direction;    // traffic direction for LED row 'OUT'
@@ -83,66 +82,68 @@ struct s_opt {
      *                   g   Wake on MagicPacket(tm)
      *                   s   activate SecureOn(tm) Passwort for MagicPacket(tm)
      *                   d   deactivated (wake on notthing). These option delete all other options! */
-     /* NTP date server ip */
-     char *ntpip;
-     /* IP Forwarding */
-     char *ip_forwarding;
-     /* harddisk */
-     char *hd_device;           // devicepath of the data partition
-     int   hd_transfer_mode;    // UDMA modus, can the handle more the UDMA2 = 66 ??
-     int   hd_dma;              // set dma flag or not
-     int   hd_interrupt_umask;  // set umaskirq or not
-     int   hd_sector_count;     // sectors to read in one go
-     int   hd_32bit;            // modus of multi IO support
-     int   hd_spindown;         // spindowntime for hd
+    /* NTP date server ip */
+    char *ntpip;
+    /* IP Forwarding */
+    char *ip_forwarding;
+    /* harddisk */
+    char *hd_device;           // devicepath of the data partition
+    int   hd_transfer_mode;    // UDMA modus, can the handle more the UDMA2 = 66 ??
+    int   hd_dma;              // set dma flag or not
+    int   hd_interrupt_umask;  // set umaskirq or not
+    int   hd_sector_count;     // sectors to read in one go
+    int   hd_32bit;            // modus of multi IO support
+    int   hd_spindown;         // spindowntime for hd
 } options;
 
 /* some variables that used in varios menus or info pages */
-struct sysinfo {
-	// the hostname of the NAS
-	char *hostname;
-	// software revision
-	char *rev;
-	// vendor + model of the NAS
-	char *vendor;
-	// uptime
-	char *uptime;
-	// the kernelversion
-	char *kernel;
-	// CPU
-	char *cpu;
-	/*int uptime_year;		// Years Uptime
-	int uptime_day;			// Days UpTime
-	int uptime_hour;		// Hours UpTime
-	int uptime_min;			// Minutes UpTime*/
-	// absolut processes (first read)
-	int total_procs1;
-	// idle processes (first read)
-	int idle_procs1;
+struct sysinfo
+{
+    // the hostname of the NAS
+    char *hostname;
+    // software revision
+    char *rev;
+    // vendor + model of the NAS
+    char *vendor;
+    // uptime
+    char *uptime;
+    // the kernelversion
+    char *kernel;
+    // CPU
+    char *cpu;
+    /*int uptime_year;		// Years Uptime
+    int uptime_day;		// Days UpTime
+    int uptime_hour;		// Hours UpTime
+    int uptime_min;		// Minutes UpTime*/
+    // absolut processes (first read)
+    int total_procs1;
+    // idle processes (first read)
+    int idle_procs1;
 } statistics;
 
-struct hdinfo {
-	// the hd manufactor and typ
-	char *modell;
-	// the firmware
-	char *fw;
-	// the serial
-	char *serial;
-	// the buffersize (Cache)
-	int cache;
-	// the maximal possible sector count
-	int maxsc;
-	// the setted maximal sector count
-	int maxscset;
-	// transfermode (Pio, DMA or UDMA modus)
-	char *tfmode;
+struct hdinfo
+{
+    // the hd manufactor and typ
+    char *modell;
+    // the firmware
+    char *fw;
+    // the serial
+    char *serial;
+    // the buffersize (Cache)
+    int cache;
+    // the maximal possible sector count
+    int maxsc;
+    // the setted maximal sector count
+    int maxscset;
+    // transfermode (Pio, DMA or UDMA modus)
+    char *tfmode;
     // hd cyclinder, heads and sectors
     int cyclinder;
     int heads;
     int sectors;
-	// size of hd, netto is size with basis 1024, brutto is basis with 1000
-	int size_netto;
-	int size_brutto;
+    // size of hd, netto is size with basis 1024, brutto is basis with 1000
+    int size_netto;
+    int size_brutto;
     // numbers of partitions on the hd
     int partition;
     // the size of the partion (in GB, if the fs_id is 83 the size is in MB because this is a swap partition)
@@ -173,7 +174,8 @@ struct hdinfo {
 
 //};
 
-struct networking {
+struct networking
+{
     // interface eth0, eth1:0, ...
     char *iface;
     // MAC adress
@@ -193,7 +195,7 @@ char *Strdup(const char *);
 //void print_location(char *);
 
 int get_sysinfos(void);
-	// return 0 if everything is o.k.
+// return 0 if everything is o.k.
 
 int read_rcconf(void);      // read data from /var/etc/rc.conf
 int write_rcconf(struct CGI_DATA *data);     // write data to /var/etc/rc.conf

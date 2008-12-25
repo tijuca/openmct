@@ -99,7 +99,7 @@ int get_hd_info(void)
             }
         }
 	fclose(i);
-    system("rm -f /tmp/hdinfo.tmp");
+	system("rm -f /tmp/hdinfo.tmp");
 	havemode=1;
     }
 
@@ -285,12 +285,12 @@ int get_networking_info (void)
             {
                 if (strncmp(buffer,"eth",3)==0) // ignoring all other lines who did't start with 'eth'
                     loop++;
-                    struct networking net[loop];
-                    net[loop].iface=Strdup("128");
+//                    struct networking net[loop];
+//                    net[loop].iface=Strdup("128");
             }
 #ifdef DEBUG
-				snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] found %d entrys 'eth'\n",__FUNCTION__,__LINE__,loop);
-				debug_info(debug_buf);
+	    snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] found %d entrys 'eth'\n",__FUNCTION__,__LINE__,loop);
+	    debug_info(debug_buf);
 #endif
 
     fclose (ifconfig);
@@ -330,6 +330,5 @@ unsigned char *read_hd_model (void)
         return ret;
     }
     else
-
         return "???";
 }
