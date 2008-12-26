@@ -102,6 +102,13 @@ int get_hd_info(void)
 	system("rm -f /tmp/hdinfo.tmp");
 	havemode=1;
     }
+    else
+    {
+#ifdef DEBUG
+        snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] open hdinfo.tmp failed!\n",__FUNCTION__,__LINE__);
+        debug_info(debug_buf);
+#endif
+    }
 
 	FILE *geo = fopen("/proc/ide/ide0/hda/geometry", "r");
 	if (geo)
@@ -115,13 +122,11 @@ int get_hd_info(void)
 		}
 	fclose(geo);
 	havesize=1;
+	hd.havehd=1;         // we found a harddisk!
 	}
 	else
 	{
-#ifdef DEBUG
-				snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] open geo failed!\n",__FUNCTION__,__LINE__);
-				debug_info(debug_buf);
-#endif
+        hd.havehd=0;    // we did'nt find a harddisk!
 	}
     // infos about partitions
     system("fdisk > /tmp/fdisk.tmp");

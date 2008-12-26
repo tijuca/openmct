@@ -10,6 +10,8 @@ MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc RN=$(OPENMCT_CROSS_COMPILE)ranlib LD=$(
 
 DEPENDSON=	packages/system/smartd
 
+CLEAN=		rm -rf src/.config && cd src/src && make clean
+
 INSTALL=	mkdir -p $(NEWROOTDIR)/var/www/ && \
 		cd src/ && make install && \
 		$(STRIP) $(NEWROOTDIR)/var/www/cgi-bin/owi

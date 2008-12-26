@@ -779,11 +779,13 @@ int write_rcconf(struct CGI_DATA *data)
 
     if ((conf = fopen(NEW_RC_CONFIG_FILE, "w")) == NULL)
         return 1;   // return with status 1 'could't open tempfile'
+#ifdef DEBUG
     else
     {
         snprintf(debug_buf,sizeof(debug_buf)-1,"[%s/%d] open %s o.k.\n",__FUNCTION__,__LINE__,NEW_RC_CONFIG_FILE);
         debug_info(debug_buf);
     }
+#endif
     // writing the header to the new rc.conf file
     fprintf(conf,"# rc.conf created %s by %s %s \n",__DATE__,PACKAGE_NAME,OWI_VERSION);
     fprintf(conf,"# OpenMCT Confguration File, edit this file carefully!\n"
@@ -1088,7 +1090,7 @@ int write_rcconf(struct CGI_DATA *data)
             // we rename the old /var/etc/rc.conf to *.back
             if (rename(RC_CONFIG_FILE, RC_CONFIG_FILE".back")!=0)
 #ifdef DEBUG
-                snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] rename 'rc.conf' to 'rc.conf.back' failed!\n",__FUNCTION__,__LINE__);
+            snprintf(debug_buf, sizeof(debug_buf)-1, "[%s/%d] rename 'rc.conf' to 'rc.conf.back' failed!\n",__FUNCTION__,__LINE__);
             debug_info(debug_buf);
 #endif
         }

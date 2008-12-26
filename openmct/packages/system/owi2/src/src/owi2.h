@@ -12,8 +12,8 @@ char debug_buf[600];   // for debugging output
 #endif
 
 #define MAX_PAIRS 255
-#define HARDDISKMODEL	"/proc/ide/ide0/hda/model"
-#define HARDDISK	"/dev/ide/host0/bus0/target0/lun0/disc"
+#define HARDDISKMODEL   "/proc/ide/ide0/hda/model"
+#define HARDDISK        "/dev/ide/host0/bus0/target0/lun0/disc"
 
 struct CGI_DATA
 {
@@ -123,6 +123,8 @@ struct sysinfo
 
 struct hdinfo
 {
+    // 1 = we have a hd, 0 = we have no hd found
+    short int havehd;
     // the hd manufactor and typ
     char *modell;
     // the firmware

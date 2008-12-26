@@ -34,137 +34,143 @@ void start_page(char *title)
     printf("    <legend> Systemstatus</legend>\n");
     printf("        <h3 class=\"content_text\">Festplatte\n"
            "		<img class=\"content_text\" border=\"0\" src=\"../img/hdd_unmount.png\">\n");
-    if (strncmp(hd.modell,"SAM",3)==0) 		// Samsung
-        printf("<img class=\"content_text\" border=\"0\" src=\"../img/samsung_logo16.png\"/></h3>\n");
-    else if (strncmp(hd.modell,"SAM",3)==0) // Western Digital
-        printf("<img class=\"content_text\" border=\"0\" src=\"../img/WD_logo16.png\"/></h3>\n");
-    else if ( (strncmp(hd.modell,"IBM",3)==0) || (strncmp(hd.modell,"IC",2)==0)) // IBM
-        printf("<img class=\"content_text\" border=\"0\" src=\"../img/IBM_logo16.png\"/></h3>\n");
-    else if (strncmp(hd.modell,"ST",2)==0) // Seagate
-        printf("<img class=\"content_text\" border=\"0\" src=\"../img/seagate_logo16.png\"/></h3>\n");
-    else if (strncmp(hd.modell,"HTC",3)==0) // Hitachi
-        printf("<img class=\"content_text\" border=\"0\" src=\"../img/hitachi_logo16.png\"/></h3>\n");
-    else if (strncmp(hd.modell,"Exc",3)==0) // Excelstore
-        printf("<img class=\"content_text\" border=\"0\" src=\"../img/excelstore_logo16.png\"/></h3>\n");
-    else if (strncmp(hd.modell,"Max",3)==0) // Maxtor
-        printf("<img class=\"content_text\" border=\"0\" src=\"../img/maxtor_logo16.png\"/></h3>\n");
+    if (hd.havehd==1)
+    {
+        if (strncmp(hd.modell,"SAM",3)==0) 		// Samsung
+            printf("<img class=\"content_text\" border=\"0\" src=\"../img/samsung_logo16.png\"/></h3>\n");
+        else if (strncmp(hd.modell,"SAM",3)==0) // Western Digital
+            printf("<img class=\"content_text\" border=\"0\" src=\"../img/WD_logo16.png\"/></h3>\n");
+        else if ( (strncmp(hd.modell,"IBM",3)==0) || (strncmp(hd.modell,"IC",2)==0)) // IBM
+            printf("<img class=\"content_text\" border=\"0\" src=\"../img/IBM_logo16.png\"/></h3>\n");
+        else if (strncmp(hd.modell,"ST",2)==0) // Seagate
+            printf("<img class=\"content_text\" border=\"0\" src=\"../img/seagate_logo16.png\"/></h3>\n");
+        else if (strncmp(hd.modell,"HTC",3)==0) // Hitachi
+            printf("<img class=\"content_text\" border=\"0\" src=\"../img/hitachi_logo16.png\"/></h3>\n");
+        else if (strncmp(hd.modell,"Exc",3)==0) // Excelstore
+            printf("<img class=\"content_text\" border=\"0\" src=\"../img/excelstore_logo16.png\"/></h3>\n");
+        else if (strncmp(hd.modell,"Max",3)==0) // Maxtor
+            printf("<img class=\"content_text\" border=\"0\" src=\"../img/maxtor_logo16.png\"/></h3>\n");
 
-    else
-        printf("</h3>\n");
-    printf("        <table class=\"content_text\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\">\n");
-    printf("        <tr>\n");
-    printf("        	<td align=\"right\"><p class=\"content_text\"><b>Hersteller/Modell:</b></td><td align=\"left\">%s</td>"
-           "<td align=\"right\"><b>Firmware:</b></td><td align=\"left\">%s</td>"
-           "<td align=\"right\"><b>Seriennummer:</b></td><td align=\"left\">%s</td></p>"
-           "		</tr>\n"
-           ,hd.modell,hd.fw,hd.serial);
-    printf("        <tr>\n"
-           "			<td align=\"right\"><p class=\"content_text\"><b>Transfermodus:</b></td><td align=\"left\">%s</td>"
-           "<td align=\"right\"><b>Cachegr&#246&#223e:</b></td><td align=\"left\">%dkB</td>"
-           "<td align=\"right\"><b>Sektoren/Interrupt:</b></td><td align=\"left\">%d</td></p>\n"
-           "		</tr>\n"
-           ,hd.tfmode,hd.cache,hd.maxscset);
-    printf("		<tr>\n");
-    printf("			<td align=\"right\"><p class=\"content_text\"><b>Kapazit&#228t netto:</b></td><td align=\"left\">%dGB</td>"
-           "<td align=\"right\"><b>Kapazit&#228t brutto:</b></td><td align=\"left\">%dGB</td></p>\n"
-           "		</tr>\n</table>",hd.size_netto,hd.size_brutto);
+        else
+            printf("</h3>\n");
+        printf("        <table class=\"content_text\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\">\n");
+        printf("        <tr>\n");
+        printf("        	<td align=\"right\"><p class=\"content_text\"><b>Hersteller/Modell:</b></td><td align=\"left\">%s</td>"
+               "<td align=\"right\"><b>Firmware:</b></td><td align=\"left\">%s</td>"
+               "<td align=\"right\"><b>Seriennummer:</b></td><td align=\"left\">%s</td></p>"
+               "		</tr>\n"
+               ,hd.modell,hd.fw,hd.serial);
+        printf("        <tr>\n"
+               "			<td align=\"right\"><p class=\"content_text\"><b>Transfermodus:</b></td><td align=\"left\">%s</td>"
+               "<td align=\"right\"><b>Cachegr&#246&#223e:</b></td><td align=\"left\">%dkB</td>"
+               "<td align=\"right\"><b>Sektoren/Interrupt:</b></td><td align=\"left\">%d</td></p>\n"
+               "		</tr>\n"
+               ,hd.tfmode,hd.cache,hd.maxscset);
+        printf("		<tr>\n");
+        printf("			<td align=\"right\"><p class=\"content_text\"><b>Kapazit&#228t netto:</b></td><td align=\"left\">%dGB</td>"
+               "<td align=\"right\"><b>Kapazit&#228t brutto:</b></td><td align=\"left\">%dGB</td></p>\n"
+               "		</tr>\n</table>",hd.size_netto,hd.size_brutto);
 
-    // smartctl data
-    printf("        <table class=\"content_text\" border=\"1\" cellpadding=\"2\" cellspacing=\"0\">\n");
-    printf("        <tr>\n");
-    printf("        	<td align=\"left\"><p class=\"content_text\"><b>Status</b></td><td><b>SMART ID</b></td><td><b>Attribut</b></td>"
-           "<td><b>aktueller Wert</b></td><td><b>Schwellwert</b></td>"
-           "<td><b>Type</b></td><td><b>Update</b></td><td><b>RAW Wert</b></td></p>"
-           "		</tr>\n");
+        // smartctl data
+        printf("        <table class=\"content_text\" border=\"1\" cellpadding=\"2\" cellspacing=\"0\">\n");
+        printf("        <tr>\n");
+        printf("        	<td align=\"left\"><p class=\"content_text\"><b>Status</b></td><td><b>SMART ID</b></td><td><b>Attribut</b></td>"
+               "<td><b>aktueller Wert</b></td><td><b>Schwellwert</b></td>"
+               "<td><b>Type</b></td><td><b>Update</b></td><td><b>RAW Wert</b></td></p>"
+               "		</tr>\n");
 
 // infos about partitions
-    printf("        <h3 class=\"content_text\">Partitionen</h3>\n");
-    int n=1;
-    while (n<= hd.partition)
-    {
-        if (n==1 && hd.fs_id1 != 82)
-            printf("        <p class=\"content_text\">/dev/ide/host0/bus0/target0/lun0/part%d <b>"
-                    "Typ:</b> %s <b> Gr&#246&#223e:</b> %dGB <b>eingeh&#228ngt auf:</b> %s <b> %s</b> benutzt</p>\n",
-                    n,hd.fs1,hd.size1,hd.mountpoint1,hd.usage1);
-        else if (n==1 && hd.fs_id1 == 82)
-            printf("        <p class=\"content_text\">/dev/ide/host0/bus0/target0/lun0/part%d <b>Typ:</b> Swap <b> Gr&#246&#223e:</b> %dMB </p>\n",
-            n,hd.size1);
-        if (n==2 && hd.fs_id2 != 82)
-            printf("        <p class=\"content_text\">/dev/ide/host0/bus0/target0/lun0/part%d <b>"
-                    "Typ:</b> %s <b> Gr&#246&#223e:</b> %dGB <b>eingeh&#228ngt auf:</b> %s <b>%s</b> benutzt</p>\n",
-                    n,hd.fs2,hd.size2,hd.mountpoint2,hd.usage2);
-        else if (n==2 && hd.fs_id2 == 82)
-            printf("        <p class=\"content_text\">/dev/ide/host0/bus0/target0/lun0/part%d <b>Typ:</b> Swap <b>  Gr&#246&#223e:</b> %dMB </p>\n",
-            n,hd.size2);
+        printf("        <h3 class=\"content_text\">Partitionen</h3>\n");
+        int n=1;
+        while (n<= hd.partition)
+        {
+            if (n==1 && hd.fs_id1 != 82)
+                printf("        <p class=\"content_text\">/dev/ide/host0/bus0/target0/lun0/part%d <b>"
+                       "Typ:</b> %s <b> Gr&#246&#223e:</b> %dGB <b>eingeh&#228ngt auf:</b> %s <b> %s</b> benutzt</p>\n",
+                       n,hd.fs1,hd.size1,hd.mountpoint1,hd.usage1);
+            else if (n==1 && hd.fs_id1 == 82)
+                printf("        <p class=\"content_text\">/dev/ide/host0/bus0/target0/lun0/part%d <b>Typ:</b> Swap <b> Gr&#246&#223e:</b> %dMB </p>\n",
+                       n,hd.size1);
+            if (n==2 && hd.fs_id2 != 82)
+                printf("        <p class=\"content_text\">/dev/ide/host0/bus0/target0/lun0/part%d <b>"
+                       "Typ:</b> %s <b> Gr&#246&#223e:</b> %dGB <b>eingeh&#228ngt auf:</b> %s <b>%s</b> benutzt</p>\n",
+                       n,hd.fs2,hd.size2,hd.mountpoint2,hd.usage2);
+            else if (n==2 && hd.fs_id2 == 82)
+                printf("        <p class=\"content_text\">/dev/ide/host0/bus0/target0/lun0/part%d <b>Typ:</b> Swap <b>  Gr&#246&#223e:</b> %dMB </p>\n",
+                       n,hd.size2);
 
-        n++;
-    }
+            n++;
+        }
 
 // smartctl for info about hd fitness
-    system("smartctl -A "HARDDISK" > /tmp/smartctl.tmp");
-    FILE *i = fopen("/tmp/smartctl.tmp", "r");
+        system("smartctl -A "HARDDISK" > /tmp/smartctl.tmp");
+        FILE *i = fopen("/tmp/smartctl.tmp", "r");
 
-    if (i)
-    {
-        unsigned char buffer[4096];
-        unsigned char attribut[40], tmp[10], type[10], update[10], failed[20], raw_val[20];
-        int id,val,worst,thresh;
-		char *grafic=NULL;
-
-        while (fgets(buffer, 4096, i))
+        if (i)
         {
-            memset(attribut, 0, sizeof(attribut));
-            memset(type, 0, sizeof(type));
-            memset(update, 0, sizeof(update));
-            memset(failed, 0, sizeof(failed));
-            memset(raw_val, 0, sizeof(raw_val));
-            id=val=worst=thresh=0;
+            unsigned char buffer[4096];
+            unsigned char attribut[40], tmp[10], type[10], update[10], failed[20], raw_val[20];
+            int id,val,worst,thresh;
+            char *grafic=NULL;
 
-            if (sscanf(buffer, " %d %s                      %s       %d     %d    %d    %s        %s           %s       %s"
-                       ,  &id, attribut,              tmp,     &val,  &worst,&thresh,type,    update,      failed,  raw_val) == 10)
+            while (fgets(buffer, 4096, i))
             {
-				if (val > thresh*100/110) // if value is greater then 110% of thresh every thing is o.k.
-					grafic="<img class=\"content_text\" border=\"0\" src=\"../img/ok16x16.png\"/>";
-				else if (val < thresh*100/110) // if value is less then 110% of thresh you should be careful, better make a backup
-					grafic="<img class=\"content_text\" border=\"0\" src=\"../img/warning16x16.png\"/>";
-				else if (val < thresh) // if value is less then 100% it is really time to make a backup!
-					grafic="<img class=\"content_text\" border=\"0\" src=\"../img/no16x16.png\"/>";
-				else
-					grafic=" - ";
+                memset(attribut, 0, sizeof(attribut));
+                memset(type, 0, sizeof(type));
+                memset(update, 0, sizeof(update));
+                memset(failed, 0, sizeof(failed));
+                memset(raw_val, 0, sizeof(raw_val));
+                id=val=worst=thresh=0;
 
-				// hd temperature is a special case
-				if ( (id==194) && (atoi(raw_val) < 45) ) // if temperature is less then 45°C
-					grafic="<img class=\"content_text\" border=\"0\" src=\"../img/ok16x16.png\"/>";
-				else if ( (id==194) && (atoi(raw_val) > 45) ) // if temperature is more then 45°C
-					grafic="<img class=\"content_text\" border=\"0\" src=\"../img/warning16x16.png\"/>";
-				else if ( (id==194) && (atoi(raw_val) > 55) ) // if temperature is more then 55°C
-					grafic="<img class=\"content_text\" border=\"0\" src=\"../img/no16x16.png\"/>";
+                if (sscanf(buffer, " %d %s                      %s       %d     %d    %d    %s        %s           %s       %s"
+                           ,  &id, attribut,              tmp,     &val,  &worst,&thresh,type,    update,      failed,  raw_val) == 10)
+                {
+                    if (val > thresh*100/110) // if value is greater then 110% of thresh every thing is o.k.
+                        grafic="<img class=\"content_text\" border=\"0\" src=\"../img/ok16x16.png\"/>";
+                    else if (val < thresh*100/110) // if value is less then 110% of thresh you should be careful, better make a backup
+                        grafic="<img class=\"content_text\" border=\"0\" src=\"../img/warning16x16.png\"/>";
+                    else if (val < thresh) // if value is less then 100% it is really time to make a backup!
+                        grafic="<img class=\"content_text\" border=\"0\" src=\"../img/no16x16.png\"/>";
+                    else
+                        grafic=" - ";
 
-				if (id!=190) // ID 190 is a manufactur special value and not temperature or something else!
-				{
-					printf( "        	<td align=\"center\"><p class=\"content_text\">%s</td><td><b>%d</b></td><td><b>%s</b></td>"
-							"<td><b>%d</b></td><td><b>%d</b></td>"
-							"<td><b>%s</b></td><td><b>%s</b></td><td><b>%s</b></td></p>"
-							"		</tr>\n"
-							,grafic,id, attribut,val,thresh,type,update,raw_val);
-				}
+                    // hd temperature is a special case
+                    if ( (id==194) && (atoi(raw_val) < 45) ) // if temperature is less then 45°C
+                        grafic="<img class=\"content_text\" border=\"0\" src=\"../img/ok16x16.png\"/>";
+                    else if ( (id==194) && (atoi(raw_val) > 45) ) // if temperature is more then 45°C
+                        grafic="<img class=\"content_text\" border=\"0\" src=\"../img/warning16x16.png\"/>";
+                    else if ( (id==194) && (atoi(raw_val) > 55) ) // if temperature is more then 55°C
+                        grafic="<img class=\"content_text\" border=\"0\" src=\"../img/no16x16.png\"/>";
+
+                    if (id!=190) // ID 190 is a manufactur special value and not temperature or something else!
+                    {
+                        printf( "        	<td align=\"center\"><p class=\"content_text\">%s</td><td><b>%d</b></td><td><b>%s</b></td>"
+                                "<td><b>%d</b></td><td><b>%d</b></td>"
+                                "<td><b>%s</b></td><td><b>%s</b></td><td><b>%s</b></td></p>"
+                                "		</tr>\n"
+                                ,grafic,id, attribut,val,thresh,type,update,raw_val);
+                    }
+                }
             }
+            fclose(i);
+            system("rm -f /tmp/smartctl.tmp");
+            printf("        </table>\n");
         }
-        fclose(i);
-        system("rm -f /tmp/smartctl.tmp");
-        printf("        </table>\n");
+        else
+        {
+            printf("        <tr><td> keine S.M.A.R.T Daten!!</td></tr>\n");
+            printf("        </table>\n");
+        }
     }
     else
-    {
-        printf("        <tr><td> keine S.M.A.R.T Daten!!</td></tr>\n");
-        printf("        </table>\n");
-    }
+        printf("        <h4 class=\"content_text\">keine Harddisk vorhanden!</h4>\n");
+
 
     printf("    </fieldset>\n");
     printf("    <fieldset id=\"sysinfo\">\n");
     printf("    <legend>Netzwerk</legend>\n");
     printf("        <h3 class=\"content_text\">Netzwerkstatus\n"
-            "		<img class=\"content_text\" border=\"0\" src=\"../img/network_16x16.png\"></h3>\n");
+           "		<img class=\"content_text\" border=\"0\" src=\"../img/network_16x16.png\"></h3>\n");
 //    if (net1.iface)
 //        printf("        <p class=\"content_text\">Interface %s</p>\n",net1.iface);
     printf("	</fieldset>\n");
