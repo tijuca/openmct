@@ -6,6 +6,8 @@ CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --target=$(TARGET)-uclibc --enable
 
 MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc RN=$(OPENMCT_CROSS_COMPILE)ranlib LD=$(OPENMCT_CROSS_COMPILE)ld
 
+CLEAN=		cd src/ && rm -rf *.o hotplug
+
 INSTALL=	$(CP) $(SRCDIR)/hotplug $(NEWROOTDIR)/sbin && \
 		$(STRIP) $(NEWROOTDIR)/sbin/hotplug
 
