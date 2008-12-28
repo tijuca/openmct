@@ -5,7 +5,7 @@
 /bin/mount -t ramfs	tmpfs	/tmp
 
 # find var partition:
-VAR=`cat /proc/mtd | grep etc | cut -b 4`
+VAR=`cat /proc/mtd | grep var | cut -b 4`
 cat /etc/fstab.in | sed -e "s/REALVAR/$VAR/g" > /etc/fstab
 
 if [ -d /dev/ide/host0/bus0/target0/lun0/ ]; then
