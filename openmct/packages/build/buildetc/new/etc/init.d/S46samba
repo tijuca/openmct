@@ -1,0 +1,35 @@
+#!/bin/sh
+. /var/etc/rc.conf
+
+/bin/mkdir -p /var/cache
+
+case "$1" in
+        start)
+            if [ "$START_SAMBA" == "yes" ]; then
+		/bin/echo -n "Starting SAMBA  ... "
+#		/sbin/nmbd -D
+		/sbin/smbd -D
+		/bin/echo -e "\033[1;32mdone\033[0m"
+   	    elif [ "$START_SAMBA" != "yes" ]; then
+   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting samba automaticly!\033[0m"
+	    fi
+            ;;
+
+        stop)
+            echo "Stopping samba"
+            killall -9 smbd
+ #           killall -9 nmbd
+	    /bin/echo -e "\033[1;32mdone\033[0m"
+            ;;
+
+        restart)
+            $0 stop
+            sleep 1
+            $0 start
+            ;;
+
+        *)
+            echo "Usage: $0 {start|stop|restart}"
+            exit 1
+    	    ;;
+esac

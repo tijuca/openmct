@@ -1,0 +1,15 @@
+diff -Naru samba-2.2.12/source/lib/interfaces.c samba-2.2.12-mct/source/lib/interfaces.c
+--- samba-2.2.12/source/lib/interfaces.c	2004-08-12 20:24:24.000000000 +0200
++++ samba-2.2.12-mct/source/lib/interfaces.c	2008-12-29 09:15:30.000000000 +0100
+@@ -82,6 +82,11 @@
+ #define QSORT_CAST (int (*)(const void *, const void *))
+ #endif
+ 
++/* OpenMCT: HAVE_IFACE_IFCONF ist not set while cross-compiling. This will
++ * result in being unable to enumerate network interfaces. */
++ 
++#define HAVE_IFACE_IFCONF 1 
++
+ #if HAVE_IFACE_IFCONF
+ 
+ /* this works for Linux 2.2, Solaris 2.5, SunOS4, HPUX 10.20, OSF1

@@ -1,4 +1,5 @@
 # Samba 2.x
+
 DOWNLOAD=	http://samba.org/samba/ftp/stable/samba-2.2.12.tar.gz
 
 SRCDIRSUFFIX=	/source
@@ -12,6 +13,8 @@ CONFIGUREARGS=	--host=$(TARGET) \
                 --sysconfdir=/etc \
                 --libdir=/var/etc/samba \
                 --with-privatedir=/var/etc/samba \
+                --with-codepagedir=/usr \
+                --with-lockdir=/var/samba/private \
                 --with-piddir=/var/run \
                 --localstatedir=/var \
                 --with-netatalk \
@@ -28,7 +31,7 @@ CONFIGUREARGS=	--host=$(TARGET) \
 INSTALL=	$(CP) $(SRCDIR)/source/bin/{smbd,nmbd,smbpasswd} $(NEWROOTDIR)/sbin && \
 		$(STRIP) $(NEWROOTDIR)/sbin/{smbd,nmbd,smbpasswd} && \
 		$(MKDIR) $(NEWROOTDIR)/var/etc/samba && \
-		$(LN) -s /var/etc/samba $(NEWROOTDIR)/etc/samba && \
+		$(LN) -sf /var/etc/samba $(NEWROOTDIR)/etc/samba && \
 		$(CP) $(SRCDIR)/examples/simple/smb.conf $(NEWROOTDIR)/var/etc/samba
 
 include		$(OPENMCT_DEVEL_PREFIX)Rules
