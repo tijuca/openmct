@@ -15,7 +15,7 @@ case "$1" in
 		/bin/echo -n "Starting NFS daemons ... "
 		/bin/echo -e "\033[1;32mdone\033[0m"
 	    elif [ "$START_NFS" != "yes" ]; then
-   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting NFS automaticly!\033[0m"
+   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting NFS automatically!\033[0m"
 	    fi
             ;;
 

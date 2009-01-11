@@ -12,5 +12,5 @@ if [ "$START_HDPARM" == "yes" ] && [ -d /dev/ide/host0/bus0/target0/lun0/ ]; the
     /bin/echo -n "Enable IDE settings ... "
     /bin/echo -e "\033[1;32mdone\033[0m"
 elif [ "$START_HDPARM" != "yes" ]; then
-    /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting hdparm automaticly!\033[0m"
+    /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting hdparm automatically!\033[0m"
 fi

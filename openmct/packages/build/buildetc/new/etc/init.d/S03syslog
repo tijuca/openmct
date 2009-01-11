@@ -9,7 +9,7 @@ case "$1" in
 		/sbin/klogd
 		/bin/echo -e "\033[1;32mdone\033[0m"
    	    elif [ "$START_SYSLOGD" != "yes" ]; then
-   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting syslogd automaticly!\033[0m"
+   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting syslogd automatically!\033[0m"
 	    fi
             ;;
 

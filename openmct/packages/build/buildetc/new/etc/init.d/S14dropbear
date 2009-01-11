@@ -22,7 +22,7 @@ case "$1" in
 				-d $DROPBEARDIR/dropbear_dss_host_key
 		/bin/echo -e "\033[1;32mdone\033[0m"
 	    elif [ "$START_SSHD" != "yes" ]; then
-   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting dropbear automaticly!\033[0m"
+   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting dropbear automatically!\033[0m"
 	    fi
             ;;
 

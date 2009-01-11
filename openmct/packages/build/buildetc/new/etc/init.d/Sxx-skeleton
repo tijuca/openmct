@@ -8,7 +8,7 @@ case "$1" in
 		/sbin/programm
 		/bin/echo -e "\033[1;32mdone\033[0m"
 #   	    elif [ "$START_???" != "yes" ]; then
-#   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting ???? automaticly!\033[0m"
+#   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting ???? automatically!\033[0m"
 	    fi
             ;;
 

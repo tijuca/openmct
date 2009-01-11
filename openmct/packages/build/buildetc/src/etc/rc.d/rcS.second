@@ -9,6 +9,7 @@
 
 /bin/sh /etc/rc.conf
 if [ $? -ne 0 ]; then
+# FIXME! Das hier kann nicht funktionieren, weil es /etc/default nicht gibt (Stand r627)
    /bin/cp /etc/default/rc.conf /etc/rc.conf
 fi
 . /etc/rc.conf

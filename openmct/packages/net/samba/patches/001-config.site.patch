@@ -1,0 +1,9 @@
+diff -Naru src/source/config.site.alt src/source/config.site
+--- src/source/config.site.alt 2009-01-04 18:41:22.000000000 +0100
++++ src/source/config.site 2009-01-04 18:40:49.000000000 +0100
+@@ -0,0 +1,5 @@
++samba_cv_HAVE_Wdeclaration_after_statement=yes
++samba_cv_HAVE_Werror=yes
++samba_cv_HAVE_w2=yes
++samba_cv_CC_NEGATIVE_ENUM_VALUES=yes
++

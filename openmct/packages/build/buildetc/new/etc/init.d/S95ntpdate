@@ -10,7 +10,7 @@ case "$1" in
 	    /bin/echo -n "Running ntp client with Server IP $OPTIONS_NTPDATE_SERVER ... "
 	    /bin/echo -e "\033[1;32mdone\033[0m"
    	elif [ "$START_NTPDATE" != "yes" ]; then
-	    /bin/echo "Your /var/etc/rc.conf is not configured for starting NTPDate automaticly!"
+	    /bin/echo "Your /var/etc/rc.conf is not configured for starting NTPDate automatically!"
 	fi
 	;;
     stop)

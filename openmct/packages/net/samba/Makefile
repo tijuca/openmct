@@ -1,10 +1,14 @@
 # Samba 3.x
-DOWNLOAD=	http://us1.samba.org/samba/ftp/stable/samba-3.0.26a.tar.gz
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
+DOWNLOAD=	    http://samba.org/samba/ftp/stable/samba-3.2.6.tar.gz
 
 SRCDIRSUFFIX=	/source
 
+CONFIGUREENV+=  CONFIG_SITE=config.site
+
 CONFIGUREARGS=	--host=$(TARGET) \
-		--with-fhs \
+                --with-fhs \
                 --enable-shared \
                 --enable-static \
                 --disable-pie \
@@ -12,7 +16,7 @@ CONFIGUREARGS=	--host=$(TARGET) \
                 --sysconfdir=/etc \
                 --libdir=/etc/samba \
                 --with-privatedir=/etc/samba \
-                --with-piddir=/var/run/samba \
+                --with-piddir=/var/run \
                 --localstatedir=/var \
                 --with-netatalk \
                 --with-syslog \
@@ -24,10 +28,10 @@ CONFIGUREARGS=	--host=$(TARGET) \
                 --with-msdfs \
                 --with-automount \
                 --with-tdbsam \
-		--without-ldap
+                --without-ldap
 
-INSTALL=	$(CP) $(SRCDIR)/source/bin/{smbd,nmbd,smbpasswd} $(NEWROOTDIR)/sbin && \
-		$(STRIP) $(NEWROOTDIR)/sbin/{smbd,nmbd,smbpasswd} && \
-		$(LN) -s /var/etc/samba $(NEWROOTDIR)/etc/samba
+#INSTALL=	$(CP) $(SRCDIR)/source/bin/{smbd,nmbd,smbpasswd} $(NEWROOTDIR)/sbin && \
+#		$(STRIP) $(NEWROOTDIR)/sbin/{smbd,nmbd,smbpasswd} && \
+#		$(LN) -sf /var/etc/samba $(NEWROOTDIR)/etc/samba
 
 include		$(OPENMCT_DEVEL_PREFIX)Rules

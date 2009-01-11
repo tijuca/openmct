@@ -1,5 +1,6 @@
 # haserl
-OPENMCT_DEVEL_PREFIX=/home/carsten/openmct/trunk/openmct/
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://downloads.sourceforge.net/haserl/haserl-0.9.24.tar.gz
 
 CONFIGUREARGS=  --prefix=$(PREFIX) --host=$(TARGET) --target=$(TARGET)-uclibc --enable-bash-extensions 

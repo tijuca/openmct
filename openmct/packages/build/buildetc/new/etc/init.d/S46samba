@@ -11,7 +11,7 @@ case "$1" in
 		/sbin/smbd -D
 		/bin/echo -e "\033[1;32mdone\033[0m"
    	    elif [ "$START_SAMBA" != "yes" ]; then
-   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting samba automaticly!\033[0m"
+   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting samba automatically!\033[0m"
 	    fi
             ;;
 
