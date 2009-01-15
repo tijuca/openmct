@@ -1,4 +1,6 @@
 # PPPOE
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://www.roaringpenguin.com/penguin/pppoe/rp-pppoe-3.8.tar.gz
 
 SRCDIRSUFFIX=	/src
