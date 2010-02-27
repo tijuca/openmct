@@ -1,5 +1,6 @@
 # e2fsprogs
-DOWNLOAD=	http://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/e2fsprogs-1.41.3.tar.bz2
+#DOWNLOAD=	http://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.41.10.tar.gz
+DOWNLOAD=	http://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.41.3.tar.gz
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-elf-shlibs
 
