@@ -1,5 +1,5 @@
 /* owi2.c
- * Copyright (c) 2008 Carsten Schoenert (claxan-com@online.de)
+ * Copyright (c) 2008-2010 Carsten Schoenert (claxan-com@online.de)
  *
  *this file is part of the OWI2 for OpenMCT (http://www.openmct.org)
  */
