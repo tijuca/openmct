@@ -184,13 +184,14 @@ gcc-final:
 
 cdk-extra:
 	@echo -e "\033[1;33mfinal work on the cdk \033[0m ..."
-	test -f $(CDK)/bin/$(TARGET)-gcc || $(MAKE) gcc-final
-	echo doing the stripping ...
-	mv $(PREFIX)/bin/mipsel-linux-uclibc-gccbug $(PREFIX)
-	strip --strip-all -R .note -R .comment $(PREFIX)/bin/*
-	mv $(CDK)/mipsel-linux-uclibc-gccbug $(CDK)/bin
+	@test -f $(CDK)/bin/$(TARGET)-gcc || \
+	    ( $(MAKE) gcc-final; \
+	    echo doing the stripping ... ; \
+	    mv $(PREFIX)/bin/mipsel-linux-uclibc-gccbug $(PREFIX); \
+	    strip --strip-all -R .note -R .comment $(PREFIX)/bin/*; \
+	    mv $(CDK)/mipsel-linux-uclibc-gccbug $(CDK)/bin)
 # Set up the symlinks to enable lying about target name.
-	set -e; \
+	@set -e; \
 	(cd $(CDK) ;\
 	        ln -sf $(TARGET) mipsel-linux ;\
 	        cd bin ;\
@@ -352,8 +353,8 @@ $(DOWNLOAD)/uClibc-$(UCLIBC):
 # downloading the tools # 
 $(DOWNLOAD)/squashfs$(SQUASHFS):
 	test -f $(DOWNLOAD)/squashfs$(SQUASHFS).tar.gz || \
-	wget http://umn.dl.sourceforge.net/sourceforge/squashfs/squashfs$(SQUASHFS).tar.gz -P $(DOWNLOAD)
-	
+	wget http://umn.dl.sourceforge.net/sourceforge/squashfs/squashfs$(SQUASHFS)/squashfs$(SQUASHFS).tar.gz -P $(DOWNLOAD)
+
 $(DOWNLOAD)/lzma$(LZMA):
 	test -f $(DOWNLOAD)/lzma$(LZMA).tar.bz2 || \
 	wget http://heanet.dl.sourceforge.net/sourceforge/sevenzip/lzma$(LZMA).tar.bz2 -P $(DOWNLOAD)
