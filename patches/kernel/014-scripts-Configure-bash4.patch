@@ -1,0 +1,14 @@
+--- linux-2.4.35.3/scripts/Configure.orig	2007-09-24 00:02:58.000000000 +0200
++++ linux-2.4.35.3-mct/scripts/Configure	2010-08-03 21:44:10.727067902 +0200
+@@ -546,9 +546,9 @@
+   echo "#"
+   echo "# Using defaults found in" $DEFAULTS
+   echo "#"
+-  . $DEFAULTS
++  . ./$DEFAULTS
+   sed -e 's/# \(CONFIG_[^ ]*\) is not.*/\1=n/' <$DEFAULTS >.config-is-not.$$
+-  . .config-is-not.$$
++  . ./.config-is-not.$$
+   rm .config-is-not.$$
+ else
+   echo "#"

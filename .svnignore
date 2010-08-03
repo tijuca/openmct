@@ -4,6 +4,7 @@ INSTALL
 Makefile
 Makefile.in
 aclocal.m4
+apps_build
 autom4te.cache
 configure
 config.guess

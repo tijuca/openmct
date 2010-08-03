@@ -345,7 +345,7 @@ $(DOWNLOAD)/glibc-$(GLIBC):
 
 $(DOWNLOAD)/uClibc-$(UCLIBC):
 	test -f $(DOWNLOAD)/uClibc-$(UCLIBC).tar.bz2 || \
-	wget -c --passive-ftp http://uclibc.org/downloads/uClibc-$(UCLIBC).tar.bz2 -P $(DOWNLOAD)
+	wget -c --passive-ftp http://uclibc.org/downloads/old-releases/uClibc-$(UCLIBC).tar.bz2 -P $(DOWNLOAD)
 	test -f $(DOWNLOAD)/uClibc-locale-030818.tgz || \
 	wget -c --passive-ftp http://uclibc.org/downloads/uClibc-locale-030818.tgz -P $(DOWNLOAD)
 
