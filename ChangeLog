@@ -1,3 +1,9 @@
+Mi 04 Aug 2010 21:00:00 CEST carsten
+* again after a long time working again on the cdk part
+* probing a new kernel config (not relevant for now), by working
+  on it a needed patch by the used bash4 and the kernel scripts is implemented
+* some little minor changes in the cdk.mk
+
 Fr 15 Feb 2008 21:13:00 CEST carsten
 * after a long time i get working agin on the cdk section
 * porting the kernel to the not fully actually version 2.4.35.3, also porting the current patches for 2.4.35.3

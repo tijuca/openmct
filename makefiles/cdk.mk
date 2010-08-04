@@ -3,10 +3,14 @@ SQUASHFS=3.0
 LZMA=442
 
 cdk:
-	test -f $(DEPS)/$@ || \
+	if [ ! -f $(DEPS)/$@ ]; then \
+	    echo -e "\033[1;33mbuilding Cross Development Kit (CDK) for Open\033[1;35mM\033[1;33mC\033[1;32mT \033[0m..."; \
 	    $(MAKE) core; \
-	    $(MAKE) tools
-	touch $(DEPS)/$@
+	    $(MAKE) tools; \
+	    touch $(DEPS)/$@; \
+	else \
+	    echo -e "\033[1;33mbuilding Cross Development Kit (CDK) \033[0m... \033[1;32mall ready Done!\033[0m"; \
+	fi
 
 ###################################################################
 # core 
@@ -280,9 +284,11 @@ mct_modify:
 	@if [ ! -f $(DEPS)/$@ ]; then \
 	    echo -e "\033[1;33mbuild mct_modify\033[0m ..."; \
 	    $(MAKE) -C tools/mct_modify all install; \
-	    echo -e "\033[1;33mbuild mct_modfy \033[0m... \033[1;32mDone!\033[0m"; \
+	    echo -e "\033[1;33mbuild mct_modify \033[0m... \033[1;32mDone!\033[0m"; \
+	    touch $(DEPS)/$@; \
+	else \
+	    echo -e "\033[1;33mbuild mct_modify \033[0m... \033[1;32mall ready Done!\033[0m"; \
 	fi
-	touch $(DEPS)/$@
 
 mkjffs2:
 	@if [ ! -f $(DEPS)/$@ ]; then \
@@ -290,6 +296,8 @@ mkjffs2:
 	    $(MAKE) -C tools/mkfs.jffs2 all install; \
 	    echo -e "\033[1;33mbuild mkjffs2 \033[0m... \033[1;32mDone!\033[0m"; \
 	    touch $(DEPS)/$@ ; \
+	else \
+	    echo -e "\033[1;33mbuild mkjffs2 \033[0m... \033[1;32mall ready Done!\033[0m"; \
 	fi
 
 mksquashfs.lzma: $(DOWNLOAD)/squashfs$(SQUASHFS) $(DOWNLOAD)/lzma$(LZMA)
@@ -302,12 +310,14 @@ mksquashfs.lzma: $(DOWNLOAD)/squashfs$(SQUASHFS) $(DOWNLOAD)/lzma$(LZMA)
 		bzcat $(DOWNLOAD)/lzma$(LZMA).tar.bz2 | /bin/tar -xf - &&\
 		patch -Np1 -i $(PATCHDIR)/lzma/lzma_zlib-stream.diff; \
 	    $(MAKE) -C C/7zip/Compress/LZMA_Lib all; \
-	    $(MAKE) -C squashfs3.0/squashfs-tools; \
-	    $(INSTALL) -m755 squashfs3.0/squashfs-tools/mksquashfs $(CDK)/bin; \
+	    $(MAKE) -C squashfs$(SQUASHFS)/squashfs-tools; \
+	    $(INSTALL) -m755 squashfs$(SQUASHFS)/squashfs-tools/mksquashfs $(CDK)/bin; \
 	    cd .. && rm -rf mksquashfs; \
 	    echo -e "\033[1;33mbuild mksquashfs \033[0m... \033[1;32mDone!\033[0m"; \
+	    touch $(DEPS)/$@; \
+	else \
+	    echo -e "\033[1;33mbuild mksquashfs \033[0m... \033[1;32mall ready Done!\033[0m"; \
 	fi
-	touch $(DEPS)/$@
 
 ########################################################################################
 # downloads
@@ -353,7 +363,8 @@ $(DOWNLOAD)/uClibc-$(UCLIBC):
 # downloading the tools # 
 $(DOWNLOAD)/squashfs$(SQUASHFS):
 	test -f $(DOWNLOAD)/squashfs$(SQUASHFS).tar.gz || \
-	wget http://umn.dl.sourceforge.net/sourceforge/squashfs/squashfs$(SQUASHFS)/squashfs$(SQUASHFS).tar.gz -P $(DOWNLOAD)
+	wget http://downloads.sourceforge.net/project/squashfs/squashfs/squashfs$(SQUASHFS)/squashfs$(SQUASHFS).tar.gz -P $(DOWNLOAD)
+#	wget http://umn.dl.sourceforge.net/sourceforge/squashfs/squashfs$(SQUASHFS)/squashfs$(SQUASHFS).tar.gz -P $(DOWNLOAD)
 
 $(DOWNLOAD)/lzma$(LZMA):
 	test -f $(DOWNLOAD)/lzma$(LZMA).tar.bz2 || \
