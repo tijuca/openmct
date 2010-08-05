@@ -1,4 +1,7 @@
 # thttpd
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://www.acme.com/software/thttpd/thttpd-2.25b.tar.gz
 
 MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc CCOPT="-Os"

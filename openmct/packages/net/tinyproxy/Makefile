@@ -1,4 +1,7 @@
 # TinyProxy
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/tinyproxy/tinyproxy-1.6.3.tar.gz
 
 INSTALL=	$(CP) $(SRCDIR)/src/tinyproxy $(NEWROOTDIR)/sbin && \

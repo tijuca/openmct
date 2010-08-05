@@ -1,4 +1,7 @@
 # PPTPD
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/poptop/pptpd-1.2.3.tar.gz
 
 MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc COPTS="-Os"

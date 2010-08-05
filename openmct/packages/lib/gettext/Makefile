@@ -1,4 +1,7 @@
 # gettext
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://ftp.gnu.org/gnu/gettext/gettext-0.16.1.tar.gz
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-shared

@@ -1,4 +1,7 @@
 # centericq
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://thekonst.net/download/centericq-4.21.0.tar.bz2
 
 CONFIGUREENV=	EMPTY=EMPTY

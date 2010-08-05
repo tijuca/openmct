@@ -1,4 +1,7 @@
 # lighttpd
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://www.lighttpd.net/download/lighttpd-1.4.18.tar.gz	
 
 MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc CCOPT="-Os"

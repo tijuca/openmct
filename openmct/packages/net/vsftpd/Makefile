@@ -1,4 +1,7 @@
 # VSFTPD
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	ftp://vsftpd.beasts.org/users/cevans/vsftpd-2.0.5.tar.gz
 
 MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc LIBS="-lcrypt"

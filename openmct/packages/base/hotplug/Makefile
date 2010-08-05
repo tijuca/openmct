@@ -1,5 +1,7 @@
 # hotplug
 
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 PREPARE= [ -f $(SRCDIR)/Makefile.in ] ||  (cd $(SRCDIR) && ./prepare.sh)
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --target=$(TARGET)-uclibc --enable-maintainer-mode --enable-debug --host=i686-pc-linux-gnu

@@ -1,4 +1,7 @@
 # ushare
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://ushare.geexbox.org/releases/ushare-1.1a.tar.bz2
 
 CONFIGUREARGS=	--prefix=/ --cross-compile --with-libupnp-dir=$(OPENMCT_CROSS_LIB)

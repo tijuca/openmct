@@ -1,4 +1,7 @@
 # curl
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://curl.haxx.se/download/curl-7.17.0.tar.bz2
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-shared --with-random=/dev/urandom

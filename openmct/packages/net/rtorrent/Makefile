@@ -1,4 +1,7 @@
 # rTorrent
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://libtorrent.rakshasa.no/downloads/rtorrent-0.7.9.tar.gz
 
 #DEPENDSON=	packages/lib/curl \

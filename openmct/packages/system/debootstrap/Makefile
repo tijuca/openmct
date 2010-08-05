@@ -1,4 +1,7 @@
 # Debootstrap
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://ftp.debian.org/debian/pool/main/d/debootstrap/debootstrap_1.0.8.tar.gz
 
 BUILD=		$(OPENMCT_CROSS_COMPILE)gcc -Os \

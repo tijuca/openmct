@@ -1,5 +1,7 @@
 # scsi-idle
 
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 BUILD=          $(OPENMCT_CROSS_COMPILE)gcc -Wall -Os -fomit-frame-pointer -pipe scsi-idle.c -o scsi-idle && \
 		$(OPENMCT_CROSS_COMPILE)gcc -Wall -Os -fomit-frame-pointer -pipe scsi-start.c -o scsi-start
 

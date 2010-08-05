@@ -1,4 +1,7 @@
 # ProFTPD
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	ftp://ftp.proftpd.org/distrib/source/proftpd-1.3.0a.tar.bz2
 
 CONFIGUREARGS=	--prefix=$(PREFIX) --host=$(TARGET) --disable-cap

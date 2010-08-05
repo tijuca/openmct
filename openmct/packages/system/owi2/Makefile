@@ -1,6 +1,6 @@
 # owi2
 
-#OPENMCT_DEVEL_PREFIX=/home/carsten/openmct/trunk/openmct/
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
 
 PREPARE= [ -f $(SRCDIR)/Makefile.in ] ||  (cd $(SRCDIR) && ./prepare.sh)
 
@@ -15,8 +15,5 @@ CLEAN=		rm -rf src/.config && cd src/src && make clean
 INSTALL=	mkdir -p $(NEWROOTDIR)/var/www/ && \
 		cd src/ && make install && \
 		$(STRIP) $(NEWROOTDIR)/var/www/cgi-bin/owi
-
-#		$(CP) $(SRCDIR)/owi $(NEWROOTDIR)/var/www/ && \
-#		$(STRIP) $(NEWROOTDIR)/var/www/owi
 
 include		$(OPENMCT_DEVEL_PREFIX)Rules

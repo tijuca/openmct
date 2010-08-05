@@ -1,4 +1,7 @@
 # Busybox (Basic Shell Utils)
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://busybox.net/downloads/busybox-1.8.0.tar.bz2
 
 MAKEARGS=	CROSS_COMPILE=$(OPENMCT_CROSS_COMPILE) ARCH=mipsel

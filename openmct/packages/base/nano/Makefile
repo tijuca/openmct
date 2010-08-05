@@ -1,4 +1,7 @@
 # nano
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://www.nano-editor.org/dist/v2.0/nano-2.0.6.tar.gz
 
 CONFIGUREENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc \

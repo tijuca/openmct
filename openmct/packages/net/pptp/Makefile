@@ -1,4 +1,7 @@
 # PPTP
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/pptpclient/pptp-1.7.1.tar.gz
 
 MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc OPTIMIZE="-Os" PPPD="/sbin/pppd"

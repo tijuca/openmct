@@ -1,4 +1,7 @@
 # OpenVPN
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://openvpn.net/release/openvpn-2.0.9.tar.gz
 
 CONFIGUREARGS=	--prefix=$(PREFIX) --host=$(TARGET) --disable-lzo

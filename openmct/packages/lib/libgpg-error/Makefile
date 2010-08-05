@@ -1,4 +1,7 @@
 # libgpg-error
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-1.5.tar.bz2
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-shared

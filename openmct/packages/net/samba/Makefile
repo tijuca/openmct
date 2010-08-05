@@ -1,7 +1,8 @@
 # Samba 3.x
+
 OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
 
-DOWNLOAD=	    http://samba.org/samba/ftp/stable/samba-3.2.6.tar.gz
+DOWNLOAD=	http://samba.org/samba/ftp/stable/samba-3.2.6.tar.gz
 
 SRCDIRSUFFIX=	/source
 

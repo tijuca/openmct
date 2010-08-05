@@ -1,4 +1,7 @@
 # oidentd
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://prdownloads.sourceforge.net/ojnk/oidentd-2.0.8.tar.gz
 
 INSTALL=	$(CP) $(SRCDIR)/src/oidentd $(NEWROOTDIR)/sbin && \

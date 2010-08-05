@@ -1,4 +1,7 @@
 # GRADM
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://www.grsecurity.net/gradm-2.1.10-200701121959.tar.gz
 
 MAKEARGS=	LIBS="" CFLAGS="-Wall -Os" CC=$(OPENMCT_CROSS_COMPILE)gcc nopam

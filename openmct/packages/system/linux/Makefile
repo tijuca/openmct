@@ -1,4 +1,7 @@
 # Linux Kernel
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://www.de.kernel.org/pub/linux/kernel/v2.4/linux-2.4.35.3.tar.bz2
 
 MAKEARGS=	CROSS_COMPILE=$(OPENMCT_CROSS_COMPILE) vmlinux modules

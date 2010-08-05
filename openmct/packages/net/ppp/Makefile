@@ -1,4 +1,7 @@
 # PPP
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	ftp://ftp.samba.org/pub/ppp/ppp-2.4.4.tar.gz
 
 MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc COPTS=-Os FILTER=

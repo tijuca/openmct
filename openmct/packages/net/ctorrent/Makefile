@@ -1,4 +1,7 @@
 # cTorrent
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
 
 DOWNLOAD=	http://downloads.sourceforge.net/ctorrent/ctorrent-1.3.4.tar.bz2

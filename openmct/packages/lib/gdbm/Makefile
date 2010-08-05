@@ -1,4 +1,7 @@
 # GDBM
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	ftp://ftp.gnu.org/gnu/gdbm/gdbm-1.8.3.tar.gz
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET)

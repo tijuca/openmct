@@ -1,4 +1,7 @@
 # iSCSI
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/unh-iscsi/unh_iscsi-1.7.00.tar.gz
 
 MAKEARGS=	-f Makefile-24 CROSS_COMPILE=$(OPENMCT_CROSS_COMPILE) KERNEL_DIR=$(PACKAGEDIR)/system/linux/src CROSS_CFLAGS=

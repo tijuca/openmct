@@ -1,4 +1,7 @@
 # mtd-utils
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	ftp://ftp.infradead.org/pub/mtd-utils/mtd-utils-1.0.0.tar.gz
 
 DEPENDSON=	packages/lib/zlib

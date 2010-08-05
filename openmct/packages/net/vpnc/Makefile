@@ -1,4 +1,7 @@
 # vpnc
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://www.unix-ag.uni-kl.de/~massar/vpnc/vpnc-0.5.1.tar.gz
 
 # DEPENDSON=      packages/lib/libgcrypt

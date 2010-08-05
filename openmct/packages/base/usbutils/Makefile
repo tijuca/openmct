@@ -1,5 +1,8 @@
 # USB Utils
-DOWNLOAD=	http://www.sfr-fresh.com/linux/misc/usbutils-0.73.tar.gz
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
+DOWNLOAD=	http://downloads.sourceforge.net/project/linux-usb/usbutils/0.73/usbutils-0.73.tar.gz
 
 DEPENDSON=	packages/lib/libusb
 

@@ -1,4 +1,7 @@
 # dlna
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://libdlna.geexbox.org/releases/libdlna-0.2.3.tar.bz2
 
 CONFIGUREARGS=	--cross-compile

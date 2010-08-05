@@ -1,4 +1,7 @@
 # IPTables (Firewalling)
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://www.netfilter.org/projects/iptables/files/iptables-1.3.7.tar.bz2
 
 MAKEENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc LD=$(OPENMCT_CROSS_COMPILE)ld

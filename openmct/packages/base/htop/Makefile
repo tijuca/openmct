@@ -1,4 +1,7 @@
 # htop
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/htop/htop-0.6.6.tar.gz
 
 CONFIGUREENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc \

@@ -1,4 +1,7 @@
 # sqlite
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://www.sqlite.org/sqlite-3.3.12.tar.gz
 
 DEPENDSON=	packages/lib/readline

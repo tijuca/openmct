@@ -1,4 +1,7 @@
 # NZBget
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/nzbget/nzbget-0.2.3.tar.gz
 
 DEPENDSON=	packages/lib/libxml2

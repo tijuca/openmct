@@ -1,4 +1,7 @@
 # fetchmail
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://prdownload.berlios.de/fetchmail/fetchmail-6.3.8.tar.bz2
 
 INSTALL=	$(CP) $(SRCDIR)/fetchmail $(NEWROOTDIR)/bin && \

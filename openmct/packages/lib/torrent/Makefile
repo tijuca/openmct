@@ -1,6 +1,8 @@
 # torrent
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://downloads.sourceforge.net/libtorrent/libtorrent-0.12.tar.gz
-#http://libtorrent.rakshasa.no/downloads/libtorrent-0.11.8.tar.gz
 
 CONFIGUREENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc \
 		CXX=$(OPENMCT_CROSS_COMPILE)g++ \

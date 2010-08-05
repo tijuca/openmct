@@ -1,7 +1,8 @@
 # boost
-DOWNLOAD=	http://downloads.sourceforge.net/boost/boost_1_34_1.tar.bz2
 
-#OPENMCT_DEVEL_PREFIX=/home/carsten/openmct/trunk/openmct/
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
+DOWNLOAD=	http://downloads.sourceforge.net/boost/boost_1_34_1.tar.bz2
 
 CONFIGUREENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc \
 		CXX=$(OPENMCT_CROSS_COMPILE)g++ 

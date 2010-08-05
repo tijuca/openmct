@@ -1,4 +1,7 @@
 # dnsmasq
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.40.tar.gz
 
 MAKEARGS=	CC=$(OPENMCT_CROSS_COMPILE)gcc CFLAGS=-Os

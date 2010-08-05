@@ -1,6 +1,8 @@
 # gdb
 
-DOWNLOAD=	http://ftp.gnu.org/gnu/gdb/gdb-6.3.tar.gz	
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
+DOWNLOAD=	http://ftp.gnu.org/gnu/gdb/gdb-6.3.tar.gz
 
 CONFIGUREARGS=	--prefix=$(PREFIX) \
  	        --build=$(build) \

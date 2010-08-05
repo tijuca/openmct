@@ -1,4 +1,7 @@
 # VServer Debiantools
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://ftp.debian.org/debian/pool/main/v/vserver-debiantools/vserver-debiantools_0.4.1.tar.gz
 
 BUILD=

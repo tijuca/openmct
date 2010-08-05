@@ -1,4 +1,7 @@
 # Asterisk
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://ftp.digium.com/pub/asterisk/releases/asterisk-1.4.11.tar.gz
 
 MAKEARGS=	CROSS_COMPILE_TARGET=$(OPENMCT_CROSS_BASE) \

@@ -1,4 +1,5 @@
 # ncftp Client
+
 OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
 
 DOWNLOAD=	ftp://ftp.ncftp.com/ncftp/ncftp-3.2.2-src.tar.bz2

@@ -1,4 +1,7 @@
 # GRADM
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://pax.grsecurity.net/chpax-0.7.tar.gz
 
 MAKEARGS=	LIBS="" CFLAGS="-Wall -Os" CC=$(OPENMCT_CROSS_COMPILE)gcc

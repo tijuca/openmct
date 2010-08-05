@@ -1,4 +1,7 @@
 # OpenSSL
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://www.openssl.org/source/openssl-0.9.8e.tar.gz
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --openssldir=/ shared openmct-mipsel

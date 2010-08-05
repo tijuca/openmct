@@ -1,4 +1,7 @@
 # e2fsprogs
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.41.10.tar.gz
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-elf-shlibs

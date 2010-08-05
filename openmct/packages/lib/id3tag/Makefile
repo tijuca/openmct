@@ -1,4 +1,7 @@
 # ID3TAG
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/mad/libid3tag-0.15.1b.tar.gz
 
 DEPENDSON=	packages/lib/zlib

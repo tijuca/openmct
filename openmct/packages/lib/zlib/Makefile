@@ -1,5 +1,8 @@
 # zlib
-DOWNLOAD=	http://www.zlib.net/zlib-1.2.3.tar.bz2
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
+DOWNLOAD=	http://zlib.net/fossils/zlib-1.2.3.tar.gz
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --shared
 

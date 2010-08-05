@@ -1,6 +1,8 @@
 # ethtool
-#DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/gkernel/ethtool-6.tar.gz
-DOWNLOAD=	http://fresh.t-systems-sfr.com/linux/src/ethtool-6.tar.gz
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
+DOWNLOAD=	http://downloads.sourceforge.net/project/gkernel/ethtool/6/ethtool-6.tar.gz
 
 INSTALL=	$(CP) $(SRCDIR)/ethtool $(NEWROOTDIR)/sbin && \
 		$(STRIP) $(NEWROOTDIR)/sbin/ethtool

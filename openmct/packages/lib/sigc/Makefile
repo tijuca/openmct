@@ -1,4 +1,7 @@
 # sigc++
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://ftp.acc.umu.se/pub/GNOME/sources/libsigc++/2.1/libsigc++-2.1.1.tar.gz
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET) --enable-shared 

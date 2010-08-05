@@ -1,4 +1,7 @@
 # upnp
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://ovh.dl.sourceforge.net/sourceforge/pupnp/libupnp-1.6.3.tar.bz2
 
 CONFIGUREARGS=	--prefix=$(OPENMCT_CROSS_BASE) --host=$(TARGET)

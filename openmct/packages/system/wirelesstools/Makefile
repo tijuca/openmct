@@ -1,4 +1,7 @@
 # Wireless Tools
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://pcmcia-cs.sourceforge.net/ftp/contrib/wireless_tools.28.tar.gz
 
 MAKEARGS=	CC=$(OUTPUTDIR)/$(TARGET)/bin/$(TARGET)-uclibc-gcc

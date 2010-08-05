@@ -1,5 +1,7 @@
 # NFS Utils
-#DOWNLOAD=	http://mesh.dl.sourceforge.net/sourceforge/nfs/nfs-utils-1.1.0.tar.gz
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://www.ch.kernel.org/pub/linux/utils/nfs/nfs-utils-1.1.0.tar.gz
 
 DEPENDSON=	packages/net/tcpwrapper \

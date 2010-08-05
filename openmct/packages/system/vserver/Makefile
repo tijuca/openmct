@@ -1,4 +1,7 @@
 # VServer
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://www.13thfloor.at/vserver/s_release/v1.2.10/util-vserver-0.30.tar.bz2
 
 CONFIGUREENV=	CC=$(OPENMCT_CROSS_COMPILE)gcc \

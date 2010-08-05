@@ -1,4 +1,7 @@
 # libgcrypt
+
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.2.4.tar.bz2
 
 DEPENDSON=	packages/lib/libgpg-error

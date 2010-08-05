@@ -1,5 +1,7 @@
 # Samba 2.x
 
+OPENMCT_DEVEL_PREFIX ?= $(MY_OPENMCT_DEVEL_PREFIX)
+
 DOWNLOAD=	http://samba.org/samba/ftp/stable/samba-2.2.12.tar.gz
 
 SRCDIRSUFFIX=	/source
