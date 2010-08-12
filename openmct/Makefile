@@ -17,10 +17,19 @@ config:
 	@if [ ! -f $(CONFIG) ] ; then \
 		if [ -f $(CONFIGDIR)/$(MCT) ]; then \
 			$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32mOpenMCT\033[0m" ; \
-			$(CP) $(CONFIGDIR)/$(MCT) $(CONFIG) ; \
+			$(CP) $(CONFIGDIR)/$(MCT) $(CONFIG) && echo "BASECONFIG=$(MCT)" >> $(CONFIG); \
 			if [ ! -d $(OUTPUTDIR) ]; then \
 			   $(MKDIR) $(OUTPUTDIR) ; \
 			fi ; \
+			if [ "$(NET)" == "dhcp" ]; then \
+				echo "NET=dhcp" >> $(CONFIG) ; \
+			elif [ "$(NET)" != "dhcp" ] && [ "$(NET)" != "" ]; then \
+				$(ECHO) -e "\033[1;33mCONFIGURE FAILED\033[0m" ; \
+				$(ECHO) "Unknown option 'NET=$(NET)' !" ; \
+				$(ECHO) "For DHCP use 'NET=dhcp' " ; \
+				$(ECHO) -e "\033[1;33mRemoving $(CONFIG)\033[0m" && rm $(CONFIG) ; \
+				exit; \
+			fi; \
 			$(ECHO) -e "\033[1;33mBASE PACKAGES:\033[0m" ; \
 			for package in $(BASEPACKAGES); do \
 			   $(ECHO) -e "\t"$$package ; \
@@ -40,9 +49,11 @@ config:
 
 show:
 	@$(ECHO) -e "\n\033[1;33mOpenMCT Firmware Builder\033[0m" ; \
-	$(ECHO) -e "\033[1;32m************************\033[0m" ; \
-	$(ECHO) -e "" ; \
-	$(ECHO) -e "\033[1;32mmake config MCT=[target]\033[0m" ; \
+	$(ECHO) -e "\033[1;32m************************\033[0m\n" ; \
+	$(ECHO) -e "First You have to configure the buildsystem like:" ; \
+	$(ECHO) -e "\033[1;32mmake config MCT=[target]\033[0m\n" ; \
+	$(ECHO) -e "or if want to use DHCP for the NIC(s):" ; \
+	$(ECHO) -e "\033[1;32mmake config MCT=[target] NET=dhcp\033[0m" ; \
 	$(ECHO) -e "\033[1;32mmake\033[0m" ; \
 	$(ECHO) -e "" ; \
 	$(ECHO) -e "choose one of the following targets: " ; \
@@ -126,100 +137,139 @@ else
 	fi
 endif
 
-$(OUTPUTDIR)/$(ROOT): etc
+$(OUTPUTDIR)/$(ROOT): etc depmod openmct-release interfaces exports hosts resolv.conf
+
+etc:
+#	@rm -rf $(NEWROOTDIR)/etc $(NEWROOTDIR)/var
+	@svn export --force packages/build/buildetc/new $(NEWROOTDIR)
+
+depmod:
+# cleaning up .svn files
 	@$(ECHO) -e "\033[1;33mREMOVE .svn FROM $(NEWROOTDIR)" 
 	@$(REMOVESVN) $(NEWROOTDIR)
+# depmod for the kernel
 	@$(ECHO) -e "\033[1;33mCALCULATE DEPENDENCIES FOR KERNEL MODULES\033[0m"
 	@$(DEPMOD) -b $(NEWROOTDIR)/lib/modules/`$(UNAME) $(PACKAGEDIR)/system/linux/src` \
 	           -k $(PACKAGEDIR)/system/linux/src/vmlinux
+
+openmct-release:
+# creating /etc/openmct-release
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/$(IMAGERELEASEFILENAME)\033[0m"
 	@$(ECHO) "OpenMCT $(IMAGETARGET) $(IMAGEVERSION) $(IMAGESUBVERSION) $(IMAGEPRODCODE) $(SOFTWAREVERSION)" > $(NEWROOTDIR)/etc/$(IMAGERELEASEFILENAME)
-	
+# creating hostname
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hostname\033[0m"
 	@$(ECHO) $(IMAGETARGET) > $(NEWROOTDIR)/var/etc/hostname
+# creating issue
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/issue\033[0m"
 	@$(ECHO) "Welcome on $(IMAGETARGET) with OpenMCT $(SOFTWAREVERSION) !" > $(NEWROOTDIR)/etc/issue
 	@$(ECHO) "### visit http://www.openmct.org ###" >> $(NEWROOTDIR)/etc/issue
 	@$(ECHO) "working Kernel is \r \m (\d \t)" >> $(NEWROOTDIR)/etc/issue
-	
-	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth0\033[0m"
-	
-	@$(ECHO) "auto lo" > $(NEWROOTDIR)/var/etc/network/interfaces
-	@$(ECHO) "" >> $(NEWROOTDIR)/var/etc/network/interfaces
-	
+
+interfaces:
+# building the interfaces files
+# we have to proof if the values from $(CONFIG) are valid
+# is there a .config file?
+	@if [ ! -f $(CONFIG) ]; then \
+		$(ECHO) -e "\033[1;33mCONFIGURE FAILED\033[0m" ; \
+		$(ECHO) "$(CONFIG) does not exist" ; \
+		$(ECHO) "You have to run 'make config ...'!"; \
+		exit 99; \
+	fi
+# yes we have a .config file, starting with the loopback device 
+	@$(ECHO) "## Loopback interface ##" > $(NEWROOTDIR)/var/etc/network/interfaces
+	@$(ECHO) "auto lo" >> $(NEWROOTDIR)/var/etc/network/interfaces
 	@$(ECHO) -e "\tiface lo inet loopback" >> $(NEWROOTDIR)/var/etc/network/interfaces
-ifdef ETH0IPADDR 
-	@$(ECHO) "auto eth0" >> $(NEWROOTDIR)/var/etc/network/interfaces
-	@$(ECHO) "iface eth0 inet static" >> $(NEWROOTDIR)/var/etc/network/interfaces
-	@$(ECHO) -e "\taddress $(ETH0IPADDR)" >> $(NEWROOTDIR)/var/etc/network/interfaces
-	
-ifdef ETH0NETMASK
-	@$(ECHO) -e "\tnetmask $(ETH0NETMASK)" >> $(NEWROOTDIR)/var/etc/network/interfaces
-else
-	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWROOTDIR)/var/etc/network/interfaces
-endif
-	
-ifdef ETH0NETWORK
-	@$(ECHO) -e "\tnetwork $(ETH0NETWORK)" >> $(NEWROOTDIR)/var/etc/network/interfaces
-	@$(ECHO) "# default nfs release for eth0" > $(NEWROOTDIR)/var/etc/exports
-	@$(ECHO) "/usr/data $(ETH0NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports
-else
-	@$(ECHO) -e "\tnetwork 192.168.1.0" >> $(NEWROOTDIR)/var/etc/network/interfaces
-	@$(ECHO) "# default nfs release for eth0" > $(NEWROOTDIR)/var/etc/exports
-	@$(ECHO) "/usr/data 192.168.1.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports
-endif
-	
-ifdef ETH0BROADCAST
-	@$(ECHO) -e "\tbroadcast $(ETH0BROADCAST)" >> $(NEWROOTDIR)/var/etc/network/interfaces
-else
-	@$(ECHO) -e "\tbroadcast 192.168.1.255" >> $(NEWROOTDIR)/var/etc/network/interfaces
-endif
-	
-ifdef ETH0DEFAULTGW
-	@$(ECHO) -e "\tgateway $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/network/interfaces
-endif
-	@$(ECHO) "" >> $(NEWROOTDIR)/var/etc/network/interfaces 
+# proofing the values for eth0 and/or for dhcp
+	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/interfaces based on device \033[1;34m$(BASECONFIG)\033[0m"
+	@if [ "$(NET)" != "dhcp" ]; then \
+		if ([[ "$(ETH0IPADDR)" = "" ]] || [[ "$(ETH0NETWORK)" = "" ]] || [[ "$(ETH0BROADCAST)" = "" ]]); then \
+			$(ECHO) -e "\033[1;33mCONFIGURE FAILED\033[0m" ; \
+			$(ECHO) -e "something is wrong with your network config!\nmaybe some misspelling?" ; \
+			$(ECHO) -e "ETH0IPADDR=$(ETH0IPADDR)\nETH0NETWORK=$(ETH0NETWORK)\nETH0BROADCAST=$(ETH0BROADCAST)"; \
+			exit 99; \
+		else \
+			$(ECHO) -e "\n## LAN interface eth0  ##" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+			$(ECHO) "auto eth0" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+			$(ECHO) "iface eth0 inet static" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+			$(ECHO) -e "\taddress $(ETH0IPADDR)" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+			if [ "$(ETH0NETMASK)" != "" ]; then \
+				$(ECHO) -e "\tnetmask $(ETH0NETMASK)" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+			else \
+				$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+			fi; \
+			$(ECHO) -e "\tbroadcast $(ETH0BROADCAST)" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+			if [ "$(ETH0DEFAULTGW)" != "" ]; then \
+				$(ECHO) -e "\tgateway $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+			else \
+			$(ECHO) -e "\033[1;33mWARNING! \033[1;31mno gateway set for eth0!\033[0m Proof your .config!" ; \
+			fi; \
+			$(ECHO) -e "\033[1;33mCONFIGURE eth0 OK\033[0m" ; \
+			if ([[ "$(BASECONFIG)" = "sa113" ]] || [[ "$(BASECONFIG)" = "sa200" ]]); then \
+				$(ECHO) -e "\n## LAN interface eth1  ##" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+				$(ECHO) "auto eth1" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+				$(ECHO) "iface eth1 inet static" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+				$(ECHO) -e "\taddress $(ETH1IPADDR)" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+				if [ "$(ETH1NETMASK)" != "" ]; then \
+					$(ECHO) -e "\tnetmask $(ETH1NETMASK)" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+				else \
+					$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+				fi; \
+				if [ "$(ETH1BROADCAST)" != "" ]; then \
+					$(ECHO) -e "\tbroadcast $(ETH1BROADCAST)" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+				else \
+					$(ECHO) -e "\tbroadcast" $(shell $(SCRIPTDIR)/ip-shift.sh ${ETH1IPADDR}).255 >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+				fi; \
+				$(ECHO) -e "\033[1;33mCONFIGURE eth1 OK\033[0m" ; \
+			fi; \
+		fi \
+	else \
+		$(ECHO) -e "\033[1;33mbuild dhcp config for eth0\033[0m" ; \
+		$(ECHO) -e "\n## LAN interface eth0  ##" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+		$(ECHO) "auto eth0" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+		$(ECHO) -e "\tiface eth0 inet dhcp" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+		if ([[ "$(BASECONFIG)" = "sa113" ]] || [[ "$(BASECONFIG)" = "sa200" ]]); then \
+			$(ECHO) -e "\033[1;33mbuild dhcp config for eth1\033[0m" ; \
+			$(ECHO) -e "\n## LAN interface eth1  ##" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+			$(ECHO) "auto eth1" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+			$(ECHO) -e "\tiface eth1 inet dhcp" >> $(NEWROOTDIR)/var/etc/network/interfaces; \
+		fi; \
+	fi
+	@cp $(NEWROOTDIR)/var/etc/network/interfaces $(NEWROOTDIR)/etc/init.d/backup/interfaces.backup
+
+exports:
+	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/exports\033[0m"
+	@if [ ! -f $(CONFIG) ]; then \
+		$(ECHO) -e "\033[1;33mCONFIGURE FAILED\033[0m" ; \
+		$(ECHO) "$(CONFIG) does not exist" ; \
+		$(ECHO) "You have to run 'make config ...'!"; \
+		exit 99; \
+	fi
+	@if [ "$(NET)" != "dhcp" ]; then \
+		$(ECHO) "# default nfs release for eth0" > $(NEWROOTDIR)/var/etc/exports; \
+		$(ECHO) -e "/usr/data $(ETH0NETWORK)/255.255.255.0(rw,async,no_subtree_check)\n" >> $(NEWROOTDIR)/var/etc/exports; \
+		if ([[ "$(BASECONFIG)" = "sa113" ]] || [[ "$(BASECONFIG)" = "sa200" ]]); then \
+			$(ECHO) "# default nfs release for eth1" >> $(NEWROOTDIR)/var/etc/exports; \
+			$(ECHO) "/usr/data $(shell $(SCRIPTDIR)/ip-shift.sh ${ETH1IPADDR}).0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
+		fi; \
+	else \
+		$(ECHO) "# default nfs release for eth0" > $(NEWROOTDIR)/var/etc/exports; \
+		$(ECHO) "# edit the following line with correct parameters, like the correct IP subnet" > $(NEWROOTDIR)/var/etc/exports; \
+		$(ECHO) -e "#/usr/data 192.168.1.0/255.255.255.0(rw,async,no_subtree_check)\n" >> $(NEWROOTDIR)/var/etc/exports; \
+		if ([[ "$(BASECONFIG)" = "sa113" ]] || [[ "$(BASECONFIG)" = "sa200" ]]); then \
+			$(ECHO) "# default nfs release for eth1" >> $(NEWROOTDIR)/var/etc/exports; \
+			$(ECHO) "# edit the following line with correct parameters, like the correct IP subnet" > $(NEWROOTDIR)/var/etc/exports; \
+			$(ECHO) "#/usr/data 172.16.0.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
+		fi; \
+	fi
+
+hosts:
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hosts\033[0m"
 	@$(ECHO) $(ETH0IPADDR) $(IMAGETARGET) > $(NEWROOTDIR)/var/etc/hosts
-endif
-ifdef ETH1IPADDR 
-	@$(ECHO) -e "\033[1;33mCONFIGURE \033[1;32meth1\033[0m"
-	@$(ECHO) "auto eth1" >> $(NEWROOTDIR)/var/etc/network/interfaces
-	@$(ECHO) "iface eth1 inet static" >> $(NEWROOTDIR)/var/etc/network/interfaces
-	@$(ECHO) -e "\taddress $(ETH1IPADDR)" >> $(NEWROOTDIR)/var/etc/network/interfaces
-ifdef ETH1NETMASK
-	@$(ECHO) -e "\tnetmask $(ETH1NETMASK)" >> $(NEWROOTDIR)/var/etc/network/interfaces
-else
-	@$(ECHO) -e "\tnetmask 255.255.255.0" >> $(NEWROOTDIR)/var/etc/network/interfaces
-endif
-ifdef ETH1NETWORK
-	@$(ECHO) -e "\tnetwork $(ETH0NETWORK)" >> $(NEWROOTDIR)/var/etc/network/interfaces
-	@if [ -f $(NEWROOTDIR)/var/etc/exports ]; then \
-	    @$(ECHO) "# default nfs release for eth1" >> $(NEWROOTDIR)/var/etc/exports
-	    $(ECHO) "/usr/data $(ETH1NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
-	else \
-	    @$(ECHO) "# default nfs release for eth1" > $(NEWROOTDIR)/var/etc/exports
-	    $(ECHO) "/usr/data $(ETH1NETWORK)/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
-	fi
-else
-	@$(ECHO) -e "\tnetwork 172.16.0.0" >> $(NEWROOTDIR)/var/etc/network/interfaces
-	@if [ -f $(NEWROOTDIR)/etc/exports ]; then \
-	    $(ECHO) "# default nfs release for eth1" >> $(NEWROOTDIR)/var/etc/exports; \
-	    $(ECHO) "/usr/data 172.16.0.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
-	else \
-	    $(ECHO) "# default nfs release for eth1" > $(NEWROOTDIR)/var/etc/exports; \
-	    $(ECHO) "/usr/data 172.16.0.0/255.255.255.0(rw,async,no_subtree_check)" >> $(NEWROOTDIR)/var/etc/exports; \
-	fi
-endif
-ifdef ETH1BROADCAST
-	@$(ECHO) -e "\tbroadcast $(ETH1BROADCAST)" >> $(NEWROOTDIR)/var/etc/network/interfaces
-else
-	@$(ECHO) -e "\tbroadcast 172.16.0.255" >> $(NEWROOTDIR)/var/etc/network/interfaces
-endif
-endif
+
+resolv.conf:
+	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/resolv.conf\033[0m"
 	@$(ECHO) "nameserver $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/resolv.conf
 	@$(ECHO) "/bin/echo \"You are in! Do the right thing! :-)\"" >>  $(NEWROOTDIR)/var/etc/profile
-	@cp $(NEWROOTDIR)/var/etc/network/interfaces $(NEWROOTDIR)/etc/init.d/backup/interfaces.backup
 
 squashfs:
 	@if [ -f $(OUTPUTDIR)/$(ROOT) ]; then rm -rf $(OUTPUTDIR)/$(ROOT) ; fi
@@ -266,7 +316,3 @@ rebuild:
                 -a $(IMAGEFLASHKERNELSIZE),$(shell expr $(IMAGEFLASHROOTSIZE) + $(IMAGEFLASHKERNELSIZE)) \
 		-z $(shell expr $(IMAGEFLASHROOTSIZE) + $(IMAGEFLASHETCSIZE))
 
-etc:
-	
-#	@rm -rf $(NEWROOTDIR)/etc $(NEWROOTDIR)/var
-	@svn export --force packages/build/buildetc/new $(NEWROOTDIR)

@@ -50,7 +50,7 @@ SVN=/usr/bin/svn
 # Directories
 ACTDIR=$(shell /bin/pwd)
 ifndef OPENMCT_DEVEL_PREFIX
-OPENMCT_DEVEL_PREFIX=$(ACTDIR)
+    OPENMCT_DEVEL_PREFIX=$(ACTDIR)
 endif
 CONFIGDIR=configs
 CONFIGMCTDIR=$(CONFIGDIR)/mct
@@ -110,55 +110,55 @@ UNAME=$(SCRIPTDIR)/uname.sh
 TAROPT=--strip-components=1
 
 ifndef CONFIGUREENV
-# default configure enviornment arguments
-CONFIGUREENV=CC=$(OPENMCT_CROSS_COMPILE)gcc CXX=$(OPENMCT_CROSS_COMPILE)g++ CFLAGS="-Os" CXXFLAGS="-Os"
+# default configure environment arguments
+    CONFIGUREENV=CC=$(OPENMCT_CROSS_COMPILE)gcc CXX=$(OPENMCT_CROSS_COMPILE)g++ CFLAGS="-Os" CXXFLAGS="-Os"
 endif
 
 ifdef DOWNLOAD
 # get filename from download url
-FILENAME=$(shell basename $(DOWNLOAD))
+    FILENAME=$(shell basename $(DOWNLOAD))
 # set suffix
-SUFFIX=$(shell (echo $(FILENAME) | sed -e 's/.*\.\(.*\)$/\1//' | tr '[A-Z]' '[a-z]'))
+    SUFFIX=$(shell (echo $(FILENAME) | sed -e 's/.*\.\(.*\)$/\1//' | tr '[A-Z]' '[a-z]'))
 endif
 
 ifndef BUILD
-BUILD=$(MAKEENV) $(MAKE) $(MAKEARGS)
+    BUILD=$(MAKEENV) $(MAKE) $(MAKEARGS)
 endif
 
 ifndef CLEAN
-CLEAN=$(RM) -rf $(SRCDIR)
+    CLEAN=$(RM) -rf $(SRCDIR)
 endif
 
 ifndef EXTRACT
-EXTRACT=$(TAR) -C $(SRCDIR) $(TAROPT) $(TARMODE) $(FILENAME)
+    EXTRACT=$(TAR) -C $(SRCDIR) $(TAROPT) $(TARMODE) $(FILENAME)
 endif
 
 ifndef EXTRACTPOST
-EXTRACTPOST=
+    EXTRACTPOST=
 endif
 
 ifndef PREFIX
-PREFIX=/
+    PREFIX=/
 endif
 
 ifeq ($(SUFFIX),z)
-TARMODE=-xzf
+    TARMODE=-xzf
 endif
 
 ifeq ($(SUFFIX),gz)
-TARMODE=-xzf
+    TARMODE=-xzf
 endif
 
 ifeq ($(SUFFIX),tgz)
-TARMODE=-xzf
+    TARMODE=-xzf
 endif
 
 ifeq ($(SUFFIX),bz2)
-TARMODE=-xjf
+    TARMODE=-xjf
 endif
 
 ifndef CONFIGUREARGS
-CONFIGUREARGS=--prefix=$(PREFIX) --host=$(TARGET)
+    CONFIGUREARGS=--prefix=$(PREFIX) --host=$(TARGET)
 endif
 
 do-all: do-prepare do-depends $(FILENAME) $(SRCDIR) $(SRCDIR)$(SRCDIRSUFFIX)/$(CONFIG) do-build do-install
