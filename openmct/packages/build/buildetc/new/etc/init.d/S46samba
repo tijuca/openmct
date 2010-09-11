@@ -1,35 +1,70 @@
 #!/bin/sh
+
 . /var/etc/rc.conf
+
+if [ "$SUB_SHELL" == "" ]; then
+    /bin/echo -e "\n[\033[1;34m$0\033[0m]"
+fi
 
 /bin/mkdir -p /var/cache
 
+SMBD_PID=`/bin/pidof smbd`
+NMBD_PID=`/bin/pidof nmbd`
+
 case "$1" in
-        start)
-            if [ "$START_SAMBA" == "yes" ]; then
-		/bin/echo -n "Starting SAMBA  ... "
-#		/sbin/nmbd -D
-		/sbin/smbd -D
-		/bin/echo -e "\033[1;32mdone\033[0m"
-   	    elif [ "$START_SAMBA" != "yes" ]; then
-   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting samba automatically!\033[0m"
+    start)
+        if [ "$START_SAMBA" == "yes" ]; then
+	    if [ -x /sbin/smbd ]; then
+		/bin/echo -n "Starting smbd ... "
+		/sbin/rpc.mountd
+		/bin/echo -e "\033[1;32mdone\033[0m."
+	    else
+		/bin/echo -e "\033[1;33mno smbd found!\033[0m"
 	    fi
-            ;;
+	    if [ -x /sbin/nmbd ]; then
+		/bin/echo -n "Starting nmbd ... "
+		/sbin/nmbd
+		/bin/echo -e "\033[1;32mdone\033[0m."
+	    else
+		/bin/echo -e "\033[1;33mno nmbd found!\033[0m"
+	    fi
+	elif [ "$START_SAMBA" != "yes" ]; then
+		/bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting samba automatically!\033[0m"
+	fi
+        ;;
 
-        stop)
-            echo "Stopping samba"
-            killall -9 smbd
- #           killall -9 nmbd
-	    /bin/echo -e "\033[1;32mdone\033[0m"
-            ;;
+    stop)
+	/bin/echo -n "Stopping smbd ... "
+	if [ "$SMBD_PID" != "" ]; then
+	    /bin/killall -9 smbd
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	else
+	    /bin/echo -e "not running."
+	fi
+	/bin/echo -n "Stopping nmbd ... "
+	if [ "$NMBD_PID" != "" ]; then
+	    /bin/killall -9 nmbd
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	else
+	    /bin/echo -e "not running."
+	fi
+	;;
 
-        restart)
-            $0 stop
-            sleep 1
-            $0 start
-            ;;
+    restart)
+	( SUB_SHELL=sub $0 stop )
+	/bin/sleep 1
+	( SUB_SHELL=sub $0 start )
+	;;
 
-        *)
-            echo "Usage: $0 {start|stop|restart}"
-            exit 1
-    	    ;;
+    *)
+	/bin/echo "Usage: $0 {start|stop|restart}"
+	exit 1
+	;;
 esac
+
+if [ "$SUB_SHELL" == "" ]; then
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+    /bin/echo -e "[finished]"
+fi
+
+exit 0

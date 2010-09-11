@@ -1,32 +1,56 @@
 #!/bin/sh
+
 . /var/etc/rc.conf
 
+if [ "$SUB_SHELL" == "" ]; then
+    /bin/echo -e "\n[\033[1;34m$0\033[0m]"
+fi
+
+VSFTP_PID=`/bin/pidof vsftpd`
+
 case "$1" in
-        start)
-            if [ "$START_FTPD" == "yes" ]; then
+    start)
+	if [ -x /sbin/vsftp ]; then
+	    if [ "$START_FTPD" == "yes" ]; then
 		/bin/echo -n "Starting FTP daemon ... "
-		/bin/mkdir -p /var/run/vsftpd
-		/sbin/vsftpd &
-		/bin/echo -e "\033[1;32mdone\033[0m"
+		if [ -x /sbin/vsftpd ]; then
+		    /bin/mkdir -p /var/run/vsftpd
+		    /sbin/vsftpd &
+		    /bin/echo -e "\033[1;32mdone\033[0m"
+		else
+		    /bin/echo -e "\033[1;33mno vsftpd found!\033[0m"
+		fi
 	    elif [ "$START_FTPD" != "yes" ]; then
-   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting dropbear automatically!\033[0m"
+		/bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting vsftpd automatically!\033[0m"
 	    fi
-            ;;
+	fi
+	;;
 
-        stop)
-            /bin/echo "Stopping SSH"
-            killall -9 vsftpd
-	    /bin/echo -e "\033[1;32mdone\033[0m"
-            ;;
+    stop)
+	/bin/echo -n "Stopping vsftpd ... "
+	if [ "$VSFTPD_PID" != "" ]; then
+	    /bin/killall -9 vsftpd
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	else
+	    /bin/echo -e "not running."
+	fi
+	;;
 
-        restart)
-            $0 stop
-            sleep 1
-            $0 start
-            ;;
+    restart)
+	( SUB_SHELL=sub $0 stop )
+	/bin/sleep 1
+	( SUB_SHELL=sub $0 start )
+	;;
 
-        *)
-            echo "Usage: $0 {start|stop|restart}"
-            exit 1
-    	    ;;
+    *)
+	/bin/echo "Usage: $0 {start|stop|restart}"
+	exit 1
+	;;
 esac
+
+if [ "$SUB_SHELL" == "" ]; then
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+    /bin/echo -e "[finished]"
+fi
+
+exit 0

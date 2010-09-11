@@ -264,12 +264,20 @@ exports:
 
 hosts:
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/hosts\033[0m"
-	@$(ECHO) $(ETH0IPADDR) $(IMAGETARGET) > $(NEWROOTDIR)/var/etc/hosts
+	@$(ECHO) "# /etc/hosts" > $(NEWROOTDIR)/var/etc/hosts
+	@$(ECHO) -e "# created by Makefile\n# edit by your own if needed\n#\n127.0.0.1\tlocalhost\t$(IMAGETARGET)" >>  $(NEWROOTDIR)/var/etc/hosts
+	@if [ "$(NET)" != "dhcp" ]; then \
+		$(ECHO) $(ETH0IPADDR) $(IMAGETARGET) >> $(NEWROOTDIR)/var/etc/hosts; \
+	fi
 
 resolv.conf:
 	@$(ECHO) -e "\033[1;33mCREATE \033[1;32m/etc/resolv.conf\033[0m"
-	@$(ECHO) "nameserver $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/resolv.conf
-	@$(ECHO) "/bin/echo \"You are in! Do the right thing! :-)\"" >>  $(NEWROOTDIR)/var/etc/profile
+	@if [ "$(NET)" = "dhcp" ]; then \
+		$(ECHO) "nameserver 127.0.0.1" >> $(NEWROOTDIR)/var/etc/resolv.conf; \
+	else \
+		$(ECHO) "nameserver $(ETH0DEFAULTGW)" >> $(NEWROOTDIR)/var/etc/resolv.conf; \
+	fi
+	$(ECHO) "/bin/echo \"You are in! Do the right thing! :-)\"" >>  $(NEWROOTDIR)/var/etc/profile
 
 squashfs:
 	@if [ -f $(OUTPUTDIR)/$(ROOT) ]; then rm -rf $(OUTPUTDIR)/$(ROOT) ; fi

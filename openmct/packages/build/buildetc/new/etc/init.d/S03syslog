@@ -1,33 +1,57 @@
 #!/bin/sh
 . /var/etc/rc.conf
 
+if [ "$SUB_SHELL" == "" ]; then
+    /bin/echo -e "\n[\033[1;34m$0\033[0m]"
+fi
+
+SYSLOGD_PID=`/bin/pidof syslogd`
+KLOGD_PID=`/bin/pidof klogd`
+
 case "$1" in
-        start)
-            if [ "$START_SYSLOGD" == "yes" ]; then
+    start)
+	    if [ "$START_SYSLOGD" == "yes" ]; then
 		/bin/echo -n "Starting Syslog and Kernellog daemon ... "
-		/sbin/syslogd -O /tmp/messages
+		/sbin/syslogd -O /var/messages
 		/sbin/klogd
-		/bin/echo -e "\033[1;32mdone\033[0m"
-   	    elif [ "$START_SYSLOGD" != "yes" ]; then
-   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting syslogd automatically!\033[0m"
+		/bin/echo -e "\033[1;32mdone\033[0m."
+	    elif [ "$START_SYSLOGD" != "yes" ]; then
+		/bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting syslogd automatically!\033[0m"
 	    fi
-            ;;
+	;;
 
-        stop)
-            /bin/echo "Stopping Syslogd"
-            killall -9 syslogd
-	    killall -9 klogd
-	    /bin/echo -e "\033[1;32mdone\033[0m"
-            ;;
+    stop)
+	    /bin/echo -n "Stopping syslogd ... "
+	    if [ "$SYSLOGD_PID" != "" ]; then
+		/bin/killall -9 syslogd
+		/bin/echo -e "\033[1;32mdone\033[0m."
+	    else
+		/bin/echo -e "nothing to stop."
+	    fi
+	    /bin/echo -n "Stopping klogd ... "
+	    if [ "$SYSLOGD_PID" != "" ]; then
+		/bin/killall -9 klogd
+		/bin/echo -e "\033[1;32mdone\033[0m."
+	    else
+		/bin/echo -e "nothing to stop."
+	    fi
+	;;
 
-        restart)
-            $0 stop
-            sleep 1
-            $0 start
-            ;;
+    restart)
+	( SUB_SHELL=sub $0 stop )
+	/bin/sleep 1
+	( SUB_SHELL=sub $0 start )
+	;;
 
-        *)
-            echo "Usage: $0 {start|stop|restart}"
-            exit 1
-    	    ;;
+    *)
+	/bin/echo "Usage: $0 {start|stop|restart}"
+	exit 1
+	;;
 esac
+
+if [ "$SUB_SHELL" == "" ]; then
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+    /bin/echo -e "[finished]"
+fi
+
+exit 0

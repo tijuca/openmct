@@ -6,3 +6,6 @@
 
 # Stuff to do before rebooting
 null::shutdown:/bin/umount -a -r
+
+# what to do when CTRL-ALT-DEL is pressed
+#ca::ctrlaltdel:/sbin/shutdown -r -t 4 now

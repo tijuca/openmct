@@ -1,31 +1,53 @@
 #!/bin/sh
+
 . /var/etc/rc.conf
 
+if [ "$SUB_SHELL" == "" ]; then
+    /bin/echo -e "\n[\033[1;34m$0\033[0m]"
+fi
+
+TELNETD_PID=`/bin/pidof telnetd`
+
 case "$1" in
-        start)
-            if [ "$START_TELNETD" == "yes" ]; then
-		/bin/echo -n "Starting Telnet daemon ... "
+    start)
+        if [ "$START_TELNETD" == "yes" ]; then
+	    /bin/echo -n "Starting Telnet daemon ... "
+	    if [ -x /sbin/telnetd ]; then  
 		/sbin/telnetd
-		/bin/echo -e "\033[1;32mdone\033[0m"
-	    elif [ "$START_TELNETD" != "yes" ] || [ "$START_TELNETD" != "no" ]; then
-   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is missconfigured for starting telnet!\033[0m"
+		/bin/echo -e "\033[1;32mdone\033[0m."
+	    else
+		/bin/echo -e "\033[1;33mno telnetd found!\033[0m"
 	    fi
-            ;;
+	elif [ "$START_TELNETD" != "yes" ] || [ "$START_TELNETD" != "no" ]; then
+	    /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is missconfigured for starting telnet!\033[0m"
+	fi
+        ;;
 
-        stop)
-            /bin/echo "Stopping Telnet"
-            killall -9 telnetd
-	    /bin/echo -e "\033[1;32mdone\033[0m"
-            ;;
+    stop)
+        /bin/echo -n "Stopping Telnet daemon ... "
+	if [ "$TELNETD_PID" != "" ]; then
+	    /bin/killall -9 telnetd
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	else
+	    /bin/echo -e "\033[1;33mnot running\033[0m."
+	fi
+        ;;
 
-        restart)
-            $0 stop
-            sleep 1
-            $0 start
-            ;;
+    restart)
+	( SUB_SHELL=sub $0 stop )
+	/bin/sleep 1
+	( SUB_SHELL=sub $0 start )
+	;;
 
-        *)
-            echo "Usage: $0 {start|stop|restart}"
-            exit 1
-    	    ;;
+    *)
+	/bin/echo "Usage: $0 {start|stop|restart}"
+	exit 1
+	;;
 esac
+
+if [ "$SUB_SHELL" == "" ]; then
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+    /bin/echo -e "[finished]"
+fi
+
+exit 0

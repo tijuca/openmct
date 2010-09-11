@@ -1,0 +1,25 @@
+--- src/networking/libiproute/ipaddress.c.orig	2010-08-04 01:15:03.000000000 +0200
++++ src/networking/libiproute/ipaddress.c	2010-08-04 01:16:27.000000000 +0200
+@@ -54,8 +54,6 @@
+ 		"MULTICAST\0""NOARP\0""UP\0""LOWER_UP\0";
+ 
+ 	bb_putchar('<');
+-	if (flags & IFF_UP && !(flags & IFF_RUNNING))
+-		printf("NO-CARRIER,");
+ 	flags &= ~IFF_RUNNING;
+ #if 0
+ 	_PF(ALLMULTI);
+@@ -164,13 +162,6 @@
+ 		printf("master %s ", ll_idx_n2a(*(int*)RTA_DATA(tb[IFLA_MASTER]), b1));
+ 	}
+ #endif
+-	if (tb[IFLA_OPERSTATE]) {
+-		static const char operstate_labels[] ALIGN1 =
+-			"UNKNOWN\0""NOTPRESENT\0""DOWN\0""LOWERLAYERDOWN\0"
+-			"TESTING\0""DORMANT\0""UP\0";
+-		printf("state %s ", nth_string(operstate_labels,
+-					*(uint8_t *)RTA_DATA(tb[IFLA_OPERSTATE])));
+-	}
+ 	if (G_filter.showqueue)
+ 		print_queuelen((char*)RTA_DATA(tb[IFLA_IFNAME]));
+ 

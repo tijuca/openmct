@@ -1,43 +1,90 @@
 #!/bin/sh
 
-# mount /proc and /tmp
-/bin/mount -t proc	none	/proc
-/bin/mount -t ramfs	tmpfs	/tmp
+/bin/echo -e "\n[\033[1;34m$0\033[0m]"
 
-# find var partition:
-VAR=`cat /proc/mtd | grep var | cut -b 4`
-cat /etc/fstab.in | sed -e "s/REALVAR/$VAR/g" > /etc/fstab
-
-if [ -d /dev/ide/host0/bus0/target0/lun0/ ]; then
-    echo "Enable Swap space (if exist)..."
-    /sbin/swapon -a > /dev/null 2>&1
+# testing if the script is called for the first time
+# if it is so the filesystems /proc and /tmp allready mounted
+if [ -f /proc/version ]; then
+    /bin/echo -e "Mounting procfs on /proc ... \033[1;33mallready mounted\033[0m."
+    PROCFS=true
 else
-    cat /etc/fstab | sed -e "s#/dev/ide/#\#/dev/ide/#g" > /etc/fstab
+    # we have no /proc mounted, we should be on startup
+    /bin/echo -n "Mounting procfs on /proc ... "
+    /bin/mount -t proc	none	/proc
+    /bin/echo -e "\033[1;32mdone\033[0m."
+    PROCFS=true
 fi
 
-echo "Mounting filesystems ..."
-/bin/mount -a 
-
-/bin/echo
-/bin/echo "mounted actually the following filesystems (thats not final!):"
-/bin/echo --------------------------------------------------------------
-/bin/mount
-/bin/echo --------------------------------------------------------------
-/bin/echo
+if cat /proc/mounts | grep ramfs | cut -f1 -d " " | grep -q "tmpfs" ; then
+    /bin/echo -e "Mounting tmpfs on /tmp ... \033[1;33mallready mounted\033[0m."
+    START_RAMFS_ONE=false
+else
+    # we have no /tmp mounted, we should be on startup
+    /bin/echo -n "Mounting tmpfs on /tmp ... "
+    /bin/mount -t ramfs tmpfs /tmp
+    /bin/echo -e "\033[1;32mdone\033[0m."
+    START_RAMFS_ONE=true
+fi
 
 #create some paths
-/bin/mkdir /tmp/root
-/bin/mkdir /tmp/run
-/bin/mkdir /tmp/media
-#/bin/mkdir /dev/shm/network
+/bin/echo -n "Create /tmp/{root,run,media} ... "
+if [ "$START_RAMFS_ONE" == "true" ]; then
+    /bin/test -d /tmp/root  || /bin/mkdir -p /tmp/root
+    /bin/test -d /tmp/run   || /bin/mkdir -p /tmp/run
+    /bin/test -d /tmp/media || /bin/mkdir -p /tmp/media
+    #/bin/mkdir /dev/shm/network
+    /bin/echo -e "\033[1;32mdone\033[0m."
+else
+    /bin/echo -e "\033[1;33mallready existing\033[0m."
+fi
+
+
+# building fstab, adding /proc and /tmp
+if [ "$PROCFS" == "true" ]; then
+    /bin/echo -n "Building /tmp/fstab based on /etc/fstab.in ... "
+    VAR=`/bin/cat /proc/mtd | /bin/grep var | /bin/cut -b 4`			# find var partition
+    /bin/sed /etc/fstab.in -e "s/REALVAR/$VAR/g" > /tmp/fstab
+    /bin/sed /tmp/fstab -e "s/#proc/proc/g" -e "s/#ramfs/ramfs/g" > /tmp/fstab.1
+    /bin/mv /tmp/fstab.1 /tmp/fstab
+    # if the script is called again usbfs may be allready mounted
+    if [ -d /proc/bus/usb ]; then
+	/bin/sed /tmp/fstab -e "s/#usbfs/usbfs/g" > /tmp/fstab.1
+	/bin/mv /tmp/fstab.1 /tmp/fstab
+    fi
+    /bin/echo -e "\033[1;32mdone\033[0m."
+else
+    /bin/echo -e "\033[1;33mSomething went wrong! Could't find /var partition\033[0m."
+fi
+
+#testing for hdd and possible swap partition
+if [ -d /dev/ide/host0/bus0/target0/lun0/ ]; then
+    /bin/echo "Enable Swap space (if exist)..."
+    /sbin/swapon -a > /dev/null 2>&1
+else
+    /bin/cat /etc/fstab | /bin/sed -e "s#/dev/ide/#\#/dev/ide/#g" > /tmp/fstab.1
+    /bin/mv /tmp/fstab.1 /tmp/fstab
+fi
+
+
+/bin/echo -n "Mounting not yet mounted filesystems from fstab..."
+/bin/mount -a
+/bin/echo -e "\033[1;32mdone\033[0m."
+
+#/bin/echo
+/bin/echo "mounted actually the following filesystems (thats may not final!):"
+/bin/echo ------------------------------------------------------------------
+/bin/mount
+/bin/echo ------------------------------------------------------------------
 
 # setting the variables from /var/etc/rc.conf
 /bin/sh /var/etc/rc.conf
 if [ $? -ne 0 ]; then
-    /bin/echo "Upps, did not find /var/etc/rc.conf"
+    /bin/echo-e  "\nUpps, did not find /var/etc/rc.conf"
     /bin/cp /etc/rc.conf.backup /var/etc/rc.conf
     /bin/echo "recoverd /var/etc/rc.conf with default values!"
 fi
 
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+/bin/echo -e "[finished]"
 
 exit 0

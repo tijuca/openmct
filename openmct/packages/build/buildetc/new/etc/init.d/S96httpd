@@ -1,12 +1,18 @@
 #!/bin/sh
+
 . /var/etc/rc.conf
+
+if [ "$SUB_SHELL" == "" ]; then
+    /bin/echo -e "\n[\033[1;34m$0\033[0m]"
+fi
+
 CONFIG=/var/etc/httpd.conf
-PID=`pidof httpd`
+HTTP_PID=`/bin/pidof httpd`
 
 check_config(){
   if [ ! -r $CONFIG ]; then
-  echo -e "\033[1;33mCreating default $CONFIG for httpd!\033[0m"
-  cat > $CONFIG << __EOF__
+  /bin/echo -e "\033[1;33mCreating default $CONFIG for httpd!\033[0m"
+  /bin/cat > $CONFIG << __EOF__
 # httpd.conf has the following format:
 #
 # A:172.20.         # Allow address from 172.20.0.0/16
@@ -26,45 +32,53 @@ __EOF__
 }
 
 case "$1" in
-        start)
-            if [ "$START_HTTPD" == "yes" ]; then
-		check_config
-		/bin/echo -n "Starting httpd ... "
-		if [ "$PID" != "" ]; then
-		    /bin/echo -e "\033[1;33mhttpd is already running! Try 'stop' or 'restart'!\033[0m"
-		    exit
-		fi
-		if [ -d /usr/var/www ]; then
-    	    		/sbin/httpd -h /usr/var/www -c $CONFIG
-	    		/bin/echo -n "with document root from hardisk (/usr/var/www) ... "
-		else
-    	    		/sbin/httpd -h /var/www -c $CONFIG
-	    		/bin/echo -n "with document root from flash (/var/www/) ... "
-		fi
-		/bin/echo -e "\033[1;32mdone\033[0m"
-   	    elif [ "$START_???" != "yes" ]; then
-   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting 'httpd' automatically!\033[0m"
+    start)
+        if [ "$START_HTTPD" == "yes" ]; then
+	    check_config
+	    /bin/echo -n "Starting httpd ... "
+	    if [ "$PID" != "" ]; then
+		/bin/echo -e "\033[1;33mhttpd is already running! Try 'stop' or 'restart'!\033[0m"
+		exit 1
 	    fi
-            ;;
-
-        stop)
-            /bin/echo -n "Stopping httpd ... "
-	    if [ "$PID" == "" ]; then
-		/bin/echo -e "\033[1;33mhttpd is already stopped!\033[0m"
-		exit
+	    if [ -d /usr/var/www ]; then
+		/sbin/httpd -h /usr/var/www -c $CONFIG
+		/bin/echo -e "with document root from hardisk (/usr/var/www) ... \033[1;32mdone\033[0m."
+	    elif [ -d var/www ]; then
+		/sbin/httpd -h /var/www -c $CONFIG
+		/bin/echo -e "with document root from flash (/var/www/) ... \033[1;32mdone\033[0m."
+	    else
+		/bin/echo -e "\033[1;33mNo valid www root found!\033[0m"
 	    fi
-            killall -9 httpd
-	    /bin/echo -e "\033[1;32mdone\033[0m"
-            ;;
+	elif [ "$START_???" != "yes" ]; then
+	    /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting 'httpd' automatically!\033[0m"
+	 fi
+         ;;
 
-        restart)
-            $0 stop
-            sleep 1
-            $0 start
-            ;;
+    stop)
+	/bin/echo -n "Stopping httpd ... "
+	if [ "$HTTPD_PID" != "" ]; then
+	    /bin/killall -9 httpd
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	else
+	    /bin/echo -e "not running."
+	fi
+	;;
 
-        *)
-            echo "Usage: $0 {start|stop|restart}"
-            exit 1
-    	    ;;
+    restart)
+	( SUB_SHELL=sub $0 stop )
+	/bin/sleep 1
+	( SUB_SHELL=sub $0 start )
+	;;
+
+    *)
+	/bin/echo "Usage: $0 {start|stop|restart}"
+	exit 1
+	;;
 esac
+
+if [ "$SUB_SHELL" == "" ]; then
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+    /bin/echo -e "[finished]"
+fi
+
+exit 0

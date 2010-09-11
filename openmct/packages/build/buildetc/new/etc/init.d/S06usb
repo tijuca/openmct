@@ -1,43 +1,72 @@
 #!/bin/sh
 
 . /var/etc/rc.conf
-HOSTNAME=`cat /etc/hostname`
+
+if [ "$SUB_SHELL" == "" ]; then
+    /bin/echo -e "\n[\033[1;34m$0\033[0m]"
+    /bin/echo FixMe!!! HOSTNAME should be set in rc.conf as HOSTNAME_TEMPLATE !!!
+fi
+
+HOSTNAME=`/bin/cat /etc/hostname`
+USBENTRY=`/bin/grep "usbfs" /etc/fstab | /bin/cut -f1`
 
 case "$1" in
     start)
-	if ([ $HOSTNAME != "nas110" ]); then
-	    /bin/echo -n "Loading usbfs related kernel modul ... "
+	if ([ "$HOSTNAME" != "nas110" ]); then
+	    /bin/echo -n "Loading usbfs related kernel modul \"usbcore\" ... "
 	    /sbin/modprobe usbcore > /dev/null 2>&1
-	    /bin/echo -e "\033[1;32mdone\033[0m"
-	    
-	    /bin/echo -e "Enabling usbfs and adding to /etc/fstab ..."
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	
+	    /bin/echo -n "Mounting usbfs on /proc/bus/usb ... "
 	    /bin/mount -t usbfs none /proc/bus/usb
-	    /bin/echo "usbfs					/proc/bus/usb	usbfs	defaults	0	0" >> /etc/fstab
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	    # adding usbfs entry to /tmp/fstab
+	    if [ "$USBENTRY" != "usbfs" ]; then
+		/bin/sed /tmp/fstab -e "s/#usb/usbfs/g" > /tmp/fstab.1
+		/bin/mv /tmp/fstab.1 /tmp/fstab
+		#/bin/echo "usbfs					/proc/bus/usb	usbfs	defaults	0	0" >> /tmp/fstab
+	    fi
 	    /bin/sleep 1
+	    /bin/echo -n "Loading kernel modul \"ehci-hcd\" ... "
 	    /sbin/modprobe ehci-hcd > /dev/null 2>&1
+	    /bin/echo -e "\033[1;32mdone\033[0m."
 	    /bin/sleep 1
+	    /bin/echo -n "Loading kernel modul \"usbcore\"  ... "
 	    /sbin/modprobe usb-storage > /dev/null 2>&1
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	    /bin/echo -n "Loading kernel modul \"scsi_mod\" ... "
 	    /sbin/modprobe scsi_mod > /dev/null 2>&1
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	    /bin/echo -n "Loading kernel modul \"sd_mod\"   ... "
 	    /sbin/modprobe sd_mod > /dev/null 2>&1
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	    /bin/echo -n "Loading kernel modul \"vfat\"     ... "
 	    /sbin/modprobe vfat > /dev/null 2>&1
+	    /bin/echo -e "\033[1;32mdone\033[0m."
 	    # loading umsdos ??
 	    #/sbin/modprobe umsdos > /dev/null 2>&1
-	    /bin/echo -e "Enabling usbfs and adding to /etc/fstab ... \033[1;32mdone\033[0m"
+	    #/bin/echo -e "Enabling usbfs and adding to /etc/fstab ... \033[1;32mdone\033[0m"
 	fi
 	;;
     stop)
-	echo -n "Disabling usbfs... "
+	/bin/echo -n "Disabling usbfs... "
 	/bin/umount /proc/bus/usb
-	echo -e "\033[1;32mdone\033[0m"
+	/bin/echo -e "\033[1;32mdone\033[0m."
 	;;
     force-reload|restart)
-	$0 stop
-	sleep 1
-	$0 start
+	( SUB_SHELL=sub $0 stop )
+	/bin/sleep 1
+	( SUB_SHELL=sub $0 start )
 	;;
     *)
-        echo "Usage: $0 {start|stop|restart|force-reload}"
+        /bin/echo "Usage: $0 {start|stop|restart|force-reload}"
+	/bin/echo -e "[\033[1;34m$0\033[0m] finished."
 	exit 1
 esac
+
+if [ "$SUB_SHELL" == "" ]; then
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+    /bin/echo -e "[finished]"
+fi
 
 exit 0

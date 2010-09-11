@@ -1,2 +1,2 @@
-# hosts, zu erstellen vom Makefile
+# hosts, will be overriden by main  Makefile
 127.0.0.1	localhost	claxan

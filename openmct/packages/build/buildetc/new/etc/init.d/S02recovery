@@ -1,7 +1,13 @@
 #!/bin/sh
 
+/bin/echo -e "\n[\033[1;34m$0\033[0m]"
+
 # loading recovery kernel modul
-/sbin/modprobe recovery
+if /sbin/modprobe recovery ; then
+    /bin/echo -e "Loading kernel modul \"recovery\" \033[1;32msuccessfully\033[0m."
+else
+    /bin/echo -e "Loading kernel modul \"recovery\" \033[1;31mfailed!\033[0m"
+fi
 
 RECOVER_REQUEST=/var/.recover
 
@@ -19,21 +25,21 @@ fi
 }
 
 case "$1" in
-	start)
-	    /bin/echo -n "Checking for recover something ... "
-	    recover_network
-	    ;;
+    start)
+	/bin/echo -n "Checking for recover something ... "
+	recover_network
+	;;
 
-        force)
-	    /bin/touch $RECOVER_REQUEST
-            $0 start
-	    reboot
-            ;;
+    force)
+	/bin/touch $RECOVER_REQUEST
+	$0 start
+	reboot
+	;;
 
-        *)
-            echo "Usage: $0 {start|force} #force is for recover without reset button!"
-            exit 1
-    	    ;;
+    *)
+	/bin/echo "Usage: $0 {start|force} #force is for recover without reset button!"
+	exit 1
+	;;
 esac
 # extract var.tar.gz in case that's neccessary
 
@@ -45,4 +51,6 @@ esac
 #fi
 #echo "done."
 
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+/bin/echo -e "[finished]"
 exit 0

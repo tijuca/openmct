@@ -1,3 +1,16 @@
 #!/bin/sh
 
-hostname -F /etc/hostname
+if [ "$SUB_SHELL" == "" ]; then
+    /bin/echo -e "\n[\033[1;34m$0\033[0m]"
+fi
+
+/bin/echo -n "Setting up hostname (`/bin/cat /etc/hostname`) ... "
+/bin/hostname -F /etc/hostname
+bin/echo -e "\033[1;32mdone\033[0m."
+
+if [ "$SUB_SHELL" == "" ]; then
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+    /bin/echo -e "[finished]"
+fi
+
+exit 0

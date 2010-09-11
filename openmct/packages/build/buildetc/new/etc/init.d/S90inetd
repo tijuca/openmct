@@ -1,14 +1,47 @@
 #!/bin/sh
 
-#case "$1" in
-#    start)
-#	/sbin/inetd
-#	;;
-#    stop)
-#	killall inetd
-#	;;
-#    restart)
-#	/sbin/inetd stop
-#	/sbin/inetd start
-#	;;
-#esac
+if [ "$SUB_SHELL" == "" ]; then
+    /bin/echo -e "\n[\033[1;34m$0\033[0m]"
+fi
+
+INETD_PID=`/bin/pidof inetd`
+
+case "$1" in
+    start)
+	/bin/echo -n "Starting inet daemon ... "
+	if [ -x /sbin/inetd ]; then  
+	    /sbin/telnetd
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	else
+	    /bin/echo -e "\033[1;33mNo inetd found!\033[0m"
+	fi
+        ;;
+
+    stop)
+	/bin/echo -n "Stopping inetd ... "
+	if [ "$PORTMAP_PID" != "" ]; then
+	    /bin/killall -9 inetd
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	else
+	    /bin/echo -e "not running."
+	fi
+	;;
+
+    restart)
+	( SUB_SHELL=sub $0 stop )
+	/bin/sleep 1
+	( SUB_SHELL=sub $0 start )
+	;;
+
+    *)
+	/bin/echo "Usage: $0 {start|stop|restart}"
+	exit 1
+	;;
+esac
+
+if [ "$SUB_SHELL" == "" ]; then
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+    /bin/echo -e "[finished]"
+fi
+
+exit 0

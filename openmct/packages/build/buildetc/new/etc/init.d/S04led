@@ -1,39 +1,51 @@
 #!/bin/sh
+
 . /var/etc/rc.conf
 
+if [ "$SUB_SHELL" == "" ]; then
+    /bin/echo -e "\n[\033[1;34m$0\033[0m]"
+fi
+
 case "$1" in
-        start)
-            if [ "$START_LEDS" == "yes" ]; then
-		/bin/echo -n "Starting LED display ... "
-   		/bin/echo $OPTIONS_LEDS_HB > /proc/mct/led/hb
-    		/bin/echo $OPTIONS_LEDS_IN_DEVICE \
-        		  $OPTIONS_LEDS_IN_DIRECTION \
-			  $OPTIONS_LEDS_IN_INTERVAL > /proc/mct/led/in
-    		/bin/echo $OPTIONS_LEDS_OUT_DEVICE \
-        		  $OPTIONS_LEDS_OUT_DIRECTION \
-			  $OPTIONS_LEDS_OUT_INTERVAL > /proc/mct/led/out
-    		/bin/echo -e "\033[1;32mdone\033[0m"
-   	    elif [ "$START_LEDS" != "yes" ]; then
-   		/bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting LEDs automatically!\033[0m"
-	    fi
-            ;;
+    start)
+	if [ "$START_LEDS" == "yes" ]; then
+	    /bin/echo -n "Starting LED display ... "
+	    /bin/echo $OPTIONS_LEDS_HB > /proc/mct/led/hb
+	    /bin/echo $OPTIONS_LEDS_IN_DEVICE \
+		      $OPTIONS_LEDS_IN_DIRECTION \
+		      $OPTIONS_LEDS_IN_INTERVAL > /proc/mct/led/in
+	    /bin/echo $OPTIONS_LEDS_OUT_DEVICE \
+		      $OPTIONS_LEDS_OUT_DIRECTION \
+		      $OPTIONS_LEDS_OUT_INTERVAL > /proc/mct/led/out
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	elif [ "$START_LEDS" != "yes" ]; then
+	    /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting LEDs automatically!\033[0m"
+	fi
+	;;
 
-        stop)
-            /bin/echo -n "Stopping LED display ... "
-   	    /bin/echo "" > /proc/mct/led/hb
-    	    /bin/echo "" > /proc/mct/led/in
-    	    /bin/echo "" > /proc/mct/led/out
-    	    /bin/echo -e "\033[1;32mdone\033[0m"
-            ;;
+    stop)
+	/bin/echo -n "Stopping LED display ... "
+	/bin/echo "" > /proc/mct/led/hb
+	/bin/echo "" > /proc/mct/led/in
+	/bin/echo "" > /proc/mct/led/out
+	/bin/echo -e "\033[1;32mdone\033[0m."
+	;;
 
-        restart)
-            $0 stop
-            sleep 1
-            $0 start
-            ;;
+    restart)
+	( SUB_SHELL=sub $0 stop )
+	/bin/sleep 1
+	( SUB_SHELL=sub $0 start )
+	;;
 
-        *)
-            echo "Usage: $0 {start|stop|restart}"
-            exit 1
-    	    ;;
+    *)
+	/bin/echo "Usage: $0 {start|stop|restart}"
+	exit 1
+	;;
 esac
+
+if [ "$SUB_SHELL" == "" ]; then
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+    /bin/echo -e "[finished]"
+fi
+
+exit 0

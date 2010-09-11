@@ -2,6 +2,7 @@
 #
 # <file system>				<mount pt>     <type>   <options>      <dump> <pass>
 
-proc					/proc		proc	defaults	0	0
+#ramfs					/tmp		ramfs	defaults	0	0
+#proc					/proc		proc	defaults	0	0
 /dev/mtdblock/REALVAR				/var		jffs2	rw		0	0
 /dev/ide/host0/bus0/target0/lun0/part1	/usr		ext3	defaults	0	0

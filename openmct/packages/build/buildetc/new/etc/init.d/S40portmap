@@ -1,24 +1,47 @@
 #!/bin/sh
+
+if [ "$SUB_SHELL" == "" ]; then
+    /bin/echo -e "\n[\033[1;34m$0\033[0m]"
+fi
+
+PORTMAP_PID=`/bin/pidof portmap`
+
 case "$1" in
-        start)
-                echo "Starting RPC Portmap"
-                /sbin/portmap
-                ;;
-
-        stop)
-                echo "Stopping Portmap"
-                killall -9 portmap
-                ;;
-
-        restart)
-                $0 stop
-                sleep 1
-                $0 start
-                ;;
-
-        *)
-                echo "Usage: $0 {start|stop|restart}"
-                exit 1
+    start)
+	/bin/echo -n "Starting RPC Portmap daemon ... "
+	if [ -x /sbin/portmap ]; then  
+	    /sbin/portmap
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	else
+	    /bin/echo -e "\033[1;33mno portmap found!\033[0m"
+	fi
         ;;
 
+    stop)
+	/bin/echo -n "Stopping portmap ... "
+	if [ "$PORTMAP_PID" != "" ]; then
+	    /bin/killall -9 portmap
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	else
+	    /bin/echo -e "not running."
+	fi
+	;;
+        
+    restart)
+	( SUB_SHELL=sub $0 stop )
+	/bin/sleep 1
+	( SUB_SHELL=sub $0 start )
+	;;
+
+    *)
+	/bin/echo "Usage: $0 {start|stop|restart}"
+	exit 1
+	;;
 esac
+
+if [ "$SUB_SHELL" == "" ]; then
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+    /bin/echo -e "[finished]"
+fi
+
+exit 0

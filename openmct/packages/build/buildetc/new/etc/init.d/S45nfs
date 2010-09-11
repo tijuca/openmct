@@ -1,39 +1,85 @@
 #!/bin/sh
+
 . /var/etc/rc.conf
+
+if [ "$SUB_SHELL" == "" ]; then
+    /bin/echo -e "\n[\033[1;34m$0\033[0m]"
+fi
+
 /bin/mkdir -p /var/lib/nfs
 /bin/touch /var/lib/nfs/rmtab
-HDD=`mount |grep /dev/ide/ | cut -c1-14`
+
+HDD=`/bin/mount | /bin/grep /dev/ide/ | /bin/cut -c1-14`
+NFSD_PID=`/bin/pidof nfsd`
+RPC_MOUNTD_PID=`/bin/pidof rpc.mountd`
 
 case "$1" in
-        start)
-            if [ "$HDD" != "/dev/ide/host0" ]; then
-		/bin/echo -e "\033[1;33mCould't start NFS because no hardisk is mounted!\033[0m"
-	    elif [ "$START_NFS" == "yes" ]; then
+    start)
+	if [ "$HDD" != "/dev/ide/host0" ]; then
+	    /bin/echo -e "\033[1;33mNo need to start NFS because no hardisk is mounted!\033[0m"
+	elif [ "$START_NFS" == "yes" ]; then
+	    if [ -x /sbin/rpc.mountd ]; then
+		/bin/echo -n "Starting rpc.mountd ... "
 		/sbin/rpc.mountd
-		/sbin/rpc.nfsd
-		/sbin/exportfs -rfa
-		/bin/echo -n "Starting NFS daemons ... "
-		/bin/echo -e "\033[1;32mdone\033[0m"
-	    elif [ "$START_NFS" != "yes" ]; then
-   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting NFS automatically!\033[0m"
+		/bin/echo -e "\033[1;32mdone\033[0m."
+	    else
+		/bin/echo -e "\033[1;33mno rpc.mountd found!\033[0m"
 	    fi
-            ;;
+	    if [ -x /sbin/rpc.mountd ]; then
+		/bin/echo -n "Starting rpc.nfsd ... "
+		/sbin/rpc.nfsd
+		/bin/echo -e "\033[1;32mdone\033[0m."
+	    else
+		/bin/echo -e "\033[1;33mno rpc.nfsd found!\033[0m"
+	    fi
+	    ( SUB_SHELL=sub $0 reload )
+	elif [ "$START_NFS" != "yes" ]; then
+	    /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting NFS automatically!\033[0m"
+	fi
+        ;;
 
-        stop)
-            /bin/echo "Stopping NFS daemons "
-            killall -9 nfsd
-	    killall -9 rpc.mountd
-	    /bin/echo -e "\033[1;32mdone\033[0m"
-            ;;
+    stop)
+        /bin/echo -n "Stopping nfsd ... "
+       	if [ "$NFSD_PID" != "" ]; then
+	    /bin/killall -9 nfsd
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	else
+	    /bin/echo -e "\033[1;33mnot running\033[0m."
+	fi
+        /bin/echo -n "Stopping rpc.mountd ... "
+       	if [ "$RPC_MOUNTD_PID" != "" ]; then
+	    /bin/killall -9 rpc.mountd
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	else
+	    /bin/echo -e "\033[1;33mnot running\033[0m."
+	fi
+        ;;
 
-        restart)
-            $0 stop
-            sleep 1
-            $0 start
-            ;;
+    restart)
+	( SUB_SHELL=sub $0 stop )
+	/bin/sleep 1
+	( SUB_SHELL=sub $0 start )
+	;;
 
-        *)
-            echo "Usage: $0 {start|stop|restart}"
-            exit 1
-    	    ;;
+    reload)
+	if [ "$HDD" != "/dev/ide/host0" ]; then
+	    /bin/echo -e "\033[1;33mNo need to reload NFS because no hardisk is mounted!\033[0m"
+	elif [ -x /sbin/exportfs ]; then
+	    /bin/echo -n "Starting rpc.nfsd ... "
+	    /sbin/exportfs -rfa
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	fi
+	;;
+
+    *)
+	/bin/echo "Usage: $0 {start|stop|restart|reload} # reload reexport the /etc/exports"
+	exit 1
+	;;
 esac
+
+if [ "$SUB_SHELL" == "" ]; then
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+    /bin/echo -e "[finished]"
+fi
+
+exit 0

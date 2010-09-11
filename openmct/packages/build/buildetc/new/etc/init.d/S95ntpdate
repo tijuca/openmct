@@ -1,27 +1,58 @@
 #!/bin/sh
+
 . /var/etc/rc.conf
+
+if [ "$SUB_SHELL" == "" ]; then
+    /bin/echo -e "\n[\033[1;34m$0\033[0m]"
+fi
+
+check_ntp_host(){
+/bin/echo -n "Trying to check network connectivity ... "
+/bin/ping -w3 $OPTIONS_NTPDATE_SERVER > /tmp/ntp-ping.tmp
+TMP_ENTRY=`/bin/cat /tmp/ntp-ping.tmp | /bin/grep packets | /bin/cut -f4 -d " "`
+if [ "$TMP_ENTRY" == "0" ]; then
+    /bin/echo -e "NTP Host $OPTIONS_NTPDATE_SERVER \033[1;33mcould't reeched or is not responding!"
+    /bin/echo -e "Maybe Your network is't working correctly?\033[0m"
+    RET=0
+else
+    /bin/echo -e "NTP Host $OPTIONS_NTPDATE_SERVER is alive, \033[1;32mdone\033[0m."
+    RET=1
+fi
+/bin/rm /tmp/ntp-ping.tmp
+}
 
 case "$1" in
     start)
-	if [ "$START_NTPDATE" == "yes" ]; then
-	# we need to check if the network can go out else there is no chance get a timerserver!
-	    /sbin/ntpdate -s $OPTIONS_NTPDATE_SERVER
-	    /sbin/hwclock -w -u
-	    /bin/echo -n "Running ntp client with Server IP $OPTIONS_NTPDATE_SERVER ... "
-	    /bin/echo -e "\033[1;32mdone\033[0m"
-   	elif [ "$START_NTPDATE" != "yes" ]; then
-	    /bin/echo "Your /var/etc/rc.conf is not configured for starting NTPDate automatically!"
+	check_ntp_host
+	if [ "$START_NTPDATE" == "yes" ] && [ "$RET" == "1" ]; then
+	    if [ -x /sbin/ntpdate ] && [ -x /sbin/hwclock ]; then
+		/sbin/ntpdate -s $OPTIONS_NTPDATE_SERVER
+		/sbin/hwclock -w -u
+		/bin/echo -n "Running ntp client with Server IP $OPTIONS_NTPDATE_SERVER ... "
+		/bin/echo -e "\033[1;32mdone\033[0m."
+	    else
+		/bin/echo -e "\033[1;33mNo ntpdate and/or hwclock found!\033[0m"
+	    fi
+	elif [ "$START_NTPDATE" != "yes" ]; then
+	    /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting NTPDate automatically!\033[0m"
 	fi
 	;;
+
     stop)
-        /bin/echo "Nothing to stop! Maybe you want to edit an cron job?"
-   	;;
+	/bin/echo "Nothing to stop! Maybe you want to edit an cron job?"
+	;;
+
     restart)
-	$0 start
+	( SUB_SHELL=sub $0 start )
 	;;
     *)
-	echo "Usage: $0 {start|stop|restart}"
+	/bin/echo "Usage: $0 {start|stop|restart}"
 	exit 1
 esac
+
+if [ "$SUB_SHELL" == "" ]; then
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+    /bin/echo -e "[finished]"
+fi
 
 exit 0

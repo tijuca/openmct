@@ -1,13 +1,21 @@
 #!/bin/sh
+
 . /var/etc/rc.conf
+
+if [ "$SUB_SHELL" == "" ]; then
+    /bin/echo -e "\n[\033[1;34m$0\033[0m]"
+fi
+
 DROPBEARDIR=/var/etc/dropbear
+DROPBEAR_PID=`/bin/pidof dropbear`
 
 case "$1" in
-        start)
-            if [ "$START_SSHD" == "yes" ]; then
-		if [ ! -d $DROPBEARDIR ]; then
-		    /bin/mkdir $DROPBEARDIR
-		fi
+    start)
+        if [ "$START_SSHD" == "yes" ]; then
+	    if [ ! -d $DROPBEARDIR ]; then
+		/bin/mkdir $DROPBEARDIR
+	    fi
+	    if [ -x /sbin/dropbearkey ]; then
 		if [ ! -f $DROPBEARDIR/dropbear_dss_host_key ]; then
 		    /bin/echo -e "\033[05;31mno secret key for `/bin/cat /etc/hostname` found, generate new one!\033[0m"
 		    /sbin/dropbearkey -t dss -f $DROPBEARDIR/dropbear_dss_host_key
@@ -16,30 +24,49 @@ case "$1" in
 		    /bin/echo -e "\033[05;31mno public key for `/bin/cat /etc/hostname` found, generate new one!\033[0m"
 		    /sbin/dropbearkey -t rsa -f $DROPBEARDIR/dropbear_rsa_host_key
 		fi
-		/bin/echo -n "Starting SSH daemon ... "
+	    else
+		/bin/echo -e "\033[1;33mno dropbearkey found!\033[0m"
+	    fi
+	    /bin/echo -n "Starting SSH daemon ... "
+	    if [ -x /sbin/dropbear ]; then
 		/sbin/dropbear -P /tmp/run/dropbear.pid \
-				-r $DROPBEARDIR/dropbear_rsa_host_key \
-				-d $DROPBEARDIR/dropbear_dss_host_key
-		/bin/echo -e "\033[1;32mdone\033[0m"
+			       -r $DROPBEARDIR/dropbear_rsa_host_key \
+			       -d $DROPBEARDIR/dropbear_dss_host_key > /dev/null 2>&1
+		/bin/echo -e "\033[1;32mdone\033[0m."
+	    else
+		/bin/echo -e "\033[1;33mno dropbear found!\033[0m"
+	    fi
+
 	    elif [ "$START_SSHD" != "yes" ]; then
-   	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting dropbear automatically!\033[0m"
+	        /bin/echo -e "\033[1;33mYour /var/etc/rc.conf is not configured for starting dropbear automatically!\033[0m"
 	    fi
             ;;
 
-        stop)
-            /bin/echo -n "Stopping SSH ..."
-            killall -9 dropbear
-	    /bin/echo -e "\033[1;32mdone\033[0m"
-            ;;
+    stop)
+        /bin/echo -n "Stopping SSH ..."
+	if [ "$DROPBEAR_PID" != "" ]; then
+	    /bin/killall -9 dropbear
+	    /bin/echo -e "\033[1;32mdone\033[0m."
+	else
+	    /bin/echo -e "not running."
+	fi
+        ;;
 
-        restart)
-            $0 stop
-            sleep 1
-            $0 start
-            ;;
+    restart)
+        ( SUB_SHELL=sub $0 stop )
+	/bin/sleep 1
+	( SUB_SHELL=sub $0 start )
+	;;
 
-        *)
-            echo "Usage: $0 {start|stop|restart}"
-            exit 1
-    	    ;;
+    *)
+        /bin/echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
 esac
+
+if [ "$SUB_SHELL" == "" ]; then
+#/bin/echo -e "[\033[7;34mfinished.\033[0m]"
+    /bin/echo -e "[finished]"
+fi
+
+exit 0
